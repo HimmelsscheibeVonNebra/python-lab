@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="make_prices_2026 — Files, Classes, Charts · Python Lab" data-title-ko="make_prices_2026 — 파일, 클래스, 차트 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>make_prices_2026 — Files, Classes, Charts · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week06/data">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 6 · Session 1</span><span lang="ko">6주차 1차시</span></a><span class="sep">/</span><span>make_prices_2026</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>make_prices_2026</h1>
+    <p><span lang="en">The generator script that created prices_2026.csv. random.seed(2026) makes it use the same random sequence every time, so each run produces a file that is identical down to the byte. The week of March 2–6 is pinned to the closing prices from the Week 5 materials.</span><span lang="ko">prices_2026.csv를 만든 생성 스크립트다. random.seed(2026)로 매번 같은 난수열을 쓰므로 실행할 때마다 바이트까지 같은 파일이 나온다. 3월 2–6일 주는 5주차 자료의 종가에 고정되어 있다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week06/data</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week06/data</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 make_prices_2026.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 make_prices_2026.py">▶</button><code>python3 make_prices_2026.py</code></div>
+          <p><span lang="en">prices_2026.csv: 260 trading days, 5 tickers. Counting only the weekdays (Mon–Fri) of 2026 gives 260 days.</span><span lang="ko">prices_2026.csv: 260 trading days, 5 tickers. 2026년의 평일(월–금)만 세면 260일이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cmp prices_2026.csv ../starter/prices_2026.csv &amp;&amp; echo identical" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cmp prices_2026.csv ../starter/prices_2026.csv &amp;&amp; echo identical">▶</button><code>cmp prices_2026.csv ../starter/prices_2026.csv &amp;&amp; echo identical</code></div>
+          <p><span lang="en">The newly made file and the copy in the starter folder do not differ by a single byte (identical). With the same seed, random gives the same results.</span><span lang="ko">새로 만든 파일과 스타터 폴더의 복사본이 한 바이트도 다르지 않다(identical). seed가 같으면 random의 결과도 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat portfolio.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat portfolio.csv">▶</button><code>cat portfolio.csv</code></div>
+          <p><span lang="en">The portfolio.csv in the same folder is the table from Week 5's my_portfolio.py saved as CSV. Each stock's close equals its March 6 close in prices_2026.csv.</span><span lang="ko">같은 폴더의 portfolio.csv는 5주차 my_portfolio.py의 표를 CSV로 저장한 것이다. 각 종목의 close가 prices_2026.csv의 3월 6일 종가와 같다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>make_prices_2026.py <span class="muted"><span lang="en">73 lines</span><span lang="ko">73줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Generate prices_2026.csv - one trading year of the five story stocks.</span>
+<span class="ln"> </span>
+<span class="ln">Deterministic: random.seed(2026) makes every run produce the same</span>
+<span class="ln">bytes, so the committed CSV can always be regenerated and checked.</span>
+<span class="ln"> </span>
+<span class="ln">Story anchor: the week of 2026-03-02..03-06 is pinned to the exact</span>
+<span class="ln">closes used across the Week 5 materials (portfolio buys match the</span>
+<span class="ln">Monday closes; Friday closes match portfolio.csv), so exercises can</span>
+<span class="ln">cross-check files against each other.</span>
+<span class="ln"> </span>
+<span class="ln">Run from this data folder:  python3 make_prices_2026.py</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln">from datetime import date, timedelta</span>
+<span class="ln"> </span>
+<span class="ln">random.seed(2026)</span>
+<span class="ln"> </span>
+<span class="ln"># ticker: Mon..Fri closes of the story week (2026-03-02..03-06)</span>
+<span class="ln">ANCHORS = {</span>
+<span class="ln">    &quot;CODE&quot;: [10000, 10200, 9800, 10500, 10800],</span>
+<span class="ln">    &quot;TEA&quot;: [5000, 4950, 4900, 4850, 4800],</span>
+<span class="ln">    &quot;ROBO&quot;: [40000, 39800, 41200, 43500, 45000],</span>
+<span class="ln">    &quot;MLBK&quot;: [2000, 2100, 1900, 2300, 2500],</span>
+<span class="ln">    &quot;FIT&quot;: [3000, 2900, 3100, 3700, 4200],</span>
+<span class="ln">}</span>
+<span class="ln">YEAR_START = date(2026, 1, 2)</span>
+<span class="ln">YEAR_END = date(2026, 12, 31)</span>
+<span class="ln">WEEK_START = date(2026, 3, 2)</span>
+<span class="ln">MAX_MOVE = 0.02  # daily change is uniform in -2%..+2%</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def walk(first, days, last=None):</span>
+<span class="ln">    &quot;&quot;&quot;Return `days` closes as a random walk starting after `first`.</span>
+<span class="ln"> </span>
+<span class="ln">    With `last`, the walk is linearly drifted so its final close lands</span>
+<span class="ln">    exactly on `last`; the anchor week then joins without a jump.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    prices = [first]</span>
+<span class="ln">    for _ in range(days):</span>
+<span class="ln">        prices.append(prices[-1] * (1 + random.uniform(-MAX_MOVE, MAX_MOVE)))</span>
+<span class="ln">    if last is not None and days:</span>
+<span class="ln">        drift = (last - prices[-1]) / days</span>
+<span class="ln">        prices = [p + drift * i for i, p in enumerate(prices)]</span>
+<span class="ln">    return [max(100, round(p)) for p in prices[1:]]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def trading_days():</span>
+<span class="ln">    days, day = [], YEAR_START</span>
+<span class="ln">    while day &lt;= YEAR_END:</span>
+<span class="ln">        if day.weekday() &lt; 5:</span>
+<span class="ln">            days.append(day)</span>
+<span class="ln">        day += timedelta(days=1)</span>
+<span class="ln">    return days</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">days = trading_days()</span>
+<span class="ln">pre = [d for d in days if d &lt; WEEK_START]</span>
+<span class="ln">post = [d for d in days if d &gt; WEEK_START + timedelta(days=4)]</span>
+<span class="ln"> </span>
+<span class="ln">columns = {}</span>
+<span class="ln">for ticker, closes in ANCHORS.items():</span>
+<span class="ln">    week = dict(zip((WEEK_START + timedelta(days=i) for i in range(5)), closes))</span>
+<span class="ln">    columns[ticker] = {**dict(zip(pre, walk(closes[0], len(pre), closes[0]))),</span>
+<span class="ln">                       **week,</span>
+<span class="ln">                       **dict(zip(post, walk(closes[-1], len(post))))}</span>
+<span class="ln"> </span>
+<span class="ln">with open(&quot;prices_2026.csv&quot;, &quot;w&quot;) as f:</span>
+<span class="ln">    f.write(&quot;date,&quot; + &quot;,&quot;.join(ANCHORS) + &quot;\n&quot;)</span>
+<span class="ln">    for day in days:</span>
+<span class="ln">        f.write(day.isoformat() + &quot;,&quot;</span>
+<span class="ln">                + &quot;,&quot;.join(str(columns[t][day]) for t in ANCHORS) + &quot;\n&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;prices_2026.csv: {len(days)} trading days, {len(ANCHORS)} tickers&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>portfolio.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">ticker,shares,buy,close</span>
+<span class="ln">CODE,10,10000,10800</span>
+<span class="ln">TEA,40,5000,4800</span>
+<span class="ln">ROBO,5,40000,45000</span>
+<span class="ln">MLBK,30,2000,2500</span>
+<span class="ln">FIT,20,3000,4200</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>trades.csv <span class="muted"><span lang="en">11 lines</span><span lang="ko">11줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,ticker,action,shares,price</span>
+<span class="ln">2026-03-02,TEA,buy,10,5000</span>
+<span class="ln">2026-03-02,MLBK,buy,10,2000</span>
+<span class="ln">2026-03-03,CODE,sell,3,10000</span>
+<span class="ln">2026-03-03,MLBK,buy,20,2000</span>
+<span class="ln">2026-03-04,CODE,sell,3,10000</span>
+<span class="ln">2026-03-04,CODE,buy,2,10000</span>
+<span class="ln">2026-03-05,TEA,buy,10,5000</span>
+<span class="ln">2026-03-05,CODE,sell,3,10000</span>
+<span class="ln">2026-03-06,CODE,sell,3,10000</span>
+<span class="ln">2026-03-06,MLBK,buy,20,2000</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="journal_chart.html">← journal_chart</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

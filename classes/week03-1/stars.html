@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="stars — Loops · Python Lab" data-title-ko="stars — 반복문 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stars — Loops · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week03/starter/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 3 · Session 1</span><span lang="ko">3주차 1차시</span></a><span class="sep">/</span><span>stars</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>stars</h1>
+    <p><span lang="en">Lab 4: read a height from 1 to 10 and print a left-aligned triangle with nested loops. If it is out of range, print Invalid height.</span><span lang="ko">실습 4: 1~10 높이를 입력받아 중첩 반복문으로 왼쪽 정렬 삼각형을 출력한다. 범위 밖이면 Invalid height를 출력한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week03/starter/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week03/starter/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'for row in range(1, 4):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'for row in range(1, 4):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -">▶</button><code>printf '%s\n' 'for row in range(1, 4):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -</code></div>
+          <p><span lang="en">end=&quot;&quot; prints the stars on the same line, and the print() after the inner loop ends the line. *, **, ***.</span><span lang="ko">end=&quot;&quot;로 별을 같은 줄에 이어 찍고, 안쪽 반복이 끝난 뒤의 print()가 줄을 바꾼다. *, **, ***.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 stars.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 stars.py; echo">▶</button><code>echo 4 | python3 stars.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the prompt.</span><span lang="ko">시작 코드는 프롬프트만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 ../../solutions/session1/stars.py; echo 1 | python3 ../../solutions/session1/stars.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 ../../solutions/session1/stars.py; echo 1 | python3 ../../solutions/session1/stars.py">▶</button><code>echo 4 | python3 ../../solutions/session1/stars.py; echo 1 | python3 ../../solutions/session1/stars.py</code></div>
+          <p><span lang="en">Height 4 gives four rows of 1, 2, 3 and 4 stars, and height 1 gives a single star.</span><span lang="ko">높이 4는 별 1, 2, 3, 4개짜리 네 줄, 높이 1은 별 하나다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 ../../solutions/session1/stars.py | grep -o '[*]' | wc -l" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 ../../solutions/session1/stars.py | grep -o '[*]' | wc -l">▶</button><code>echo 4 | python3 ../../solutions/session1/stars.py | grep -o '[*]' | wc -l</code></div>
+          <p><span lang="en">Height 4 has 1 + 2 + 3 + 4 = 10 stars in total.</span><span lang="ko">높이 4의 별은 모두 1 + 2 + 3 + 4 = 10개다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for h in 0 11; do echo $h | python3 ../../solutions/session1/stars.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for h in 0 11; do echo $h | python3 ../../solutions/session1/stars.py; done">▶</button><code>for h in 0 11; do echo $h | python3 ../../solutions/session1/stars.py; done</code></div>
+          <p><span lang="en">0 and 11 print only Invalid height.</span><span lang="ko">0과 11은 Invalid height만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'height = 3' 'for row in range(1, height + 1):' '    for col in range(height):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'height = 3' 'for row in range(1, height + 1):' '    for col in range(height):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -">▶</button><code>printf '%s\n' 'height = 3' 'for row in range(1, height + 1):' '    for col in range(height):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -</code></div>
+          <p><span lang="en">A common mistake: writing the inner loop as range(height) gives a 3 × 3 square instead of a triangle.</span><span lang="ko">흔한 실수: 안쪽을 range(height)로 쓰면 삼각형이 아니라 3 × 3 사각형이 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'height = 3' 'for row in range(1, height):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'height = 3' 'for row in range(1, height):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -">▶</button><code>printf '%s\n' 'height = 3' 'for row in range(1, height):' '    for col in range(row):' '        print(&quot;*&quot;, end=&quot;&quot;)' '    print()' | python3 -</code></div>
+          <p><span lang="en">A common mistake: writing the outer loop as range(1, height) drops the last row, giving only two rows.</span><span lang="ko">흔한 실수: 바깥을 range(1, height)로 쓰면 마지막 줄이 빠져 두 줄만 나온다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The optional extension is to add, after an empty line, a triangle that shrinks: ****, ***, **, *. Think of range(height, 0, -1).</span><span lang="ko">선택 확장 과제는 빈 줄 뒤에 ****, ***, **, *로 줄어드는 삼각형을 추가하는 것이다. range(height, 0, -1)을 떠올려 보자.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>stars.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: growing triangle, with integer height from 1 to 10.</span>
+<span class="ln">Tests: 1 -&gt; one star; 4 -&gt; rows of 1, 2, 3, 4 stars;</span>
+<span class="ln">0 or 11 -&gt; Invalid height. Optional: add a shrinking triangle.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">height = int(input(&quot;Height (1-10): &quot;))</span>
+<span class="ln"># TODO: validate height and use nested loops to print the triangle.</span>
+<span class="ln"># Keep print() for the row ending outside the inner loop.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week03/solutions/session1/stars.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 core solution. Assume integer-formatted input.</span>
+<span class="ln">Tests: 1 -&gt; '*'; 4 -&gt; rows of 1, 2, 3, 4 stars;</span>
+<span class="ln">0, 11 -&gt; Invalid height. Optional shrinking triangle is in the guide.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">height = int(input(&quot;Height (1-10): &quot;))</span>
+<span class="ln">if 1 &lt;= height &lt;= 10:</span>
+<span class="ln">    for row in range(1, height + 1):</span>
+<span class="ln">        for col in range(row):</span>
+<span class="ln">            print(&quot;*&quot;, end=&quot;&quot;)</span>
+<span class="ln">        print()</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid height&quot;)</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="multiplication.html">← multiplication</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

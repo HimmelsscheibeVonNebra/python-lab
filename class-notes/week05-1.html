@@ -1,0 +1,494 @@
+<p>이번 시간의 주제는 모듈입니다. 같은 함수를 여러 프로그램에서 쓰고 싶을 때 코드를 복사하는 대신 한 파일(모듈)에 담아 두고 <code>import</code>로 불러 쓰는 방법을 배웁니다. 먼저 <code>import</code>의 여러 형태와 점(.)의 의미, 이름을 불러오지 않았을 때 나는 <code>NameError</code>를 살펴보고, 직접 만든 모듈 <code>number_tools</code>를 다른 프로그램에서 가져다 씁니다. 그다음 표준 라이브러리의 <code>math</code>, <code>datetime</code>, <code>random</code>을 실제 과제에 적용하고, 마지막으로 외부 패키지인 NumPy로 배열 전체를 한 번에 계산하는 방법을 처음 맛봅니다. 실습 프로그램은 <a href="math_practice.html">math_practice</a>, <a href="date_check.html">date_check</a>, <a href="number_tools.html">number_tools</a>, <a href="lotto.html">lotto</a>, <a href="guessing.html">guessing</a>입니다.</p>
+
+<h2>복습: 함수 하나, 프로그램 둘</h2>
+
+<p>3주차에 만든 <code>sum_to(n)</code>은 1 + 2 + … + n을 돌려줍니다. 이 함수가 필요한 두 번째 프로그램이 생겼다고 해 봅시다. 코드를 복사해 붙이면 당장은 되지만, 버그를 발견하면 두 곳을 모두 고쳐야 합니다. 이번 시간의 목표는 다시 쓸 코드에 자기만의 집을 마련해 주는 것입니다.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>모듈과 import</h2>
+
+<h3>모듈이란</h3>
+
+<p>모듈은 Python 정의(함수, 변수 등)가 들어 있는 파일입니다. 파일 이름에서 <code>.py</code>를 뺀 것이 모듈 이름이 됩니다. 예를 들어 <code>greetings.py</code>는 <code>greetings</code> 모듈입니다. 모듈을 import하면 그 모듈의 맨 위 수준 코드가 한 번 실행됩니다. 사실 지금까지 작성한 모든 프로그램도 이미 모듈이었습니다.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import와 점(.)</h3>
+
+<p><code>import math</code>는 <code>math</code> 모듈을 불러옵니다. 모듈 안의 이름은 점으로 꺼냅니다. <code>math.sqrt(2)</code>는 "math 모듈 안의 sqrt"라는 뜻입니다. 접두사를 붙여 쓰면 각 이름이 어디에서 왔는지 코드만 보고도 알 수 있습니다. Python은 처음 import한 모듈을 기억해(캐시) 두므로, 같은 모듈을 다시 import해도 다시 실행하지 않습니다.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>필요한 이름만 골라 가져오면 접두사 없이 쓸 수 있습니다. 쉼표로 여러 이름을 나열할 수 있고, 가져오면서 이름을 바꿀 수도 있습니다. 이때는 가져온 이름만 보입니다. <code>from math import sqrt</code> 뒤에 <code>math.pi</code>를 쓰면 <code>math</code>라는 이름이 없어서 오류가 납니다.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>import 방식 비교</h3>
+
+<table>
+<thead>
+<tr><th>형태</th><th>사용</th><th>특징</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>출처가 가장 분명하지만 타이핑이 조금 많다</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>짧다. 이름 몇 개만 쓸 때 좋다</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>짧은 별칭. <code>np</code>, <code>pd</code>처럼 관례적인 별칭에 쓴다</td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>이름이 어디서 왔는지 감춰지므로 피한다</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Traceback 읽기</h3>
+
+<p>import하지 않은 이름을 쓰면 <code>NameError</code>가 납니다. Traceback은 실패한 파일과 줄 번호를 알려 줍니다. 읽을 때는 마지막 줄(오류 종류와 메시지)부터 보고, 원인을 고친 뒤 다시 실행합니다. 아래 예에서 원인은 <code>math</code>를 import하지 않은 것입니다. <a href="math_practice.html">math_practice</a> 페이지의 단계에서 같은 오류를 직접 내 볼 수 있습니다.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math의 핵심 함수</h3>
+
+<p>상수 <code>pi</code>와 <code>e</code>, 제곱근 <code>sqrt</code>, 내림 <code>floor</code>와 올림 <code>ceil</code>이 있습니다. <code>factorial(n)</code>과 <code>gcd(a, b)</code>는 정수에 쓰고, <code>hypot(a, b)</code>는 직각삼각형의 빗변(대각선) 길이입니다.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: 원과 빗변</h3>
+
+<p><a href="math_practice.html">math_practice</a>를 엽니다. 반지름을 읽어 원의 넓이와 둘레를 소수 둘째 자리로 반올림해 출력하고, 이어서 두 변의 길이를 읽어 빗변을 출력합니다. 입력은 숫자라고 가정하고 <code>math.pi</code>와 <code>math.hypot</code>을 사용합니다(5분).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>웹 실습에서는 <code>printf '3\n3\n4\n' | python3 math_practice.py</code>처럼 입력을 미리 넣어 실행할 수도 있고, 그냥 <code>python3 math_practice.py</code>로 실행해 직접 입력해도 됩니다.</p>
+
+<h3>표준 라이브러리: 배터리 포함</h3>
+
+<p>Python에는 검증된 모듈 수백 개가 함께 들어 있어 따로 설치하거나 내려받을 필요가 없습니다. 오늘은 <code>math</code>, <code>random</code>, <code>datetime</code>을 다룹니다. 전체 목록은 docs.python.org/3/library에 있습니다.</p>
+
+<table>
+<thead>
+<tr><th>모듈</th><th>예</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>파일과 데이터 교환</td></tr>
+</tbody>
+</table>
+
+<h2>나만의 모듈</h2>
+
+<h3>첫 모듈: number_tools.py</h3>
+
+<p>다시 쓸 코드는 별도의 <code>.py</code> 파일에 둡니다. <code>average</code>는 숫자 리스트의 평균을, <code>spread</code>는 최댓값과 최솟값의 차를 돌려줍니다. 모듈은 도구를 정의할 뿐 사용자와 대화(input, print)하지 않습니다. 이 파일을 import할 프로그램과 같은 폴더에 둡니다.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>내 파일 import하기</h3>
+
+<p><code>stats_report.py</code>는 필요한 도구를 <code>import number_tools</code>로 가져와 <code>number_tools.average(...)</code>처럼 부릅니다. 두 파일은 같은 폴더에 있어야 합니다. 모듈을 수정했다면 프로그램을 다시 실행해야 반영됩니다.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>실행할까, import할까: __name__ == "__main__"</h3>
+
+<p>파일을 직접 실행하면 그 파일의 <code>__name__</code>은 <code>"__main__"</code>이고, 다른 파일이 import하면 <code>__name__</code>은 모듈 이름(<code>"number_tools"</code>)이 됩니다. 이 차이를 이용한 조건문(가드)으로 다시 쓸 도구와 데모 코드를 나눕니다. import할 때는 조용하고, 직접 실행할 때만 데모가 보입니다. <a href="number_tools.html">number_tools</a> 페이지에서 <code>number_tools.__name__</code>을 직접 출력해 확인할 수 있습니다.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>패키지: 폴더 속의 모듈</h3>
+
+<p>패키지는 관련 모듈을 모은 폴더입니다. 폴더 안의 <code>__init__.py</code>가 그 폴더를 패키지로 표시합니다. 이름은 점으로 따라 내려갑니다: <code>package.module.function</code>. 패키지는 pip와 외부 라이브러리를 다룰 때 다시 나옵니다.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>중간 점검</h3>
+
+<ul>
+<li><code>math.sqrt</code>의 점은 무엇과 무엇을 잇는가? 모듈과 그 안의 이름입니다.</li>
+<li>import하지 않은 이름은 왜 <code>NameError</code>를 내는가? 그 이름이 현재 파일에 정의된 적이 없기 때문입니다.</li>
+<li>모듈의 맨 위 수준 코드는 언제 실행되는가? 처음 import될 때 한 번입니다.</li>
+</ul>
+
+<h2>datetime: 날짜와 시각</h2>
+
+<h3>date와 datetime</h3>
+
+<p><code>date</code>는 연·월·일을, <code>datetime</code>은 거기에 시·분·초까지 담습니다. <code>today()</code>와 <code>now()</code>는 현재 시점을 알려 주고, 각 부분은 <code>.year</code>, <code>.month</code>, <code>.day</code>, <code>.hour</code> 같은 속성으로 읽습니다. 웹 실습의 가상 머신은 내 컴퓨터의 시계를 따라 오늘 날짜를 정하며, 터미널에서 <code>date</code> 명령으로 확인할 수 있습니다.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>날짜 서식: strftime</h3>
+
+<p><code>strftime</code>은 날짜를 원하는 모양의 문자열로 바꿉니다. <code>%Y</code>, <code>%m</code>, <code>%d</code>는 연·월·일, <code>%A</code>는 요일의 전체 이름입니다. 보고서에 필요한 문자열을 정확히 만들 수 있습니다.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>날짜 계산: timedelta</h3>
+
+<p>두 날짜를 빼면 일 단위의 <code>timedelta</code>가 나오고, <code>.days</code>로 정수 일수를 꺼냅니다. 날짜에 <code>timedelta</code>를 더하면 미래의 날짜가 됩니다. 일수가 음수이면 그 날짜가 이미 지났다는 뜻입니다.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: 날짜까지 남은 날</h3>
+
+<p><a href="date_check.html">date_check</a>를 엽니다. 목표 날짜를 YYYY-MM-DD 형식으로 읽어 요일 이름과 남은 날 수를 출력합니다. 지난 날짜, 오늘, 미래 날짜를 모두 시험해 봅니다(5분). 힌트: <code>strptime(text, "%Y-%m-%d")</code>로 문자열을 날짜로 바꾼 뒤 <code>date.today()</code>를 뺍니다.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>남은 날 수는 실행하는 날에 따라 달라집니다. 슬라이드의 89는 2026-09-27 기준입니다.</p>
+
+<h2>random: 난수</h2>
+
+<h3>실수와 정수</h3>
+
+<p><code>random()</code>은 0.0 이상 1.0 미만의 실수를, <code>uniform(a, b)</code>는 더 넓은 범위의 실수를 돌려줍니다. <code>randint(a, b)</code>는 양 끝을 모두 포함하는 정수를 고릅니다. 결과는 실행할 때마다 다릅니다.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>고르기, 섞기, 뽑기</h3>
+
+<p><code>choice(seq)</code>는 원소 하나를 고릅니다. <code>shuffle(list)</code>는 리스트를 그 자리에서 섞고 <code>None</code>을 돌려줍니다. 그래서 <code>names = random.shuffle(names)</code>처럼 쓰면 리스트를 잃어버립니다. <code>sample(seq, k)</code>는 서로 다른 원소 k개를 뽑습니다. 모두 4주차의 리스트 위에서 동작합니다.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>재현성: seed</h3>
+
+<p>같은 seed를 주면 같은 수열이 나오고, seed가 다르면 결과도 다릅니다. 테스트하거나 실행 결과를 재현할 때 쓰며, 게임이나 복권은 seed 없이 매번 다른 난수에 의존합니다.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>실습</h2>
+
+<h3>Lab 1: number_tools 모듈</h3>
+
+<p><a href="number_tools.html">number_tools</a>에서 <code>number_tools.py</code>의 <code>average</code>와 <code>count_above</code>를 완성합니다. <code>count_above(numbers, limit)</code>은 <code>limit</code>보다 큰 값의 개수를 셉니다. 그런 다음 <code>stats_report.py</code>를 완성해 보고서를 출력합니다. 모듈 아래의 <code>__main__</code> 가드 데모는 그대로 둡니다.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>확인할 점: 직접 실행(<code>python3 number_tools.py</code>)에서는 데모가 나오고, import된 실행(<code>stats_report.py</code>)에서는 두 도구를 모두 씁니다. Average 88.0은 352 / 4, Above 85의 3은 88, 92, 93이고, 데모의 5.0은 2+4+6+8을 4로 나눈 값입니다. <code>average([])</code>는 빈 리스트에서 <code>ZeroDivisionError</code>를 냅니다. 이 오류를 부드럽게 처리하는 방법은 다음 시간 주제입니다.</p>
+
+<h3>Lab 2: 로또 번호 생성기</h3>
+
+<p><a href="lotto.html">lotto</a>에서 몇 게임을 할지(1–5)를 읽고, 게임마다 1부터 45 사이의 서로 다른 수 6개를 뽑아 작은 수부터 정렬해 한 줄에 출력합니다. 입력은 정수 형식이라고 가정하고 게임마다 <code>random.sample</code>을 한 번 씁니다.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>확인할 점: 입력 1이면 정확히 한 줄, 5이면 다섯 줄이 나옵니다. 모든 줄은 정렬되어 있고(각 수가 앞의 수 이상), 여섯 값이 모두 다르며, 1에서 45 사이입니다. 0과 6은 <code>Invalid games</code>만 출력합니다. 리스트를 대괄호 없이 공백으로 구분해 출력하려면 <code>print(*numbers)</code>처럼 리스트를 풀어 넘깁니다.</p>
+
+<h3>Lab 3(과제): 숫자 맞히기 게임</h3>
+
+<p><a href="guessing.html">guessing</a>에서 컴퓨터가 1부터 100 사이의 비밀 수를 고르고, 추측할 때마다 <code>Higher</code>, <code>Lower</code>, <code>Correct!</code>를 알려 줍니다. 시도 횟수를 세어 맞혔을 때 함께 출력합니다.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>게임 반복의 구조는 이렇습니다. <code>randint(1, 100)</code>은 반복 전에 비밀 수를 한 번만 고릅니다. 반복은 추측이 맞을 때까지 계속되고, <code>if</code>/<code>elif</code>/<code>else</code>로 비교하며 시도 횟수를 셉니다. 맞히면 반복을 멈춥니다. 슬라이드의 예는 추측을 리스트로 고정해 흐름만 보여 주고, 실제 프로그램은 <code>input()</code>으로 추측을 읽으며 <code>break</code>로 멈춥니다.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: 표준 라이브러리 너머</h2>
+
+<p>표준 라이브러리는 Python과 함께 오지만, NumPy는 배열 계산을 위한 외부 패키지입니다. 배열은 숫자 묶음 전체를 한 번에 계산합니다. 다음 시간의 pandas와 이후의 matplotlib이 NumPy 위에 만들어져 있습니다. 슬라이드는 Colab(NumPy가 미리 설치됨)이나 내 PC(<code>pip install numpy</code>)에서 따라 치도록 되어 있습니다. 이 웹 실습의 가상 머신에는 NumPy가 이미 들어 있으므로 아무 페이지의 터미널에서 <code>python3</code>을 실행해 아래 코드를 그대로 입력해 볼 수 있습니다. 다만 <code>import numpy</code>는 가상 머신에서 몇 초에서 수십 초가 걸립니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: 리스트가 배열로</h3>
+
+<p><code>np.array</code>는 리스트를 ndarray로 바꿉니다. 중첩 리스트는 2차원 배열이 됩니다. 아래 예에서 행은 매장, 열은 상품입니다. 재료는 이미 알고 있는 리스트입니다.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>규칙으로 배열 만들기</h3>
+
+<p><code>arange(1, 10, 2)</code>는 끝을 제외한 범위를, <code>zeros((2, 3))</code>와 <code>ones((2, 2))</code>는 모양을 0이나 1로 채운 배열을, <code>full((4,), 0.03)</code>은 한 값을 반복한 배열을, <code>linspace(0, 1, 5)</code>는 양 끝을 포함해 고르게 나눈 값을 만듭니다.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>seed를 준 난수 배열</h3>
+
+<p><code>np.random</code>은 <code>random</code> 모듈과 비슷합니다. <code>randint(50, 151, size=5)</code>는 정수 다섯 개를 뽑는데, <code>range</code>처럼 끝 151은 제외됩니다. <code>seed(42)</code>로 모두가 같은 결과를 얻습니다.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>배열 읽기: shape와 dtype</h3>
+
+<p><code>shape</code>는 (행, 열)이고 위 <code>sales</code>는 (3, 4)입니다. <code>ndim</code>은 차원 수, <code>size</code>는 원소 개수, <code>dtype</code>은 모든 원소가 공유하는 하나의 자료형입니다. 새 데이터를 받으면 먼저 shape와 dtype을 물어봅니다.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>정수 배열의 기본 dtype은 환경에 따라 다릅니다. 64비트 PC에서는 보통 <code>int64</code>이지만, 32비트인 이 가상 머신에서는 <code>int32</code>로 나옵니다.</p>
+
+<h3>배열 하나에 dtype 하나</h3>
+
+<p>배열은 한 가지 자료형만 저장합니다. 정수와 실수를 섞으면 float64가 되고, 숫자와 문자열을 섞으면 모두 문자열이 됩니다. <code>astype(np.float64)</code>로 실수로 바꿀 수 있습니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>인덱싱과 슬라이싱</h3>
+
+<p>리스트와 똑같이 인덱스와 슬라이스를 씁니다. <code>prices[1:3]</code>은 1에서 시작해 3 앞에서 멈춥니다. 다른 점은 슬라이스가 같은 메모리를 보는 뷰(view)라는 것입니다. 뷰를 고치면 원본도 바뀝니다. 진짜 복사본이 필요하면 <code>prices[1:3].copy()</code>를 씁니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2차원 인덱싱: [행, 열]</h3>
+
+<p>대괄호 한 쌍 안에 쉼표로 행과 열을 씁니다. <code>sales[1, 2]</code>는 칸 하나, <code>sales[:, 1]</code>은 열 하나 전체입니다. 두 방향 모두 슬라이스할 수 있습니다: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>조건으로 고르기: 마스크</h3>
+
+<p>비교 연산은 불리언 배열을 돌려주고, 그것을 인덱스로 쓰면 True인 원소만 남습니다. 마스크를 결합할 때는 <code>and</code>/<code>or</code>가 아니라 <code>&amp;</code>와 <code>|</code>를 쓰고, 비교마다 괄호를 씌워야 합니다.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>팬시 인덱싱</h3>
+
+<p>위치의 리스트를 넘기면 원하는 순서로 고를 수 있고, 같은 위치를 반복해도 됩니다. 결과는 뷰가 아닌 새 배열입니다. 뒤에서 이름과 순위를 짝지을 때 씁니다.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>벡터화 연산과 브로드캐스팅</h3>
+
+<p>연산자는 원소별로 적용됩니다. <code>prices * 2</code>는 모든 값을 두 배로 만들지만, 리스트에 <code>* 2</code>를 하면 리스트 전체가 반복됩니다. <code>np.sqrt</code>, <code>np.round</code>도 배열 전체에 적용됩니다. NumPy는 작은 모양을 큰 모양에 맞게 늘려(브로드캐스팅) 계산합니다. 숫자 하나는 배열 전체에 퍼지므로 <code>prices * 0.9</code>는 모든 상품을 할인합니다. 끝쪽 차원이 같거나 1이어야 합니다.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>axis로 집계하기</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code>, <code>min</code>은 배열을 하나의 값으로 접습니다. <code>axis=0</code>은 각 열을 위에서 아래로, <code>axis=1</code>은 각 행을 가로로 계산합니다. 결과 길이로 확인합니다: 상품 4개, 매장 3개.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, 쌓기, 정렬</h3>
+
+<p><code>reshape(4, 3)</code>은 같은 데이터를 새 모양으로 묶습니다. 12개월을 네 분기로 나누는 식입니다. <code>-1</code>은 "남는 만큼"이라는 뜻이고, <code>.T</code>는 행과 열을 바꿉니다. 원소 개수(size)는 바뀔 수 없습니다. <code>vstack</code>은 배열을 새 행으로, <code>hstack</code>은 새 열로 이어 붙입니다(새 매장은 vstack, 새 기간은 hstack). <code>sort</code>는 정렬된 값을, <code>argsort</code>는 정렬된 위치를 돌려주므로 팬시 인덱싱과 함께 이름을 순서대로 늘어놓을 수 있습니다. <code>argsort(-x)</code>는 큰 것부터 순위를 매깁니다.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>따라 하기: 연간 보고서</h3>
+
+<p>12개월 매출(단위: 만 원)을 네 분기로 reshape하고, <code>axis=1</code>로 분기별 합계를 구하고, <code>argmax</code>로 최고 매출 달의 인덱스를, <code>argsort(-monthly)[:3]</code>로 상위 세 달을 찾습니다.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy 다섯 줄 요약</h3>
+
+<ul>
+<li>ndarray: 여러 차원, 하나의 dtype.</li>
+<li>만들기: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>고르기: 슬라이스, 마스크, 팬시 인덱싱.</li>
+<li>계산: 벡터화, 브로드캐스팅, axis.</li>
+<li>재배치: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li>import를 빠뜨린 것이 <code>NameError</code>의 첫 번째 용의자입니다. 디버깅할 때는 맨 위의 import 줄부터 봅니다.</li>
+<li><code>randint(1, 6)</code>은 6을 포함하지만 <code>range(1, 6)</code>은 포함하지 않습니다.</li>
+<li><code>shuffle(names)</code>는 그 자리에서 섞고 <code>None</code>을 돌려줍니다.</li>
+<li><code>print(*numbers)</code>는 리스트를 풀어 따로따로 출력합니다.</li>
+<li>NumPy 마스크는 괄호와 함께 <code>&amp;</code>, <code>|</code>를 씁니다. <code>and</code>/<code>or</code>는 쓰지 않습니다.</li>
+</ul>
+
+<p>실행 전에는 각 이름이 어디에서 왔는지 말할 수 있어야 합니다.</p>
+
+<h2>확인 퀴즈와 제출</h2>
+
+<ol>
+<li><strong><code>math.sqrt</code>의 점은 무엇을 잇는가?</strong> 모듈 <code>math</code>와 그 안의 함수 <code>sqrt</code>입니다.</li>
+<li><strong>import하지 않은 이름을 쓰면 어떤 오류가 나는가?</strong> <code>NameError</code>입니다.</li>
+<li><strong><code>shuffle</code>은 무엇을 돌려주는가?</strong> <code>None</code>입니다. 리스트 자체가 섞입니다.</li>
+<li><strong>1부터 45 사이의 서로 다른 수 6개는 어떻게 뽑는가?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>import된 모듈 안에서 <code>__name__</code>은?</strong> 모듈 이름입니다(예: <code>"number_tools"</code>).</li>
+<li><strong><code>sales.sum(axis=0)</code>은 행과 열 중 무엇을 접는가?</strong> 행 방향으로 내려가며 접어 열마다 합계 하나를 남깁니다.</li>
+<li><strong>NumPy에서 매출을 큰 것부터 순위 매기려면?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>제출: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>. <code>guessing.py</code>는 다음 시간까지입니다. 프로그램마다 테스트 사례를 세 개 이상 주석으로 기록합니다. 웹 실습에서 고친 파일은 <code>cp 파일 /mnt/host/</code> 후 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>다음 시간</h2>
+
+<p>슬라이드 마지막 장은 다음 시간 주제로 예외(<code>int("abc")</code>가 <code>ValueError</code>를 내는 이유, <code>try</code>/<code>except</code>로 프로그램이 멈추지 않게 하기)를 예고합니다. 준비로 4주차 프로그램을 망가뜨리는 입력을 하나 찾아 옵니다. 실제 다음 차시 자료는 pandas를 다룹니다.</p>

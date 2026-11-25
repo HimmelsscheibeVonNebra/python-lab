@@ -1,0 +1,39 @@
+{
+  "class": "week13-3",
+  "title": "데이터베이스 시스템 개론",
+  "summary": "파일만으로는 왜 공유·변경·장애를 감당할 수 없는지, 관계형 모델·스키마·DDL·SQL이 무엇을 숨겨 주는지, 엔진 안의 저장·질의·트랜잭션 관리자가 무슨 일을 하는지를 개념으로 정리한다. 실습 페이지에서는 market.db로 데이터 사전(sqlite_master), 스키마와 인스턴스, 질의 실행 계획, 동시 쓰기 제어를 직접 들여다본다.",
+  "examples": [
+    {
+      "name": "db_internals",
+      "source": "week13/examples/sqlite_lab/create_db.py",
+      "also": [
+        "week13/examples/sqlite_lab/schema.sql"
+      ],
+      "summary": "1차시의 market.db를 엔진의 눈으로 본다. DDL로 만든 정의가 메타데이터로 저장되는 곳, 바뀌지 않는 스키마와 계속 바뀌는 인스턴스, 같은 SQL에 대해 엔진이 고르는 실행 계획, 두 연결이 동시에 쓰려 할 때 순서를 세우는 잠금을 차례로 관찰한다.",
+      "steps": [
+        {
+          "cmd": "python3 create_db.py; python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(*con.execute(\"SELECT type, name, tbl_name FROM sqlite_master\"), sep=\"\\n\"); print(con.execute(\"SELECT sql FROM sqlite_master WHERE name = ?\", (\"quotes\",)).fetchone()[0])'",
+          "note": "데이터 사전: CREATE TABLE로 선언한 정의는 sqlite_master라는 테이블에 메타데이터로 저장된다. quotes 테이블과, PRIMARY KEY (date, code) 때문에 엔진이 자동으로 만든 인덱스 sqlite_autoindex_quotes_1이 보이고, 그 아래에 저장된 DDL 원문이 나온다."
+        },
+        {
+          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print([(c[1], c[2]) for c in con.execute(\"PRAGMA table_info(quotes)\")]); print(\"rows:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone()[0]); con.execute(\"DELETE FROM quotes WHERE market = ?\", (\"KOSDAQ\",)); print([(c[1], c[2]) for c in con.execute(\"PRAGMA table_info(quotes)\")]); print(\"rows:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone()[0]); con.rollback()'",
+          "note": "스키마는 설계, 인스턴스는 지금의 내용이다. KOSDAQ 두 행을 지우면 인스턴스는 5행에서 3행으로 바뀌지만 열 이름과 자료형 목록(스키마)은 그대로다. 프로그램의 자료형과 변수의 현재 값에 해당한다. 마지막에 rollback()했으므로 실제 파일은 5행 그대로다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'import sqlite3' 'con = sqlite3.connect(\":memory:\")' 'con.execute(\"CREATE TABLE department (dept_name VARCHAR(20), building VARCHAR(15), budget NUMERIC(12,2))\")' 'con.execute(\"CREATE TABLE instructor (ID CHAR(5), name VARCHAR(20), dept_name VARCHAR(20), salary NUMERIC(8,2))\")' 'con.executemany(\"INSERT INTO department VALUES (?, ?, ?)\", [(\"Comp. Sci.\", \"Taylor\", 100000), (\"Finance\", \"Painter\", 120000)])' 'con.executemany(\"INSERT INTO instructor VALUES (?, ?, ?, ?)\", [(\"10101\", \"Srinivasan\", \"Comp. Sci.\", 65000), (\"12121\", \"Wu\", \"Finance\", 90000), (\"45565\", \"Katz\", \"Comp. Sci.\", 75000)])' 'print(con.execute(\"SELECT name FROM instructor WHERE dept_name = ?\", (\"Comp. Sci.\",)).fetchall())' 'print(*con.execute(\"SELECT i.name, d.building FROM instructor AS i JOIN department AS d ON i.dept_name = d.dept_name ORDER BY i.name\"), sep=\"\\n\")' > university.py; python3 university.py",
+          "note": "슬라이드의 instructor/department 예. DDL(CREATE TABLE)로 구조를 선언하고, 선언적 SQL로 결과만 요청한다: Comp. Sci. 교수의 이름 [('Srinivasan',), ('Katz',)]. 학과의 건물·예산은 교수마다 반복 저장하지 않고 department에 한 번만 두며, dept_name을 따라가(JOIN) 두 테이블을 결합해 교수별 건물을 얻는다."
+        },
+        {
+          "cmd": "cp market.db /tmp/plan.db; python3 -c 'import sqlite3; con = sqlite3.connect(\"/tmp/plan.db\"); P = \"EXPLAIN QUERY PLAN \"; q1 = \"SELECT name FROM quotes WHERE date = ? AND code = ?\"; q2 = \"SELECT name FROM quotes WHERE market = ?\"; print(con.execute(P + q1, (\"2026-11-05\", \"005930\")).fetchall()[-1][-1]); print(con.execute(P + q2, (\"KOSPI\",)).fetchall()[-1][-1]); con.execute(\"CREATE INDEX quotes_market ON quotes (market)\"); print(con.execute(P + q2, (\"KOSPI\",)).fetchall()[-1][-1]); print(con.execute(q2, (\"KOSPI\",)).fetchall())'",
+          "note": "질의 처리기가 고른 실행 계획을 본다. 기본 키로 찾으면 SEARCH … USING INDEX sqlite_autoindex_quotes_1, market으로 찾으면 표 전체를 훑는 SCAN quotes다. market에 인덱스를 추가하면 같은 SQL의 계획이 SEARCH … USING INDEX quotes_market으로 바뀌지만 결과와 SQL 문장은 그대로다. 저장 방식이 바뀌어도 논리 스키마와 응용은 영향받지 않는 물리적 데이터 독립성이다(복사본 /tmp/plan.db에서 실험했다)."
+        },
+        {
+          "cmd": "printf '%s\\n' 'import sqlite3' 'a = sqlite3.connect(\"market.db\", timeout=0)' 'b = sqlite3.connect(\"market.db\", timeout=0)' 'U = \"UPDATE quotes SET volume = volume + 1 WHERE code = ?\"' 'a.execute(U, (\"005930\",))' 'try:' '    b.execute(U, (\"005930\",))' 'except sqlite3.OperationalError as error:' '    print(\"B:\", error)' '    b.rollback()' 'a.commit()' 'b.execute(U, (\"005930\",))' 'b.commit()' 'print(b.execute(\"SELECT volume FROM quotes WHERE code = ?\", (\"005930\",)).fetchone())' > two_users.py; python3 two_users.py; python3 create_db.py",
+          "note": "두 사용자가 같은 행을 동시에 고치려 한다. A가 커밋하기 전에 B가 쓰려 하면 B: database is locked로 거절된다(timeout=0이라 기다리지 않고 바로 실패). B는 rollback()으로 시도를 접는다. A가 커밋한 뒤에야 B가 쓸 수 있어 거래량이 1000000 → 1000002로 두 번 모두 반영된다. 1차시의 파일 예제에서 한 건이 사라졌던 갱신 손실을 엔진의 동시성 제어가 막는 모습이다. 마지막에 create_db.py로 원래 값을 되돌린다."
+        }
+      ],
+      "expect": "database is locked",
+      "notes": "SQLite는 하나의 파일을 쓰는 내장형(embedded) 엔진이고, 슬라이드의 분류로는 한 시스템이 모든 일을 하는 중앙 집중형(centralized)이다. 슬라이드의 클라이언트-서버, 병렬, 분산 구조나 DBA 권한 관리는 이 실습에서 재현하지 않는다. 14주차의 Flask가 3계층 구조의 응용 서버 역할을 맡는다."
+    }
+  ]
+}

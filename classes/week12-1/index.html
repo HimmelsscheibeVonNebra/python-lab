@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 12 · Session 1 Debugging and Regression Tests · Python Lab" data-title-ko="12주차 1차시 디버깅과 회귀 테스트 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 12 · Session 1 Debugging and Regression Tests · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body data-root="../../">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 12 · Session 1</span><span lang="ko">12주차 1차시</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Debugging and Regression Tests</span><span lang="ko">디버깅과 회귀 테스트</span></h1>
+    <p><span lang="en">Practise the debugging loop (reproduce → diagnose → record → fix → re-verify) on market_rules.py, which contains three deliberate defects. Reproduce each failure with a small fixed input, inspect variable state with the traceback and pdb, then fix the defects one at a time and watch how the unittest results change.</span><span lang="ko">의도적인 결함 세 개가 든 market_rules.py로 디버깅의 반복 과정(재현 → 진단 → 기록 → 수정 → 재검증)을 연습한다. 고정된 작은 입력으로 실패를 재현하고, traceback과 pdb로 변수 상태를 확인한 뒤, 결함을 한 번에 하나씩 고치며 unittest 결과가 어떻게 바뀌는지 관찰한다.</span></p>
+  </header>
+  <main class="list">
+    <section>
+      <h2><span lang="en">Examples to run</span><span lang="ko">실행해 볼 예제</span></h2>
+      <ul class="cards">
+        <li><a href="debug_lab.html"><strong>debug_lab</strong><span><span lang="en">The three functions change_pct (percentage change), summarize (summary) and rank_changes (ranking) each contain one defect: in the denominator of a calculation, in handling empty input, and in the sorting rule. Before fixing anything, reproduce each defect with the smallest possible input, tell failures (Failure) apart from errors (Error), and collect the evidence for your bug report.</span><span lang="ko">change_pct(등락률), summarize(요약), rank_changes(순위) 세 함수에 계산 분모·빈 입력·정렬 규칙의 결함이 하나씩 있다. 고치기 전에 각 결함을 가장 작은 입력으로 재현하고, 실패(Failure)와 오류(Error)를 구분해 버그 보고서에 기록할 증거를 모은다.</span></span></a></li>
+        <li><a href="debug_fix.html"><strong>debug_fix</strong><span><span lang="en">Fix the three defects one at a time, minimally, and rerun the relevant test and then the full test suite after each fix. Here sed replaces the slides' before/after lines exactly, but in the lab you edit the file yourself with nano market_rules.py. Finally, check your changes with diff and test some extra cases that were not provided.</span><span lang="ko">세 결함을 한 번에 하나씩 최소한으로 고치고, 매번 해당 테스트와 전체 테스트를 다시 실행한다. 여기서는 sed로 슬라이드의 수정 전/후 줄을 그대로 바꾸지만, 실습에서는 nano market_rules.py로 직접 고친다. 마지막에 diff로 수정 내용을 확인하고, 제공되지 않은 사례를 추가로 검사한다.</span></span></a></li>
+      </ul>
+    </section>
+    <article class="notes">
+<div lang="en">
+<p>This session is about where to find the evidence when you fix a working MVP. There are four goals: reproduce a failure with a small fixed input, read a traceback and inspect variable state, write a regression test and fix the cause, and explain why the fix satisfies the requirements. The lab code is <code>market_rules.py</code>, which contains three deliberate defects. You reproduce and diagnose the defects in <a href="debug_lab.html">debug_lab</a>, and fix them one at a time while watching the test results change in <a href="debug_fix.html">debug_fix</a>.</p>
+
+<h2>Week 11 MVP review</h2>
+
+<p>The market report reads a CSV, analyses the stocks and saves an HTML file. Stock codes stay strings, and prices are validated before any calculation. A missing file is an error; a valid file with only a header is empty data. Even if a run fails, the existing report must be preserved. A feature is only done when both its success and its failure behaviour meet the criteria.</p>
+
+<h2>The debugging loop</h2>
+
+<ol>
+<li><strong>Reproduce</strong>: confirm the same failure with the same command and the same input.</li>
+<li><strong>Diagnose</strong>: compare the function contract, the traceback and the variable state.</li>
+<li><strong>Record</strong>: write a failing test that catches the observed defect.</li>
+<li><strong>Fix</strong>: change only the smallest part that explains the failure.</li>
+<li><strong>Re-verify</strong>: run the relevant test first, then the full test suite.</li>
+</ol>
+
+<p>For example, for BUG-01 we fix the inputs at 100 and 110 and check that both the corrected formula and the test satisfy the +10% contract.</p>
+
+<h3>Three kinds of errors</h3>
+
+<ul>
+<li><strong>Syntax error</strong>: Python cannot parse the code.</li>
+<li><strong>Runtime exception</strong>: some operation fails while the program is running.</li>
+<li><strong>Logic bug</strong>: the program runs but returns a wrong result.</li>
+</ul>
+
+<p>From 100 to 110 should be +10%. A result near +9.09% is a logic bug. When a test fails, the cause can be in the code, the data or the test itself.</p>
+
+<h3>Bug report</h3>
+
+<p>Record the command you ran, the environment and the exact input, and keep the expected behaviour separate from the actual behaviour. Take the expected value from the requirements, not from what the implementation produces. The lab uses made-up data for the class.</p>
+
+<pre><code>BUG-01 / daily percentage change
+Input:    previous_close=100, close=110
+Expected: 10.0
+Observed: 9.090909...</code></pre>
+
+<p>The worksheet <code>debugging-report.md</code> (in the file list of the lab pages) has a form to fill in for each bug: the related requirement, the command and minimal input, the expected and actual results, the last line of the traceback or the failed assertion, your hypothesis and the variable values you checked, the function you fixed and why, and the test results before and after the fix.</p>
+
+<h3>Minimal reproducing input</h3>
+
+<p>In the first experiment, leave out the CSV, the browser and report generation, and call the pure function directly with two integers. Keep the failing input fixed while you investigate.</p>
+
+<pre><code>cd 12week/examples/debug_lab
+python3 -c "from market_rules import change_pct; \
+print(change_pct(100, 110))"</code></pre>
+
+<p>In this lab the folder is <code>~/week12/examples/debug_lab</code>, and this command is the second step of <a href="debug_lab.html">debug_lab</a>. The result is <code>9.090909090909092</code>.</p>
+
+<h2>Reading a traceback</h2>
+
+<ul>
+<li>Start with the last line: the exception type and message.</li>
+<li>Find the last operation that failed in your own code.</li>
+<li>Go back up through the callers to see how the value got there.</li>
+<li>Where the failure happens and its root cause can be different.</li>
+</ul>
+
+<h3>A traceback across two calls</h3>
+
+<pre><code>Traceback (most recent call last):
+  File "debug_empty.py", line 2, in &lt;module&gt;
+    summarize([])
+  File "market_rules.py", line 18, in summarize
+    return {"count": len(changes),
+            "mean": sum(changes) / len(changes)}
+ZeroDivisionError: division by zero</code></pre>
+
+<p>The last line tells you the failed operation is a division by zero. The function frame shows that <code>changes</code> is empty, so <code>len(changes)</code> is 0. The caller frame shows that the reproduction script passed an empty list. But according to the contract, an empty list is a valid input. So we fix the summary function, not the caller, and keep this case as a test.</p>
+
+<h2>Hypothesis and confirmation</h2>
+
+<p>Observation: the computed increase is smaller than expected. Hypothesis: it divides by the current price instead of the previous price. Check the numerator and the denominator separately, and compare with the hand calculation (110 − 100) / 100 × 100 = 10. The principle: confirm the cause with evidence, then fix one thing at a time.</p>
+
+<h3>Checking state with print</h3>
+
+<pre><code>previous_close, close = 100, 110
+print("difference:", close - previous_close)
+print("previous:", previous_close, "current:", close)</code></pre>
+
+<p>Check the types as well as the values. Remove the temporary debugging output after the fix.</p>
+
+<h3>Stepping through with pdb</h3>
+
+<p>Set a breakpoint in the terminal and inspect the state of the failing call. Save the two lines below as <code>debug_empty.py</code> and run <code>python3 -m pdb debug_empty.py</code>.</p>
+
+<pre><code>from market_rules import summarize
+summarize([])</code></pre>
+
+<ul>
+<li><kbd>n</kbd>: run the next line; <kbd>s</kbd>: step into a function.</li>
+<li>Inside the function, inspect the state with <code>p changes</code> and <code>p len(changes)</code>.</li>
+<li><kbd>q</kbd>: quit.</li>
+</ul>
+
+<pre><code>(Pdb) n
+-&gt; summarize([])
+(Pdb) s
+&gt; market_rules.py(...)summarize()
+(Pdb) p changes
+[]
+(Pdb) p len(changes)
+0</code></pre>
+
+<p>Running the import with n stops just before the function call. s steps into summarize so you can check the argument before the body runs. If you keep going through the division, the exception is reproduced. The slides also show how to put a breakpoint on the function's return line in VS Code, but this web lab uses pdb. In <a href="debug_lab.html">debug_lab</a> the pdb commands are piped in so you can see the same session; to type them yourself, run <code>python3 -m pdb debug_empty.py</code> in the terminal.</p>
+
+<h2>Function contracts and test cases</h2>
+
+<table>
+<thead>
+<tr><th>Contract</th><th>Input</th><th>Expected result</th></tr>
+</thead>
+<tbody>
+<tr><td>Change relative to the previous price</td><td>100 → 110</td><td>+10%</td></tr>
+<tr><td>Price falls</td><td>100 → 90</td><td>-10%</td></tr>
+<tr><td>Price unchanged</td><td>100 → 100</td><td>0%</td></tr>
+<tr><td>Only positive prices allowed</td><td>0 → 100</td><td>ValueError</td></tr>
+<tr><td>Empty summary</td><td>[]</td><td>count 0, mean None</td></tr>
+</tbody>
+</table>
+
+<p>Choose inputs whose expected values you can compute independently.</p>
+
+<h3>Normal, boundary and error inputs</h3>
+
+<table>
+<thead>
+<tr><th>Category</th><th>Input</th><th>Expected result</th></tr>
+</thead>
+<tbody>
+<tr><td>Smallest valid price</td><td>prices 1, 2</td><td>+100%</td></tr>
+<tr><td>Price outside the boundary</td><td>prices 0, 100</td><td>ValueError</td></tr>
+<tr><td>Wrong type</td><td>prices True, 100</td><td>ValueError</td></tr>
+<tr><td>Empty summary</td><td>[]</td><td>mean None</td></tr>
+<tr><td>One observation</td><td>[5]</td><td>mean 5</td></tr>
+</tbody>
+</table>
+
+<p>Pick the points where acceptance changes, such as prices 0 and 1. bool is a subclass of int, so check True as a separate case too.</p>
+
+<h2>Verifying with unittest</h2>
+
+<pre><code>import unittest
+from market_rules import change_pct
+
+class ChangeTests(unittest.TestCase):
+    def test_increase(self):
+        self.assertAlmostEqual(change_pct(100, 110), 10.0)</code></pre>
+
+<p>Write it in the order: prepare the input, call the function, assert the result. Use approximate comparison for floating-point results. Default test discovery looks for files named <code>test*.py</code>.</p>
+
+<h3>Arrange, act, assert</h3>
+
+<pre><code>def test_increase(self):
+    # Arrange: known input and expected answer.
+    previous, close = 100, 110
+    expected = 10.0
+    # Act: call the function once.
+    actual = change_pct(previous, close)
+    # Assert: check the contract.
+    self.assertAlmostEqual(actual, expected)</code></pre>
+
+<p>Decide the expected value 10 first, by hand. If you copy the implementation's formula into the expected value, you may copy its defect along with it.</p>
+
+<h3>Choosing the assertion that fits the contract</h3>
+
+<table>
+<thead>
+<tr><th>assertion</th><th>Example</th><th>Contract checked</th></tr>
+</thead>
+<tbody>
+<tr><td><code>assertEqual</code></td><td>count, 3</td><td>exact count or order</td></tr>
+<tr><td><code>assertAlmostEqual</code></td><td>change, 10.0</td><td>a computed float</td></tr>
+<tr><td><code>assertIsNone</code></td><td>mean</td><td>no mean</td></tr>
+<tr><td><code>assertRaises</code></td><td>ValueError</td><td>rejecting invalid input</td></tr>
+</tbody>
+</table>
+
+<pre><code>with self.assertRaises(ValueError):
+    change_pct(0, 100)</code></pre>
+
+<p>Put the call inside the with block. If no ValueError is raised, or a different exception is raised, the test fails.</p>
+
+<h3>Failure, error, regression</h3>
+
+<ul>
+<li><strong>Failure</strong>: an assertion found a difference between the expected and actual values.</li>
+<li><strong>Error</strong>: the test stopped because of an unexpected exception.</li>
+<li><strong>Regression</strong>: after a change, behaviour that used to work is broken.</li>
+</ul>
+
+<p>Before the fix, check that the new test catches the defect; after the fix, run the full test suite to make sure no other behaviour was damaged.</p>
+
+<h3>Running one test and reading the result</h3>
+
+<pre><code>python3 -m unittest -v test_market_rules.MarketRuleTests.test_empty_summary
+python3 -m unittest -v
+Ran 5 tests ...
+FAILED (failures=3, errors=1)</code></pre>
+
+<p>This is the result for the starter code. Three defects are reported as four problems because the two subTests inside the price test method (100→110 and 100→90) each fail. The empty summary raises an exception before it reaches an assertion, so it counts as an error, not a failure. Focus on fixing one problem, then run everything. The number of tests alone does not tell you whether the verification is sufficient. You can check this output in the first step of <a href="debug_lab.html">debug_lab</a>.</p>
+
+<h2>Contracts of the lab functions</h2>
+
+<ul>
+<li><code>change_pct</code>: accepts only positive integer prices, excluding bool. Returns the unrounded percentage change.</li>
+<li><code>summarize</code>: computes the count and mean of a list of validated numbers. The mean of an empty list is None.</li>
+<li><code>rank_changes</code>: sorts validated rows by percentage change descending, then code ascending. Returns a new list and does not change the input.</li>
+</ul>
+
+<p>In this lab the calculation rules are kept separate from file input and output.</p>
+
+<h2>Lab A: percentage change</h2>
+
+<p>Before fixing, reproduce the wrong result for 100 → 110, check the denominator and record the cause. After correcting the formula, run the rise, fall and unchanged tests. Rounding is done at the output stage, not in the calculation function. Ask yourself: does this test catch the wrong formula, or does it just repeat it?</p>
+
+<pre><code># Before: wrong reference price.
+return (close - previous_close) / close * 100
+# After: change relative to the previous price.
+return (close - previous_close) / previous_close * 100</code></pre>
+
+<p>Before the fix, the result for 100 to 110 is about 9.09, so the test fails; after the fix, the same test gets 10 and passes. Also check that a fall from 100 to 90 gives -10%. Keep the existing input validation and the parameters of the public function. A fake fix that returns the constant 10 may pass one example but fails the fall and unchanged cases.</p>
+
+<h2>Lab B: empty summary</h2>
+
+<p>Call <code>summarize([])</code> and read the traceback. With no observations there is no arithmetic mean. Return a count of 0 and a mean of None. After the fix, also check one element and several elements. An actual mean of 0 must be distinguishable from no data.</p>
+
+<pre><code>summary = {"count": 3, "mean": 0.0}
+mean = summary["mean"]
+label = "N/A" if mean is None else f"{mean:.2f}%"
+print(label)  # 0.00%</code></pre>
+
+<p><code>[]</code> has count 0 and mean None; <code>[10, -10, 0]</code> has count 3 and an actual mean of 0. <code>if not mean</code> treats both None and 0.0 as false, so check for None explicitly when displaying the no-value state.</p>
+
+<h2>Lab C: sorting ties</h2>
+
+<p>Sort by percentage change descending; when percentage changes are equal, sort by stock code ascending. Prepare the input in an order different from the expected one, and check that the original list and the row values have not changed.</p>
+
+<pre><code>Input codes:  000003(-1), 000002(+2), 000001(+2)
+Output codes: 000001, 000002, 000003</code></pre>
+
+<h3>A sort key with two parts</h3>
+
+<pre><code>key = lambda row: (-row["change_pct"], row["code"])</code></pre>
+
+<table>
+<thead>
+<tr><th>Code and change</th><th>Sort key</th><th>Final position</th></tr>
+</thead>
+<tbody>
+<tr><td>000003, -1</td><td>(1, "000003")</td><td>3</td></tr>
+<tr><td>000002, +2</td><td>(-2, "000002")</td><td>2</td></tr>
+<tr><td>000001, +2</td><td>(-2, "000001")</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>Python compares tuples in ascending order, starting from the first item. Negating the percentage change puts the originally larger values first. When the first items are equal, the second item, the code, decides the order.</p>
+
+<h3>A new list with shared row objects</h3>
+
+<pre><code>before = [dict(row) for row in rows]
+ranked = rank_changes(rows)
+self.assertEqual(rows, before)
+self.assertIsNot(ranked, rows)</code></pre>
+
+<p><code>rows.sort()</code> changes the input list; <code>sorted()</code> builds a new list. But the dictionaries in the new list still refer to the original row objects. The lab's contract is not to change the original while sorting; it does not promise a deep copy. Copy each flat row to build a state to compare against. <code>before = rows</code> points to the same object, so it misses any change.</p>
+
+<p>Fixing the three defects one by one with sed, watching the number of problems drop from 3+1 → 1+1 → 1 → 0, and the final diff are in <a href="debug_fix.html">debug_fix</a>. In the lab, you edit the file yourself with <code>nano market_rules.py</code>.</p>
+
+<h2>Two extra tests</h2>
+
+<p>Pick cases that are not in the provided tests, for example the smallest positive price, a summary of one element, or ranking an empty list. Write down the expected value before running the function, and record the requirement each case checks. Rerun the full test suite after your last fix.</p>
+
+<h3>Weak checks and checks that catch defects</h3>
+
+<pre><code># Weak: an empty dictionary would also pass.
+self.assertIsNotNone(summarize([]))
+# Stronger: verify the agreed empty-state values.
+self.assertEqual(summarize([]), {"count": 0, "mean": None})</code></pre>
+
+<p>If you change the implementation to a plausible wrong answer, the test should fail. Ask whether it would catch ascending sorting or missing tie handling. Prepare inputs in the reverse of the expected order so that such mistakes show up. Do not build expected values by calling the function under test.</p>
+
+<h2>Reviewing the fix</h2>
+
+<ul>
+<li>Show the failing input and the relevant code diff.</li>
+<li>Explain the cause based on values or control flow.</li>
+<li>Check that you did not delete tests or weaken any check.</li>
+<li>Consider whether the contract might break for other valid inputs.</li>
+<li>Record the review in <code>debugging-report.md</code> in the lab folder.</li>
+</ul>
+
+<h2>Submission and review questions</h2>
+
+<p>Submit the fixed code, the two extra tests and the debugging report. Include the commands you ran and the actual test summary.</p>
+
+<ul>
+<li>Why is an empty mean different from a mean of 0?</li>
+<li>Why are tied stocks entered in reverse code order?</li>
+</ul>
+
+<p>Next session covers input validation, file failures and tests for feature extensions.</p>
+</div><div lang="ko">
+<p>이번 시간에는 동작하는 MVP를 고칠 때 근거를 어디서 찾는지 배웁니다. 목표는 네 가지입니다. 고정된 작은 입력으로 실패를 재현하고, traceback을 읽고 변수 상태를 확인하고, 회귀 테스트를 쓰고 원인을 고치고, 그 수정이 요구사항을 만족하는 이유를 설명하는 것입니다. 실습 코드는 의도적인 결함 세 개가 든 <code>market_rules.py</code>입니다. 결함을 재현하고 진단하는 과정은 <a href="debug_lab.html">debug_lab</a>, 한 번에 하나씩 고치며 테스트 결과가 바뀌는 과정은 <a href="debug_fix.html">debug_fix</a>에서 실행합니다.</p>
+
+<h2>11주차 MVP 복습</h2>
+
+<p>시장 보고서는 CSV를 읽고 종목을 분석한 뒤 HTML을 저장합니다. 종목 코드는 문자열로 유지하고, 계산 전에 가격을 검증합니다. 파일 누락은 오류이고, 헤더만 있는 정상 파일은 빈 데이터입니다. 실행이 실패해도 기존 보고서는 보존해야 합니다. 기능이 완료되었다고 하려면 성공했을 때와 실패했을 때의 동작이 모두 기준을 만족해야 합니다.</p>
+
+<h2>디버깅의 반복 과정</h2>
+
+<ol>
+<li><strong>재현</strong>: 같은 명령, 같은 입력으로 같은 실패를 확인한다.</li>
+<li><strong>진단</strong>: 함수 계약, traceback, 변수 상태를 비교한다.</li>
+<li><strong>기록</strong>: 관찰한 결함을 잡아내는 실패 테스트를 만든다.</li>
+<li><strong>수정</strong>: 실패 원인을 설명하는 최소한의 부분만 고친다.</li>
+<li><strong>재검증</strong>: 해당 테스트를 먼저, 전체 테스트를 나중에 실행한다.</li>
+</ol>
+
+<p>예를 들어 BUG-01은 입력 100과 110을 고정해 두고, 고친 식과 테스트가 모두 +10%라는 계약을 만족하는지 확인합니다.</p>
+
+<h3>오류의 세 가지 유형</h3>
+
+<ul>
+<li><strong>문법 오류</strong>: 파이썬이 코드를 해석할 수 없다.</li>
+<li><strong>실행 중 예외</strong>: 실행 도중 어떤 연산이 실패한다.</li>
+<li><strong>논리 버그</strong>: 실행은 되지만 잘못된 결과를 반환한다.</li>
+</ul>
+
+<p>100에서 110이면 +10%여야 합니다. +9.09% 근처의 결과가 나온다면 논리 버그입니다. 테스트가 실패했을 때 원인은 코드, 데이터, 테스트 중 어디에나 있을 수 있습니다.</p>
+
+<h3>버그 보고서</h3>
+
+<p>실행 명령, 환경, 정확한 입력을 기록하고, 기대 동작과 실제 동작을 구분합니다. 기대값은 구현 결과가 아니라 요구사항에서 구합니다. 실습에는 수업용 가상 데이터를 씁니다.</p>
+
+<pre><code>BUG-01 / daily percentage change
+Input:    previous_close=100, close=110
+Expected: 10.0
+Observed: 9.090909...</code></pre>
+
+<p>실습지 <code>debugging-report.md</code>(실습 페이지의 파일 목록에 있음)에는 버그마다 이 항목을 채우는 양식이 있습니다. 관련 요구사항, 실행 명령과 최소 입력, 기대/실제 결과, traceback 마지막 줄 또는 실패한 assertion, 가설과 확인한 변수 값, 수정한 함수와 이유, 수정 전후의 테스트 결과입니다.</p>
+
+<h3>최소 재현 입력</h3>
+
+<p>첫 실험에서는 CSV, 브라우저, 보고서 생성을 빼고, 정수 두 개로 순수 함수를 직접 호출합니다. 조사하는 동안 실패 입력은 고정해 둡니다.</p>
+
+<pre><code>cd 12week/examples/debug_lab
+python3 -c "from market_rules import change_pct; \
+print(change_pct(100, 110))"</code></pre>
+
+<p>이 실습에서 폴더는 <code>~/week12/examples/debug_lab</code>이고, <a href="debug_lab.html">debug_lab</a>의 둘째 단계가 이 명령입니다. 결과는 <code>9.090909090909092</code>입니다.</p>
+
+<h2>Traceback 읽기</h2>
+
+<ul>
+<li>마지막 줄에서 예외 유형과 메시지를 먼저 확인한다.</li>
+<li>자신의 코드에서 실패한 마지막 연산을 찾는다.</li>
+<li>호출자를 거슬러 올라가 값이 전달된 경로를 확인한다.</li>
+<li>실패한 위치와 근본 원인은 다를 수 있다.</li>
+</ul>
+
+<h3>두 호출에 걸친 traceback</h3>
+
+<pre><code>Traceback (most recent call last):
+  File "debug_empty.py", line 2, in &lt;module&gt;
+    summarize([])
+  File "market_rules.py", line 18, in summarize
+    return {"count": len(changes),
+            "mean": sum(changes) / len(changes)}
+ZeroDivisionError: division by zero</code></pre>
+
+<p>마지막 줄은 실패한 연산이 0으로 나누기라는 것을 알려 줍니다. 함수 프레임을 보면 <code>changes</code>가 비어 있어 <code>len(changes)</code>가 0입니다. 호출자 프레임을 보면 재현 스크립트가 빈 목록을 넘겼습니다. 그런데 계약에 따르면 빈 목록은 유효한 입력입니다. 따라서 호출자가 아니라 요약 함수를 고치고, 이 상태를 테스트로 남깁니다.</p>
+
+<h2>가설과 확인</h2>
+
+<p>관찰: 계산된 상승률이 기대값보다 작다. 가설: 이전 가격 대신 현재 가격으로 나누고 있다. 분자와 분모를 각각 확인하고, 손으로 계산한 (110 − 100) / 100 × 100 = 10과 비교합니다. 원칙은 증거로 원인을 확인한 뒤 한 가지씩 고치는 것입니다.</p>
+
+<h3>print로 상태 확인</h3>
+
+<pre><code>previous_close, close = 100, 110
+print("difference:", close - previous_close)
+print("previous:", previous_close, "current:", close)</code></pre>
+
+<p>값과 함께 자료형도 확인합니다. 고친 뒤에는 임시 디버깅 출력을 지웁니다.</p>
+
+<h3>pdb로 한 줄씩 실행</h3>
+
+<p>터미널에서 중단점을 걸고 실패한 호출의 상태를 확인합니다. 아래 두 줄을 <code>debug_empty.py</code>로 저장하고 <code>python3 -m pdb debug_empty.py</code>를 실행합니다.</p>
+
+<pre><code>from market_rules import summarize
+summarize([])</code></pre>
+
+<ul>
+<li><kbd>n</kbd>: 다음 줄 실행, <kbd>s</kbd>: 함수 안으로 진입.</li>
+<li>함수 안에서 <code>p changes</code>, <code>p len(changes)</code>로 상태 확인.</li>
+<li><kbd>q</kbd>: 종료.</li>
+</ul>
+
+<pre><code>(Pdb) n
+-&gt; summarize([])
+(Pdb) s
+&gt; market_rules.py(...)summarize()
+(Pdb) p changes
+[]
+(Pdb) p len(changes)
+0</code></pre>
+
+<p>n으로 import를 실행하면 함수 호출 직전에 멈춥니다. s로 summarize에 들어가 본문이 실행되기 전에 인자를 확인합니다. 나눗셈을 계속 실행하면 예외가 재현됩니다. 슬라이드는 VS Code에서 함수의 return 줄에 중단점을 두는 방법도 소개하지만, 이 웹 실습에서는 pdb를 씁니다. <a href="debug_lab.html">debug_lab</a>에서는 pdb 명령을 파이프로 넣어 같은 기록을 볼 수 있고, 직접 입력해 보려면 터미널에서 <code>python3 -m pdb debug_empty.py</code>를 실행합니다.</p>
+
+<h2>함수 계약과 테스트 사례</h2>
+
+<table>
+<thead>
+<tr><th>계약</th><th>입력</th><th>기대 결과</th></tr>
+</thead>
+<tbody>
+<tr><td>이전 가격 기준 변화율</td><td>100 → 110</td><td>+10%</td></tr>
+<tr><td>가격 하락</td><td>100 → 90</td><td>-10%</td></tr>
+<tr><td>가격 유지</td><td>100 → 100</td><td>0%</td></tr>
+<tr><td>양의 가격만 허용</td><td>0 → 100</td><td>ValueError</td></tr>
+<tr><td>빈 요약</td><td>[]</td><td>count 0, mean None</td></tr>
+</tbody>
+</table>
+
+<p>기대값을 독립적으로 계산할 수 있는 입력을 고릅니다.</p>
+
+<h3>정상·경계·오류 입력 나누기</h3>
+
+<table>
+<thead>
+<tr><th>분류</th><th>입력</th><th>기대 결과</th></tr>
+</thead>
+<tbody>
+<tr><td>최소 유효 가격</td><td>가격 1, 2</td><td>+100%</td></tr>
+<tr><td>경계 밖의 가격</td><td>가격 0, 100</td><td>ValueError</td></tr>
+<tr><td>잘못된 자료형</td><td>가격 True, 100</td><td>ValueError</td></tr>
+<tr><td>빈 요약</td><td>[]</td><td>평균 None</td></tr>
+<tr><td>관측값 한 개</td><td>[5]</td><td>평균 5</td></tr>
+</tbody>
+</table>
+
+<p>가격 0과 1처럼 허용 여부가 바뀌는 지점을 고릅니다. bool은 int의 하위 클래스이므로 True도 별도 사례로 확인합니다.</p>
+
+<h2>unittest로 검증하기</h2>
+
+<pre><code>import unittest
+from market_rules import change_pct
+
+class ChangeTests(unittest.TestCase):
+    def test_increase(self):
+        self.assertAlmostEqual(change_pct(100, 110), 10.0)</code></pre>
+
+<p>입력 준비, 함수 호출, 결과 단언 순서로 씁니다. 부동소수점 결과에는 근사 비교를 씁니다. 기본 자동 탐색은 <code>test*.py</code> 이름의 파일을 찾습니다.</p>
+
+<h3>입력 준비·실행·결과 단언</h3>
+
+<pre><code>def test_increase(self):
+    # Arrange: known input and expected answer.
+    previous, close = 100, 110
+    expected = 10.0
+    # Act: call the function once.
+    actual = change_pct(previous, close)
+    # Assert: check the contract.
+    self.assertAlmostEqual(actual, expected)</code></pre>
+
+<p>기대값 10은 손으로 계산해 먼저 정합니다. 구현의 계산식을 기대값에 복사하면 같은 결함을 함께 복사할 수 있습니다.</p>
+
+<h3>계약에 맞는 assertion 고르기</h3>
+
+<table>
+<thead>
+<tr><th>assertion</th><th>예시</th><th>확인할 계약</th></tr>
+</thead>
+<tbody>
+<tr><td><code>assertEqual</code></td><td>count, 3</td><td>정확한 개수·순서</td></tr>
+<tr><td><code>assertAlmostEqual</code></td><td>change, 10.0</td><td>계산한 실수</td></tr>
+<tr><td><code>assertIsNone</code></td><td>mean</td><td>평균 없음</td></tr>
+<tr><td><code>assertRaises</code></td><td>ValueError</td><td>잘못된 입력 거절</td></tr>
+</tbody>
+</table>
+
+<pre><code>with self.assertRaises(ValueError):
+    change_pct(0, 100)</code></pre>
+
+<p>호출은 with 블록 안에 넣습니다. ValueError가 나지 않거나 다른 예외가 나면 테스트가 실패합니다.</p>
+
+<h3>실패·오류·회귀</h3>
+
+<ul>
+<li><strong>실패(Failure)</strong>: assertion이 기대값과 실제값의 차이를 발견했다.</li>
+<li><strong>오류(Error)</strong>: 예상하지 않은 예외로 테스트가 중단됐다.</li>
+<li><strong>회귀(Regression)</strong>: 변경 뒤에 기존에 되던 동작이 깨졌다.</li>
+</ul>
+
+<p>고치기 전에 새 테스트가 해당 결함을 발견하는지 확인하고, 고친 뒤에는 전체 테스트로 다른 동작이 손상되지 않았는지 확인합니다.</p>
+
+<h3>테스트 하나 실행하고 결과 읽기</h3>
+
+<pre><code>python3 -m unittest -v test_market_rules.MarketRuleTests.test_empty_summary
+python3 -m unittest -v
+Ran 5 tests ...
+FAILED (failures=3, errors=1)</code></pre>
+
+<p>시작 코드의 결과입니다. 결함 세 개가 문제 네 건으로 보고되는 이유는, 가격 테스트 메서드 안의 subTest 두 개(100→110, 100→90)가 각각 실패하기 때문입니다. 빈 요약은 assertion에 닿기 전에 예외가 나므로 실패가 아니라 오류로 셉니다. 한 문제를 집중해서 고친 뒤 전체를 실행합니다. 테스트 개수만으로 검증이 충분한지 판단할 수는 없습니다. <a href="debug_lab.html">debug_lab</a>의 첫 단계에서 이 출력을 확인합니다.</p>
+
+<h2>실습 함수의 계약</h2>
+
+<ul>
+<li><code>change_pct</code>: 양의 정수 가격만 허용하며 bool은 제외한다. 반올림하지 않은 등락률을 반환한다.</li>
+<li><code>summarize</code>: 검증된 숫자 목록에서 개수와 평균을 구한다. 빈 목록의 평균은 None이다.</li>
+<li><code>rank_changes</code>: 검증된 행을 등락률 내림차순, 코드 오름차순으로 정렬한다. 새 목록을 반환하고 입력을 바꾸지 않는다.</li>
+</ul>
+
+<p>이 실습에서는 계산 규칙을 파일 입출력과 분리합니다.</p>
+
+<h2>실습 A: 등락률 계산</h2>
+
+<p>고치기 전에 100 → 110의 잘못된 결과를 재현하고, 분모를 확인해 원인을 기록합니다. 식을 고친 뒤 상승·하락·보합 테스트를 실행합니다. 반올림은 계산 함수가 아니라 출력 단계에서 합니다. 이 테스트가 잘못된 식을 잡아내는지, 아니면 그대로 반복하는지 물어봅니다.</p>
+
+<pre><code># Before: wrong reference price.
+return (close - previous_close) / close * 100
+# After: change relative to the previous price.
+return (close - previous_close) / previous_close * 100</code></pre>
+
+<p>고치기 전에는 100에서 110의 결과가 약 9.09라 테스트가 실패하고, 고친 뒤에는 같은 테스트에서 10을 반환해 통과합니다. 100에서 90으로 떨어지면 -10%인지도 확인합니다. 기존 입력 검증과 공개 함수의 인자 형식은 유지합니다. 상수 10을 반환하는 가짜 수정은 한 예제를 통과해도 하락·보합 사례에서 실패합니다.</p>
+
+<h2>실습 B: 빈 요약</h2>
+
+<p><code>summarize([])</code>를 호출하고 traceback을 읽습니다. 관측값이 없으면 산술평균도 없습니다. 개수는 0, 평균은 None으로 반환합니다. 고친 뒤 원소가 한 개일 때와 여러 개일 때도 확인합니다. 실제 평균 0과 데이터 없음은 구별할 수 있어야 합니다.</p>
+
+<pre><code>summary = {"count": 3, "mean": 0.0}
+mean = summary["mean"]
+label = "N/A" if mean is None else f"{mean:.2f}%"
+print(label)  # 0.00%</code></pre>
+
+<p><code>[]</code>는 개수 0, 평균 None이고, <code>[10, -10, 0]</code>은 개수 3, 실제 평균 0입니다. <code>if not mean</code>은 None과 0.0을 모두 거짓으로 판단하므로, 값이 없는 상태를 표시할 때는 None을 명시적으로 확인합니다.</p>
+
+<h2>실습 C: 동률 정렬</h2>
+
+<p>등락률은 내림차순, 등락률이 같으면 종목 코드 오름차순입니다. 기대 순서와 다른 순서로 입력을 준비하고, 원래 목록과 행의 값이 바뀌지 않았는지 확인합니다.</p>
+
+<pre><code>Input codes:  000003(-1), 000002(+2), 000001(+2)
+Output codes: 000001, 000002, 000003</code></pre>
+
+<h3>두 항목으로 된 정렬 키</h3>
+
+<pre><code>key = lambda row: (-row["change_pct"], row["code"])</code></pre>
+
+<table>
+<thead>
+<tr><th>코드와 등락률</th><th>정렬 키</th><th>최종 위치</th></tr>
+</thead>
+<tbody>
+<tr><td>000003, -1</td><td>(1, "000003")</td><td>3</td></tr>
+<tr><td>000002, +2</td><td>(-2, "000002")</td><td>2</td></tr>
+<tr><td>000001, +2</td><td>(-2, "000001")</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>파이썬은 튜플을 앞 항목부터 오름차순으로 비교합니다. 등락률에 음수를 붙이면 원래 큰 값이 먼저 옵니다. 첫 항목이 같을 때는 두 번째 항목인 코드가 순서를 정합니다.</p>
+
+<h3>새 목록과 공유되는 행 객체</h3>
+
+<pre><code>before = [dict(row) for row in rows]
+ranked = rank_changes(rows)
+self.assertEqual(rows, before)
+self.assertIsNot(ranked, rows)</code></pre>
+
+<p><code>rows.sort()</code>는 입력 목록을 바꾸고, <code>sorted()</code>는 새 목록을 만듭니다. 하지만 새 목록 안의 딕셔너리는 여전히 원래 행 객체를 가리킵니다. 실습의 계약은 정렬하는 동안 원본을 바꾸지 않는 것이지 깊은 복사를 보장하는 것이 아닙니다. 평평한 행을 하나씩 복사해 비교용 상태를 만듭니다. <code>before = rows</code>는 같은 객체를 가리키므로 변경을 놓칩니다.</p>
+
+<p>세 결함을 sed로 하나씩 고치며 실패 수가 3+1 → 1+1 → 1 → 0으로 줄어드는 과정과 최종 diff는 <a href="debug_fix.html">debug_fix</a>에 있습니다. 실습에서는 <code>nano market_rules.py</code>로 직접 고칩니다.</p>
+
+<h2>추가 테스트 두 개</h2>
+
+<p>제공된 테스트에 없는 사례를 고릅니다. 예를 들어 최소 양의 가격, 원소 한 개의 요약, 빈 순위입니다. 함수를 실행하기 전에 기대값을 먼저 적고, 각 사례가 확인하는 요구사항을 기록합니다. 마지막 수정 뒤에 전체 테스트를 다시 실행합니다.</p>
+
+<h3>약한 검사와 결함을 잡는 검사</h3>
+
+<pre><code># Weak: an empty dictionary would also pass.
+self.assertIsNotNone(summarize([]))
+# Stronger: verify the agreed empty-state values.
+self.assertEqual(summarize([]), {"count": 0, "mean": None})</code></pre>
+
+<p>구현을 그럴듯한 오답으로 바꾸면 테스트가 실패해야 합니다. 오름차순으로 정렬하거나 동률 처리를 빼면 잡아낼 수 있는지 물어봅니다. 이런 실수가 드러나도록 기대 순서와 반대인 입력도 준비합니다. 기대값을 검사 대상 함수를 호출해서 만들지 않습니다.</p>
+
+<h2>수정 내용 리뷰</h2>
+
+<ul>
+<li>실패 입력과 관련 코드 diff를 보여 준다.</li>
+<li>값이나 제어 흐름을 근거로 원인을 설명한다.</li>
+<li>테스트를 지우거나 검증을 약하게 바꾸지 않았는지 확인한다.</li>
+<li>다른 유효 입력에서도 계약이 깨질 가능성을 검토한다.</li>
+<li>실습 폴더의 <code>debugging-report.md</code>에 리뷰를 기록한다.</li>
+</ul>
+
+<h2>제출과 확인 질문</h2>
+
+<p>고친 코드, 추가 테스트 두 개, 디버깅 보고서를 제출합니다. 실행 명령과 실제 테스트 요약을 포함합니다.</p>
+
+<ul>
+<li>빈 평균과 평균 0은 왜 다른가?</li>
+<li>동률 종목을 코드 역순으로 입력하는 이유는 무엇인가?</li>
+</ul>
+
+<p>다음 수업에서는 입력 검증, 파일 실패, 기능 확장 테스트를 다룹니다.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>

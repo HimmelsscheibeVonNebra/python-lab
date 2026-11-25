@@ -1,0 +1,5 @@
+#!/bin/sh
+# Serial-console shell for the web pages: user "student".  The page's
+# lab.dir=<dir> (kernel command line) picks the start directory under
+# /home/student; see /etc/profile.d/lab.sh.
+exec su -l student

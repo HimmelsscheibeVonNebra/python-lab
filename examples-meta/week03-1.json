@@ -1,0 +1,153 @@
+{
+  "class": "week03-1",
+  "title": "반복문",
+  "summary": "for와 range(), 누적 합, while과 break·continue, 중첩 반복문으로 짝수 합, 0까지 입력 합, 구구단, 별 삼각형을 만든다.",
+  "examples": [
+    {
+      "name": "even_sum",
+      "source": "week03/starter/session1/even_sum.py",
+      "also": [
+        "week03/solutions/session1/even_sum.py"
+      ],
+      "summary": "연습 1: 1부터 10까지의 정수 중 짝수만 total에 더해 30을 출력한다. 그 전에 for, range(), 누적 변수의 동작을 슬라이드 예제로 확인한다.",
+      "steps": [
+        {
+          "cmd": "printf '%s\\n' 'for letter in \"ABC\":' '    print(letter)' 'print(\"Done\")' | python3 -",
+          "note": "반복마다 다음 글자가 letter에 들어간다. A, B, C 다음 반복이 끝나고 Done이 한 번 출력된다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'for i in range(3): print(i, end=\" \")' 'print(\"| range(3)\")' 'for i in range(1, 4): print(i, end=\" \")' 'print(\"| range(1, 4)\")' 'for i in range(2, 7, 2): print(i, end=\" \")' 'print(\"| range(2, 7, 2)\")' 'for i in range(3, 0, -1): print(i, end=\" \")' 'print(\"| range(3, 0, -1)\")' 'for i in range(3, 0): print(i, end=\" \")' 'print(\"| range(3, 0)\")' | python3 -",
+          "note": "stop 값은 언제나 빠진다: 0 1 2, 1 2 3, 2 4 6, 3 2 1. 방향이 맞지 않는 range(3, 0)은 비어 있어 아무 값도 없다."
+        },
+        {
+          "cmd": "python3 -u -c 'range(1, 5, 0)' 2>&1 | grep -v -e '^Traceback' -e '^ '",
+          "note": "step이 0이면 ValueError: range() arg 3 must not be zero다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'total = 0' 'for n in range(1, 6):' '    before = total' '    total += n' '    print(n, before, total)' 'print(\"final:\", total)' | python3 -",
+          "note": "누적 추적표: 각 줄은 n, 더하기 전 total, 더한 뒤 total이다. 이전 total을 이어받아 1, 3, 6, 10, 15가 된다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'for n in range(1, 6):' '    total = 0' '    total += n' 'print(\"final:\", total)' | python3 -",
+          "note": "슬라이드의 질문: total = 0을 반복문 안에 두면 매번 초기화돼 마지막 값 5만 남는다."
+        },
+        {
+          "cmd": "python3 even_sum.py",
+          "note": "시작 코드는 pass만 있어 아무것도 더하지 않고 0을 출력한다."
+        },
+        {
+          "cmd": "python3 ../../solutions/session1/even_sum.py",
+          "note": "if n % 2 == 0일 때만 더하면 2 + 4 + 6 + 8 + 10 = 30이다."
+        }
+      ],
+      "expect": "final: 15"
+    },
+    {
+      "name": "input_sum",
+      "source": "week03/starter/session1/input_sum.py",
+      "also": [
+        "week03/solutions/session1/input_sum.py"
+      ],
+      "summary": "연습 2: while True로 정수를 하나씩 입력받아 0이 나오면 break하고 합계를 출력한다. while의 실행 순서, break, continue를 먼저 확인한다.",
+      "steps": [
+        {
+          "cmd": "printf '%s\\n' 'count = 1' 'while count <= 3:' '    print(count)' '    count += 1' 'print(\"Done\", count)' | python3 -",
+          "note": "조건을 먼저 검사하고 본문을 실행한다. count가 4가 되어 조건이 False일 때 빠져나오므로 Done 4다. count += 1이 없으면 무한 반복이다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'while True:' '    text = input(\"Message (q: quit): \")' '    if text == \"q\":' '        break' '    print(\"Input:\", text)' 'print(\"Done\")' > /tmp/echo_q.py; printf 'hello\\nhi\\nq\\n' | python3 /tmp/echo_q.py",
+          "note": "break 예제를 /tmp/echo_q.py로 저장하고 hello, hi, q를 넣었다. hello와 hi는 Input:으로 되돌려 주고, q에서는 출력 없이 반복을 끝내 Done이 나온다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'for n in range(1, 6):' '    if n == 3:' '        continue' '    print(n)' | python3 -",
+          "note": "continue는 이번 반복의 나머지만 건너뛴다. 3만 빠지고 1, 2, 4, 5가 출력된다."
+        },
+        {
+          "cmd": "printf '3\\n5\\n0\\n' | python3 input_sum.py",
+          "note": "시작 코드는 0에서 멈추긴 하지만 더하는 코드가 없어 Total: 0이다."
+        },
+        {
+          "cmd": "printf '3\\n5\\n0\\n' | python3 ../../solutions/session1/input_sum.py; printf '0\\n' | python3 ../../solutions/session1/input_sum.py; printf -- '-2\\n5\\n0\\n' | python3 ../../solutions/session1/input_sum.py",
+          "note": "세 테스트: 3, 5, 0은 Total: 8, 바로 0이면 Total: 0, -2, 5, 0은 Total: 3. 0인지 먼저 검사한 뒤 더한다."
+        }
+      ],
+      "expect": "Total: 8",
+      "notes": "직접 python3 input_sum.py로 실행해 숫자를 하나씩 입력하고 0으로 끝내 봐도 된다. 실수로 무한 반복에 빠지면 Ctrl+C로 멈춘다(Colab에서는 Stop 버튼)."
+    },
+    {
+      "name": "multiplication",
+      "source": "week03/starter/session1/multiplication.py",
+      "also": [
+        "week03/solutions/session1/multiplication.py"
+      ],
+      "summary": "실습 3: 2~9 사이의 단을 입력받아 그 단의 9개 식을 출력하고(범위 밖이면 Invalid table), 이어서 중첩 반복문으로 2단부터 9단까지 72개 식을 모두 출력한다.",
+      "steps": [
+        {
+          "cmd": "printf '%s\\n' 'for row in range(1, 3):' '    for col in range(1, 4):' '        print(row, col)' | python3 -",
+          "note": "바깥 row 하나마다 안쪽 col이 1, 2, 3을 모두 돈다. 2 × 3 = 6쌍이 출력된다."
+        },
+        {
+          "cmd": "echo 7 | python3 multiplication.py",
+          "note": "시작 코드: 단 하나 출력 부분이 비어 있고, 전체 구구단도 안쪽이 pass라 All tables: 뒤에 빈 줄 8개만 나온다(단마다 print() 한 번)."
+        },
+        {
+          "cmd": "echo 7 | python3 ../../solutions/session1/multiplication.py | head -11",
+          "note": "답안: 7 x 1 = 7부터 7 x 9 = 63까지 9개 식 다음에 All tables:와 2 x 1 = 2가 이어진다."
+        },
+        {
+          "cmd": "echo 7 | python3 ../../solutions/session1/multiplication.py | grep -c ' = '; echo 1 | python3 ../../solutions/session1/multiplication.py | grep -c ' = '",
+          "note": "식의 개수를 센다. 유효한 7은 9 + 72 = 81개, 잘못된 1은 전체 구구단 72개뿐이다."
+        },
+        {
+          "cmd": "for t in 1 10; do echo $t | python3 ../../solutions/session1/multiplication.py | head -1; done",
+          "note": "1과 10은 Invalid table이다. 입력 검증 블록 다음에 전체 구구단이 있으므로 그 부분은 항상 실행된다."
+        },
+        {
+          "cmd": "echo 9 | python3 ../../solutions/session1/multiplication.py | grep -n '9 x 9 = 81'",
+          "note": "경계값 9: 9 x 9 = 81이 단 하나 출력의 마지막(9번 줄)과 전체 구구단의 마지막(89번 줄)에 두 번 나온다. 89번 줄 다음은 9단 뒤의 빈 줄이다."
+        }
+      ],
+      "expect": "7 x 9 = 63"
+    },
+    {
+      "name": "stars",
+      "source": "week03/starter/session1/stars.py",
+      "also": [
+        "week03/solutions/session1/stars.py"
+      ],
+      "summary": "실습 4: 1~10 높이를 입력받아 중첩 반복문으로 왼쪽 정렬 삼각형을 출력한다. 범위 밖이면 Invalid height를 출력한다.",
+      "steps": [
+        {
+          "cmd": "printf '%s\\n' 'for row in range(1, 4):' '    for col in range(row):' '        print(\"*\", end=\"\")' '    print()' | python3 -",
+          "note": "end=\"\"로 별을 같은 줄에 이어 찍고, 안쪽 반복이 끝난 뒤의 print()가 줄을 바꾼다. *, **, ***."
+        },
+        {
+          "cmd": "echo 4 | python3 stars.py; echo",
+          "note": "시작 코드는 프롬프트만 출력한다."
+        },
+        {
+          "cmd": "echo 4 | python3 ../../solutions/session1/stars.py; echo 1 | python3 ../../solutions/session1/stars.py",
+          "note": "높이 4는 별 1, 2, 3, 4개짜리 네 줄, 높이 1은 별 하나다."
+        },
+        {
+          "cmd": "echo 4 | python3 ../../solutions/session1/stars.py | grep -o '[*]' | wc -l",
+          "note": "높이 4의 별은 모두 1 + 2 + 3 + 4 = 10개다."
+        },
+        {
+          "cmd": "for h in 0 11; do echo $h | python3 ../../solutions/session1/stars.py; done",
+          "note": "0과 11은 Invalid height만 출력한다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'height = 3' 'for row in range(1, height + 1):' '    for col in range(height):' '        print(\"*\", end=\"\")' '    print()' | python3 -",
+          "note": "흔한 실수: 안쪽을 range(height)로 쓰면 삼각형이 아니라 3 × 3 사각형이 된다."
+        },
+        {
+          "cmd": "printf '%s\\n' 'height = 3' 'for row in range(1, height):' '    for col in range(row):' '        print(\"*\", end=\"\")' '    print()' | python3 -",
+          "note": "흔한 실수: 바깥을 range(1, height)로 쓰면 마지막 줄이 빠져 두 줄만 나온다."
+        }
+      ],
+      "expect": "****",
+      "notes": "선택 확장 과제는 빈 줄 뒤에 ****, ***, **, *로 줄어드는 삼각형을 추가하는 것이다. range(height, 0, -1)을 떠올려 보자."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="03_init_and_self — Object-Oriented Programming · Python Lab" data-title-ko="03_init_and_self — 객체 지향 프로그래밍 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>03_init_and_self — Object-Oriented Programming · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week07/examples/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 7 · Session 1</span><span lang="ko">7주차 1차시</span></a><span class="sep">/</span><span>03_init_and_self</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>03_init_and_self</h1>
+    <p><span lang="en">__init__(self, owner, balance) is called for every new instance and stores the initial values in self.owner and self.balance. Arguments are passed at creation, as in BankAccount(&quot;Minsu&quot;, 10000).</span><span lang="ko">__init__(self, owner, balance)가 새 인스턴스마다 호출되어 self.owner와 self.balance에 초기값을 저장한다. BankAccount(&quot;Minsu&quot;, 10000)처럼 생성할 때 인자를 넘긴다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week07/examples/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week07/examples/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 03_init_and_self.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 03_init_and_self.py">▶</button><code>python3 03_init_and_self.py</code></div>
+          <p><span lang="en">The accounts are initialized to Minsu 10000 and Jisu 5000, then only minsu grows by 3000, giving After changing Minsu: 13000 5000.</span><span lang="ko">Minsu 10000, Jisu 5000으로 초기화된 뒤 minsu만 3000 늘려 After changing Minsu: 13000 5000이 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;03_init_and_self&quot;).BankAccount; a = BankAccount(&quot;A&quot;, 2000); b = BankAccount(&quot;B&quot;, 7000); a.balance = a.balance + 1000; print(a.balance); print(b.balance)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;03_init_and_self&quot;).BankAccount; a = BankAccount(&quot;A&quot;, 2000); b = BankAccount(&quot;B&quot;, 7000); a.balance = a.balance + 1000; print(a.balance); print(b.balance)'">▶</button><code>python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;03_init_and_self&quot;).BankAccount; a = BankAccount(&quot;A&quot;, 2000); b = BankAccount(&quot;B&quot;, 7000); a.balance = a.balance + 1000; print(a.balance); print(b.balance)'</code></div>
+          <p><span lang="en">This is the prediction question from the slides. Importing the file first runs its top-level code once, printing the same three lines as above, and then 3000 and 7000 appear. Changing a.balance does not affect b. Because the file name starts with a digit, import_module is used instead of an import statement.</span><span lang="ko">슬라이드의 예측 문제다. 먼저 파일을 import하면서 맨 위 코드가 한 번 실행되어 위와 같은 세 줄이 나오고, 그 다음에 3000과 7000이 나온다. a.balance를 바꿔도 b는 영향을 받지 않는다. 파일 이름이 숫자로 시작해서 import 문 대신 import_module을 썼다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>03_init_and_self.py <span class="muted"><span lang="en">16 lines</span><span lang="ko">16줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Step 3: initialize instance attributes with __init__ and self.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class BankAccount:</span>
+<span class="ln">    def __init__(self, owner, balance):</span>
+<span class="ln">        self.owner = owner</span>
+<span class="ln">        self.balance = balance</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">minsu = BankAccount(&quot;Minsu&quot;, 10000)</span>
+<span class="ln">jisu = BankAccount(&quot;Jisu&quot;, 5000)</span>
+<span class="ln">print(minsu.owner, minsu.balance)</span>
+<span class="ln">print(jisu.owner, jisu.balance)</span>
+<span class="ln"> </span>
+<span class="ln">minsu.balance = minsu.balance + 3000</span>
+<span class="ln">print(&quot;After changing Minsu:&quot;, minsu.balance, jisu.balance)</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="02_classes_and_objects.html">← 02_classes_and_objects</a>
+    <a href="03b_class_and_instance_variables.html">03b_class_and_instance_variables →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

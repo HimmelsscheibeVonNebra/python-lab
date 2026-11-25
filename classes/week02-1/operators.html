@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="operators — Operators, Strings &amp; Conditionals (Theory) · Python Lab" data-title-ko="operators — 연산자, 문자열, 조건문 (이론) · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>operators — Operators, Strings &amp; Conditionals (Theory) · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week02/solutions">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 2 · Session 1</span><span lang="ko">2주차 1차시</span></a><span class="sep">/</span><span>operators</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>operators</h1>
+    <p><span lang="en">Run the operator examples from the slides as one-line programs. Check the value and type of expressions, // and %, comparisons and ranges, short-circuiting with and / or, precedence and compound assignment. At the end, run a leap-year program that uses all of these operators (the solution to Session 2, Lab 4).</span><span lang="ko">슬라이드의 연산자 예제를 한 줄 프로그램으로 실행한다. 식의 값과 자료형, //와 %, 비교와 범위, and·or의 단락 평가, 우선순위와 복합 대입을 확인한다. 마지막에 이 연산자들을 모두 쓰는 윤년 프로그램(2차시 실습 4의 답안)을 돌려 본다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week02/solutions</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week02/solutions</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(8 + 2, type(8 + 2)); print(8 / 2, type(8 / 2)); print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(8 + 2, type(8 + 2)); print(8 / 2, type(8 / 2)); print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))'">▶</button><code>python3 -c 'print(8 + 2, type(8 + 2)); print(8 / 2, type(8 / 2)); print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))'</code></div>
+          <p><span lang="en">8 / 2 is the float 4.0 even though both operands are integers, and &quot;8&quot; + &quot;2&quot; is the str 82. Predict the value and type before running it.</span><span lang="ko">8 / 2는 정수끼리 나눠도 float 4.0이고, &quot;8&quot; + &quot;2&quot;는 str 82다. 실행 전에 값과 자료형을 먼저 예측해 본다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'raw = &quot; 12 &quot;; clean = raw.strip(); number = int(clean); print(repr(raw), repr(clean)); print(number + 3, clean + &quot;3&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'raw = &quot; 12 &quot;; clean = raw.strip(); number = int(clean); print(repr(raw), repr(clean)); print(number + 3, clean + &quot;3&quot;)'">▶</button><code>python3 -c 'raw = &quot; 12 &quot;; clean = raw.strip(); number = int(clean); print(repr(raw), repr(clean)); print(number + 3, clean + &quot;3&quot;)'</code></div>
+          <p><span lang="en">Seen with repr, raw still has its leading and trailing spaces. The numeric addition gives 15, and the string concatenation gives 123.</span><span lang="ko">repr로 보면 raw의 앞뒤 공백이 그대로 남아 있다. 숫자 덧셈은 15, 문자열 연결은 123이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'a, b = 7, 3; print(a + b, a - b, a * b, a / b); print(a // b, a % b, a ** b, -7 // 3)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'a, b = 7, 3; print(a + b, a - b, a * b, a / b); print(a // b, a % b, a ** b, -7 // 3)'">▶</button><code>python3 -c 'a, b = 7, 3; print(a + b, a - b, a * b, a / b); print(a // b, a % b, a ** b, -7 // 3)'</code></div>
+          <p><span lang="en">7 // 3 is 2, 7 % 3 is 1 and 7 ** 3 is 343. -7 // 3 rounds down, so it is -3, not -2.</span><span lang="ko">7 // 3은 2, 7 % 3은 1, 7 ** 3은 343이다. -7 // 3은 내림이라 -2가 아니라 -3이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'minutes = 185; print(minutes // 60, minutes % 60); students = 29; print(students // 4, students % 4); print(3 * 60 + 5, 7 * 4 + 1)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'minutes = 185; print(minutes // 60, minutes % 60); students = 29; print(students // 4, students % 4); print(3 * 60 + 5, 7 * 4 + 1)'">▶</button><code>python3 -c 'minutes = 185; print(minutes // 60, minutes % 60); students = 29; print(students // 4, students % 4); print(3 * 60 + 5, 7 * 4 + 1)'</code></div>
+          <p><span lang="en">Answers to the exercise: 3 hours 5 minutes, and 7 groups of 4 with 1 student left. Check that quotient × divisor + remainder gives back the original values 185 and 29.</span><span lang="ko">연습 문제의 답: 3시간 5분, 4명씩 7모둠에 1명 남음. 몫 × 나누는 수 + 나머지가 원래 값 185, 29로 돌아오는지 확인한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'score = 85; print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'score = 85; print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)'">▶</button><code>python3 -c 'score = 85; print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)'</code></div>
+          <p><span lang="en">Comparisons return True/False. The string &quot;85&quot; and the integer 85 are not equal, so input must be converted before comparing.</span><span lang="ko">비교 결과는 True/False다. 문자열 &quot;85&quot;와 정수 85는 같지 않으므로 입력은 비교 전에 변환해야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'">▶</button><code>python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'</code></div>
+          <p><span lang="en">&lt;= includes the endpoint and &lt; excludes it. The two results differ at 0 and 100, and for 101 both are False.</span><span lang="ko">&lt;=는 끝값을 포함하고 &lt;는 제외한다. 0과 100에서 두 결과가 갈리고, 101은 둘 다 False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'age = 20; has_id = True; print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'age = 20; has_id = True; print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)'">▶</button><code>python3 -c 'age = 20; has_id = True; print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)'</code></div>
+          <p><span lang="en">and is True when both are true, or is True when at least one is true, and not reverses the value.</span><span lang="ko">and는 둘 다 참일 때, or는 하나만 참이어도 True, not은 뒤집는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'n = 0; print(n != 0 and 10 / n &gt; 2); text = &quot;&quot;; print(text != &quot;&quot; and text[0] == &quot;A&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'n = 0; print(n != 0 and 10 / n &gt; 2); text = &quot;&quot;; print(text != &quot;&quot; and text[0] == &quot;A&quot;)'">▶</button><code>python3 -c 'n = 0; print(n != 0 and 10 / n &gt; 2); text = &quot;&quot;; print(text != &quot;&quot; and text[0] == &quot;A&quot;)'</code></div>
+          <p><span lang="en">Both print False and there is no error. The first condition is False, so 10 / n and text[0] are never evaluated (short-circuiting).</span><span lang="ko">둘 다 False가 나오고 오류가 없다. 앞쪽 조건이 False라 10 / n과 text[0]은 평가되지 않는다(단락 평가).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2); print(True or False and False, (True or False) and False)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2); print(True or False and False, (True or False) and False)'">▶</button><code>python3 -c 'print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2); print(True or False and False, (True or False) and False)'</code></div>
+          <p><span lang="en">14, 20, -4, 4. ** binds more tightly than unary -, so -2 ** 2 is -4. and comes before or, so the first expression is True; with parentheses it is False.</span><span lang="ko">14, 20, -4, 4. **가 단항 -보다 먼저라 -2 ** 2는 -4다. and가 or보다 먼저라 첫 식은 True, 괄호를 치면 False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'score = 80; score += 5; print(score); x = 5; x += 3; x *= 2; print(x)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'score = 80; score += 5; print(score); x = 5; x += 3; x *= 2; print(x)'">▶</button><code>python3 -c 'score = 80; score += 5; print(score); x = 5; x += 3; x *= 2; print(x)'</code></div>
+          <p><span lang="en">Compound assignments run in written order: 85, and then (5 + 3) × 2 = 16.</span><span lang="ko">복합 대입은 적힌 순서대로 실행된다: 85, 그리고 (5 + 3) × 2 = 16.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done">▶</button><code>for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done</code></div>
+          <p><span lang="en">A leap-year test that combines %, ==, and, or and not in one expression. After the Year: prompt you get 2000: Leap year, 1900: Not a leap year. It is worked through in detail in Session 2, Lab 4.</span><span lang="ko">%, ==, and, or, not을 한 식에 묶은 윤년 판정이다. 프롬프트 Year: 뒤에 2000: Leap year, 1900: Not a leap year가 나온다. 자세한 풀이는 2차시 실습 4에서 한다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>leap_year.py <span class="muted"><span lang="en">18 lines</span><span lang="ko">18줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 reference solution: the Gregorian leap-year rule.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume integer-formatted input. Range validation follows conversion.</span>
+<span class="ln">year = int(input(&quot;Year: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">if year &lt;= 0:</span>
+<span class="ln">    print(&quot;Enter a positive year&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    is_leap = year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)</span>
+<span class="ln">    if is_leap:</span>
+<span class="ln">        print(f&quot;{year}: Leap year&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(f&quot;{year}: Not a leap year&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># 2024, 2000 -&gt; &lt;year&gt;: Leap year</span>
+<span class="ln"># 2023, 1900 -&gt; &lt;year&gt;: Not a leap year</span>
+<span class="ln"># 0, -4 -&gt; Enter a positive year</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="string_basics.html">string_basics →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

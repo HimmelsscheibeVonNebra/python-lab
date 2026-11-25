@@ -1,0 +1,17 @@
+{
+  "title": "Introduction to Database Systems",
+  "summary": "Sort out the concepts: why files alone cannot cope with sharing, change and failure; what the relational model, schemas, DDL and SQL hide from you; and what the storage, query and transaction managers inside the engine do. On the lab page, look directly at the data dictionary (sqlite_master), schema and instance, query execution plans and control of concurrent writes, using market.db.",
+  "examples": {
+    "db_internals": {
+      "summary": "Look at Session 1's market.db through the engine's eyes. Observe in turn where definitions created with DDL are stored as metadata, the schema that stays fixed and the instance that keeps changing, the execution plan the engine chooses for the same SQL, and the locking that puts two connections in order when both try to write at the same time.",
+      "notes": "SQLite is an embedded engine that writes a single file; in the slides' classification it is centralized (one system does all the work). The client-server, parallel and distributed architectures and the DBA permission management from the slides are not reproduced in this lab. In Week 14, Flask plays the role of the application server in a three-tier architecture.",
+      "steps": [
+        "The data dictionary: the definitions declared with CREATE TABLE are stored as metadata in a table called sqlite_master. You can see the quotes table and the index sqlite_autoindex_quotes_1, which the engine created automatically because of PRIMARY KEY (date, code), followed by the stored DDL text.",
+        "The schema is the design; the instance is the current content. Deleting the two KOSDAQ rows changes the instance from 5 rows to 3, but the list of column names and types (the schema) stays the same. They correspond to a type in a program and a variable's current value. Because of the rollback() at the end, the actual file still has 5 rows.",
+        "The instructor/department example from the slides. DDL (CREATE TABLE) declares the structure, and declarative SQL asks only for the result: the names of the Comp. Sci. instructors, [('Srinivasan',), ('Katz',)]. A department's building and budget are not stored again for every instructor but only once, in department; following dept_name (JOIN) combines the two tables to give each instructor's building.",
+        "See the execution plan the query processor chose. Searching by the primary key gives SEARCH … USING INDEX sqlite_autoindex_quotes_1; searching by market gives SCAN quotes, which reads the whole table. After adding an index on market, the plan for the same SQL changes to SEARCH … USING INDEX quotes_market, but the result and the SQL statement stay the same. This is physical data independence: changing how data is stored does not affect the logical schema or the application (the experiment used the copy /tmp/plan.db).",
+        "Two users try to change the same row at the same time. When B tries to write before A has committed, it is refused with B: database is locked (with timeout=0 it fails immediately instead of waiting). B gives up its attempt with rollback(). Only after A commits can B write, so the volume goes 1000000 → 1000002, with both changes applied. This is the engine's concurrency control preventing the lost update in which one change disappeared in Session 1's file example. The final create_db.py restores the original values."
+      ]
+    }
+  }
+}

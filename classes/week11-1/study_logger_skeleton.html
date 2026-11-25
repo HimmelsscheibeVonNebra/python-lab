@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="study_logger_skeleton — Writing the Project Documents: Requirement, Feature, Function, UML · Python Lab" data-title-ko="study_logger_skeleton — 프로젝트 문서 쓰기: 요구사항·기능·함수·UML · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>study_logger_skeleton — Writing the Project Documents: Requirement, Feature, Function, UML · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week11/examples/study_logger_skeleton">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 11 · Session 1</span><span lang="ko">11주차 1차시</span></a><span class="sep">/</span><span>study_logger_skeleton</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>study_logger_skeleton</h1>
+    <p><span lang="en">A skeleton that turns the Week 10 design document into code. Every function has a name, parameters and a docstring (the contract), but its body is raise NotImplementedError or a TODO placeholder. See how the document's function table (FUNC) became files and functions as it is.</span><span lang="ko">10주차 설계 문서를 코드로 옮긴 뼈대다. 모든 함수에 이름·매개변수·docstring(계약)은 있지만 본문은 raise NotImplementedError나 TODO 자리 표시다. 문서의 함수 표(FUNC)가 그대로 파일과 함수가 된 모습을 확인한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week11/examples/study_logger_skeleton</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week11/examples/study_logger_skeleton</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls; cat data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls; cat data/study.csv">▶</button><code>ls; cat data/study.csv</code></div>
+          <p><span lang="en">There are four modules, main.py, logic.py, storage.py and report.py, plus data/study.csv. The CSV holds the header date,course,minutes and two rows: python 90 minutes and stats 45 minutes.</span><span lang="ko">main.py·logic.py·storage.py·report.py 네 모듈과 data/study.csv가 있다. CSV에는 헤더 date,course,minutes와 python 90분, stats 45분 두 행이 들어 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py">▶</button><code>python3 main.py</code></div>
+          <p><span lang="en">This prints Loaded 0 records and TODO: totals. It says 0 even though the file has two rows because load_records() is still a placeholder that returns an empty list. It runs, but it does not yet satisfy the requirements (REQ-03, REQ-04).</span><span lang="ko">Loaded 0 records와 TODO: totals가 나온다. 파일에 두 행이 있는데도 0인 이유는 load_records()가 아직 빈 리스트를 돌려주는 자리 표시이기 때문이다. 실행은 되지만 요구사항(REQ-03, REQ-04)은 아직 만족하지 못한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import logic; print(logic.make_record.__doc__)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import logic; print(logic.make_record.__doc__)'">▶</button><code>python3 -c 'import logic; print(logic.make_record.__doc__)'</code></div>
+          <p><span lang="en">The contract written in the function document (DOC 3) is there as the docstring. Read the shape of the return value {&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;: int}, the lower-casing, and the conditions that raise ValueError.</span><span lang="ko">함수 문서(DOC 3)에 쓴 계약이 docstring으로 들어 있다. 반환값의 모양 {&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;: int}, 소문자 변환, ValueError를 내는 조건을 읽어 본다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -nE 'def |raise NotImplementedError|TODO' *.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -nE 'def |raise NotImplementedError|TODO' *.py">▶</button><code>grep -nE 'def |raise NotImplementedError|TODO' *.py</code></div>
+          <p><span lang="en">All six functions from the function table (parse_minutes, make_record, weekly_totals, load_records, append_record, format_totals) and main() are present, and each body is marked with NotImplementedError or TODO. Every function name is a verb plus a noun.</span><span lang="ko">함수 표의 여섯 함수(parse_minutes, make_record, weekly_totals, load_records, append_record, format_totals)와 main()이 모두 있고, 각 본문이 NotImplementedError 또는 TODO로 표시되어 있다. 함수 이름은 모두 동사+명사다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'">▶</button><code>python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'</code></div>
+          <p><span lang="en">Calling a function that has no body yet gives a NotImplementedError: parse_minutes traceback. At the skeleton stage this is normal. From the next session on, these lines are replaced one by one with real bodies.</span><span lang="ko">아직 본문이 없는 함수를 호출하면 NotImplementedError: parse_minutes 트레이스백이 난다. 뼈대 단계에서는 이것이 정상이다. 다음 차시부터 이 줄을 하나씩 실제 본문으로 바꾼다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">19 lines</span><span lang="ko">19줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Entry point: python3 main.py</span>
+<span class="ln"> </span>
+<span class="ln">Week 10 skeleton: loads records and prints a placeholder summary.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">from report import format_totals</span>
+<span class="ln">from storage import load_records</span>
+<span class="ln"> </span>
+<span class="ln">DATA = &quot;data/study.csv&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    records = load_records(DATA)</span>
+<span class="ln">    print(f&quot;Loaded {len(records)} records&quot;)</span>
+<span class="ln">    for line in format_totals({}):</span>
+<span class="ln">        print(line)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">29 lines</span><span lang="ko">29줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Rules of the study logger. No input(), print() or open() in this file.</span>
+<span class="ln"> </span>
+<span class="ln">Week 10 left the contracts. Week 11 fills the bodies, one function at a time.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_minutes(text):</span>
+<span class="ln">    &quot;&quot;&quot;Return text as a positive whole number of minutes.</span>
+<span class="ln"> </span>
+<span class="ln">    Raises ValueError if text is not a whole number or is not above 0.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;parse_minutes&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def make_record(date, course, minutes_text):</span>
+<span class="ln">    &quot;&quot;&quot;Return one record: {&quot;date&quot;: str, &quot;course&quot;: str, &quot;minutes&quot;: int}.</span>
+<span class="ln"> </span>
+<span class="ln">    The course is stored in lower case. Raises ValueError for an empty</span>
+<span class="ln">    course or invalid minutes.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;make_record&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def weekly_totals(records):</span>
+<span class="ln">    &quot;&quot;&quot;Return {course: total minutes} for a list of records.</span>
+<span class="ln"> </span>
+<span class="ln">    An empty list returns {}. The input list is not changed.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;weekly_totals&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Reading and writing data/study.csv. The only module that touches the disk.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_records(path):</span>
+<span class="ln">    &quot;&quot;&quot;Return every row of the CSV file as a record dict.</span>
+<span class="ln"> </span>
+<span class="ln">    minutes is converted to int. A missing file returns [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    # TODO (week 11, F2): implement with csv.DictReader.</span>
+<span class="ln">    return []</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def append_record(path, record):</span>
+<span class="ln">    &quot;&quot;&quot;Append one record to the CSV file, writing the header if the file is new.&quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;append_record&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Turning results into text for the screen.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_totals(totals):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per course, largest total first: &quot;python   90 min&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    # TODO (week 11, F3): implement this contract.</span>
+<span class="ln">    return [&quot;TODO: totals&quot;]</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/study.csv <span class="muted"><span lang="en">3 lines</span><span lang="ko">3줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,course,minutes</span>
+<span class="ln">2026-10-24,python,90</span>
+<span class="ln">2026-10-25,stats,45</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="study_logger_f1.html">study_logger_f1 →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="even_sum — Loops · Python Lab" data-title-ko="even_sum — 반복문 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>even_sum — Loops · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week03/starter/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 3 · Session 1</span><span lang="ko">3주차 1차시</span></a><span class="sep">/</span><span>even_sum</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>even_sum</h1>
+    <p><span lang="en">Practice 1: add only the even integers from 1 to 10 to total and print 30. Before that, check how for, range() and an accumulator variable behave using the examples from the slides.</span><span lang="ko">연습 1: 1부터 10까지의 정수 중 짝수만 total에 더해 30을 출력한다. 그 전에 for, range(), 누적 변수의 동작을 슬라이드 예제로 확인한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week03/starter/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week03/starter/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'for letter in &quot;ABC&quot;:' '    print(letter)' 'print(&quot;Done&quot;)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'for letter in &quot;ABC&quot;:' '    print(letter)' 'print(&quot;Done&quot;)' | python3 -">▶</button><code>printf '%s\n' 'for letter in &quot;ABC&quot;:' '    print(letter)' 'print(&quot;Done&quot;)' | python3 -</code></div>
+          <p><span lang="en">On each iteration the next character goes into letter. After A, B, C the loop ends and Done is printed once.</span><span lang="ko">반복마다 다음 글자가 letter에 들어간다. A, B, C 다음 반복이 끝나고 Done이 한 번 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'for i in range(3): print(i, end=&quot; &quot;)' 'print(&quot;| range(3)&quot;)' 'for i in range(1, 4): print(i, end=&quot; &quot;)' 'print(&quot;| range(1, 4)&quot;)' 'for i in range(2, 7, 2): print(i, end=&quot; &quot;)' 'print(&quot;| range(2, 7, 2)&quot;)' 'for i in range(3, 0, -1): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0, -1)&quot;)' 'for i in range(3, 0): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0)&quot;)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'for i in range(3): print(i, end=&quot; &quot;)' 'print(&quot;| range(3)&quot;)' 'for i in range(1, 4): print(i, end=&quot; &quot;)' 'print(&quot;| range(1, 4)&quot;)' 'for i in range(2, 7, 2): print(i, end=&quot; &quot;)' 'print(&quot;| range(2, 7, 2)&quot;)' 'for i in range(3, 0, -1): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0, -1)&quot;)' 'for i in range(3, 0): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0)&quot;)' | python3 -">▶</button><code>printf '%s\n' 'for i in range(3): print(i, end=&quot; &quot;)' 'print(&quot;| range(3)&quot;)' 'for i in range(1, 4): print(i, end=&quot; &quot;)' 'print(&quot;| range(1, 4)&quot;)' 'for i in range(2, 7, 2): print(i, end=&quot; &quot;)' 'print(&quot;| range(2, 7, 2)&quot;)' 'for i in range(3, 0, -1): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0, -1)&quot;)' 'for i in range(3, 0): print(i, end=&quot; &quot;)' 'print(&quot;| range(3, 0)&quot;)' | python3 -</code></div>
+          <p><span lang="en">The stop value is always left out: 0 1 2, 1 2 3, 2 4 6, 3 2 1. range(3, 0), whose direction is wrong, is empty and gives no values.</span><span lang="ko">stop 값은 언제나 빠진다: 0 1 2, 1 2 3, 2 4 6, 3 2 1. 방향이 맞지 않는 range(3, 0)은 비어 있어 아무 값도 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">A step of 0 gives ValueError: range() arg 3 must not be zero.</span><span lang="ko">step이 0이면 ValueError: range() arg 3 must not be zero다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'total = 0' 'for n in range(1, 6):' '    before = total' '    total += n' '    print(n, before, total)' 'print(&quot;final:&quot;, total)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'total = 0' 'for n in range(1, 6):' '    before = total' '    total += n' '    print(n, before, total)' 'print(&quot;final:&quot;, total)' | python3 -">▶</button><code>printf '%s\n' 'total = 0' 'for n in range(1, 6):' '    before = total' '    total += n' '    print(n, before, total)' 'print(&quot;final:&quot;, total)' | python3 -</code></div>
+          <p><span lang="en">An accumulator trace table: each line is n, total before adding and total after adding. Each iteration carries on from the previous total, giving 1, 3, 6, 10, 15.</span><span lang="ko">누적 추적표: 각 줄은 n, 더하기 전 total, 더한 뒤 total이다. 이전 total을 이어받아 1, 3, 6, 10, 15가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'for n in range(1, 6):' '    total = 0' '    total += n' 'print(&quot;final:&quot;, total)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'for n in range(1, 6):' '    total = 0' '    total += n' 'print(&quot;final:&quot;, total)' | python3 -">▶</button><code>printf '%s\n' 'for n in range(1, 6):' '    total = 0' '    total += n' 'print(&quot;final:&quot;, total)' | python3 -</code></div>
+          <p><span lang="en">The question from the slides: if total = 0 is put inside the loop, it is reset every time and only the last value, 5, remains.</span><span lang="ko">슬라이드의 질문: total = 0을 반복문 안에 두면 매번 초기화돼 마지막 값 5만 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 even_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 even_sum.py">▶</button><code>python3 even_sum.py</code></div>
+          <p><span lang="en">The starter code has only pass, so it adds nothing and prints 0.</span><span lang="ko">시작 코드는 pass만 있어 아무것도 더하지 않고 0을 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session1/even_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session1/even_sum.py">▶</button><code>python3 ../../solutions/session1/even_sum.py</code></div>
+          <p><span lang="en">Adding only when n % 2 == 0 gives 2 + 4 + 6 + 8 + 10 = 30.</span><span lang="ko">if n % 2 == 0일 때만 더하면 2 + 4 + 6 + 8 + 10 = 30이다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>even_sum.py <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: sum even integers from 1 through 10. Expected output: 30.&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">for n in range(1, 11):</span>
+<span class="ln">    # TODO: add only even n to total.</span>
+<span class="ln">    pass</span>
+<span class="ln">print(total)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week03/solutions/session1/even_sum.py <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: sum the even integers from 1 through 10.&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">for n in range(1, 11):</span>
+<span class="ln">    if n % 2 == 0:</span>
+<span class="ln">        total += n</span>
+<span class="ln">print(total)  # 30</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="input_sum.html">input_sum →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

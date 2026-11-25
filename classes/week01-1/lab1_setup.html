@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="lab1_setup — Python Overview &amp; Development Environment · Python Lab" data-title-ko="lab1_setup — Python 개요와 개발 환경 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>lab1_setup — Python Overview &amp; Development Environment · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week01/starter">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 1 · Session 1</span><span lang="ko">1주차 1차시</span></a><span class="sep">/</span><span>lab1_setup</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>lab1_setup</h1>
+    <p><span lang="en">Follow Lab 1 (set up your development environment) in this web lab. Check the Python version, try interactive mode (REPL), type() and type conversion, then create and activate a virtual environment .venv.</span><span lang="ko">실습 1(개발 환경 준비)을 이 웹 실습실에서 따라 한다. Python 버전을 확인하고, 대화형 모드(REPL)와 type()·형 변환을 시험한 뒤 가상 환경 .venv를 만들어 활성화한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week01/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week01/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 --version" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 --version">▶</button><code>python3 --version</code></div>
+          <p><span lang="en">This lab's Python is 3.14.10. Only the number differs from the 3.12.4 on the slides; what you learn is the same. On a Windows PC the command is usually python or py.</span><span lang="ko">이 실습실의 Python은 3.14.10이다. 슬라이드의 3.12.4와 숫자만 다를 뿐 배우는 내용은 같다. Windows PC에서는 명령이 보통 python 또는 py다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i">▶</button><code>printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i</code></div>
+          <p><span lang="en">This feeds input into the REPL. After each &gt;&gt;&gt; you see, in order, the value of the expression 5, the print output hi, and &lt;class 'float'&gt;. If you type just python3 yourself, the same &gt;&gt;&gt; prompt appears, and exit() leaves it.</span><span lang="ko">REPL에 입력을 흘려 넣은 모습이다. &gt;&gt;&gt; 뒤에 식의 값 5, print 결과 hi, &lt;class 'float'&gt;가 차례로 나온다. 직접 python3만 입력하면 같은 &gt;&gt;&gt; 프롬프트가 뜨고 exit()로 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'">▶</button><code>python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'</code></div>
+          <p><span lang="en">The five basic data types int, float, str, bool and NoneType are printed.</span><span lang="ko">다섯 가지 기본 자료형 int, float, str, bool, NoneType이 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'">▶</button><code>python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'</code></div>
+          <p><span lang="en">int(3.9) truncates rather than rounds, giving 3, and float(7) gives 7.0. Only 0, the empty string and None are False; 5 is True.</span><span lang="ko">int(3.9)는 반올림이 아니라 버려서 3이 되고, float(7)은 7.0이 된다. 0·빈 문자열·None만 False이고 5는 True다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'print(&quot;3&quot; + &quot;3&quot;); print(int(&quot;3&quot;) + 3); print(&quot;3&quot; + 3)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'print(&quot;3&quot; + &quot;3&quot;); print(int(&quot;3&quot;) + 3); print(&quot;3&quot; + 3)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'print(&quot;3&quot; + &quot;3&quot;); print(int(&quot;3&quot;) + 3); print(&quot;3&quot; + 3)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">&quot;3&quot; + &quot;3&quot; is the concatenation 33; converted with int it is 6. Adding a string and an integer raises a TypeError, as in the last line (the start of the Traceback is hidden with grep).</span><span lang="ko">&quot;3&quot; + &quot;3&quot;은 이어 붙인 33, int로 바꾸면 6이다. 문자열과 정수를 더하면 마지막 줄처럼 TypeError가 난다(Traceback 앞부분은 grep으로 숨겼다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">&quot;3.5&quot; has to go through float to become the integer 3. Calling int(&quot;3.5&quot;) directly raises ValueError: invalid literal for int().</span><span lang="ko">&quot;3.5&quot;는 float을 거쳐야 정수 3이 된다. int(&quot;3.5&quot;)를 바로 하면 ValueError: invalid literal for int()가 난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin" title="Run in the terminal / 터미널에서 실행" aria-label="Run: mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin">▶</button><code>mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin</code></div>
+          <p><span lang="en">The virtual environment folder .venv is created, and activate and python appear inside bin. This lab has no pip, so --without-pip is added. On a real PC, python3 -m venv .venv is enough.</span><span lang="ko">가상 환경 폴더 .venv가 생기고 bin 안에 activate와 python이 보인다. 이 실습실에는 pip이 없어 --without-pip을 붙였다. 실제 PC에서는 python3 -m venv .venv면 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd=". ~/python-week1/.venv/bin/activate; which python; python --version; deactivate; which python" title="Run in the terminal / 터미널에서 실행" aria-label="Run: . ~/python-week1/.venv/bin/activate; which python; python --version; deactivate; which python">▶</button><code>. ~/python-week1/.venv/bin/activate; which python; python --version; deactivate; which python</code></div>
+          <p><span lang="en">After activation, python points to ~/python-week1/.venv/bin/python; after deactivate it is /usr/bin/python again. If you activate it yourself without deactivate, (.venv) appears in front of the prompt.</span><span lang="ko">활성화하면 python이 ~/python-week1/.venv/bin/python을 가리키고, deactivate 뒤에는 다시 /usr/bin/python이 된다. deactivate 없이 직접 활성화해 보면 프롬프트 앞에 (.venv)가 붙는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Installing VS Code and the Python extension, selecting the interpreter and creating a Google Colab notebook are steps you do on a real PC, outside the browser. The terminal in this lab plays the role of VS Code's built-in terminal (Ctrl+` / Cmd+`), and instead of the ▶ Run button you run a file with python3 filename.py. In the BusyBox shell the source command is written as . (a dot).</span><span lang="ko">VS Code 설치, Python 확장 설치, 인터프리터 선택, Google Colab 노트북 만들기는 브라우저 밖 실제 PC에서 하는 단계다. 이 실습실의 터미널은 VS Code의 내장 터미널(Ctrl+` / Cmd+`) 역할을 하고, ▶ Run 버튼 대신 python3 파일이름.py로 실행한다. source 명령은 BusyBox 셸에서 . 으로 쓴다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>hello.py <span class="muted"><span lang="en">8 lines</span><span lang="ko">8줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: Print greetings and your own details.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Print Hello, World! and Hello, Python! on separate lines.</span>
+<span class="ln"># TODO: Store your name, major and today's date in string variables.</span>
+<span class="ln"># TODO: Print each value with the labels Name:, Major: and Date:.</span>
+<span class="ln"># TODO: Use print() with multiple arguments to display Week 1 of 16.</span>
+<span class="ln"> </span>
+<span class="ln"># Document your output checks here.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="hello.html">hello →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="tidy_lab — Korean Stock Market Analysis: From Scenario to a Web Report MVP · Python Lab" data-title-ko="tidy_lab — 한국 증권시장 분석: 시나리오에서 웹 보고서 MVP까지 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tidy_lab — Korean Stock Market Analysis: From Scenario to a Web Report MVP · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week11/labs/session2">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 11 · Session 2</span><span lang="ko">11주차 2차시</span></a><span class="sep">/</span><span>tidy_lab</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>tidy_lab</h1>
+    <p><span lang="en">Code that works but is hard to read. Apply renaming, constant extraction, pulling a duplicated line into a function, and guard clauses, but the output of the six checks must not change by a single character. Refactoring is a different kind of change from adding features or fixing bugs, and its evidence is the same check results before and after.</span><span lang="ko">동작은 맞지만 읽기 어려운 코드다. 이름 바꾸기, 상수 추출, 중복 줄을 함수로 빼기, guard clause를 적용하되 여섯 검사의 출력은 한 글자도 바뀌면 안 된다. 리팩터링은 기능 추가·버그 수정과 다른 종류의 변경이며, 증거는 전후의 같은 검사 결과다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week11/labs/session2</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week11/labs/session2</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 tidy_lab.py">▶</button><code>python3 tidy_lab.py</code></div>
+          <p><span lang="en">Six PASS lines appear. This is the baseline before refactoring. Rerun after every change and check that the same six lines appear.</span><span lang="ko">PASS가 여섯 줄 나온다. 리팩터링 전의 기준 결과다. 한 번 고칠 때마다 다시 실행해서 같은 여섯 줄이 나오는지 확인한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -n '2000' tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -n '2000' tidy_lab.py">▶</button><code>grep -n '2000' tidy_lab.py</code></div>
+          <p><span lang="en">The daily goal of 2000 ml is scattered through the code as a bare number (Move 2). Give it a name at the top, like DAILY_GOAL_ML = 2000, and keep it in one place.</span><span lang="ko">하루 목표량 2000 ml이 코드 여러 곳에 숫자로 흩어져 있다(Move 2). 상단에 DAILY_GOAL_ML = 2000처럼 이름을 붙여 한 곳에 둔다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -n 'out.append' tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -n 'out.append' tidy_lab.py">▶</button><code>grep -n 'out.append' tidy_lab.py</code></div>
+          <p><span lang="en">The same line appears twice, in the if and in the else (Move 3). The two branches are identical, so if you extract one function that builds the line, the branch itself is no longer needed.</span><span lang="ko">같은 줄이 if와 else에 두 번 있다(Move 3). 두 분기가 완전히 같으므로 한 줄을 만드는 함수 하나로 뽑아내면 분기 자체가 필요 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py; python3 tidy_lab.py &gt; before.txt; python3 my_tidy.py &gt; after.txt; diff before.txt after.txt &amp;&amp; echo same output" title="Run in the terminal / 터미널에서 실행" aria-label="Run: [ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py; python3 tidy_lab.py &gt; before.txt; python3 my_tidy.py &gt; after.txt; diff before.txt after.txt &amp;&amp; echo same output">▶</button><code>[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py; python3 tidy_lab.py &gt; before.txt; python3 my_tidy.py &gt; after.txt; diff before.txt after.txt &amp;&amp; echo same output</code></div>
+          <p><span lang="en">The first run creates a copy, my_tidy.py (same output, since nothing has been changed yet); after that the existing copy is left as it is. Make one change at a time with nano my_tidy.py, then rerun this command to compare its output with the original. same output is the evidence that the behavior is unchanged. Use names like entries, day, ml and totals instead of x, d, m and tmp (Move 1). Do not change the check() calls or the function names.</span><span lang="ko">처음 실행하면 복사본 my_tidy.py를 만들고(아직 고치지 않았으므로 same output), 이후에는 있는 복사본을 그대로 둔다. nano my_tidy.py로 한 가지씩 고친 뒤 이 명령을 다시 실행해 원본과 출력을 비교한다. same output이 나오면 동작이 그대로라는 증거다. x, d, m, tmp 대신 entries, day, ml, totals 같은 이름을 쓴다(Move 1). check() 호출과 함수 이름은 바꾸지 않는다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>tidy_lab.py <span class="muted"><span lang="en">68 lines</span><span lang="ko">68줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: refactor without changing behavior.</span>
+<span class="ln"> </span>
+<span class="ln">Everything below works: every check at the bottom prints PASS. The code is</span>
+<span class="ln">still hard to read. The names say nothing, the number 2000 appears three</span>
+<span class="ln">times, and the same line is written twice.</span>
+<span class="ln"> </span>
+<span class="ln">Your task (8 minutes): make it readable without changing any output.</span>
+<span class="ln"> </span>
+<span class="ln">  Move 1  Rename: entries, day, ml, totals instead of x, d, m, tmp.</span>
+<span class="ln">  Move 2  Constant: 2000 means &quot;daily goal in ml&quot;. Name it once, at the top.</span>
+<span class="ln">  Move 3  Extract: the line that builds &quot;day: total ml (status)&quot; exists</span>
+<span class="ln">          twice. Write it once as a function and call it.</span>
+<span class="ln">  Bonus   Guard clause: goal_status does not need a nested if.</span>
+<span class="ln"> </span>
+<span class="ln">Run the file after every move. All six checks must still print PASS.</span>
+<span class="ln">Keep the function names used by the checks. Do not change the check() calls.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def daily_totals(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return {day: total ml} for a list of (day, ml) pairs. An empty list returns {}.&quot;&quot;&quot;</span>
+<span class="ln">    tmp = {}</span>
+<span class="ln">    for d, m in x:</span>
+<span class="ln">        if d in tmp:</span>
+<span class="ln">            tmp[d] = tmp[d] + m</span>
+<span class="ln">        else:</span>
+<span class="ln">            tmp[d] = m</span>
+<span class="ln">    return tmp</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def goal_status(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return &quot;goal&quot; if x ml reaches the daily goal of 2000 ml, otherwise &quot;under&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    if x &gt;= 2000:</span>
+<span class="ln">        return &quot;goal&quot;</span>
+<span class="ln">    else:</span>
+<span class="ln">        if x &lt; 2000:</span>
+<span class="ln">            return &quot;under&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_report(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per day in day order, like &quot;2026-11-10: 2100 ml (goal)&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    tmp = daily_totals(x)</span>
+<span class="ln">    out = []</span>
+<span class="ln">    for d in sorted(tmp):</span>
+<span class="ln">        if tmp[d] &gt;= 2000:</span>
+<span class="ln">            out.append(d + &quot;: &quot; + str(tmp[d]) + &quot; ml (&quot; + goal_status(tmp[d]) + &quot;)&quot;)</span>
+<span class="ln">        else:</span>
+<span class="ln">            out.append(d + &quot;: &quot; + str(tmp[d]) + &quot; ml (&quot; + goal_status(tmp[d]) + &quot;)&quot;)</span>
+<span class="ln">    return out</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def check(name, actual, expected):</span>
+<span class="ln">    if actual == expected:</span>
+<span class="ln">        print(&quot;PASS&quot;, name)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;FAIL&quot;, name, &quot;-&gt; got&quot;, repr(actual), &quot;expected&quot;, repr(expected))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    sample = [(&quot;2026-11-10&quot;, 500), (&quot;2026-11-10&quot;, 1600), (&quot;2026-11-11&quot;, 1500)]</span>
+<span class="ln">    check(&quot;daily_totals(sample)&quot;, daily_totals(sample),</span>
+<span class="ln">          {&quot;2026-11-10&quot;: 2100, &quot;2026-11-11&quot;: 1500})</span>
+<span class="ln">    check(&quot;daily_totals([])&quot;, daily_totals([]), {})</span>
+<span class="ln">    check(&quot;goal_status(2100)&quot;, goal_status(2100), &quot;goal&quot;)</span>
+<span class="ln">    check(&quot;goal_status(1500)&quot;, goal_status(1500), &quot;under&quot;)</span>
+<span class="ln">    check(&quot;format_report(sample)&quot;, format_report(sample),</span>
+<span class="ln">          [&quot;2026-11-10: 2100 ml (goal)&quot;, &quot;2026-11-11: 1500 ml (under)&quot;])</span>
+<span class="ln">    check(&quot;format_report([])&quot;, format_report([]), [])</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="korea_market_mvp.html">← korea_market_mvp</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

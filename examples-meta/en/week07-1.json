@@ -1,0 +1,81 @@
+{
+  "title": "Object-Oriented Programming",
+  "summary": "Starting from code that handles a bank account with variables and functions, build a BankAccount with class, __init__, self and methods, then see the four principles of encapsulation, abstraction, inheritance and polymorphism in step-by-step examples. In the lab you complete BankAccount's four methods and the optional SavingsAccount.",
+  "examples": {
+    "01_variables_and_functions": {
+      "summary": "Each account has its own pair of owner and balance variables, and the deposit(balance, amount) function returns the new balance, which the caller stores again. Which values belong to the same account can only be told from the variable names.",
+      "steps": [
+        "Minsu 13000 and Jisu 5000. The function only adds 3000 to the balance it receives and returns it; the balance changes only when you store it with minsu_balance = deposit(...).",
+        "Each new account adds another pair of _owner and _balance variables. Bundling this data into one object is the next step."
+      ]
+    },
+    "02_classes_and_objects": {
+      "summary": "Define a class BankAccount whose body is just pass, and make two objects with BankAccount(). Attaching owner and balance attributes to each object with the dot (.) lets attributes with the same name hold different values in each object.",
+      "steps": [
+        "Minsu 13000, Jisu 5000. Changing minsu's balance leaves jisu unchanged. The final False is the result of minsu is jisu: calling the constructor twice creates two different objects.",
+        "Importing first prints the file's three lines once more, followed by BankAccount True. The type name of minsu is BankAccount, and jisu is also an instance of BankAccount. Because the file name starts with a digit, import_module is used instead of an import statement."
+      ]
+    },
+    "03_init_and_self": {
+      "summary": "__init__(self, owner, balance) is called for every new instance and stores the initial values in self.owner and self.balance. Arguments are passed at creation, as in BankAccount(\"Minsu\", 10000).",
+      "steps": [
+        "The accounts are initialized to Minsu 10000 and Jisu 5000, then only minsu grows by 3000, giving After changing Minsu: 13000 5000.",
+        "This is the prediction question from the slides. Importing the file first runs its top-level code once, printing the same three lines as above, and then 3000 and 7000 appear. Changing a.balance does not affect b. Because the file name starts with a digit, import_module is used instead of an import statement."
+      ]
+    },
+    "03b_class_and_instance_variables": {
+      "summary": "bank_name, placed in the class body, is a class variable that all instances read together, while owner and balance, stored on self in __init__, are instance variables that each account has separately.",
+      "steps": [
+        "First line: both accounts read the class variable Python Bank. Third line: changing BankAccount.bank_name makes both Campus Bank. Fourth line: minsu.bank_name = ... creates a new instance attribute with the same name on minsu only, giving Minsu Bank Campus Bank, while, as the fifth line shows, the class variable itself is still Campus Bank. The last line shows that each account has its own balance (13000 5000)."
+      ]
+    },
+    "04_methods": {
+      "summary": "The deposit(self, amount) and withdraw(self, amount) methods change self.balance and return True. When you call minsu.deposit(3000), the minsu before the dot becomes self. This is a teaching version that does not check the amount yet.",
+      "steps": [
+        "Deposit: True 13000, Withdraw: True 9000, Jisu: 5000. return gives True back to the caller, and print shows that value on the screen.",
+        "Importing prints the file's three lines first. Then True -10000: a withdraw without checks accepts even a withdrawal larger than the balance. There is also no way to stop the direct assignment account.balance = -9999. Encapsulation in the next example solves this problem."
+      ]
+    },
+    "05_encapsulation": {
+      "summary": "The balance is kept in the internal _balance and read with get_balance(). deposit rejects amounts of 0 or less, and withdraw rejects amounts of 0 or less or above the balance, returning False; when rejecting, they return before changing the state.",
+      "steps": [
+        "The result matches the lab's table of expected results. Withdraw 10000, Deposit -1000 and Withdraw 0 are all False, and the balance stays at 9000. Jisu withdraw 5000, which withdraws the whole balance, is allowed and leaves 0.",
+        "-1 appears after the file's output. The underscore is only a promise meaning \"internal\"; Python does not prevent access. Encapsulation holds only if code using the class sticks to the public methods."
+      ]
+    },
+    "06_inheritance": {
+      "summary": "class SavingsAccount(BankAccount) inherits deposit, withdraw and get_balance. Its __init__ reuses the parent's initialization with super().__init__(owner, balance) and also stores bonus, and add_bonus() calls the inherited deposit.",
+      "steps": [
+        "Start: 10000 → Bonus: True 10500 → Deposit: True 11500 → Withdraw: True 10000. The final Rejected: False 10000 shows that the checks in the inherited withdraw still work in the child class."
+      ]
+    },
+    "07_abstraction": {
+      "summary": "The caller requests withdraw(4000) and looks only at the result (True/False) and get_balance(). It never changes _balance directly, and implementation details such as how the checks work stay hidden inside the methods.",
+      "steps": [
+        "Accepted: True, Balance: 6000. Reading just the few lines of calling code at the bottom is enough to know what happened."
+      ]
+    },
+    "08_polymorphism": {
+      "summary": "The parent BankAccount's account_type() returns \"Standard\", and the account_type() that the child SavingsAccount redefines (overrides) with the same name returns \"Savings\". One loop makes the same call on both kinds of account.",
+      "steps": [
+        "Minsu Standard 10000, Jisu Savings 5000. Without any if branching on the class name, Python picks and calls the method of the actual object."
+      ]
+    },
+    "bank_account": {
+      "summary": "Lab. Complete BankAccount's four TODOs (__init__, get_balance, deposit, withdraw). Store owner and _balance on the instance, and for amounts that are zero, negative or above the balance, return False without changing the state.",
+      "notes": "Fill in the TODOs with nano bank_account.py, rerun the first step and compare its output line by line with the second step's. Common mistakes: forgetting self in a method's def, mixing balance and _balance, and changing the balance before checking.",
+      "steps": [
+        "The starter deliberately returns wrong values, so you get Start: 0 0 and every operation is False. It runs, but the results are wrong.",
+        "This is the output of a finished class performing the same operations in the same order. As in the lab's table of expected results, it should go from Start: 10000 5000 to Final: 9000 0.",
+        "These are the two extra checks left in the starter (depositing 0 and withdrawing a negative amount). Once finished, it should print False False 1000. For now the balance is not stored, so it prints False False 0."
+      ]
+    },
+    "savings_account": {
+      "summary": "Optional lab. Import BankAccount from bank_account.py in the same folder and complete SavingsAccount. Initialize the shared state with super().__init__(owner, balance), store bonus, and have add_bonus() return the result of the inherited deposit.",
+      "steps": [
+        "The starter prints False and 0. Once finished, the expected values are True and 10500. You must finish bank_account.py first for these results to come out right.",
+        "How the finished SavingsAccount behaves: Bonus: True 10500, and Rejected: False 10000, where the balance is kept even after the rejected withdrawal."
+      ]
+    }
+  }
+}

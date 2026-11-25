@@ -1,0 +1,80 @@
+<p>The stock MVP from Week 11, Session 2 was a command-line program: it read a CSV (<code>storage.py</code>), validated and analyzed it (<code>logic.py</code>) and wrote an HTML report to a file (<code>report.py</code>). These examples move the same flow into a Flask web app. Instead of writing a report file, the app reads and analyzes the data each time a browser sends a request and builds the HTML on the spot. Start with <a href="sample2_korea.html">sample2_korea</a>, the closest to the lecture, then <a href="sample1_us.html">sample1_us</a> with a different currency and code format, and finish with <a href="sample4_sqlite.html">sample4_sqlite</a>, which stores the data in SQLite. All numbers are fictional class data for 2026-11-05, not live prices.</p>
+
+<h2>Project structure</h2>
+
+<p>All three projects are split into the same four parts. Each file does one job, so you can change the page or the way data is stored without touching the other files.</p>
+
+<table>
+<thead><tr><th>File</th><th>Job</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>Receives HTTP requests, turns errors into status codes (400, 500) and renders the template</td></tr>
+<tr><td><code>storage.py</code></td><td>Reads the CSV. All file I/O lives here</td></tr>
+<tr><td><code>logic.py</code></td><td>Validates one row (<code>parse_row</code>), filters by market and sorts by change (<code>analyze</code>), and summarizes (<code>summarize</code>). Pure functions with no I/O</td></tr>
+<tr><td><code>templates/index.html</code></td><td>The Jinja template that draws the table and the summary</td></tr>
+</tbody>
+</table>
+
+<p>sample4 has one more file, <code>database.py</code>, for SQLite.</p>
+
+<h2>Routes and query strings</h2>
+
+<p><code>@app.get('/')</code> connects GET requests for the address <code>/</code> to the function <code>index()</code>. The chosen market arrives in the query string after the address, <code>?market=KOSPI</code>, and is read with <code>request.args.get('market', 'ALL')</code>. Without a value it defaults to <code>ALL</code>.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>Note that error handling splits into two branches. When the <strong>input</strong> is wrong, such as an unknown market name or a bad CSV row, a <code>ValueError</code> is raised and the app answers 400 (Bad Request). When the problem is on the <strong>server</strong> side, such as an unreadable data file, it answers 500. Either way the program does not crash; it returns a page with the error message.</p>
+
+<h2>Calculation rules</h2>
+
+<p>The change is (close − previous close) / previous close × 100. The computed value is kept unrounded and shown with two decimal places only on screen. The mean is an equal-weight sample mean of the selected stocks, so it is not a market index return. A CSV with only a header is a valid empty sample and shows the mean as N/A, but a missing file is an error.</p>
+
+<ul>
+<li>Korean stocks (sample2, sample4): prices are whole won and volumes whole shares. Codes such as <code>005930</code> are handled as strings to keep the leading 0. Means: ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%.</li>
+<li>US stocks (sample1): prices are stored as whole <strong>cents</strong> and converted to USD on screen (<code>scale=100</code>). The markets are NASDAQ/NYSE and codes are uppercase tickers. The ALL mean is +0.40%.</li>
+</ul>
+
+<h2>Jinja auto-escaping</h2>
+
+<p>Jinja, Flask's template engine, automatically replaces HTML special characters when it prints a value such as <code>{{ row.name }}</code>. So even if a stock name contains a tag like <code>&lt;script&gt;</code>, it is not executed but printed literally as <code>&amp;lt;script&amp;gt;</code>. That is why we don't write code that pastes data straight into the page ourselves.</p>
+
+<h2>Storing data in SQLite (sample4)</h2>
+
+<p>sample4 draws the page from an SQLite database instead of the CSV. Loading the data is not done by a web request but by a separate command, <code>flask --app app init-db</code>, registered with <code>@app.cli.command('init-db')</code>.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>Validate first</strong>: <code>import_snapshot()</code> validates every row before deleting the existing ones. Bad data such as a duplicate code is rejected before the database is touched.</li>
+<li><strong>One transaction</strong>: the delete and the inserts are committed together inside <code>with connection:</code>, so if anything fails the previous data stays.</li>
+<li><strong>Read-only connection</strong>: <code>read_quotes()</code> opens the file with <code>mode=ro</code>. When the database file is missing it fails instead of creating an empty database, and the page tells you to run init-db first.</li>
+<li>After editing the CSV, import it again with <code>init-db</code> to see the change on the page.</li>
+</ul>
+
+<p><code>database.py</code> defines <code>read_quotes()</code> twice. In Python the later definition replaces the earlier one, so the one actually used is the second (<code>mode=ro</code>).</p>
+
+<h2>Running it in this web lab</h2>
+
+<p>On a real PC you create a virtual environment for each project, install Flask with <code>pip install -r requirements.txt</code>, run <code>python app.py</code> and open an address such as <code>http://127.0.0.1:5002</code> in your browser. The virtual machine in this web lab already has Flask, but it has no network connection to the page, so your browser cannot reach its server. The example pages therefore run it like this:</p>
+
+<ul>
+<li>Start the server in the background: <code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></li>
+<li>Send requests from inside the machine with <code>wget</code> and find the lines you need in the HTML with <code>grep</code>.</li>
+<li>Check status codes and error messages with <code>app.test_client()</code>, which sends requests to the app without a server — the usual tool for automated tests.</li>
+<li>Copy the fetched HTML and <code>static/style.css</code> to <code>/mnt/host</code> and save them with <strong>Download</strong> to see the page in your own browser.</li>
+<li>Stop the server with <code>kill %1</code> (on a real PC, <kbd>Ctrl</kbd>+<kbd>C</kbd>).</li>
+</ul>
+
+<p>sample3, which uses the Naver news API, needs an external network and is not included in this lab.</p>

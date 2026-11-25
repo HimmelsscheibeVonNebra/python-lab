@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="guessing — Modules and the Standard Library · Python Lab" data-title-ko="guessing — 모듈과 표준 라이브러리 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>guessing — Modules and the Standard Library · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week05/starter/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 5 · Session 1</span><span lang="ko">5주차 1차시</span></a><span class="sep">/</span><span>guessing</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>guessing</h1>
+    <p><span lang="en">Lab 3 (take-home). The computer picks a secret number from 1 to 100 once, answers each guess with Higher/Lower until it is guessed, and on success prints Correct! with the number of attempts and ends the loop with break.</span><span lang="ko">Lab 3(과제). 컴퓨터가 1–100 사이의 비밀 수를 한 번 고르고, 맞힐 때까지 추측마다 Higher/Lower를 알려 주며, 맞히면 시도 횟수와 함께 Correct!를 출력하고 break로 반복을 끝낸다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week05/starter/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week05/starter/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 3 | python3 guessing.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 3 | python3 guessing.py">▶</button><code>seq 1 3 | python3 guessing.py</code></div>
+          <p><span lang="en">The starter has neither the comparison nor break, so while True never ends. It uses up the three input lines and the fourth input() raises EOFError: EOF when reading a line. If you ran it yourself, you would have to stop it with Ctrl+C.</span><span lang="ko">스타터에는 비교도 break도 없어서 while True가 끝나지 않는다. 입력 세 줄을 다 쓰고 네 번째 input()에서 EOFError: EOF when reading a line이 난다. 직접 실행했다면 Ctrl+C로 멈춰야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3">▶</button><code>seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding 1 to 100 in order into the finished version prints Higher until it reaches the secret, then ends with Correct! Attempts: N. Here N is the secret itself. Only the last three lines are shown.</span><span lang="ko">완성본에 1부터 100까지 차례로 넣으면 비밀 수에 닿을 때까지 Higher가 이어지다가 Correct! Attempts: N으로 끝난다. 이 경우 N이 곧 비밀 수다. 마지막 세 줄만 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3">▶</button><code>seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding the numbers backwards from 100 prints Lower this time. A new secret is chosen on every run.</span><span lang="ko">거꾸로 100부터 넣으면 이번에는 Lower가 이어진다. 비밀 수는 실행마다 새로 정해진다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The EOFError in the first step is an intended error showing that the starter never finishes. To play yourself, run python3 ../../solutions/session1/guessing.py, start at 50 and halve the range according to Higher/Lower (you can always win within 7 guesses). The starter's TODO is to split Higher, Lower and Correct! with if/elif/else and break on a correct guess. When you are done, check with seq 1 100 | python3 guessing.py | tail -n 3 that the last lines match the finished version.</span><span lang="ko">첫 단계의 EOFError는 스타터가 끝나지 않는다는 것을 보여 주는 의도된 오류다. 직접 플레이하려면 python3 ../../solutions/session1/guessing.py를 실행하고 50부터 시작해 Higher/Lower에 따라 범위를 반씩 줄여 본다(7번 안에 맞힐 수 있다). 스타터의 TODO는 if/elif/else로 Higher, Lower, Correct!를 나누고 맞힌 경우 break하는 것이다. 완성한 뒤 seq 1 100 | python3 guessing.py | tail -n 3으로 완성본과 같은 마지막 줄이 나오는지 확인한다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>guessing.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: number guessing game. Assume integer-formatted input.</span>
+<span class="ln">Test: a finished game ends with Correct! Attempts: N.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    # TODO: print Higher or Lower, or print</span>
+<span class="ln">    # &quot;Correct! Attempts:&quot; with the count and stop the loop.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/guessing.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution: number guessing game.&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    if guess &lt; secret:</span>
+<span class="ln">        print(&quot;Higher&quot;)</span>
+<span class="ln">    elif guess &gt; secret:</span>
+<span class="ln">        print(&quot;Lower&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;Correct! Attempts:&quot;, attempts)</span>
+<span class="ln">        break</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="lotto.html">← lotto</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

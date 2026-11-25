@@ -1,0 +1,4 @@
+#!/bin/sh
+# The flask command (Flask itself is served over 9p, see scripts/build-images.sh;
+# package executables in /usr/bin are not copied there).
+exec python3 -m flask "$@"

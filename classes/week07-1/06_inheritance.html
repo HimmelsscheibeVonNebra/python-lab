@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="06_inheritance — Object-Oriented Programming · Python Lab" data-title-ko="06_inheritance — 객체 지향 프로그래밍 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>06_inheritance — Object-Oriented Programming · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week07/examples/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 7 · Session 1</span><span lang="ko">7주차 1차시</span></a><span class="sep">/</span><span>06_inheritance</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>06_inheritance</h1>
+    <p><span lang="en">class SavingsAccount(BankAccount) inherits deposit, withdraw and get_balance. Its __init__ reuses the parent's initialization with super().__init__(owner, balance) and also stores bonus, and add_bonus() calls the inherited deposit.</span><span lang="ko">class SavingsAccount(BankAccount)는 deposit, withdraw, get_balance를 물려받는다. __init__에서 super().__init__(owner, balance)로 부모의 초기화를 재사용하고 bonus를 추가로 저장하며, add_bonus()는 물려받은 deposit을 호출한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week07/examples/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week07/examples/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 06_inheritance.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 06_inheritance.py">▶</button><code>python3 06_inheritance.py</code></div>
+          <p><span lang="en">Start: 10000 → Bonus: True 10500 → Deposit: True 11500 → Withdraw: True 10000. The final Rejected: False 10000 shows that the checks in the inherited withdraw still work in the child class.</span><span lang="ko">Start: 10000 → Bonus: True 10500 → Deposit: True 11500 → Withdraw: True 10000. 마지막 Rejected: False 10000은 물려받은 withdraw의 검사가 자식 클래스에서도 그대로 작동함을 보여 준다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>06_inheritance.py <span class="muted"><span lang="en">44 lines</span><span lang="ko">44줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Step 6: extend BankAccount with a fixed bonus.</span>
+<span class="ln"> </span>
+<span class="ln">Self-contained for copying into Colab. Same BankAccount as Step 5.</span>
+<span class="ln">Starting balance is a nonnegative integer and bonus is a positive integer.</span>
+<span class="ln">add_bonus adds the fixed amount each time it is called.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class BankAccount:</span>
+<span class="ln">    def __init__(self, owner, balance):</span>
+<span class="ln">        self.owner = owner</span>
+<span class="ln">        self._balance = balance</span>
+<span class="ln"> </span>
+<span class="ln">    def get_balance(self):</span>
+<span class="ln">        return self._balance</span>
+<span class="ln"> </span>
+<span class="ln">    def deposit(self, amount):</span>
+<span class="ln">        if amount &lt;= 0:</span>
+<span class="ln">            return False</span>
+<span class="ln">        self._balance = self._balance + amount</span>
+<span class="ln">        return True</span>
+<span class="ln"> </span>
+<span class="ln">    def withdraw(self, amount):</span>
+<span class="ln">        if amount &lt;= 0 or amount &gt; self._balance:</span>
+<span class="ln">            return False</span>
+<span class="ln">        self._balance = self._balance - amount</span>
+<span class="ln">        return True</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class SavingsAccount(BankAccount):</span>
+<span class="ln">    def __init__(self, owner, balance, bonus):</span>
+<span class="ln">        super().__init__(owner, balance)</span>
+<span class="ln">        self.bonus = bonus</span>
+<span class="ln"> </span>
+<span class="ln">    def add_bonus(self):</span>
+<span class="ln">        return self.deposit(self.bonus)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">savings = SavingsAccount(&quot;Minsu&quot;, 10000, 500)</span>
+<span class="ln">print(&quot;Start:&quot;, savings.get_balance())</span>
+<span class="ln">print(&quot;Bonus:&quot;, savings.add_bonus(), savings.get_balance())</span>
+<span class="ln">print(&quot;Deposit:&quot;, savings.deposit(1000), savings.get_balance())</span>
+<span class="ln">print(&quot;Withdraw:&quot;, savings.withdraw(1500), savings.get_balance())</span>
+<span class="ln">print(&quot;Rejected:&quot;, savings.withdraw(20000), savings.get_balance())</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="05_encapsulation.html">← 05_encapsulation</a>
+    <a href="07_abstraction.html">07_abstraction →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

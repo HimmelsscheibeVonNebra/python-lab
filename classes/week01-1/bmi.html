@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="bmi — Python Overview &amp; Development Environment · Python Lab" data-title-ko="bmi — Python 개요와 개발 환경 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bmi — Python Overview &amp; Development Environment · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week01/starter">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 1 · Session 1</span><span lang="ko">1주차 1차시</span></a><span class="sep">/</span><span>bmi</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>bmi</h1>
+    <p><span lang="en">Lab 4: read height (cm) and weight (kg), convert the height to m, and print BMI = weight ÷ height (m)² to one decimal place.</span><span lang="ko">실습 4: 키(cm)와 몸무게(kg)를 입력받아 키를 m로 바꾸고 BMI = 몸무게 ÷ 키(m)²를 소수 한 자리로 출력한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week01/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week01/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '175\n70\n' | python3 bmi.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '175\n70\n' | python3 bmi.py; echo">▶</button><code>printf '175\n70\n' | python3 bmi.py; echo</code></div>
+          <p><span lang="en">The starter code only reads the input and prints nothing.</span><span lang="ko">시작 코드는 입력만 받고 아무것도 출력하지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '175\n70\n' | python3 ../solutions/bmi.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '175\n70\n' | python3 ../solutions/bmi.py">▶</button><code>printf '175\n70\n' | python3 ../solutions/bmi.py</code></div>
+          <p><span lang="en">These are the test values from the slides. You should see Height: 1.75 m, Weight: 70.0 kg, Your BMI is 22.9.</span><span lang="ko">슬라이드의 테스트 값이다. Height: 1.75 m, Weight: 70.0 kg, Your BMI is 22.9가 나와야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '160\n64\n' | python3 ../solutions/bmi.py; printf '180\n81\n' | python3 ../solutions/bmi.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '160\n64\n' | python3 ../solutions/bmi.py; printf '180\n81\n' | python3 ../solutions/bmi.py">▶</button><code>printf '160\n64\n' | python3 ../solutions/bmi.py; printf '180\n81\n' | python3 ../solutions/bmi.py</code></div>
+          <p><span lang="en">:.2f keeps the trailing zero, as in 1.60 m. In both cases the BMI is 25.0.</span><span lang="ko">1.60 m처럼 :.2f가 끝자리 0을 유지한다. 두 경우 모두 BMI 25.0이다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The challenge, a BMI category (Underweight, Normal, Overweight, Obese), is built with Week 2's if / elif / else. Leave three test inputs and their expected results as comments at the bottom of the file.</span><span lang="ko">도전 과제인 BMI 분류(Underweight, Normal, Overweight, Obese)는 2주차의 if / elif / else로 만든다. 테스트 입력 세 가지와 예상 결과를 파일 아래 주석으로 남긴다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>bmi.py <span class="muted"><span lang="en">13 lines</span><span lang="ko">13줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: Convert units and calculate BMI.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># For this lab, enter positive numeric values.</span>
+<span class="ln">height_cm = float(input(&quot;Height (cm): &quot;))</span>
+<span class="ln">weight_kg = float(input(&quot;Weight (kg): &quot;))</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Convert height_cm to height_m by dividing by 100.</span>
+<span class="ln"># TODO: Calculate bmi = weight_kg / height_m ** 2.</span>
+<span class="ln"># TODO: Print height with two decimal places and the unit m.</span>
+<span class="ln"># TODO: Print weight with one decimal place and the unit kg.</span>
+<span class="ln"># TODO: Print Your BMI is followed by BMI with one decimal place.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week01/solutions/bmi.py <span class="muted"><span lang="en">18 lines</span><span lang="ko">18줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 reference solution: height conversion and BMI arithmetic.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume positive numeric measurements. This exercise does not classify health.</span>
+<span class="ln">height_cm = float(input(&quot;Height (cm): &quot;))</span>
+<span class="ln">weight_kg = float(input(&quot;Weight (kg): &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">height_m = height_cm / 100</span>
+<span class="ln">bmi = weight_kg / (height_m ** 2)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;Height: {height_m:.2f} m&quot;)</span>
+<span class="ln">print(f&quot;Weight: {weight_kg:.1f} kg&quot;)</span>
+<span class="ln">print(f&quot;Your BMI is {bmi:.1f}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests (height in cm, weight in kg -&gt; displayed height and BMI):</span>
+<span class="ln"># 175, 70 -&gt; 1.75 m, BMI 22.9</span>
+<span class="ln"># 160, 64 -&gt; 1.60 m, BMI 25.0</span>
+<span class="ln"># 180, 81 -&gt; 1.80 m, BMI 25.0</span>
+<span class="ln"># Zero height and nonnumeric text are outside this lab's valid input.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="calc.html">← calc</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="rps — Operators, Strings &amp; Conditionals (Practice) · Python Lab" data-title-ko="rps — 연산자, 문자열, 조건문 (실습) · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rps — Operators, Strings &amp; Conditionals (Practice) · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week02/starter">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 2 · Session 2</span><span lang="ko">2주차 2차시</span></a><span class="sep">/</span><span>rps</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>rps</h1>
+    <p><span lang="en">Lab 3: clean the input with strip().lower(), check that it is rock, paper or scissors, compare it with the computer's choice made by random.choice, and print Tie, You win or You lose.</span><span lang="ko">실습 3: 입력을 strip().lower()로 정리해 rock, paper, scissors인지 검사하고, random.choice로 고른 컴퓨터 선택과 비교해 Tie, You win, You lose를 출력한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week02/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week02/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo rock | python3 rps.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo rock | python3 rps.py; echo">▶</button><code>echo rock | python3 rps.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the prompt. The computer's choice is already made, but there is no comparison code.</span><span lang="ko">시작 코드는 프롬프트만 출력한다. 컴퓨터 선택은 이미 만들어지지만 비교 코드가 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done">▶</button><code>for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done</code></div>
+          <p><span lang="en">Even with the same rock entered three times, the computer's choice and the result can differ each time because of random.choice. So as it is, the test cannot be repeated.</span><span lang="ko">같은 rock을 세 번 넣어도 random.choice 때문에 컴퓨터 선택과 결과가 매번 달라질 수 있다. 그래서 이대로는 테스트를 반복할 수 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py; grep -n 'computer =' /tmp/rps_fixed.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py; grep -n 'computer =' /tmp/rps_fixed.py">▶</button><code>sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py; grep -n 'computer =' /tmp/rps_fixed.py</code></div>
+          <p><span lang="en">The reproducible test from the slides: a copy with the computer's choice fixed to &quot;scissors&quot; is made in /tmp. The original file is not changed.</span><span lang="ko">슬라이드의 재현 가능한 테스트: 컴퓨터 선택을 &quot;scissors&quot;로 고정한 사본을 /tmp에 만들었다. 원본 파일은 바꾸지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done">▶</button><code>for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done</code></div>
+          <p><span lang="en">With the computer on scissors: ROCK with spaces and capitals is cleaned up and gives You win, paper gives You lose, scissors gives Tie, and lizard and the empty input give Invalid choice.</span><span lang="ko">컴퓨터가 scissors일 때: 공백과 대문자가 섞인 ROCK은 정리돼 You win, paper는 You lose, scissors는 Tie, lizard와 빈 입력은 Invalid choice다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done">▶</button><code>for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done</code></div>
+          <p><span lang="en">Prints all 9 possible pairs as a table. As in the table on the slides, there must be 3 Ties, 3 You wins and 3 You loses.</span><span lang="ko">가능한 9가지 조합 전체를 표로 출력한다. 슬라이드의 표와 같이 Tie 3번, You win 3번, You lose 3번이어야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]; print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]; print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)'">▶</button><code>python3 -c 'options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]; print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)'</code></div>
+          <p><span lang="en">Without lower(), ROCK is treated as invalid input (False). After normalizing, it is True.</span><span lang="ko">lower()를 빠뜨리면 ROCK이 잘못된 입력(False)으로 처리된다. 정규화한 뒤에는 True다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">When testing your own rps.py, temporarily fix computer = &quot;scissors&quot; as on the slides, and change it back to random.choice(options) before submitting. If you replace ../solutions/rps.py with rps.py in the sed command above, you can run the same test without editing your file.</span><span lang="ko">자기 rps.py를 테스트할 때는 슬라이드처럼 computer = &quot;scissors&quot;로 잠시 고정해 보고, 제출 전에 random.choice(options)로 되돌린다. 위의 sed 명령에서 ../solutions/rps.py를 rps.py로 바꾸면 파일을 고치지 않고 같은 시험을 할 수 있다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>rps.py <span class="muted"><span lang="en">16 lines</span><span lang="ko">16줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: Complete one round of rock-paper-scissors.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]</span>
+<span class="ln">player = input(&quot;Your choice: &quot;).strip().lower()</span>
+<span class="ln">computer = random.choice(options)</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Print Invalid choice if player is not in options.</span>
+<span class="ln"># TODO: For valid input, print the player and computer choices.</span>
+<span class="ln"># TODO: Check for a tie, the three winning combinations, then a loss.</span>
+<span class="ln"># Print exactly Tie, You win or You lose for the outcome.</span>
+<span class="ln"> </span>
+<span class="ln"># Testing tip: temporarily set computer = &quot;scissors&quot; for predictable results.</span>
+<span class="ln"># Restore random.choice(options) before submission.</span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week02/solutions/rps.py <span class="muted"><span lang="en">29 lines</span><span lang="ko">29줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 reference solution: one round of rock-paper-scissors.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]</span>
+<span class="ln">player = input(&quot;Your choice: &quot;).strip().lower()</span>
+<span class="ln">computer = random.choice(options)</span>
+<span class="ln"> </span>
+<span class="ln">if player not in options:</span>
+<span class="ln">    print(&quot;Invalid choice&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(f&quot;You: {player}, computer: {computer}&quot;)</span>
+<span class="ln">    if player == computer:</span>
+<span class="ln">        print(&quot;Tie&quot;)</span>
+<span class="ln">    elif (</span>
+<span class="ln">        (player == &quot;rock&quot; and computer == &quot;scissors&quot;)</span>
+<span class="ln">        or (player == &quot;scissors&quot; and computer == &quot;paper&quot;)</span>
+<span class="ln">        or (player == &quot;paper&quot; and computer == &quot;rock&quot;)</span>
+<span class="ln">    ):</span>
+<span class="ln">        print(&quot;You win&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;You lose&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests with computer temporarily fixed to &quot;scissors&quot;:</span>
+<span class="ln"># &quot; ROCK &quot; -&gt; You win</span>
+<span class="ln"># &quot;paper&quot; -&gt; You lose</span>
+<span class="ln"># &quot;scissors&quot; -&gt; Tie</span>
+<span class="ln"># &quot;lizard&quot; or &quot;&quot; -&gt; Invalid choice</span>
+<span class="ln"># Restore random.choice(options) after testing.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="grades.html">← grades</a>
+    <a href="leap_year.html">leap_year →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

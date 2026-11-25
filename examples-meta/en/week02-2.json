@@ -1,0 +1,50 @@
+{
+  "title": "Operators, Strings & Conditionals (Practice)",
+  "summary": "Complete four programs, string processing, a grade classifier, rock-paper-scissors and a leap-year calculator, and test them with boundary values and invalid input.",
+  "examples": {
+    "strings": {
+      "summary": "Lab 1: remove the leading and trailing spaces from the input and print Length, Upper and Reverse. If the text is not empty, print its first character with First; if it is empty, print No text entered.",
+      "notes": "Fill in the TODOs with nano strings.py, then run it with the same three inputs (an ordinary word, spaces only, one character) and compare with the solution's output. Record the test inputs and expected results as comments at the bottom of the file.",
+      "steps": [
+        "The starter code prints only the Text: prompt. The input is piped in; you can also run python3 strings.py and type it yourself.",
+        "The spaces are removed, giving Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.",
+        "Input of spaces only becomes an empty string after strip. Length: 0, Upper: and Reverse: are empty, and No text entered is printed. Even for an empty string, the first three lines must be printed.",
+        "One character gives Length: 1, and Upper, Reverse and First are all A.",
+        "The defect you get by indexing without a check. An empty string raises IndexError, so it must be guarded with if text:.",
+        "Optional extension: after converting to lowercase and comparing with the reverse, the palindrome Level gives True."
+      ]
+    },
+    "grades": {
+      "summary": "Lab 2: classify an integer score from 0 to 100 as A (90–100), B (80–89), C (70–79), D (60–69) or F (0–59), and print Invalid score if it is out of range.",
+      "notes": "You can test your own grades.py with the same for loop. Replace ../solutions/grades.py with grades.py, run it, and compare the two tables.",
+      "steps": [
+        "The starter code prints only the Score: prompt and no grade.",
+        "A boundary test table. It uses the value just below each threshold and the threshold itself, the two endpoints 0 and 100, and the out-of-range values -1 and 101. 59 must be F, 60 D, 89 B, 90 A, and 101 Invalid score.",
+        "A wrong chain that checks the low threshold first. 95 comes out as D. This is why thresholds must be checked from the highest.",
+        "Optional Pass/Fail task: the decision is placed inside the valid-score branch, so 101 gets no Pass/Fail."
+      ]
+    },
+    "rps": {
+      "summary": "Lab 3: clean the input with strip().lower(), check that it is rock, paper or scissors, compare it with the computer's choice made by random.choice, and print Tie, You win or You lose.",
+      "notes": "When testing your own rps.py, temporarily fix computer = \"scissors\" as on the slides, and change it back to random.choice(options) before submitting. If you replace ../solutions/rps.py with rps.py in the sed command above, you can run the same test without editing your file.",
+      "steps": [
+        "The starter code prints only the prompt. The computer's choice is already made, but there is no comparison code.",
+        "Even with the same rock entered three times, the computer's choice and the result can differ each time because of random.choice. So as it is, the test cannot be repeated.",
+        "The reproducible test from the slides: a copy with the computer's choice fixed to \"scissors\" is made in /tmp. The original file is not changed.",
+        "With the computer on scissors: ROCK with spaces and capitals is cleaned up and gives You win, paper gives You lose, scissors gives Tie, and lizard and the empty input give Invalid choice.",
+        "Prints all 9 possible pairs as a table. As in the table on the slides, there must be 3 Ties, 3 You wins and 3 You loses.",
+        "Without lower(), ROCK is treated as invalid input (False). After normalizing, it is True."
+      ]
+    },
+    "leap_year": {
+      "summary": "Lab 4: read a positive integer year and decide that it is a leap year if it is a multiple of 400, or a multiple of 4 but not of 100. If it is 0 or less, print Enter a positive year.",
+      "steps": [
+        "The starter code prints only the Year: prompt.",
+        "Work out the three divisibility tests first. 1900 gives True True False, so it is not a leap year (False); 2000 is a multiple of 400, so it is a leap year. 2024 is True, 2023 is False.",
+        "Running the solution: 2024 and 2000 are Leap year, 2023 and 1900 are Not a leap year, and 0 and -4 give Enter a positive year.",
+        "The if/elif solution to the challenge. Checking in the order 400 → 100 → 4 gives the same results as the Boolean-expression solution.",
+        "A common defect, checking only for multiples of 4: 1900 comes out True and is wrongly judged a leap year. 1900 is the test that exposes this defect."
+      ]
+    }
+  }
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="calc — Python Overview &amp; Development Environment · Python Lab" data-title-ko="calc — Python 개요와 개발 환경 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>calc — Python Overview &amp; Development Environment · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week01/starter">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 1 · Session 1</span><span lang="ko">1주차 1차시</span></a><span class="sep">/</span><span>calc</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>calc</h1>
+    <p><span lang="en">Lab 3: read two numbers with input(), convert them to float, and print their sum, difference, product and the quotient to two decimal places with f-strings.</span><span lang="ko">실습 3: 두 수를 input()으로 받아 float로 바꾸고 합·차·곱과 소수 둘째 자리까지의 몫을 f-string으로 출력한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week01/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week01/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n2\n' | python3 calc.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n2\n' | python3 calc.py; echo">▶</button><code>printf '8\n2\n' | python3 calc.py; echo</code></div>
+          <p><span lang="en">The inputs 8 and 2 are piped in beforehand. The starter code prints only the two prompts and no results. You can also run python3 calc.py yourself and type the numbers on the keyboard.</span><span lang="ko">입력 8과 2를 파이프로 미리 넣었다. 시작 코드는 두 프롬프트만 출력하고 계산 결과는 없다. 직접 python3 calc.py로 실행해 키보드로 입력해도 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n2\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n2\n' | python3 ../solutions/calc.py">▶</button><code>printf '8\n2\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">The input is not shown on screen, so the two prompts run together on one line. Because the values were converted to float, a decimal point appears, as in 8.0 + 2.0 = 10.0.</span><span lang="ko">입력이 화면에 보이지 않아 프롬프트 두 개가 한 줄에 붙어 나온다. float로 바꿨으므로 8.0 + 2.0 = 10.0처럼 소수점이 붙는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '7\n3\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '7\n3\n' | python3 ../solutions/calc.py">▶</button><code>printf '7\n3\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">The quotient is 2.333..., but {a / b:.2f} shows it as 2.33.</span><span lang="ko">몫은 2.333...이지만 {a / b:.2f} 때문에 2.33으로 표시된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf -- '-6\n2\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf -- '-6\n2\n' | python3 ../solutions/calc.py">▶</button><code>printf -- '-6\n2\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">Negative numbers work as well: -4.0, -8.0, -12.0, -3.00.</span><span lang="ko">음수도 그대로 계산된다: -4.0, -8.0, -12.0, -3.00.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'">▶</button><code>python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'</code></div>
+          <p><span lang="en">The three operators from the challenge: floor division 3.0, remainder 1.0, exponent 49.0. When both operands are floats, the result is a float too.</span><span lang="ko">도전 과제의 세 연산자: 정수 나눗셈 3.0, 나머지 1.0, 거듭제곱 49.0. float끼리 계산하면 결과도 float다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">If the second number is 0, the sum, difference and product are printed, but the division stops with ZeroDivisionError: division by zero. Handling this is covered in Week 5.</span><span lang="ko">두 번째 수가 0이면 합·차·곱은 출력되지만 나눗셈에서 ZeroDivisionError: division by zero로 멈춘다. 이 처리는 5주차에 배운다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>calc.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: Read two numbers and calculate four arithmetic results.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># For this lab, enter numeric text and a nonzero second number.</span>
+<span class="ln">first_text = input(&quot;First number: &quot;)</span>
+<span class="ln">second_text = input(&quot;Second number: &quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Convert both strings to floats and store them as a and b.</span>
+<span class="ln"># TODO: Print the sum, difference and product with labeled expressions.</span>
+<span class="ln"># TODO: Print the quotient with two decimal places using an f-string.</span>
+<span class="ln"># Use the example output in the README as a guide.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week01/solutions/calc.py <span class="muted"><span lang="en">19 lines</span><span lang="ko">19줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 reference solution: numeric input and arithmetic output.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume numeric input and a nonzero second number.</span>
+<span class="ln">first_text = input(&quot;First number: &quot;)</span>
+<span class="ln">second_text = input(&quot;Second number: &quot;)</span>
+<span class="ln">a = float(first_text)</span>
+<span class="ln">b = float(second_text)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;{a} + {b} = {a + b}&quot;)</span>
+<span class="ln">print(f&quot;{a} - {b} = {a - b}&quot;)</span>
+<span class="ln">print(f&quot;{a} * {b} = {a * b}&quot;)</span>
+<span class="ln">print(f&quot;{a} / {b} = {a / b:.2f}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests (sum, difference, product, displayed quotient):</span>
+<span class="ln"># 8, 2 -&gt; 10.0, 6.0, 16.0, 4.00</span>
+<span class="ln"># 7, 3 -&gt; 10.0, 4.0, 21.0, 2.33</span>
+<span class="ln"># 2.5, 0.5 -&gt; 3.0, 2.0, 1.25, 5.00</span>
+<span class="ln"># -6, 2 -&gt; -4.0, -8.0, -12.0, -3.00</span>
+<span class="ln"># Zero divisors and nonnumeric text are outside this lab's valid input.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="hello.html">← hello</a>
+    <a href="bmi.html">bmi →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "title": "Debugging and Regression Tests",
+  "summary": "Practise the debugging loop (reproduce → diagnose → record → fix → re-verify) on market_rules.py, which contains three deliberate defects. Reproduce each failure with a small fixed input, inspect variable state with the traceback and pdb, then fix the defects one at a time and watch how the unittest results change.",
+  "examples": {
+    "debug_lab": {
+      "summary": "The three functions change_pct (percentage change), summarize (summary) and rank_changes (ranking) each contain one defect: in the denominator of a calculation, in handling empty input, and in the sorting rule. Before fixing anything, reproduce each defect with the smallest possible input, tell failures (Failure) apart from errors (Error), and collect the evidence for your bug report.",
+      "steps": [
+        "Ran 5 tests, FAILED (failures=3, errors=1). There are three defects but four problems. The two subTests inside test_daily_change (100→110 and 100→90) each fail, and test_empty_summary raises ZeroDivisionError before reaching its assertion, so it is reported as ERROR. test_rank_and_input_preservation is a FAIL because the order is wrong.",
+        "The minimal reproducing input for BUG-01. The expected value, worked out from the requirements, is 10.0, but the actual result is 9.090909090909092. It is a logic bug: a wrong value returned without any error. We call the pure function directly with two integers, without CSV or HTML.",
+        "Checking the hypothesis: the numerator (difference) is correctly 10. Dividing 10 by the current price 110 gives 9.09…, while dividing by the previous price 100 gives 10.0. So the cause is the denominator. Once you have confirmed this, delete temporary prints like these.",
+        "Run a single test. The last line, ZeroDivisionError: division by zero, gives the exception type, and the market_rules.py ... in summarize line above it is the last operation that failed in your own code.",
+        "Create the slides' debug_empty.py and run it. The traceback has two frames: debug_empty.py line 2 (the caller passes an empty list) and summarize in market_rules.py (len(changes) is 0, so the division fails). The failure happens at the division, but an empty list is a valid input, so summarize is what needs fixing.",
+        "The pdb commands are piped in. n runs the import line and stops at -> summarize([]); s steps into summarize, and before the body runs, p changes shows [] and p len(changes) shows 0. q quits. To try it yourself, type python3 -m pdb debug_empty.py and enter the same commands one at a time.",
+        "The input for Lab C (prepared in the reverse of the expected order). The expected result is ['000001', '000002', '000003'], but the actual result is ['000003', '000002', '000001']: ascending by percentage change, with ties left in input order.",
+        "How a two-part sort key works: tuples are compared starting from the first item. When -change_pct (the percentage change with a minus sign) is equal (-2), the second item, the code, decides the order, giving 000001, 000002, 000003.",
+        "No data (None) is not the same as an actual mean of 0. Checking with is None distinguishes them: None → N/A, 0.0 → 0.00%. But if not mean turns both into N/A (second column)."
+      ]
+    },
+    "debug_fix": {
+      "summary": "Fix the three defects one at a time, minimally, and rerun the relevant test and then the full test suite after each fix. Here sed replaces the slides' before/after lines exactly, but in the lab you edit the file yourself with nano market_rules.py. Finally, check your changes with diff and test some extra cases that were not provided.",
+      "notes": "The slides' cd 12week/examples/debug_lab is ~/week12/examples/debug_lab in this lab. The steps on this page edit market_rules.py directly. To get back to the starting state, run cp market_rules.orig.py market_rules.py or press Reboot. We use python3 -m pdb instead of VS Code breakpoints.",
+      "steps": [
+        "Keep the original, unfixed file as market_rules.orig.py. The starting point is FAILED (failures=3, errors=1).",
+        "Lab A: change the denominator to the previous price. test_daily_change becomes ok, and the overall result drops to FAILED (failures=1, errors=1). A fake fix such as returning the constant 10 would have been caught by the 100→90 (-10%) and 100→100 (0%) subTests.",
+        "Lab B: if the list is empty, set mean to None. [] gives {'count': 0, 'mean': None}, [5] has mean 5.0, and [10, -10, 0] has an actual mean of 0.0. Now only one problem is left: failures=1.",
+        "Lab C: change the sort key to (-change_pct, code). All five tests are ok and the last line is OK. Because sorted() builds a new list, assertIsNot(ranked, rows) and the comparison with the original also pass (rows.sort() would have changed the original).",
+        "This is the diff to attach to your debugging report. Exactly three lines changed; input validation and the functions' parameters are unchanged. The test file was not modified.",
+        "Candidate extra tests: the smallest positive prices 1 → 2 give 100.0 (%), the mean of a single element is that value, and ranking an empty list gives []. Write the expected values by hand first, then run and compare, and move the cases you checked into test_market_rules.py as assertions.",
+        "bool is a subclass of int, so isinstance(True, int) is True. This code checks with type(...) is not int, so it raises ValueError: prices must be positive integers. This is an intended traceback showing that the input is rejected as the contract says."
+      ]
+    }
+  }
+}

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="korea_market_sqlite — From CSV to SQLite: Swapping the Storage Layer · Python Lab" data-title-ko="korea_market_sqlite — CSV에서 SQLite로: 저장 계층 교체 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>korea_market_sqlite — From CSV to SQLite: Swapping the Storage Layer · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week13/examples/korea_market_sqlite">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 13 · Session 2</span><span lang="ko">13주차 2차시</span></a><span class="sep">/</span><span>korea_market_sqlite</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>korea_market_sqlite</h1>
+    <p><span lang="en">Only storage.py of the Week 11 MVP has changed. connect() and init_db() open and prepare data/market.db, replace_quotes() replaces a validated snapshot in one transaction, and load_quotes(con) returns the same list of quote dicts as before. The old CSV reader remains as read_csv() and is used by --import-csv. In main.py only a few lines that open and pass the connection have changed.</span><span lang="ko">11주차 MVP에서 storage.py만 바꿨다. connect()·init_db()가 data/market.db를 열고 준비하며, replace_quotes()가 검증된 스냅숏을 트랜잭션 하나로 교체하고, load_quotes(con)가 전과 같은 quote dict 목록을 돌려준다. 예전 CSV 읽기는 read_csv()로 남아 --import-csv에서 쓰인다. main.py는 연결을 열고 넘기는 몇 줄만 바뀌었다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week13/examples/korea_market_sqlite</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week13/examples/korea_market_sqlite</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -m unittest -v" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -m unittest -v">▶</button><code>python3 -m unittest -v</code></div>
+          <p><span lang="en">Start green: Ran 18 tests, OK. The 12 MarketTests from Week 11 are joined by 6 StorageTests (test_13 to test_18). StorageTests creates a fresh empty database for each test with connect(&quot;:memory:&quot;) in setUp, so it never touches the real market.db.</span><span lang="ko">통과에서 시작: Ran 18 tests, OK. 11주차의 MarketTests 12개에 StorageTests 6개(test_13~18)가 더해졌다. StorageTests는 setUp에서 connect(&quot;:memory:&quot;)로 테스트마다 새 빈 데이터베이스를 만들므로 실제 market.db를 건드리지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="diff logic.py ../../../week11/examples/korea_market_mvp/logic.py &amp;&amp; diff report.py ../../../week11/examples/korea_market_mvp/report.py &amp;&amp; echo 'logic.py, report.py unchanged'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: diff logic.py ../../../week11/examples/korea_market_mvp/logic.py &amp;&amp; diff report.py ../../../week11/examples/korea_market_mvp/report.py &amp;&amp; echo 'logic.py, report.py unchanged'">▶</button><code>diff logic.py ../../../week11/examples/korea_market_mvp/logic.py &amp;&amp; diff report.py ../../../week11/examples/korea_market_mvp/report.py &amp;&amp; echo 'logic.py, report.py unchanged'</code></div>
+          <p><span lang="en">Evidence for the completion criteria: the rules (logic.py) and the display (report.py) do not differ by a single character from Week 11. storage.py is the only module that knows about SQLite.</span><span lang="ko">완료 기준의 증거: 규칙(logic.py)과 화면(report.py)은 11주차와 한 글자도 다르지 않다. SQLite를 아는 모듈은 storage.py 하나뿐이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -n '^def ' storage.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -n '^def ' storage.py">▶</button><code>grep -n '^def ' storage.py</code></div>
+          <p><span lang="en">connect, init_db, replace_quotes, load_quotes, read_csv, write_html. The four names the slides ask you to find are here. write_html is the same atomic replacement as in Week 11.</span><span lang="ko">connect, init_db, replace_quotes, load_quotes, read_csv, write_html. 슬라이드에서 찾아보라고 한 네 이름이 여기에 있다. write_html은 11주차와 같은 원자적 교체다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="rm -f data/market.db; python3 main.py; ls data" title="Run in the terminal / 터미널에서 실행" aria-label="Run: rm -f data/market.db; python3 main.py; ls data">▶</button><code>rm -f data/market.db; python3 main.py; ls data</code></div>
+          <p><span lang="en">Before any import, the table is empty. init_db() creates the table and writes a valid empty report from the empty sample, so it is (0 stocks). market.db has newly appeared in data/.</span><span lang="ko">가져오기 전에는 테이블이 비어 있다. init_db()가 테이블을 만들고, 빈 표본으로 정상 빈 보고서를 써서 (0 stocks)다. data/에 market.db가 새로 생겼다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --import-csv data/prices.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --import-csv data/prices.csv">▶</button><code>python3 main.py --import-csv data/prices.csv</code></div>
+          <p><span lang="en">read_csv() validates the CSV exactly as in Week 11, then replace_quotes() replaces the snapshot. Generated … (5 stocks).</span><span lang="ko">read_csv()가 11주차와 똑같이 CSV를 검증한 뒤 replace_quotes()가 스냅숏을 교체한다. Generated … (5 stocks).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --market KOSPI; cp docs/index.html /mnt/host/report.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --market KOSPI; cp docs/index.html /mnt/host/report.html">▶</button><code>python3 main.py --market KOSPI; cp docs/index.html /mnt/host/report.html</code></div>
+          <p><span lang="en">Now the report (3 stocks) is built from market.db alone, without the CSV. Enter /mnt/host/report.html in the Download box to fetch it, and you will see the same KOSPI report as in Week 11 (average +0.33%).</span><span lang="ko">이제 CSV 없이 market.db만 읽어 (3 stocks) 보고서를 만든다. 받기 칸에 /mnt/host/report.html을 입력해 내려받으면 11주차와 같은 KOSPI 보고서(평균 +0.33%)가 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from storage import connect, load_quotes; quotes = load_quotes(connect(&quot;data/market.db&quot;)); print(len(quotes)); print(*[f&quot;{k:&lt;15}{v!r}&quot; for k, v in quotes[0].items()], sep=&quot;\n&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from storage import connect, load_quotes; quotes = load_quotes(connect(&quot;data/market.db&quot;)); print(len(quotes)); print(*[f&quot;{k:&lt;15}{v!r}&quot; for k, v in quotes[0].items()], sep=&quot;\n&quot;)'">▶</button><code>python3 -c 'from storage import connect, load_quotes; quotes = load_quotes(connect(&quot;data/market.db&quot;)); print(len(quotes)); print(*[f&quot;{k:&lt;15}{v!r}&quot; for k, v in quotes[0].items()], sep=&quot;\n&quot;)'</code></div>
+          <p><span lang="en">One row returned by load_quotes(). Because of ORDER BY code the first row is 000660. The keys follow the table's column order, code is a string that keeps its leading zero, and prices and volume are already int. analyze() and summarize() accept this dict unchanged.</span><span lang="ko">load_quotes()가 돌려주는 행 하나. ORDER BY code라 첫 행은 000660이다. 키는 테이블의 열 순서이고, code는 앞자리 0이 남은 문자열, 가격과 거래량은 이미 int다. analyze()와 summarize()가 이 dict를 그대로 받는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --import-csv data/invalid-zero.csv; echo &quot;exit=$?&quot;; python3 -c 'from storage import connect, load_quotes; print(len(load_quotes(connect(&quot;data/market.db&quot;))), &quot;rows kept&quot;)'; grep -oE '시장: [A-Z]+' docs/index.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --import-csv data/invalid-zero.csv; echo &quot;exit=$?&quot;; python3 -c 'from storage import connect, load_quotes; print(len(load_quotes(connect(&quot;data/market.db&quot;))), &quot;rows kept&quot;)'; grep -oE '시장: [A-Z]+' docs/index.html">▶</button><code>python3 main.py --import-csv data/invalid-zero.csv; echo &quot;exit=$?&quot;; python3 -c 'from storage import connect, load_quotes; print(len(load_quotes(connect(&quot;data/market.db&quot;))), &quot;rows kept&quot;)'; grep -oE '시장: [A-Z]+' docs/index.html</code></div>
+          <p><span lang="en">A bad CSV: Report not generated: CSV row 2: previous_close must be &gt;= 1, with exit code 1. It is rejected at the read_csv() stage, so the table has 5 rows kept and the HTML is still the KOSPI report from just before.</span><span lang="ko">잘못된 CSV: Report not generated: CSV row 2: previous_close must be &gt;= 1, 종료 코드 1. read_csv() 단계에서 거절되어 테이블은 5 rows kept, HTML은 바로 앞의 KOSPI 보고서 그대로다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --import-csv data/empty.csv; python3 main.py --import-csv data/prices.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --import-csv data/empty.csv; python3 main.py --import-csv data/prices.csv">▶</button><code>python3 main.py --import-csv data/empty.csv; python3 main.py --import-csv data/prices.csv</code></div>
+          <p><span lang="en">A header-only CSV is a valid empty snapshot, so it empties the table and produces a (0 stocks) report. Importing prices.csv again restores (5 stocks).</span><span lang="ko">헤더만 있는 CSV는 정상적인 빈 스냅숏이므로 테이블을 비우고 (0 stocks) 보고서를 만든다. 다시 prices.csv를 가져와 (5 stocks)로 되돌린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat ../.gitignore" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat ../.gitignore">▶</button><code>cat ../.gitignore</code></div>
+          <p><span lang="en">It contains *.db. market.db is a result; schema.sql and the code that fills the table are the source. Anyone can rebuild the database with a single python3 main.py --import-csv data/prices.csv.</span><span lang="ko">*.db가 들어 있다. market.db는 결과물이고 schema.sql과 테이블을 채우는 코드가 소스다. 누구나 python3 main.py --import-csv data/prices.csv 한 번으로 데이터베이스를 다시 만들 수 있다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The slides' cd 13week/examples/korea_market_sqlite is ~/week13/examples/korea_market_sqlite in this lab. Do Lab B (adding WHERE market = ? to load_quotes(con, market=&quot;ALL&quot;)) and C (adding :memory: tests) with nano storage.py and nano test_market.py, and check with python3 -m unittest. Do git add/commit in the repository on your real PC.</span><span lang="ko">슬라이드의 cd 13week/examples/korea_market_sqlite는 이 실습에서 ~/week13/examples/korea_market_sqlite다. 실습 B(load_quotes(con, market=&quot;ALL&quot;)에 WHERE market = ? 추가)와 C(:memory: 테스트 추가)는 nano storage.py, nano test_market.py로 하고 python3 -m unittest로 확인한다. git add/commit은 실제 PC의 저장소에서 한다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">45 lines</span><span lang="ko">45줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Generate a static page from Korean stock classroom data stored in SQLite.&quot;&quot;&quot;</span>
+<span class="ln">import argparse</span>
+<span class="ln">from contextlib import closing</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import (connect, init_db, load_quotes, read_csv,</span>
+<span class="ln">                     replace_quotes, write_html)</span>
+<span class="ln">from report import render_html</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main(argv=None):</span>
+<span class="ln">    &quot;&quot;&quot;Return 0 after successful generation, 1 on data/file errors; CLI errors use 2.</span>
+<span class="ln"> </span>
+<span class="ln">    --import-csv validates a CSV and replaces the stored snapshot first.</span>
+<span class="ln">    A failed import changes neither the database nor the old HTML.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    parser = argparse.ArgumentParser(description=__doc__)</span>
+<span class="ln">    parser.add_argument(&quot;--db&quot;, type=Path, default=BASE / &quot;data/market.db&quot;)</span>
+<span class="ln">    parser.add_argument(&quot;--import-csv&quot;, type=Path, metavar=&quot;CSV&quot;)</span>
+<span class="ln">    parser.add_argument(&quot;--output&quot;, type=Path, default=BASE / &quot;docs/index.html&quot;)</span>
+<span class="ln">    parser.add_argument(&quot;--market&quot;, choices=MARKETS, default=&quot;ALL&quot;)</span>
+<span class="ln">    args = parser.parse_args(argv)</span>
+<span class="ln">    try:</span>
+<span class="ln">        with closing(connect(args.db)) as con:</span>
+<span class="ln">            init_db(con)</span>
+<span class="ln">            if args.import_csv:</span>
+<span class="ln">                replace_quotes(con, read_csv(args.import_csv))</span>
+<span class="ln">            quotes = load_quotes(con)</span>
+<span class="ln">        rows = analyze(quotes, args.market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0][&quot;date&quot;] if quotes else &quot;데이터 없음&quot;</span>
+<span class="ln">        html = render_html(rows, summary, args.market, day)</span>
+<span class="ln">        write_html(args.output, html)</span>
+<span class="ln">    except (OSError, ValueError, UnicodeError, sqlite3.Error) as error:</span>
+<span class="ln">        print(f&quot;Report not generated: {error}&quot;)</span>
+<span class="ln">        return 1</span>
+<span class="ln">    print(f&quot;Generated {args.output} ({len(rows)} stocks)&quot;)</span>
+<span class="ln">    return 0</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    raise SystemExit(main())</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">80 lines</span><span lang="ko">80줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;SQLite storage, CSV import and atomic HTML output; all I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">import os</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">import tempfile</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln">SCHEMA = Path(__file__).resolve().parent / &quot;schema.sql&quot;</span>
+<span class="ln">INSERT = &quot;&quot;&quot;</span>
+<span class="ln">    INSERT INTO quotes</span>
+<span class="ln">    VALUES (?, ?, ?, ?, ?, ?, ?)</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def connect(path):</span>
+<span class="ln">    &quot;&quot;&quot;Open the database (&quot;:memory:&quot; in tests) with rows readable by name.&quot;&quot;&quot;</span>
+<span class="ln">    if str(path) != &quot;:memory:&quot;:</span>
+<span class="ln">        Path(path).parent.mkdir(parents=True, exist_ok=True)</span>
+<span class="ln">    con = sqlite3.connect(path)</span>
+<span class="ln">    con.row_factory = sqlite3.Row</span>
+<span class="ln">    return con</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def init_db(con):</span>
+<span class="ln">    &quot;&quot;&quot;Create the quotes table if it is missing. Safe to call every run.&quot;&quot;&quot;</span>
+<span class="ln">    con.executescript(SCHEMA.read_text(encoding=&quot;utf-8&quot;))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def replace_quotes(con, quotes):</span>
+<span class="ln">    &quot;&quot;&quot;Replace the whole snapshot in one transaction: all rows or none.</span>
+<span class="ln"> </span>
+<span class="ln">    quotes are typed dicts from parse_row(). A constraint failure raises</span>
+<span class="ln">    sqlite3.IntegrityError and leaves the previous rows in place.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    rows = [tuple(q[f] for f in FIELDS) for q in quotes]</span>
+<span class="ln">    with con:</span>
+<span class="ln">        con.execute(&quot;DELETE FROM quotes&quot;)</span>
+<span class="ln">        con.executemany(INSERT, rows)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(con):</span>
+<span class="ln">    &quot;&quot;&quot;Return every stored quote as a dict, in code order. Empty table -&gt; [].&quot;&quot;&quot;</span>
+<span class="ln">    query = &quot;SELECT * FROM quotes ORDER BY code&quot;</span>
+<span class="ln">    return [dict(row) for row in con.execute(query)]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def read_csv(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    (This was load_quotes() in the week 11 MVP.)</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def write_html(path, html):</span>
+<span class="ln">    &quot;&quot;&quot;Replace output only after a complete UTF-8 write; raise OSError on failure.&quot;&quot;&quot;</span>
+<span class="ln">    path = Path(path)</span>
+<span class="ln">    path.parent.mkdir(parents=True, exist_ok=True)</span>
+<span class="ln">    temporary = None</span>
+<span class="ln">    try:</span>
+<span class="ln">        with tempfile.NamedTemporaryFile(mode=&quot;w&quot;, encoding=&quot;utf-8&quot;,</span>
+<span class="ln">                                         dir=path.parent, delete=False) as stream:</span>
+<span class="ln">            temporary = Path(stream.name)</span>
+<span class="ln">            stream.write(html)</span>
+<span class="ln">        os.replace(temporary, path)</span>
+<span class="ln">    finally:</span>
+<span class="ln">        if temporary is not None and temporary.exists():</span>
+<span class="ln">            temporary.unlink()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>schema.sql <span class="muted"><span lang="en">13 lines</span><span lang="ko">13줄</span></span></summary>
+      <pre class="code"><code><span class="ln">CREATE TABLE IF NOT EXISTS quotes (</span>
+<span class="ln">    date   TEXT NOT NULL,</span>
+<span class="ln">    code   TEXT NOT NULL,</span>
+<span class="ln">    name   TEXT NOT NULL,</span>
+<span class="ln">    market TEXT NOT NULL,</span>
+<span class="ln">    previous_close INTEGER NOT NULL</span>
+<span class="ln">        CHECK (previous_close &gt; 0),</span>
+<span class="ln">    close  INTEGER NOT NULL</span>
+<span class="ln">        CHECK (close &gt; 0),</span>
+<span class="ln">    volume INTEGER NOT NULL</span>
+<span class="ln">        CHECK (volume &gt;= 0),</span>
+<span class="ln">    PRIMARY KEY (date, code)</span>
+<span class="ln">);</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>test_market.py <span class="muted"><span lang="en">176 lines</span><span lang="ko">176줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;REQ-linked checks: python3 -m unittest -v.&quot;&quot;&quot;</span>
+<span class="ln">import contextlib</span>
+<span class="ln">import io</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">import tempfile</span>
+<span class="ln">import unittest</span>
+<span class="ln">from unittest.mock import patch</span>
+<span class="ln"> </span>
+<span class="ln">from logic import analyze, change_pct, parse_row, summarize</span>
+<span class="ln">from main import BASE, main</span>
+<span class="ln">from report import render_html</span>
+<span class="ln">from storage import (connect, init_db, load_quotes, read_csv,</span>
+<span class="ln">                     replace_quotes, write_html)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class MarketTests(unittest.TestCase):</span>
+<span class="ln">    def setUp(self):</span>
+<span class="ln">        self.quotes = read_csv(BASE / 'data/prices.csv')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_01_schema_and_leading_zero(self):</span>
+<span class="ln">        self.assertEqual(self.quotes[0]['code'], '005930')</span>
+<span class="ln">        self.assertEqual(self.quotes[0]['close'], 71400)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_02_changes(self):</span>
+<span class="ln">        for previous, close, expected in [(70000, 71400, 2), (200000, 198000, -1), (100, 100, 0)]:</span>
+<span class="ln">            self.assertAlmostEqual(change_pct(previous, close), expected)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_03_reject_invalid_fields(self):</span>
+<span class="ln">        row = {k: str(v) for k, v in self.quotes[0].items()}</span>
+<span class="ln">        for field, bad in [('previous_close', '0'), ('close', '-1'), ('volume', '-1'),</span>
+<span class="ln">                           ('close', 'NaN'), ('volume', '1.5'), ('code', '5930'),</span>
+<span class="ln">                           ('date', '2026-02-30'), ('name', ''), ('market', 'OTHER')]:</span>
+<span class="ln">            with self.subTest(field=field, bad=bad), self.assertRaises(ValueError):</span>
+<span class="ln">                parse_row(dict(row, **{field: bad}))</span>
+<span class="ln"> </span>
+<span class="ln">    def test_04_filter_and_sort(self):</span>
+<span class="ln">        rows = analyze(self.quotes, 'KOSPI')</span>
+<span class="ln">        self.assertEqual([q['code'] for q in rows], ['005930', '035420', '000660'])</span>
+<span class="ln">        self.assertNotIn('change_pct', self.quotes[0])</span>
+<span class="ln">        tied = [dict(self.quotes[0], code='000002'), dict(self.quotes[0], code='000001')]</span>
+<span class="ln">        self.assertEqual(analyze(tied, 'ALL')[0]['code'], '000001')</span>
+<span class="ln">        with self.assertRaises(ValueError):</span>
+<span class="ln">            analyze(self.quotes, 'OTHER')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_05_sample_summary(self):</span>
+<span class="ln">        summary = summarize(analyze(self.quotes, 'ALL'))</span>
+<span class="ln">        self.assertEqual((summary['count'], summary['up'], summary['down'], summary['flat']), (5, 2, 2, 1))</span>
+<span class="ln">        self.assertAlmostEqual(summary['mean'], 0.4)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_06_empty_data(self):</span>
+<span class="ln">        for rows in [analyze([], 'ALL'), analyze(self.quotes[:1], 'KOSDAQ')]:</span>
+<span class="ln">            summary = summarize(rows)</span>
+<span class="ln">            self.assertIsNone(summary['mean'])</span>
+<span class="ln">            html = render_html(rows, summary, 'KOSDAQ', '데이터 없음')</span>
+<span class="ln">            self.assertIn('표시할 종목이 없습니다', html)</span>
+<span class="ln">            self.assertIn('N/A', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_07_snapshot_identity(self):</span>
+<span class="ln">        for rows in [self.quotes + [self.quotes[0]],</span>
+<span class="ln">                     [self.quotes[0], dict(self.quotes[1], date='2026-11-04')]]:</span>
+<span class="ln">            with self.assertRaises(ValueError):</span>
+<span class="ln">                analyze(rows, 'ALL')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_08_html_escape(self):</span>
+<span class="ln">        rows = analyze([dict(self.quotes[0], name='&lt;script&gt;alert(1)&lt;/script&gt;')], 'ALL')</span>
+<span class="ln">        html = render_html(rows, summarize(rows), 'ALL', '2026-11-05')</span>
+<span class="ln">        self.assertNotIn('&lt;script&gt;', html)</span>
+<span class="ln">        self.assertIn('&amp;lt;script&amp;gt;', html)</span>
+<span class="ln">        self.assertIn('+2.00%', html)</span>
+<span class="ln">        self.assertIn('71,400', html)</span>
+<span class="ln">        self.assertIn('005930', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_09_failed_import_preserves_report_and_rows(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            root = Path(folder)</span>
+<span class="ln">            db = root / 'market.db'</span>
+<span class="ln">            output = root / 'index.html'</span>
+<span class="ln">            with contextlib.redirect_stdout(io.StringIO()):</span>
+<span class="ln">                self.assertEqual(main(['--db', str(db), '--output', str(output),</span>
+<span class="ln">                                       '--import-csv', str(BASE / 'data/prices.csv')]), 0)</span>
+<span class="ln">            output.write_text('OLD', encoding='utf-8')</span>
+<span class="ln">            bad = root / 'bad.csv'</span>
+<span class="ln">            bad.write_text('wrong,header\n1,2\n', encoding='utf-8')</span>
+<span class="ln">            for source in [root / 'missing.csv', bad, BASE / 'data/invalid-zero.csv']:</span>
+<span class="ln">                with contextlib.redirect_stdout(io.StringIO()):</span>
+<span class="ln">                    self.assertEqual(main(['--db', str(db), '--output', str(output),</span>
+<span class="ln">                                           '--import-csv', str(source)]), 1)</span>
+<span class="ln">                self.assertEqual(output.read_text(), 'OLD')</span>
+<span class="ln">                with contextlib.closing(connect(db)) as con:</span>
+<span class="ln">                    self.assertEqual(len(load_quotes(con)), 5)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_10_atomic_write_failure(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            output = Path(folder) / 'index.html'</span>
+<span class="ln">            output.write_text('OLD')</span>
+<span class="ln">            with patch('storage.os.replace', side_effect=OSError('simulated failure')):</span>
+<span class="ln">                with self.assertRaises(OSError):</span>
+<span class="ln">                    write_html(output, 'NEW')</span>
+<span class="ln">            self.assertEqual(output.read_text(), 'OLD')</span>
+<span class="ln">            self.assertEqual(list(Path(folder).iterdir()), [output])</span>
+<span class="ln"> </span>
+<span class="ln">    def test_11_end_to_end(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            output = Path(folder) / 'docs/index.html'</span>
+<span class="ln">            db = Path(folder) / 'data/market.db'</span>
+<span class="ln">            with contextlib.redirect_stdout(io.StringIO()):</span>
+<span class="ln">                self.assertEqual(main(['--db', str(db), '--import-csv', str(BASE / 'data/prices.csv'),</span>
+<span class="ln">                                       '--market', 'KOSPI', '--output', str(output)]), 0)</span>
+<span class="ln">                # A second run reads the stored rows; no CSV is needed.</span>
+<span class="ln">                self.assertEqual(main(['--db', str(db), '--market', 'KOSPI', '--output', str(output)]), 0)</span>
+<span class="ln">            html = output.read_text(encoding='utf-8')</span>
+<span class="ln">            self.assertIn('삼성전자', html)</span>
+<span class="ln">            self.assertNotIn('에코프로비엠', html)</span>
+<span class="ln">            self.assertIn('종목 3개', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_12_csv_boundaries(self):</span>
+<span class="ln">        header = 'date,code,name,market,previous_close,close,volume\n'</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            source = Path(folder) / 'prices.csv'</span>
+<span class="ln">            source.write_text('\ufeff' + header, encoding='utf-8')</span>
+<span class="ln">            self.assertEqual(read_csv(source), [])</span>
+<span class="ln">            for tail in ['2026-11-05,005930,삼성전자,KOSPI,70000,71400\n',</span>
+<span class="ln">                         '2026-11-05,005930,삼성전자,KOSPI,70000,71400,0,extra\n']:</span>
+<span class="ln">                source.write_text(header + tail, encoding='utf-8')</span>
+<span class="ln">                with self.assertRaises(ValueError):</span>
+<span class="ln">                    read_csv(source)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class StorageTests(unittest.TestCase):</span>
+<span class="ln">    &quot;&quot;&quot;Week 13: the storage layer, checked against an in-memory database.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">    def setUp(self):</span>
+<span class="ln">        self.con = connect(':memory:')</span>
+<span class="ln">        init_db(self.con)</span>
+<span class="ln">        self.quotes = read_csv(BASE / 'data/prices.csv')</span>
+<span class="ln"> </span>
+<span class="ln">    def tearDown(self):</span>
+<span class="ln">        self.con.close()</span>
+<span class="ln"> </span>
+<span class="ln">    def test_13_empty_table_is_empty_list(self):</span>
+<span class="ln">        self.assertEqual(load_quotes(self.con), [])</span>
+<span class="ln"> </span>
+<span class="ln">    def test_14_round_trip_keeps_types(self):</span>
+<span class="ln">        replace_quotes(self.con, self.quotes)</span>
+<span class="ln">        stored = load_quotes(self.con)</span>
+<span class="ln">        self.assertEqual(stored, sorted(self.quotes, key=lambda q: q['code']))</span>
+<span class="ln">        self.assertEqual(stored[0]['code'], '000660')</span>
+<span class="ln">        self.assertIsInstance(stored[0]['close'], int)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_15_replace_does_not_append(self):</span>
+<span class="ln">        replace_quotes(self.con, self.quotes)</span>
+<span class="ln">        replace_quotes(self.con, self.quotes[:2])</span>
+<span class="ln">        self.assertEqual(len(load_quotes(self.con)), 2)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_16_failed_replace_keeps_old_rows(self):</span>
+<span class="ln">        replace_quotes(self.con, self.quotes)</span>
+<span class="ln">        for bad in [self.quotes[:1] * 2,                      # duplicate key</span>
+<span class="ln">                    [dict(self.quotes[0], close=0)],          # CHECK</span>
+<span class="ln">                    [dict(self.quotes[0], name=None)]]:       # NOT NULL</span>
+<span class="ln">            with self.subTest(bad=bad), self.assertRaises(sqlite3.IntegrityError):</span>
+<span class="ln">                replace_quotes(self.con, bad)</span>
+<span class="ln">            self.assertEqual(len(load_quotes(self.con)), 5)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_17_same_analysis_from_csv_and_database(self):</span>
+<span class="ln">        replace_quotes(self.con, self.quotes)</span>
+<span class="ln">        self.assertEqual(analyze(load_quotes(self.con), 'ALL'), analyze(self.quotes, 'ALL'))</span>
+<span class="ln"> </span>
+<span class="ln">    def test_18_init_db_twice_keeps_rows(self):</span>
+<span class="ln">        replace_quotes(self.con, self.quotes)</span>
+<span class="ln">        init_db(self.con)</span>
+<span class="ln">        self.assertEqual(len(load_quotes(self.con)), 5)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    unittest.main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">65 lines</span><span lang="ko">65줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; prices are integer KRW.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;KOSPI&quot;, &quot;KOSDAQ&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if len(code) != 6 or not code.isascii() or not code.isdigit():</span>
+<span class="ln">        raise ValueError(&quot;code must be six ASCII digits&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and KOSPI/KOSDAQ market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, KOSPI or KOSDAQ&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">44 lines</span><span lang="ko">44줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure HTML formatting. Escape all external text before interpolation.&quot;&quot;&quot;</span>
+<span class="ln">from html import escape</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def render_html(rows, summary, market, snapshot_date):</span>
+<span class="ln">    &quot;&quot;&quot;Return a complete HTML page; round percentages only when displaying.&quot;&quot;&quot;</span>
+<span class="ln">    body = []</span>
+<span class="ln">    for q in rows:</span>
+<span class="ln">        change = q[&quot;change_pct&quot;]</span>
+<span class="ln">        direction = &quot;up&quot; if change &gt; 0 else &quot;down&quot; if change &lt; 0 else &quot;flat&quot;</span>
+<span class="ln">        body.append(f'&lt;tr&gt;&lt;td&gt;{escape(q[&quot;code&quot;])}&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{escape(q[&quot;name&quot;])}&lt;/td&gt;&lt;td&gt;{escape(q[&quot;market&quot;])}&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{q[&quot;close&quot;]:,}&lt;/td&gt;&lt;td class=&quot;{direction}&quot;&gt;{change:+.2f}%&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{q[&quot;volume&quot;]:,}&lt;/td&gt;&lt;/tr&gt;')</span>
+<span class="ln">    mean = &quot;N/A&quot; if summary[&quot;mean&quot;] is None else f'{summary[&quot;mean&quot;]:+.2f}%'</span>
+<span class="ln">    table_body = &quot;&quot;.join(body) or '&lt;tr&gt;&lt;td colspan=&quot;6&quot;&gt;표시할 종목이 없습니다.&lt;/td&gt;&lt;/tr&gt;'</span>
+<span class="ln">    return f'''&lt;!doctype html&gt;</span>
+<span class="ln">&lt;html lang=&quot;ko&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;</span>
+<span class="ln">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;</span>
+<span class="ln">&lt;title&gt;한국 주식시장 분석 실습&lt;/title&gt;</span>
+<span class="ln">&lt;style&gt;</span>
+<span class="ln">body {{font-family:system-ui,sans-serif;background:#f3f5f9;color:#17243c;margin:0}}</span>
+<span class="ln">main {{max-width:1040px;margin:48px auto;padding:24px}}</span>
+<span class="ln">h1 {{font-size:2rem}} .meta {{color:#53627b}} .summary {{background:#17243c;color:white;padding:24px;border-radius:12px}}</span>
+<span class="ln">.scroll {{overflow-x:auto}} table {{border-collapse:collapse;width:100%;background:white;margin-top:24px}}</span>
+<span class="ln">caption {{text-align:left;padding:12px 0;font-weight:bold}}</span>
+<span class="ln">th,td {{padding:14px;text-align:right;border-bottom:1px solid #dde3ec;white-space:nowrap}}</span>
+<span class="ln">th:nth-child(-n+3),td:nth-child(-n+3) {{text-align:left}}</span>
+<span class="ln">.up {{color:#b12a38}} .down {{color:#245bbb}} .flat {{color:#53627b}}</span>
+<span class="ln">footer {{margin-top:24px;color:#53627b;line-height:1.6}}</span>
+<span class="ln">&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;main&gt;</span>
+<span class="ln">&lt;p class=&quot;meta&quot;&gt;PYTHON / WEEK 11 / CLASSROOM DATA&lt;/p&gt;</span>
+<span class="ln">&lt;h1&gt;한국 주식시장 분석&lt;/h1&gt;</span>
+<span class="ln">&lt;p&gt;기준일: {escape(snapshot_date)} · 시장: {escape(market)} · 출처: 수업용 가상 CSV&lt;/p&gt;</span>
+<span class="ln">&lt;section class=&quot;summary&quot; aria-label=&quot;표본 요약&quot;&gt;</span>
+<span class="ln">종목 {summary[&quot;count&quot;]}개 · 상승 {summary[&quot;up&quot;]} · 하락 {summary[&quot;down&quot;]} · 보합 {summary[&quot;flat&quot;]}</span>
+<span class="ln">&lt;p&gt;표본 단순평균 등락률 &lt;strong&gt;{mean}&lt;/strong&gt;&lt;/p&gt;&lt;/section&gt;</span>
+<span class="ln">&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;&lt;caption&gt;일간 등락률 내림차순 / 동률은 종목코드 오름차순&lt;/caption&gt;</span>
+<span class="ln">&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;코드&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;종목&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;시장&lt;/th&gt;</span>
+<span class="ln">&lt;th scope=&quot;col&quot;&gt;종가 (원)&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;등락률&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;거래량 (주)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</span>
+<span class="ln">&lt;tbody&gt;{table_body}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</span>
+<span class="ln">&lt;footer&gt;교육용 가상 데이터입니다. 실제 시세 또는 현재 상장 종목 목록이 아닙니다.&lt;br&gt;</span>
+<span class="ln">표본의 단순평균이며 KOSPI/KOSDAQ 지수 수익률이 아닙니다. 투자 판단용 정보가 아닙니다.&lt;/footer&gt;</span>
+<span class="ln">&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;'''</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/prices.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/invalid-zero.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,0,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week13/labs/session2/storage-swap.md <span class="muted"><span lang="en">57 lines</span><span lang="ko">57줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 13주차 2차 실습 — 저장 계층 교체</span>
+<span class="ln"> </span>
+<span class="ln">이름 / 학번:</span>
+<span class="ln"> </span>
+<span class="ln">작업 폴더: `13week/examples/korea_market_sqlite` (복사본 또는 개인 저장소의 브랜치) · 제출: 이 파일, 변경한 코드, PR 링크 또는 로컬 diff</span>
+<span class="ln"> </span>
+<span class="ln">## A. 통과에서 시작 (4분)</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">python3 -m unittest</span>
+<span class="ln">python3 main.py --import-csv data/prices.csv</span>
+<span class="ln">python3 main.py --market KOSPI</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">- 테스트 결과(개수와 OK 여부):</span>
+<span class="ln">- `storage.py`에서 SQLite를 쓰는 함수 이름:</span>
+<span class="ln"> </span>
+<span class="ln">## B. 시장 필터를 SQL로 (12분)</span>
+<span class="ln"> </span>
+<span class="ln">`load_quotes(con, market=&quot;ALL&quot;)`이 되도록 고친다.</span>
+<span class="ln"> </span>
+<span class="ln">- `market`이 `&quot;ALL&quot;`이면 모든 행, 아니면 `WHERE market = ?`로 고른 행을 돌려준다.</span>
+<span class="ln">- `load_quotes(con)`처럼 `market` 없이 부르는 기존 코드가 그대로 동작해야 한다.</span>
+<span class="ln"> </span>
+<span class="ln">내가 쓴 쿼리:</span>
+<span class="ln"> </span>
+<span class="ln">## C. `:memory:` 테스트 (8분)</span>
+<span class="ln"> </span>
+<span class="ln">`StorageTests`에 테스트를 추가한다.</span>
+<span class="ln"> </span>
+<span class="ln">| 입력 | 기대 결과 | 통과 |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| `load_quotes(con, &quot;KOSPI&quot;)` | 3행, 모두 KOSPI | |</span>
+<span class="ln">| `load_quotes(con, &quot;ALL&quot;)` | 5행 | |</span>
+<span class="ln">| `load_quotes(con)` | 5행 | |</span>
+<span class="ln"> </span>
+<span class="ln">이 테스트가 잡아내는 결함 하나(예: WHERE를 빠뜨림):</span>
+<span class="ln"> </span>
+<span class="ln">## D. 내 프로젝트의 테이블 (10분)</span>
+<span class="ln"> </span>
+<span class="ln">| 질문 | 답 |</span>
+<span class="ln">|---|---|</span>
+<span class="ln">| 한 행은 무엇인가? | |</span>
+<span class="ln">| 열과 자료형(TEXT / INTEGER / REAL) | |</span>
+<span class="ln">| 기본 키 | |</span>
+<span class="ln">| 테이블이 거절해야 하는 값(NOT NULL, CHECK) | |</span>
+<span class="ln"> </span>
+<span class="ln">- `schema.sql`에 `CREATE TABLE IF NOT EXISTS` 문장을 쓴다.</span>
+<span class="ln">- 저장 함수 하나와 조회 함수 하나를 만든다. 값은 `?`로 넘긴다.</span>
+<span class="ln">- 데이터베이스가 필요 없다고 판단했다면 그 이유를 적는다.</span>
+<span class="ln"> </span>
+<span class="ln">## 제출 전 확인</span>
+<span class="ln"> </span>
+<span class="ln">- [ ] 기존 테스트 18개와 내 테스트가 모두 통과한다.</span>
+<span class="ln">- [ ] `logic.py`와 `report.py`를 고치지 않았다.</span>
+<span class="ln">- [ ] `.gitignore`에 `*.db`가 있고 PR에 `.db` 파일이 없다.</span>
+<span class="ln">- [ ] 잘못된 CSV를 가져오면 테이블과 기존 HTML이 그대로다.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="sql_changes.html">← sql_changes</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

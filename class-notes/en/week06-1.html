@@ -1,0 +1,370 @@
+<p>"Your program has amnesia. Today we cure it." The programs you have written so far know everything while they run and forget it all the moment they end. This session is one story in three acts. In Act 1, <strong>Files</strong>, we use <code>open()</code> and <code>with</code> to leave results on disk so the report survives after the program ends. In Act 2, <strong>Classes</strong>, we design a <code>Position</code> object that knows how to calculate its own profit. In Act 3, <strong>Charts</strong>, we turn numbers into lines, bars and histograms with matplotlib. It is the same story from start to finish: we save, structure and draw the record of a trading week.</p>
+
+<p>The practice programs are <a href="journal_by_hand.html">journal_by_hand</a>, <a href="position_report.html">position_report</a>, <a href="my_charts.html">my_charts</a>, <a href="year_report.html">year_report</a> and <a href="journal_chart.html">journal_chart</a>. This week's starters come without separate finished versions, so the steps on each page show the starter's current state together with expected results computed ahead of time with shell commands. <a href="make_prices_2026.html">make_prices_2026</a> is the generator script that created the one-year price file.</p>
+
+<h2>Review: Where Did the Numbers Go?</h2>
+
+<p>Last session, a Series answered each question with a single call. The <code>price_report.py</code> you submit today prints four numbers. But when the program ends, those four numbers are gone. If you run it again tomorrow, where are yesterday's answers? Today we save them, structure them and draw them.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800, 10500, 10800])
+print(closes.mean())    # one question, one answer</code></pre>
+
+<h2>Act 1 · Files: Teach Your Program to Remember</h2>
+
+<p><code>print()</code> talks; a file remembers. The screen is not storage; the disk is. A file is your program's memory: what you write today is still there tomorrow. In fact, you have already been using files: <code>prices_2026.csv</code> is a file too.</p>
+
+<h3>open(): Three Moves and One Trap</h3>
+
+<p><code>open(path, "w")</code> creates a file and returns a file object. <code>f.write(text)</code> puts a string into the file and does nothing more. <code>f.close()</code> hands the file back to the system. If you forget <code>close()</code>, the file may be left empty or locked. Trap: <code>write()</code> adds no newline, so you have to write <code>"\n"</code> at the end of each line yourself.</p>
+
+<pre><code>report = open("summary.txt", "w")
+report.write("CODE week high: 10800")
+report.write("\n")
+report.close()
+print("Saved summary.txt")</code></pre>
+
+<h3>with: The Door That Closes Itself</h3>
+
+<p><code>with open(...) as f:</code> closes the file when the block ends. Even if an error occurs inside the block, the file is closed on the way out. No forgotten <code>close()</code>, no locked file, no half-written report. From this slide on, every <code>open()</code> is written with <code>with</code>.</p>
+
+<pre><code>lines = ["CODE 10800", "TEA 4800"]
+with open("summary.txt", "w") as f:
+    for line in lines:
+        f.write(line + "\n")
+print("Saved summary.txt")</code></pre>
+
+<p>Predict: if you run this script twice, how many lines will <code>summary.txt</code> have? The answer is in the "Modes" section below.</p>
+
+<h3>Reading: Three Ways to Drink from a File</h3>
+
+<p><code>read()</code> gives the whole file as one string (the whole glass at once). <code>readlines()</code> gives a list of lines (poured into cups). <code>for line in f:</code> reads one line at a time and saves memory (one sip at a time). If you leave out the mode, the default is <code>"r"</code>, that is, reading. Trap: every line ends with <code>"\n"</code>, so you have to remove it with <code>strip()</code>. Otherwise <code>"buy\n"</code> is not equal to <code>"buy"</code>.</p>
+
+<pre><code>with open("trades.csv") as f:
+    header = f.readline()
+    print(header.strip())         # date,ticker,...
+
+with open("trades.csv") as f:
+    print(len(f.readlines()))     # 11 with header</code></pre>
+
+<p>11 is 10 trades plus 1 header line. On the <a href="journal_by_hand.html">journal_by_hand</a> page you can confirm the same number with <code>wc -l trades.csv</code>.</p>
+
+<h3>Anatomy of a CSV Line</h3>
+
+<p><code>strip()</code> removes the hidden <code>"\n"</code> at the end, and <code>split(",")</code> cuts the line into a list of fields. Every field is a string, even <code>"3"</code>, so turn it into a number with <code>int()</code>. This is exactly what <code>read_csv</code> does.</p>
+
+<pre><code>with open("trades.csv") as f:
+    f.readline()
+    line = f.readline()
+
+fields = line.strip().split(",")
+print(fields[1], fields[2],
+      int(fields[3]) * int(fields[4]))
+# TEA buy 50000</code></pre>
+
+<p>The output is the first trade of the week: 10 shares × 5000 won.</p>
+
+<h3>Modes: r Reads, w Wipes, a Adds</h3>
+
+<ul>
+<li><code>"r"</code> reads. If the file does not exist, you get a clear <code>FileNotFoundError</code>.</li>
+<li><code>"w"</code> writes from scratch. It wipes the file before writing. Every time.</li>
+<li><code>"a"</code> appends. The old lines stay and new lines are added at the end.</li>
+<li>A report that replaces itself uses <code>"w"</code>; a journal that grows uses <code>"a"</code>.</li>
+</ul>
+
+<pre><code>with open("journal.txt", "a") as f:
+    f.write("2026-03-09,CODE,buy,2,10900\n")</code></pre>
+
+<p>The answer to the earlier prediction: even after two runs, there are still 2 lines, because <code>"w"</code> wiped the first run's contents before the second run wrote.</p>
+
+<h3>Practice 1: Be the Parser</h3>
+
+<p>For five minutes, you are <code>pd.read_csv</code>. Open <a href="journal_by_hand.html">journal_by_hand</a>. <code>trades.csv</code> is right next to it, and the starter already opens the file and skips the header. Read all the remaining lines, strip and split them, and look at the action field. Count <code>"buy"</code> and <code>"sell"</code> and print the two numbers. Tip: the action is <code>fields[2]</code>, and two counters are all you need.</p>
+
+<pre><code>buy 6
+sell 4</code></pre>
+
+<h3>The Payoff: Twelve Lines Become One</h3>
+
+<p>You just parsed a file by hand. <code>pd.read_csv</code> does the strip, split and <code>int()</code> for every line. Columns arrive with names, and numbers arrive as numbers. Same question, same answer: 6 buys. After the break, the one-year file loads exactly the same way.</p>
+
+<pre><code>import pandas as pd
+
+log = pd.read_csv("trades.csv")
+print(log["action"].value_counts()["buy"])    # 6</code></pre>
+
+<h2>Act 2 · Classes: You Already Talk to Objects</h2>
+
+<p>The dot is a sentence: "this thing, do what you know." In <code>"CODE".upper()</code> the string knows how to shout in capitals, in <code>closes.mean()</code> the Series knows how to average, and in <code>f.write(...)</code> the file knows how to save. An object combines data with the behavior that fits that data. Today we design such objects ourselves.</p>
+
+<h3>Blueprint and Buildings: class Position</h3>
+
+<p><code>class Position:</code> draws a blueprint for a new kind of object. <code>__init__</code> runs every time a Position is created, and <code>self</code>, the object being built right now, is always the first parameter. Everything assigned to <code>self</code> becomes that object's own data.</p>
+
+<pre><code>class Position:
+    def __init__(self, ticker, shares, buy):
+        self.ticker = ticker
+        self.shares = shares
+        self.buy = buy</code></pre>
+
+<h3>Attributes: Every Object Packs Its Own Bag</h3>
+
+<p>Attributes are the data inside one object. <code>p1</code> and <code>p2</code> come from the same class but share nothing. <code>p1.ticker</code> is CODE and <code>p2.ticker</code> is TEA, and they do not mix. You reach an attribute with the dot: <code>object.name</code>.</p>
+
+<pre><code>p1 = Position("CODE", 2, 10000)
+p2 = Position("TEA", 10, 5000)
+print(p1.ticker, p2.shares)    # CODE 10</code></pre>
+
+<h3>Methods: Teach the Object a Trick</h3>
+
+<p>A method is a function inside a class. <code>self</code> goes first in the def but is not written in the call. <code>profit(self, close)</code> uses <code>self.shares</code> and <code>self.buy</code>, and when you call <code>p.profit(4800)</code>, Python passes <code>p</code> as <code>self</code>. Trap: leaving <code>self</code> out of the def gives the error "takes 1 positional argument but 2 were given". You can reproduce this error in the last step of the <a href="position_report.html">position_report</a> page.</p>
+
+<pre><code>class Position:
+    def __init__(self, ticker, shares, buy):
+        self.ticker = ticker
+        self.shares = shares
+        self.buy = buy
+
+    def profit(self, close):
+        return (close - self.buy) * self.shares
+
+print(Position("TEA", 40, 5000).profit(4800))   # -8000</code></pre>
+
+<p>40 shares, bought at 5000 won, now 4800. Ouch.</p>
+
+<h3>One Loop, Five Objects, Two Destinations</h3>
+
+<p>A portfolio is a list of Position objects. Each object carries its own numbers in its own bag, and one loop asks every position the same question. The answers go to two places at once: the screen and a file.</p>
+
+<pre><code>portfolio = [Position("CODE", 10, 10000),
+             Position("TEA", 40, 5000),
+             Position("ROBO", 5, 40000)]
+
+with open("report.txt", "w") as f:
+    for p in portfolio:
+        line = p.ticker + " " + str(p.shares)
+        f.write(line + "\n")
+        print(line)</code></pre>
+
+<p>The screen shows <code>CODE 10</code>, <code>TEA 40</code> and <code>ROBO 5</code>, and the same three lines are saved in <code>report.txt</code>. Check the saved file in the terminal with <code>cat report.txt</code>.</p>
+
+<h3>Practice 2: The Position Report</h3>
+
+<p>Open <a href="position_report.html">position_report</a>. Add <code>profit(self, close)</code> to the class, build all five positions from the starter's rows, and print each ticker and profit while saving everything to <code>portfolio_report.txt</code> (5 minutes). The starter contains the row data, the Friday closes and the to-do list; you write the method and the loop.</p>
+
+<pre><code>CODE +8000
+TEA -8000
+ROBO +25000
+MLBK +15000
+FIT +24000
+Saved portfolio_report.txt</code></pre>
+
+<p>Four winners, one loser. TEA, we need to talk.</p>
+
+<h3>Break Check</h3>
+
+<ul>
+<li>What does <code>with open(...) as f:</code> guarantee? That the file is closed when the block ends (even if an error occurs).</li>
+<li>What is <code>self</code> inside a method? The object that called the method.</li>
+<li>Why did Practice 1 skip the first line? Because the first line is the column names (the header), not data.</li>
+</ul>
+
+<h2>Act 3 · Charts: Numbers That Persuade</h2>
+
+<p>Files remember, objects structure, and charts persuade. A table makes the reader do the math, but a line shows the trend at once. matplotlib is Python's standard plotting library. NumPy computes, pandas labels, and matplotlib draws.</p>
+
+<h3>One Install, One Alias: plt</h3>
+
+<p>On your own PC, run <code>pip install matplotlib</code> in the terminal; Colab already has it. The convention is <code>import matplotlib.pyplot as plt</code>. np, pd and plt are three-letter aliases the whole world uses the same way.</p>
+
+<p>The web lab's virtual machine has matplotlib installed but no screen. So you cannot open a window with <code>plt.show()</code>; always save the figure to a file with <code>plt.savefig("file.png")</code>. Copy the saved PNG with <code>cp week.png /mnt/host/</code>, then enter the file name in the page's Download box to save it to your computer and open it. Loading matplotlib can take several tens of seconds.</p>
+
+<h3>Your First Line Plot</h3>
+
+<p><code>plt.plot(x, y)</code> draws one line from point to point. x comes first (the weekdays), y next (the closes). The figure is the canvas and the axes are the chart on it. <code>savefig</code> writes the chart to a file; on your own PC in class you can open a window with <code>show()</code>.</p>
+
+<pre><code>import matplotlib.pyplot as plt
+
+days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+closes = [10000, 10200, 9800, 10500, 10800]
+
+plt.plot(days, closes)
+plt.title("CODE closing prices")
+plt.savefig("week.png")
+# plt.show() opens the chart in class</code></pre>
+
+<h3>Titles, Labels, Grid, Markers</h3>
+
+<p><code>title</code> names the chart, and <code>xlabel</code> and <code>ylabel</code> name the axes. <code>grid(True)</code> adds grid lines, and <code>marker="o"</code> puts a dot on each day. A labeled chart needs no explanation; an unlabeled chart needs an apology.</p>
+
+<pre><code>plt.plot(days, closes, marker="o")
+plt.title("CODE closing prices")
+plt.xlabel("Day")
+plt.ylabel("Won")
+plt.grid(True)
+plt.savefig("labeled.png")</code></pre>
+
+<h3>Two Lines and a Legend</h3>
+
+<p>Calling <code>plot</code> once per line makes them share one chart. <code>label=</code> names each line and <code>legend()</code> shows those names. You can see TEA sliding while CODE climbs without printing anything. If needed, change the look with <code>linestyle="--"</code> and <code>color=</code>.</p>
+
+<pre><code>code = [10000, 10200, 9800, 10500, 10800]
+tea = [5000, 4950, 4900, 4850, 4800]
+
+plt.plot(days, code, label="CODE", marker="o")
+plt.plot(days, tea, label="TEA", marker="o")
+plt.legend()
+plt.savefig("two.png")</code></pre>
+
+<h3>The pandas Shortcut</h3>
+
+<p>A Series can draw itself: <code>closes.plot()</code>. The index automatically becomes the x axis, and here <code>title=</code> is an argument of plot. Saving is still done with pyplot's <code>plt.savefig</code>.</p>
+
+<pre><code>import pandas as pd
+import matplotlib.pyplot as plt
+
+closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+closes.plot(title="CODE", marker="o")
+plt.savefig("series.png")</code></pre>
+
+<h3>Bar Charts: Who Is Biggest?</h3>
+
+<p><code>plt.bar(x, y)</code> draws one bar per category. Lines show change; bars compare size. Drawing the values of your five Positions as bars shows that ROBO is ahead before you print a single number.</p>
+
+<pre><code>tickers = ["CODE", "TEA", "ROBO", "MLBK", "FIT"]
+values = [108000, 192000, 225000, 75000, 84000]
+
+plt.bar(tickers, values)
+plt.title("Portfolio value")
+plt.ylabel("won")
+plt.savefig("values.png")</code></pre>
+
+<h3>Sort, Then Bar</h3>
+
+<p>Bars sorted from largest are read at a glance. Pair and rank them with <code>sorted(zip(values, tickers))</code>, tilt long names with <code>xticks(rotation=45)</code>, and set the canvas size with <code>figsize=(w, h)</code>.</p>
+
+<pre><code>pairs = sorted(zip(values, tickers), reverse=True)
+plt.bar([t for v, t in pairs],
+        [v for v, t in pairs])
+plt.xticks(rotation=45)
+plt.savefig("ranked.png")</code></pre>
+
+<h3>Choosing the Chart</h3>
+
+<p>The question picks the chart, not your taste.</p>
+
+<ul>
+<li>How did it move over time? A line: <code>plt.plot</code>.</li>
+<li>Who is biggest? Bars: <code>plt.bar</code>.</li>
+<li>How spread out are the values? A histogram: <code>plt.hist</code>.</li>
+</ul>
+
+<p>Wrong chart, wrong answer, even when the data is right.</p>
+
+<h3>The Year from Disk</h3>
+
+<p>This morning you parsed <code>trades.csv</code> by hand. <code>read_csv</code> reads the one-year file the same way. Plot one column and 260 trading days appear. One file, one line of code, one year.</p>
+
+<pre><code>import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("prices_2026.csv")
+df["CODE"].plot(title="CODE in 2026")
+plt.savefig("code.png")
+print(len(df))   # 260</code></pre>
+
+<h3>Histograms: How Spread?</h3>
+
+<p><code>diff()</code> gives each day's difference from the day before. The first day has no previous day, so <code>dropna()</code> drops it. <code>plt.hist</code> counts the changes per interval (bin). The shape of the distribution is the risk story: narrow is calm, wide is rough.</p>
+
+<pre><code>df = pd.read_csv("prices_2026.csv")
+changes = df["CODE"].diff().dropna()
+
+plt.hist(changes)
+plt.title("CODE daily change")
+plt.savefig("changes.png")
+print(len(changes))   # 259</code></pre>
+
+<h3>Saving and Fresh Charts</h3>
+
+<p><code>savefig</code> writes the current figure to a file. A png file can be pasted into reports and slides. <code>figure()</code> starts a new, empty chart, so to make two charts in one script you need a <code>figure()</code> between them. Trap: without <code>figure()</code>, the bars are drawn on top of the line and one file becomes a mess. On the <a href="my_charts.html">my_charts</a> page you can save two similar charts and download them.</p>
+
+<pre><code>import matplotlib.pyplot as plt
+
+closes = [10000, 10200, 9800, 10500, 10800]
+
+plt.plot(closes, marker="o")
+plt.savefig("week.png")     # file for reports
+
+plt.figure()                # a fresh chart
+plt.bar(["win", "loss"], [3, 2])
+plt.savefig("record.png")</code></pre>
+
+<h2>Labs</h2>
+
+<h3>Lab 1: Friday Evening Charts</h3>
+
+<p>Open <a href="my_charts.html">my_charts</a>. Chart 1: CODE's week as a line chart with markers and a grid. Chart 2: the portfolio values as a bar chart. Print the week's high and the names of the two files you saved (9 minutes). Tip: remember <code>figure()</code> between the two charts. One wall, two rooms.</p>
+
+<pre><code>High: 10800
+Saved week.png
+Saved values.png</code></pre>
+
+<p>Checks: <code>week.png</code> has five points and one line, with labels and a grid. <code>values.png</code> has five bars with a title and a y axis in won. They must be two separate files, not one image with the charts overlapping, and the printed high must equal <code>max(closes)</code>, that is, 10800. The y axis starts near 9800, not 0, because matplotlib zooms in to fit the data.</p>
+
+<h3>Lab 2: The Trading Year</h3>
+
+<p>Open <a href="year_report.html">year_report</a>. <code>prices_2026.csv</code> is right next to it. Chart 1: CODE's year as a line chart with a title. Chart 2: a histogram of CODE's daily changes. Print the number of trading days, the best close and its date (11 minutes). Tip: <code>idxmax()</code> gives the row of the best close, and <code>df["date"]</code> turns that row into a date.</p>
+
+<pre><code>Days: 260
+Best close: 12795
+Best date: 2026-08-06
+Saved code_year.png
+Saved changes.png</code></pre>
+
+<p>Checks: the line covers all 260 trading days, and the histogram counts 259 changes, one fewer than the number of days. The best close, 12795 on 2026-08-06, is the date <code>idxmax</code> found. Save the charts as files and print the numbers as evidence.</p>
+
+<h3>Lab 3 (Take-Home): Journal Chart</h3>
+
+<p>Create <a href="journal_chart.html">journal_chart</a>. Read the <code>trades.csv</code> next to it with <code>pd.read_csv</code>, draw the action counts as a bar chart with a title, and print the two counts and the total amount traded.</p>
+
+<pre><code>buy 6
+sell 4
+Traded: 340000
+Saved journal.png</code></pre>
+
+<h2>Five Ways to Ruin a Friday Evening</h2>
+
+<ul>
+<li><code>open()</code> without <code>with</code>: the file stays open, maybe even empty.</li>
+<li><code>"w"</code> on a journal: a week of trades disappears. Use <code>"a"</code> to append.</li>
+<li>No <code>self</code> in a method's def: takes 1 argument but 2 were given.</li>
+<li>Two charts without <code>figure()</code>: one overlapping mess.</li>
+<li>Comparing unstripped lines: <code>"sell\n"</code> is not <code>"sell"</code>.</li>
+</ul>
+
+<p><code>strip()</code> every line you read. Behind every comparison you forgot, a newline is hiding.</p>
+
+<h2>Exit Quiz and Submission</h2>
+
+<ol>
+<li><strong>Which mode appends without wiping?</strong> <code>"a"</code>.</li>
+<li><strong>What is <code>self</code> inside a method?</strong> The object that called the method.</li>
+<li><strong>Which command installs matplotlib?</strong> <code>pip install matplotlib</code> in the terminal.</li>
+<li><strong>Which chart compares the sizes of categories?</strong> A bar chart (<code>plt.bar</code>).</li>
+<li><strong>What starts a new chart inside a script?</strong> <code>plt.figure()</code>.</li>
+</ol>
+
+<p>Submit: <code>journal_by_hand.py</code>, <code>position_report.py</code>, <code>my_charts.py</code>, <code>year_report.py</code>. <code>journal_chart.py</code> is due next session. Record at least three test cases in comments for each program. Files you made in the web lab (code, txt reports, png charts) are downloaded for submission with <code>cp file /mnt/host/</code> followed by the Download box.</p>
+
+<h2>Next Session: Your Position Learns New Tricks</h2>
+
+<ul>
+<li>Inheritance: a subclass extends Position without rewriting it.</li>
+<li>Encapsulation: protecting the data inside an object.</li>
+<li>Getting started with Git: version your work before the Week 8 midterm. Git is not available in the web lab's virtual machine, so this is done on your own PC.</li>
+<li>Keep your files, classes and charts safe. All three come back in the second half of the project.</li>
+</ul>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="power — Functions · Python Lab" data-title-ko="power — 함수 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>power — Functions · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week03/starter/session2">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 3 · Session 2</span><span lang="ko">3주차 2차시</span></a><span class="sep">/</span><span>power</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>power</h1>
+    <p><span lang="en">Practice 2: complete power(base, exponent=2), which has the default value exponent=2. Also check positional and keyword arguments, and the error for a wrong number of arguments.</span><span lang="ko">연습 2: 기본값 exponent=2를 가진 power(base, exponent=2)를 완성한다. 위치 인자와 키워드 인자, 인자 개수 오류도 확인한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week03/starter/session2</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week03/starter/session2</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price(20, 3))' 'print(total_price(price=20, quantity=3))' 'print(total_price(quantity=3, price=20))' 'print(total_price(20, quantity=3))' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price(20, 3))' 'print(total_price(price=20, quantity=3))' 'print(total_price(quantity=3, price=20))' 'print(total_price(20, quantity=3))' | python3 -">▶</button><code>printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price(20, 3))' 'print(total_price(price=20, quantity=3))' 'print(total_price(quantity=3, price=20))' 'print(total_price(20, quantity=3))' | python3 -</code></div>
+          <p><span lang="en">Positional arguments bind in order, and keyword arguments bind by name. All four calls give 60.</span><span lang="ko">위치 인자는 순서대로, 키워드 인자는 이름으로 짝지어진다. 네 호출 모두 60이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 power.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 power.py">▶</button><code>python3 power.py</code></div>
+          <p><span lang="en">The starter code prints None three times.</span><span lang="ko">시작 코드는 None을 세 번 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/power.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/power.py">▶</button><code>python3 ../../solutions/session2/power.py</code></div>
+          <p><span lang="en">power(3) uses the default 2 and gives 9, power(2, 3) gives 8, and power(5, exponent=0) gives 1.</span><span lang="ko">power(3)은 기본값 2를 써서 9, power(2, 3)은 8, power(5, exponent=0)은 1이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'def power(base, exponent=2):' '    return base ** exponent' 'print(power(-2, 3))' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'def power(base, exponent=2):' '    return base ** exponent' 'print(power(-2, 3))' | python3 -">▶</button><code>printf '%s\n' 'def power(base, exponent=2):' '    return base ** exponent' 'print(power(-2, 3))' | python3 -</code></div>
+          <p><span lang="en">The last row of the table on the slides: with a negative base, power(-2, 3) is -8.</span><span lang="ko">슬라이드 표의 마지막 줄: 음수 밑 power(-2, 3)은 -8이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price)' 'print(total_price(20))' | python3 -u - 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price)' 'print(total_price(20))' | python3 -u - 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>printf '%s\n' 'def total_price(price, quantity):' '    return price * quantity' 'print(total_price)' 'print(total_price(20))' | python3 -u - 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">Two common mistakes: writing just the name without parentheses does not call the function and shows only &lt;function total_price at ...&gt;. Leaving out one argument gives TypeError: ... missing 1 required positional argument: 'quantity'.</span><span lang="ko">흔한 실수 두 가지: 괄호 없이 이름만 쓰면 호출되지 않고 &lt;function total_price at ...&gt;만 보인다. 인자를 하나 빠뜨리면 TypeError: ... missing 1 required positional argument: 'quantity'다.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>power.py <span class="muted"><span lang="en">10 lines</span><span lang="ko">10줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: numeric base, nonnegative integer exponent, default exponent 2.</span>
+<span class="ln">Tests: power(3) -&gt; 9; power(2,3) -&gt; 8; power(5,exponent=0) -&gt; 1.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def power(base, exponent=2):</span>
+<span class="ln">    # TODO: return base raised to exponent.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln">print(power(3))</span>
+<span class="ln">print(power(2, 3))</span>
+<span class="ln">print(power(5, exponent=0))</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week03/solutions/session2/power.py <span class="muted"><span lang="en">9 lines</span><span lang="ko">9줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution. Numeric base and nonnegative integer exponent.</span>
+<span class="ln">Tests: power(3) -&gt; 9; power(2,3) -&gt; 8; power(5,exponent=0) -&gt; 1.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def power(base, exponent=2):</span>
+<span class="ln">    return base ** exponent</span>
+<span class="ln"> </span>
+<span class="ln">print(power(3))</span>
+<span class="ln">print(power(2, 3))</span>
+<span class="ln">print(power(5, exponent=0))</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="is_even.html">← is_even</a>
+    <a href="sum_to.html">sum_to →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<p>Week 3, Session 1 is about loops. We learn <code>for</code>, <code>range()</code> and <code>while</code> as ways to do the same task many times, and trace how an accumulator variable changes on each iteration and when a loop stops. After learning to use <code>break</code> and <code>continue</code> as intended, we use nested loops, a loop inside a loop, to make multiplication tables and star patterns. The class runs as 10 minutes of review, 25 minutes of <code>for</code>, 20 minutes of <code>while</code>, a 10-minute break, 15 minutes of nested loops, 30 minutes of guided practice and 10 minutes of wrap-up.</p>
+
+<p>There are four examples: the even-number sum of Practice 1 (<a href="even_sum.html">even_sum</a>), the sum until zero of Practice 2 (<a href="input_sum.html">input_sum</a>), the multiplication tables of Lab 3 (<a href="multiplication.html">multiplication</a>), and the star triangle of Lab 4 (<a href="stars.html">stars</a>). Each example page also includes, as run steps, the slide examples taught before it.</p>
+
+<h2>Review: One Student's Result</h2>
+
+<p>An <code>if</code> statement selects which block runs. A score of 60 or more is a pass.</p>
+
+<pre><code>score = 75
+if score &gt;= 60:
+    print("Pass")
+else:
+    print("Fail")
+# Output: Pass</code></pre>
+
+<p>But what if there are 30 students? Instead of copying the same code 30 times, we repeat the same processing with a loop.</p>
+
+<h2>for: One Value at a Time</h2>
+
+<p>Place the sequence after the <code>in</code> that follows <code>for</code>. On each iteration, the next value goes into the variable. The colon and four-space indentation define the body of the loop. After the last value is processed, the loop ends and the code outside the indentation runs.</p>
+
+<pre><code>for letter in "ABC":
+    print(letter)
+print("Done")
+
+# Output
+# A
+# B
+# C
+# Done</code></pre>
+
+<h3>Integer Ranges with range()</h3>
+
+<p><code>range(stop)</code> starts at 0. <code>range(start, stop)</code> includes <code>start</code>. In either case, the <code>stop</code> value is always left out. A <code>range</code> represents a sequence of integers; it is not a list.</p>
+
+<pre><code>for i in range(3):
+    print(i)
+# 0, 1, 2 on separate lines
+
+for i in range(1, 4):
+    print(i)
+# 1, 2, 3 on separate lines</code></pre>
+
+<h3>Steps &amp; Reverse Ranges</h3>
+
+<p>The third argument is the step. A negative step counts backwards. If the direction does not match, the range is empty and the body never runs, and a step of 0 raises a <code>ValueError</code>.</p>
+
+<pre><code>for i in range(2, 7, 2):
+    print(i)
+# 2, 4, 6
+
+for i in range(3, 0, -1):
+    print(i)
+# 3, 2, 1
+
+for i in range(3, 0):
+    print(i)
+# No output</code></pre>
+
+<p>In the first steps of <a href="even_sum.html">even_sum</a> you can print five ranges, one per line, and also see the <code>ValueError</code> from <code>range(1, 5, 0)</code>.</p>
+
+<h2>Accumulating a Total</h2>
+
+<p>Initialize the variable <code>total</code>, which holds the sum, <strong>before</strong> the loop. <code>total += n</code> is the same as <code>total = total + n</code>. Print the final result <strong>after</strong> the loop ends.</p>
+
+<pre><code>total = 0
+for n in range(1, 6):
+    total += n
+print(total)
+# 15</code></pre>
+
+<p>The question on the slides is "What happens if <code>total = 0</code> is put inside the loop?" Then it goes back to 0 on every iteration, so only the 5 added in the last iteration remains. Run both cases in <a href="even_sum.html">even_sum</a>.</p>
+
+<h3>Tracing the Accumulator</h3>
+
+<p>Before running the code, predict each variable's value on each iteration and write it in a table. Each iteration carries on from the previous iteration's <code>total</code>.</p>
+
+<table>
+<thead><tr><th>Iteration</th><th>n</th><th>Before</th><th>After</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>2</td><td>2</td><td>1</td><td>3</td></tr>
+<tr><td>3</td><td>3</td><td>3</td><td>6</td></tr>
+<tr><td>4</td><td>4</td><td>6</td><td>10</td></tr>
+<tr><td>5</td><td>5</td><td>10</td><td>15</td></tr>
+</tbody>
+</table>
+
+<p>On the example page, this table is reproduced by code that prints <code>n</code> and the before and after values on each iteration.</p>
+
+<h2>Practice 1: Sum of Even Numbers</h2>
+
+<p>Go through the integers from 1 to 10 in order, pick out the even ones with <code>if</code> and <code>%</code>, and add them to <code>total</code>. The expected result is 30. Take 5 minutes to solve it.</p>
+
+<pre><code>total = 0
+for n in range(1, 11):
+    # Add your condition and update here.
+    pass
+print(total)</code></pre>
+
+<p><code>pass</code> is a placeholder statement that does nothing. It temporarily fills a place where the syntax requires a body. So if you run the starter code as it is, it adds nothing and prints 0. Adding only when <code>n % 2 == 0</code> gives 2 + 4 + 6 + 8 + 10 = 30 (<a href="even_sum.html">even_sum</a>).</p>
+
+<h2>while: Repeat While True</h2>
+
+<p><code>while</code> tests the condition before running the body. If the condition is false from the start, the body never runs. To end the loop, the body must change the value used in the condition.</p>
+
+<pre><code>count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print("Done", count)
+# 1
+# 2
+# 3
+# Done 4</code></pre>
+
+<h3>Execution Order &amp; Infinite Loops</h3>
+
+<p>It proceeds in this order: initialize, check the condition, run the body, check the condition again.</p>
+
+<table>
+<thead><tr><th>count</th><th>count &lt;= 3</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>True</td><td>Print 1</td></tr>
+<tr><td>2</td><td>True</td><td>Print 2</td></tr>
+<tr><td>3</td><td>True</td><td>Print 3</td></tr>
+<tr><td>4</td><td>False</td><td>Exit the loop</td></tr>
+</tbody>
+</table>
+
+<p>Without <code>count += 1</code>, the condition stays true and the loop never ends. Stop a running loop with <kbd>Ctrl</kbd>+<kbd>C</kbd> in a terminal, or with the Stop button in Colab. <kbd>Ctrl</kbd>+<kbd>C</kbd> also works in this lab's terminal.</p>
+
+<h2>break: Exit the Loop</h2>
+
+<p>Consider repeating input until the user asks to stop. <code>break</code> exits the nearest loop that encloses it. If the input is <code>q</code>, it skips the echo output and leaves the loop.</p>
+
+<pre><code>while True:
+    text = input("Message (q: quit): ")
+    if text == "q":
+        break
+    print("Input:", text)
+print("Done")</code></pre>
+
+<p>In <a href="input_sum.html">input_sum</a> this code is saved to a file, and you can see the result of entering hello, hi and q in turn.</p>
+
+<h2>continue: Skip This Iteration</h2>
+
+<p><code>continue</code> skips the remaining statements in the current iteration and moves on to the next iteration. When you use it in a <code>while</code> loop, be careful not to skip, by mistake, the update statement that makes the loop stop.</p>
+
+<pre><code>for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+
+# Output
+# 1
+# 2
+# 4
+# 5</code></pre>
+
+<h2>Choosing for or while</h2>
+
+<ul>
+<li>To process each character in a string: <code>for</code></li>
+<li>To repeat a fixed number of times: <code>for</code> with <code>range()</code></li>
+<li>To repeat while a condition holds: <code>while</code></li>
+<li>Both loops can contain <code>if</code> statements.</li>
+</ul>
+
+<p>Choose which loop to use in the following three cases and explain why. (1) Printing each character of a word, (2) reading messages until the user enters q, (3) printing the 7 times table from 1 to 9. The natural choices are, in order, <code>for</code> over a string, <code>while</code> because the end point is not known in advance, and <code>for</code> with <code>range()</code> because the count is fixed.</p>
+
+<h2>Practice 2: Sum Until Zero</h2>
+
+<p>Read one integer per iteration, stop when 0 is entered, and print the total. Check whether the value is the stop value before adding it. Assume the input is in integer format. Hints: <code>total = 0</code>, <code>while True</code>, <code>int(input())</code>, <code>break</code>.</p>
+
+<table>
+<thead><tr><th>Input sequence</th><th>Expected total</th></tr></thead>
+<tbody>
+<tr><td>3, 5, 0</td><td>8</td></tr>
+<tr><td>0</td><td>0</td></tr>
+<tr><td>-2, 5, 0</td><td>3</td></tr>
+</tbody>
+</table>
+
+<p>The starter code already includes the <code>break</code>, and only the line that adds is missing, so when run it does stop at 0, but the total is always <code>Total: 0</code>. In <a href="input_sum.html">input_sum</a>, run the three tests at once and compare them with the solution. You can also run <code>python3 input_sum.py</code> yourself and enter numbers one at a time.</p>
+
+<h2>Break &amp; Midpoint Check</h2>
+
+<p>After a 10-minute break, check the first half with the following questions.</p>
+
+<ol>
+<li><strong>What is the last value of <code>range(1, 5)</code>?</strong> It is 4. The stop is not included.</li>
+<li><strong>When does <code>while</code> test its condition?</strong> Before running the body, at the start of every iteration.</li>
+<li><strong>What is the difference between <code>break</code> and <code>continue</code>?</strong> <code>break</code> ends the whole loop, and <code>continue</code> skips only the current iteration.</li>
+</ol>
+
+<p>Next is how to repeat inside a loop.</p>
+
+<h2>Nested Loops</h2>
+
+<p>When the outer loop chooses a group, the inner loop goes through all of its own values from start to finish for each outer value. The example below prints six pairs. Indentation decides which statement belongs to which loop.</p>
+
+<pre><code>for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+# 1 1
+# 1 2
+# 1 3
+# 2 1
+# 2 2
+# 2 3</code></pre>
+
+<h3>Tracing Nested Loops</h3>
+
+<p>Finish the inner loop completely before advancing the outer loop one step. For each new <code>row</code>, <code>col</code> starts again from 1. With 2 rows and 3 columns, the body runs six times.</p>
+
+<table>
+<thead><tr><th>Outer row</th><th>Inner col values</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1, 2, 3</td></tr>
+<tr><td>2</td><td>1, 2, 3</td></tr>
+</tbody>
+</table>
+
+<p>After both loops finish, <code>row</code> is 2 and <code>col</code> is 3. A loop variable keeps the last value it received.</p>
+
+<h2>Lab 3: Multiplication Tables</h2>
+
+<h3>3A: One Multiplication Table</h3>
+
+<p><code>multiplication.py</code> reads one integer from 2 to 9. If it is valid, it prints the 9 equations multiplying it by 1 to 9 with f-strings; otherwise it prints <code>Invalid table</code> and skips the single-table part. Assume the input is in integer format.</p>
+
+<pre><code>Input: 7
+First line: 7 x 1 = 7
+Last line:  7 x 9 = 63
+Number of equations: 9
+
+Input: 1
+Invalid table</code></pre>
+
+<h3>3B: Tables from 2 to 9</h3>
+
+<p>After printing one table, extend the program to print all the tables as well. The outer loop chooses the table, and the inner loop chooses the factor. After each table, print one empty line. Put this part <strong>after</strong> the input validation block so that it always runs.</p>
+
+<pre><code>for table in range(2, 10):
+    for factor in range(1, 10):
+        # Print one equation here.
+        pass
+    print()</code></pre>
+
+<p>The starter code already has this skeleton, so if you run it as it is, after <code>All tables:</code> you see only the 8 empty lines printed once per table.</p>
+
+<h3>Lab 3 Checks</h3>
+
+<ul>
+<li>Test 2 and 9 as valid boundary inputs, and 1 and 10 as invalid inputs.</li>
+<li>The all-tables part must have 8 tables × 9 = 72 equations. The first is <code>2 x 1 = 2</code> and the last is <code>9 x 9 = 81</code>.</li>
+<li>A valid input adds 9 equations before this part; an invalid input adds nothing.</li>
+</ul>
+
+<p>Counting the equations by hand is hard, so <a href="multiplication.html">multiplication</a> counts them with <code>grep -c ' = '</code>. Entering 7 should give 81, and entering 1 should give 72.</p>
+
+<h2>Star Patterns: Rows &amp; Columns</h2>
+
+<p>Use one outer iteration for each row. Row 1 has 1 star, row 2 has 2, and so on. <code>print("*", end="")</code> continues on the same line without a line break, and the <code>print()</code> after the inner loop ends the current row.</p>
+
+<pre><code>for row in range(1, 4):
+    for col in range(row):
+        print("*", end="")
+    print()
+# *
+# **
+# ***</code></pre>
+
+<h2>Lab 4: A Growing Triangle</h2>
+
+<p><code>stars.py</code> reads an integer height from 1 to 10 and prints a left-aligned triangle with nested loops. If it is out of range, it prints <code>Invalid height</code>. The extension is to print a shrinking triangle after one empty line.</p>
+
+<pre><code>Input: 4
+*
+**
+***
+****
+
+Optional extension
+****
+***
+**
+*</code></pre>
+
+<p>The basic task must be built with nested loops. String repetition (<code>"*" * row</code>) is another way, but we will talk about it separately later.</p>
+
+<h3>Lab 4 Checks &amp; Common Mistakes</h3>
+
+<ul>
+<li>Height 1 produces exactly one row with one star.</li>
+<li>Height 4 gives four rows, 10 stars in total.</li>
+<li>Height 10 gives ten rows.</li>
+<li>Heights 0 and 11 print only the <code>Invalid height</code> message.</li>
+</ul>
+
+<p>There are three common mistakes. Writing the outer loop as <code>range(1, height)</code> drops the last row. Putting <code>print()</code> inside the inner loop prints one star per line. Writing the inner loop as <code>range(height)</code> gives a square instead of a triangle. In <a href="stars.html">stars</a> you can count the stars and reproduce two of these mistakes yourself.</p>
+
+<h2>Common Loop Mistakes</h2>
+
+<ul>
+<li><code>range(1, 10)</code> includes 1 through 9, not 10.</li>
+<li>Initialize the accumulator before the loop.</li>
+<li>Put the final summary output outside the loop.</li>
+<li>A <code>while</code> loop needs a statement that changes the condition, or a way to exit.</li>
+<li>Put the <code>print()</code> that ends a row after the inner loop.</li>
+</ul>
+
+<p>Before running, predict the first iteration, the last iteration and the final output. When debugging, temporarily print the loop variable and the accumulator.</p>
+
+<h2>Next Session: Functions</h2>
+
+<p>Next session we learn to give a reusable task a name with <code>def</code>, pass values through parameters, and get a result back to use where the function was called. We will also turn code that calculated with loops into reusable functions. To prepare, think about what the input and output of the even-number sum program are. Lists, tuples, dictionaries and sets are covered in Week 4.</p>

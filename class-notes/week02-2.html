@@ -1,0 +1,346 @@
+<p>2주차 2차시는 실습 시간입니다. 1차시에서 배운 연산자, 문자열, 조건문으로 짧은 프로그램 네 개를 만듭니다. 문자열 처리(<a href="strings.html">strings</a>, 20분), 성적 분류(<a href="grades.html">grades</a>, 25분), 가위바위보(<a href="rps.html">rps</a>, 40분), 윤년 계산(<a href="leap_year.html">leap_year</a>, 25분)을 차례로 하고, 마지막 10분에 테스트하고 제출합니다. 예제 페이지는 시작 코드(starter) 폴더에서 열리며, 아래쪽에 예시 답안도 함께 보입니다. 시작 코드를 <code>nano</code>로 편집해 완성한 뒤, 예제 단계로 답안의 출력과 비교해 보세요.</p>
+
+<h2>키보드 입력: input()</h2>
+
+<p><code>input()</code>은 프롬프트를 보여 주고 키보드 입력을 기다립니다. 값을 입력하고 <kbd>Enter</kbd>를 누르면 프로그램이 계속됩니다. 돌려받는 값은 숫자를 입력해도 항상 문자열이므로, 정수가 필요한 실습에서는 <code>int(input(...))</code>을 씁니다. 다른 입력을 시험하려면 프로그램을 다시 실행합니다.</p>
+
+<pre><code>name = input("Name: ")
+print(f"Hello, {name}!")
+# Type Mina, then press Enter.
+# Output: Hello, Mina!
+
+score = int(input("Score: "))
+print(score + 1)
+# Type 85, then press Enter.
+# Output: 86
+# Enter integer-formatted text for score.</code></pre>
+
+<p>이 실습실의 예제 단계는 입력을 미리 넣어 자동으로 실행합니다. 예를 들어 <code>echo 85 | python3 grades.py</code>는 85를 입력하고 <kbd>Enter</kbd>를 누른 것과 같습니다. 입력이 화면에 보이지 않기 때문에 출력이 <code>Score: B</code>처럼 프롬프트 바로 뒤에 붙어 나옵니다. 직접 입력해 보려면 <code>python3 grades.py</code>만 실행하면 됩니다.</p>
+
+<h2>f-string: 텍스트 안에 값 넣기</h2>
+
+<p><code>print()</code>는 값을 보여 주는 함수이고, <code>f</code>는 <code>print()</code>에 꼭 필요한 문법이 아닙니다. <code>f</code>를 붙이지 않으면 중괄호와 변수 이름이 글자 그대로 출력됩니다. 따옴표 앞에 <code>f</code>를 붙이면 <code>{name}</code> 자리에 <code>name</code>의 현재 값이 들어갑니다. Python이 먼저 문자열을 완성하고, 그다음 <code>print()</code>가 그것을 보여 줍니다. 간단한 출력은 쉼표로 값을 나열해도 됩니다.</p>
+
+<pre><code>name = "Mina"
+score = 85
+print("Hello, Mina!")
+# Hello, Mina!
+print("Hello, {name}!")
+# Hello, {name}!
+print(f"Hello, {name}!")
+# Hello, Mina!
+print(f"Score: {score}")
+# Score: 85
+print("Score:", score)
+# Score: 85</code></pre>
+
+<h2>실습 진행 방법: 입력에서 테스트까지</h2>
+
+<p>코딩을 시작하기 전에 입력, 변환, 요구되는 출력을 나눠 적습니다. 작은 예에 대한 기대 결과를 먼저 쓰고, 요구 사항을 하나 구현할 때마다 프로그램을 실행합니다. 제출 전에는 경계값과 잘못된 입력도 추가로 테스트합니다. 추가 연습 문제는 실습 시간 안에서 선택적으로 합니다.</p>
+
+<pre><code># Example plan for strings.py
+# Input:   "  Python  "
+# Clean:   "Python"
+# Length:  6
+# Upper:   PYTHON
+# Reverse: nohtyP
+# First:   P
+# Empty input is a separate test case.
+# Write expected output before coding.</code></pre>
+
+<h2>실습 1: 문자열 처리</h2>
+
+<p><code>strings.py</code>는 한 줄을 입력받아 앞뒤 공백을 지운 뒤 길이, 대문자 변환 결과, 역순 문자열을 출력합니다. 첫 글자는 비어 있지 않을 때만 출력합니다. 일반 단어, 공백만 있는 입력, 한 글자로 테스트합니다.</p>
+
+<pre><code>text = input("Text: ").strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+# Input: Python
+# Length: 6, Upper: PYTHON
+# Reverse: nohtyP, First: P</code></pre>
+
+<p>시작 코드에는 입력을 받는 줄만 있고 나머지는 TODO입니다. 출력 레이블 <code>Length:</code>, <code>Upper:</code>, <code>Reverse:</code>, <code>First:</code>와 빈 입력의 <code>No text entered</code>를 정확히 맞춰야 합니다.</p>
+
+<h3>단계별 추적</h3>
+
+<p>앞뒤에 공백이 붙은 단어로 중간 값을 하나씩 추적합니다. 변환은 정리된 <code>text</code>에 대해 하고, 인덱싱하기 전에 비어 있지 않은지 명시적으로 검사합니다. 실습에서는 고정된 <code>raw</code> 값 대신 <code>input()</code>을 씁니다.</p>
+
+<pre><code>raw = "  Python  "
+text = raw.strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if len(text) &gt; 0:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")</code></pre>
+
+<h3>빈 입력과 확장 과제</h3>
+
+<p>아무것도 입력하지 않은 경우와 공백만 입력한 경우 모두 <code>strip()</code> 뒤에는 빈 문자열이 됩니다. 빈 경우에도 길이, 대문자, 역순 세 줄은 출력되어야 하며(<code>Length: 0</code>, 그리고 비어 있는 <code>Upper:</code>와 <code>Reverse:</code>), 빈 문자열에서 인덱싱이 절대 실행되지 않는지 확인합니다. 검사 없이 <code>text[0]</code>을 실행하면 <code>IndexError</code>가 납니다.</p>
+
+<pre><code>text = "   ".strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+word = "Level".lower()
+print(word == word[::-1])    # True</code></pre>
+
+<p>선택 확장 과제는 정리하고 소문자로 바꾼 텍스트가 자기 역순과 같은지(회문인지) 출력하는 것입니다. <a href="strings.html">strings</a> 예제에서 세 가지 입력과 IndexError, 회문 검사를 모두 실행해 볼 수 있습니다.</p>
+
+<h2>실습 2: 성적 분류</h2>
+
+<p><code>grades.py</code>는 정수 점수를 입력받습니다. 0부터 100까지(양 끝 포함)만 받아들이고, 그 밖의 값은 <code>Invalid score</code>로 알립니다. 등급은 A: 90–100, B: 80–89, C: 70–79, D: 60–69, F: 0–59입니다.</p>
+
+<pre><code>score = int(input("Score: "))
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+elif score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+elif score &gt;= 70:
+    print("C")
+elif score &gt;= 60:
+    print("D")
+else:
+    print("F")</code></pre>
+
+<p>범위 검사를 사슬의 맨 앞에 두었기 때문에, 그 뒤의 <code>elif</code>는 유효한 점수만 만납니다. 기준은 높은 것부터 검사합니다. 59, 60, 89, 90, 100, 101로 테스트합니다.</p>
+
+<h3>경계값 테스트 설계</h3>
+
+<p>테스트 하나는 입력 하나를 기대 결과와 비교하는 것입니다. 각 기준에서 바로 아래 값과 기준 값 자체를 시험하고, 두 끝값과 범위 밖의 값도 시험합니다. 89가 A로 나온다면 비교 연산자와 기준 값을 확인합니다.</p>
+
+<pre><code># Input    Expected
+# -1       Invalid score
+# 0, 59    F
+# 60, 69   D
+# 70, 79   C
+# 80, 89   B
+# 90, 100  A
+# 101      Invalid score
+
+# Run grades.py once for each input.
+# Record actual output beside expected.</code></pre>
+
+<p>입력마다 프로그램을 한 번씩 실행하는 일은 셸의 <code>for</code> 반복으로 한꺼번에 할 수 있습니다. <a href="grades.html">grades</a> 예제의 두 번째 단계가 위 표의 12개 입력을 모두 실행해 <code>59 -&gt; F</code> 같은 표를 만듭니다. 자기 파일도 같은 명령으로 시험해 보세요.</p>
+
+<h3>선택 과제: Pass/Fail 출력</h3>
+
+<p>유효한 점수가 60 이상이면 Pass, 60 미만이면 Fail도 함께 출력합니다. 잘못된 점수에는 Pass/Fail을 붙이면 안 되므로, 추가 판단은 유효한 점수 갈래 안에 넣습니다. 59, 60, 101로 테스트합니다.</p>
+
+<pre><code>score = 59
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+else:
+    # Keep grade classification here.
+    if score &gt;= 60:
+        print("Pass")
+    else:
+        print("Fail")
+# Test 59, 60 and 101.</code></pre>
+
+<h2>실습 3: 가위바위보</h2>
+
+<h3>규칙</h3>
+
+<p><code>rps.py</code>는 컴퓨터와 한 판을 겨룹니다. 입력은 <code>strip().lower()</code>로 정리한 뒤 rock, paper, scissors 중 하나만 받아들입니다. 둘이 같으면 무승부이고, 바위는 가위를, 가위는 보를, 보는 바위를 이깁니다. 잘못된 입력은 거부하고, 유효하면 양쪽의 선택을 출력합니다. 컴퓨터의 선택은 <code>random.choice()</code>로 리스트에서 하나를 고릅니다.</p>
+
+<pre><code>import random
+
+# choice() picks one item.
+computer = random.choice(
+    ["rock", "paper", "scissors"]
+)
+
+# First, test with fixed values:
+player = "rock"
+computer = "scissors"
+# Expected outcome: You win</code></pre>
+
+<h3>가능한 9가지 조합</h3>
+
+<p>사람의 선택 3가지와 컴퓨터의 선택 3가지로 9가지 조합이 나옵니다. 그중 무승부, 승리, 패배가 각각 3개입니다. 표는 사람의 입장에서 읽으며, 이 기대 결과로 모든 갈래를 확인합니다.</p>
+
+<table>
+<thead><tr><th>Player</th><th>Computer</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>rock</td><td>rock</td><td>Tie</td></tr>
+<tr><td>rock</td><td>paper</td><td>You lose</td></tr>
+<tr><td>rock</td><td>scissors</td><td>You win</td></tr>
+<tr><td>paper</td><td>rock</td><td>You win</td></tr>
+<tr><td>paper</td><td>paper</td><td>Tie</td></tr>
+<tr><td>paper</td><td>scissors</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>rock</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>paper</td><td>You win</td></tr>
+<tr><td>scissors</td><td>scissors</td><td>Tie</td></tr>
+</tbody>
+</table>
+
+<h3>분기 예제</h3>
+
+<p>결과를 판단하기 전에 사람의 선택부터 검증합니다. 승패보다 무승부를 먼저 검사하고, 이기는 세 조합을 모두 나열합니다. 나머지는 모두 패배입니다.</p>
+
+<pre><code>import random
+p = input("Your choice: ").strip().lower()
+options = ["rock", "paper", "scissors"]
+c = random.choice(options)
+if p not in ["rock", "paper", "scissors"]:
+    print("Invalid choice")
+else:
+    print(f"You: {p}, computer: {c}")
+    if p == c:
+        print("Tie")
+    elif ((p == "rock" and c == "scissors")
+          or (p == "scissors" and c == "paper")
+          or (p == "paper" and c == "rock")):
+        print("You win")
+    else:
+        print("You lose")</code></pre>
+
+<p>출력은 <code>Tie</code>, <code>You win</code>, <code>You lose</code> 중 정확히 하나여야 합니다.</p>
+
+<h3>재현 가능한 테스트</h3>
+
+<p>컴퓨터의 선택이 무작위이면 같은 입력도 실행할 때마다 결과가 달라서 테스트를 반복할 수 없습니다. 그래서 테스트하는 동안에는 컴퓨터 선택을 임시로 고정합니다. 공백과 대소문자가 섞인 입력이 정리되는지, 잘못된 단어와 빈 입력이 각각 거부되는지 확인하고, 제출하기 전에 <code>random.choice(options)</code>를 되돌려 놓습니다.</p>
+
+<pre><code>computer = "scissors"
+player = " ROCK ".strip().lower()
+print(player, computer)
+# rock scissors: expected You win
+
+# With computer fixed to scissors:
+# rock     -&gt; You win
+# paper    -&gt; You lose
+# scissors -&gt; Tie
+# lizard   -&gt; Invalid choice
+# empty    -&gt; Invalid choice</code></pre>
+
+<p><a href="rps.html">rps</a> 예제는 파일을 직접 고치지 않고, <code>sed</code>로 <code>random.choice(options)</code>를 고정값으로 바꾼 사본을 <code>/tmp</code>에 만들어 테스트합니다. 같은 방법으로 9가지 조합 전체를 표로 출력해 위 표와 비교할 수 있습니다.</p>
+
+<h2>실습 4: 윤년 계산</h2>
+
+<h3>윤년 규칙</h3>
+
+<p><code>leap_year.py</code>는 양의 정수 연도를 입력받아 그레고리력 규칙으로 윤년인지 판단합니다. 400으로 나누어떨어지면 윤년입니다. 그렇지 않고 100으로 나누어떨어지면 윤년이 아닙니다. 그렇지 않고 4로 나누어떨어지면 윤년입니다. 나머지는 모두 윤년이 아닙니다. 나누어떨어지는지는 나머지 연산 <code>%</code>로 검사합니다.</p>
+
+<pre><code># Divisibility uses remainder:
+print(2024 % 4 == 0)      # True
+print(1900 % 100 == 0)    # True
+print(2000 % 400 == 0)    # True
+
+# Expected classifications:
+# 2024: Leap year
+# 1900: Not a leap year
+# 2000: Leap year
+# 2023: Not a leap year</code></pre>
+
+<h3>규칙 추적하기</h3>
+
+<p>먼저 세 가지 나눗셈 검사의 결과를 구합니다. 100의 배수인 해는 400으로도 나누어떨어져야 윤년이고, 일반적인 4의 배수는 윤년입니다. 1900과 2000의 결과가 왜 다른지 설명해 봅니다.</p>
+
+<pre><code>year = 1900
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(by4, by100, by400)
+# True True False
+print(by400 or (by4 and not by100))
+# False
+
+# Repeat with 2000, 2024 and 2023.
+# Expected: True, True, False.</code></pre>
+
+<h3>윤년 계산기</h3>
+
+<p>0과 음수 연도는 거부합니다. 규칙은 <code>and</code>와 <code>or</code>로 묶고, 괄호로 윤년이 되는 두 가지 경우를 구분합니다. 입력한 연도에 대해 분명한 결과를 출력합니다.</p>
+
+<pre><code>year = int(input("Year: "))
+if year &lt;= 0:
+    print("Enter a positive year")
+else:
+    is_leap = (year % 400 == 0 or
+               (year % 4 == 0 and
+                year % 100 != 0))
+    if is_leap:
+        print(f"{year}: Leap year")
+    else:
+        print(f"{year}: Not a leap year")</code></pre>
+
+<h3>같은 규칙의 if/elif 사슬</h3>
+
+<p>도전 과제는 같은 규칙을 <code>if</code>/<code>elif</code>/<code>else</code>로 표현하는 것입니다. 양수 검사를 맨 앞에 두고, 400의 배수 검사를 100의 배수 검사보다, 100의 배수 검사를 4의 배수 검사보다 먼저 합니다. 결과를 불리언 식 버전과 비교해 봅니다.</p>
+
+<pre><code>year = 2000
+if year &lt;= 0:
+    print("Enter a positive year")
+elif year % 400 == 0:
+    print(f"{year}: Leap year")
+elif year % 100 == 0:
+    print(f"{year}: Not a leap year")
+elif year % 4 == 0:
+    print(f"{year}: Leap year")
+else:
+    print(f"{year}: Not a leap year")</code></pre>
+
+<p><a href="leap_year.html">leap_year</a> 예제에서 네 해의 추적, 답안의 여섯 가지 입력(2024, 2000, 2023, 1900, 0, -4), 그리고 <code>if</code>/<code>elif</code> 버전을 실행할 수 있습니다.</p>
+
+<h2>제출 전 디버깅</h2>
+
+<p>결함마다 그것을 드러내는 입력을 하나씩 고릅니다. 코드를 고치기 전에 왜 실패하는지 먼저 설명하고, 고친 뒤에는 정상 입력과 실패하던 입력을 모두 다시 실행합니다. 테스트 입력과 기대 결과는 파일의 주석으로 남깁니다.</p>
+
+<table>
+<thead><tr><th>결함</th><th>드러내는 테스트</th></tr></thead>
+<tbody>
+<tr><td>검사 전에 인덱싱</td><td><code>""</code></td></tr>
+<tr><td><code>strip()</code> 누락</td><td><code>"  "</code></td></tr>
+<tr><td>낮은 등급을 먼저 검사</td><td><code>95</code></td></tr>
+<tr><td><code>lower()</code> 누락</td><td><code>"ROCK"</code></td></tr>
+<tr><td><code>year % 4 == 0</code>만 검사</td><td><code>1900</code></td></tr>
+</tbody>
+</table>
+
+<p>고치는 방법은 각각 인덱싱 전에 검사하기, 텍스트 정규화하기, 등급 기준을 높은 것부터 정렬하기, 윤년 규칙을 빠짐없이 적용하기입니다. 각 예제 페이지에는 이런 결함을 재현하는 단계가 하나씩 들어 있습니다. 예를 들어 <a href="grades.html">grades</a>에서는 낮은 기준을 먼저 검사한 사슬이 95를 D로 판정하고, <a href="leap_year.html">leap_year</a>에서는 4의 배수만 검사하면 1900이 윤년으로 잘못 나옵니다.</p>
+
+<h2>테스트와 제출</h2>
+
+<p>파일마다 실행해 출력을 기대 결과와 비교합니다. 경계값과 잘못된 선택을 확인하고, 가위바위보는 9가지 조합을 모두 시험합니다.</p>
+
+<table>
+<thead><tr><th>프로그램</th><th>입력</th><th>기대 결과</th></tr></thead>
+<tbody>
+<tr><td>strings.py</td><td><code>"   "</code></td><td>No text entered</td></tr>
+<tr><td>strings.py</td><td><code>" A "</code></td><td>Length: 1</td></tr>
+<tr><td>grades.py</td><td>59 / 60</td><td>F / D</td></tr>
+<tr><td>grades.py</td><td>100 / 101</td><td>A / Invalid score</td></tr>
+<tr><td>leap_year.py</td><td>1900 / 2000</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>2023 / 2024</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>0</td><td>양수 연도 안내 메시지</td></tr>
+</tbody>
+</table>
+
+<p><code>strings.py</code>, <code>grades.py</code>, <code>rps.py</code>, <code>leap_year.py</code>를 제출합니다. 파일마다 테스트 입력과 기대 결과를 최소 세 개씩 주석으로 기록합니다. 이 실습실에서 완성한 파일은 <code>cp strings.py /mnt/host/</code>처럼 복사한 뒤 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>정리와 다음 주</h2>
+
+<ul>
+<li>연산자로 식과 비교를 만듭니다.</li>
+<li>문자열 인덱스는 0부터 시작하고, 슬라이스는 stop 인덱스를 포함하지 않습니다.</li>
+<li>문자열 메서드는 결과를 돌려줄 뿐, 문자열 자체는 바뀌지 않습니다.</li>
+<li><code>if</code>/<code>elif</code>/<code>else</code>는 처음 맞은 갈래를 고릅니다.</li>
+<li>경계값 테스트는 빠뜨린 경우를 드러내 줍니다.</li>
+</ul>
+
+<p>다음 주에는 <code>for</code>와 <code>while</code> 반복문, <code>range()</code>, <code>break</code>와 <code>continue</code>를 배웁니다. 슬라이드의 예고에는 리스트·튜플·딕셔너리·집합도 있지만, 3주차 자료에 따르면 이 자료 구조는 4주차에 다루고 3주차 2차시에는 함수를 배웁니다. 미리 생각해 볼 질문은 "사용자가 그만두겠다고 할 때까지 가위바위보를 반복하려면 어떻게 해야 할까?"입니다.</p>

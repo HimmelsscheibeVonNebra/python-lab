@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 13 · Session 2 From CSV to SQLite: Swapping the Storage Layer · Python Lab" data-title-ko="13주차 2차시 CSV에서 SQLite로: 저장 계층 교체 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 13 · Session 2 From CSV to SQLite: Swapping the Storage Layer · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body data-root="../../">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 13 · Session 2</span><span lang="ko">13주차 2차시</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">From CSV to SQLite: Swapping the Storage Layer</span><span lang="ko">CSV에서 SQLite로: 저장 계층 교체</span></h1>
+    <p><span lang="en">Run UPDATE and DELETE with WHERE, rowcount and rollback, the aggregates COUNT, SUM, AVG and GROUP BY, and transactions grouped with with con (all or nothing) on market.db. Then run korea_market_sqlite, where only storage.py of the Week 11 MVP has been switched to SQLite, and check that all 18 tests pass without a single line of logic.py or report.py changing, and that a bad import preserves both the table and the old HTML.</span><span lang="ko">UPDATE·DELETE와 WHERE, rowcount와 rollback, COUNT·SUM·AVG·GROUP BY 집계, with con으로 묶는 트랜잭션(전부 아니면 전무)을 market.db에서 실행한다. 이어서 11주차 MVP의 storage.py만 SQLite로 바꾼 korea_market_sqlite를 실행해, logic.py·report.py는 한 줄도 바뀌지 않은 채 테스트 18개가 통과하고 잘못된 가져오기가 테이블과 기존 HTML을 모두 보존하는지 확인한다.</span></p>
+  </header>
+  <main class="list">
+    <section>
+      <h2><span lang="en">Examples to run</span><span lang="ko">실행해 볼 예제</span></h2>
+      <ul class="cards">
+        <li><a href="sql_changes.html"><strong>sql_changes</strong><span><span lang="en">Change rows, summarize them and group changes into transactions in Session 1's market.db (five rows in quotes). Each step starts from five clean rows rebuilt by create_db.py.</span><span lang="ko">1차시의 market.db(quotes 다섯 행)에서 행을 바꾸고, 요약하고, 트랜잭션으로 묶는다. 각 단계는 create_db.py로 다시 만든 깨끗한 다섯 행에서 출발한다.</span></span></a></li>
+        <li><a href="korea_market_sqlite.html"><strong>korea_market_sqlite</strong><span><span lang="en">Only storage.py of the Week 11 MVP has changed. connect() and init_db() open and prepare data/market.db, replace_quotes() replaces a validated snapshot in one transaction, and load_quotes(con) returns the same list of quote dicts as before. The old CSV reader remains as read_csv() and is used by --import-csv. In main.py only a few lines that open and pass the connection have changed.</span><span lang="ko">11주차 MVP에서 storage.py만 바꿨다. connect()·init_db()가 data/market.db를 열고 준비하며, replace_quotes()가 검증된 스냅숏을 트랜잭션 하나로 교체하고, load_quotes(con)가 전과 같은 quote dict 목록을 돌려준다. 예전 CSV 읽기는 read_csv()로 남아 --import-csv에서 쓰인다. main.py는 연결을 열고 넘기는 몇 줄만 바뀌었다.</span></span></a></li>
+      </ul>
+    </section>
+    <article class="notes">
+<div lang="en">
+<p>This session we swap only the storage layer and keep every test passing. We change rows (UPDATE and DELETE), summarize them (COUNT, SUM, AVG, GROUP BY), group several changes into a transaction (all or nothing), and then move the MVP onto the database. storage.py reads SQLite, and logic.py does not notice. Done means 18 tests pass and no rule moved. Run the SQL statements in <a href="sql_changes.html">sql_changes</a> and the swapped MVP in <a href="korea_market_sqlite.html">korea_market_sqlite</a>.</p>
+
+<h2>Recap: five rows in market.db</h2>
+
+<pre><code>import sqlite3
+con = sqlite3.connect("market.db")
+count = "SELECT COUNT(*) FROM quotes"
+print(con.execute(count).fetchone())
+query = "SELECT code, close FROM quotes"
+for row in con.execute(query):
+    print(row)</code></pre>
+
+<pre><code>(5,)
+('005930', 71400)
+('000660', 198000)
+('035420', 200000)
+('247540', 103000)
+('035900', 49000)</code></pre>
+
+<p>Session 1 left a table with rules and five rows. Remember the connect, execute, commit, close order and the ? placeholders. SELECT only asks; it never changes the table. No rows? Run <code>create_db.py</code> in sqlite_lab first.</p>
+
+<h3>Done means: same tests, new storage</h3>
+
+<p>Only one module is allowed to know about SQLite. Not one line of <code>logic.py</code> or <code>report.py</code> changes. <code>storage.py</code> is rewritten around a connection. In <code>main.py</code> only a few lines change, to open and pass the connection. The Week 12 contracts still hold after the swap.</p>
+
+<h2>ACT 1 · Change rows: UPDATE and DELETE</h2>
+
+<p>Two statements that can ruin a table in one line. UPDATE changes values in rows that already exist, and DELETE removes rows. Both act on every row that WHERE selects; with no WHERE, every row is affected.</p>
+
+<h3>UPDATE with WHERE</h3>
+
+<pre><code>UPDATE = """
+    UPDATE quotes SET close = ?
+    WHERE code = ?
+"""
+cur = con.execute(UPDATE, (72000, "005930"))
+print(cur.rowcount)
+cur = con.execute(UPDATE, (72000, "999999"))
+print(cur.rowcount)</code></pre>
+
+<pre><code>1
+0</code></pre>
+
+<p>SET names the column and its new value, and WHERE chooses the rows, as in SELECT. <code>rowcount</code> is the number of rows changed. Trap: a wrong code is not an error. It changes 0 rows, silently.</p>
+
+<h3>The WHERE you forgot</h3>
+
+<pre><code>cur = con.execute("DELETE FROM quotes")
+print(cur.rowcount)
+print(con.execute(count).fetchone())
+con.rollback()
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>5
+(0,)
+(5,)</code></pre>
+
+<p>One short line, and five rows are gone. Nothing was committed yet, so <code>rollback()</code> undoes it. It also undoes the earlier 72000 update. Before deleting, first run a SELECT with the same WHERE. The second step of <a href="sql_changes.html">sql_changes</a> shows everything from the UPDATE to the rollback in one go.</p>
+
+<h2>ACT 2 · Summarize: count and group</h2>
+
+<p>Ask for the answer, not for the rows. Aggregate functions turn many rows into one value, and GROUP BY gives one answer per group. The loop you wrote in Week 4 becomes one line of SQL.</p>
+
+<h3>COUNT, SUM, MAX, AVG</h3>
+
+<pre><code>query = """
+    SELECT COUNT(*), SUM(volume),
+           MAX(close), AVG(close)
+    FROM quotes
+"""
+print(con.execute(query).fetchone())</code></pre>
+
+<pre><code>(5, 2100000, 200000, 124280.0)</code></pre>
+
+<p>Four questions, one row back. COUNT(*) counts rows; SUM and AVG need a numeric column. AVG returns a REAL even for INTEGER columns.</p>
+
+<h3>GROUP BY: one row per market</h3>
+
+<pre><code>query = """
+    SELECT market, COUNT(*), SUM(volume)
+    FROM quotes
+    GROUP BY market
+    ORDER BY market
+"""</code></pre>
+
+<pre><code>('KOSDAQ', 2, 300000)
+('KOSPI', 3, 1800000)</code></pre>
+
+<p>Split the rows by market, then aggregate each group. Rows with the same market fall into one group. Every selected column must be the group column or an aggregate. ORDER BY still applies to the result. Trap: if you SELECT name with GROUP BY market, which name comes out? Do not ask for it.</p>
+
+<h3>Where should the rule live?</h3>
+
+<pre><code>query = """
+    SELECT SUM(close &gt; previous_close),
+           SUM(close &lt; previous_close),
+           SUM(close = previous_close)
+    FROM quotes
+"""</code></pre>
+
+<pre><code>(2, 2, 1)</code></pre>
+
+<p>SQL can count up, down and flat, and so can summarize(). A comparison is 1 when true and 0 when false, so the SUM of a comparison counts the rows where it holds. The answer matches summarize(). But each rule should have one home, and ours is logic.py, with its tests. SQL fetches rows.</p>
+
+<h2>ACT 3 · Transactions: all or nothing</h2>
+
+<p>A transaction is a group of changes that succeed together or are cancelled together. It starts with the first change; <code>commit()</code> keeps all of it, and <code>rollback()</code> discards all of it. There is no state in between.</p>
+
+<h3>Half a snapshot is worse than none</h3>
+
+<p>Suppose tomorrow's file has a bad row in the middle. Committing row by row leaves a table nobody asked for, and the report would mix two days yet look correct. Grouping everything in one transaction keeps yesterday's rows instead. This is the Week 12 rule again: on failure, keep the old result.</p>
+
+<h3>Two new rows, one of them bad</h3>
+
+<pre><code>INSERT = """
+    INSERT INTO quotes
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+"""
+new_rows = [
+    ("2026-11-06", "005930", "삼성전자",
+     "KOSPI", 71400, 72100, 900000),
+    ("2026-11-06", "000660", "SK하이닉스",
+     "KOSPI", 198000, 0, 450000),
+]</code></pre>
+
+<p>The first row is valid; the second has close 0, so the CHECK must refuse it. After the failure, how many rows does the table hold: 5, 6 or 7?</p>
+
+<h3>with con: commit or roll back</h3>
+
+<pre><code>try:
+    with con:
+        con.executemany(INSERT, new_rows)
+except sqlite3.IntegrityError as error:
+    print(error)
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>CHECK constraint failed: close &gt; 0
+(5,)</code></pre>
+
+<p>The with block is the transaction. If the block ends normally, it commits; if it raises, it rolls back and the exception continues. Row 1 was inserted, then taken back together with row 2. Trap: <code>with con</code> does not close the connection; it only ends the transaction. <a href="sql_changes.html">sql_changes</a> runs this code side by side with, for comparison, committing row by row, which ends at (6,).</p>
+
+<h2>ACT 4 · Swap the storage layer</h2>
+
+<p>You now have every piece the swap needs. SELECT with <code>dict(row)</code> reads quotes, and <code>with con</code> with <code>executemany</code> replaces a snapshot safely. Keep the same promises to the callers and replace only the machinery inside.</p>
+
+<ul>
+<li><code>connect()</code> and <code>init_db()</code> open and prepare the file.</li>
+<li><code>replace_quotes()</code> stores a validated snapshot.</li>
+<li><code>load_quotes()</code> returns the same dicts as before.</li>
+<li><code>read_csv()</code> is the old reader, kept for importing.</li>
+</ul>
+
+<p>Open storage.py in the example folder and find these four names (it is in the file list on the lab page).</p>
+
+<h3>load_quotes(): before and after</h3>
+
+<pre><code># BEFORE
+def load_quotes(path):
+    with open(path, encoding="utf-8-sig",
+              newline="") as stream:
+        reader = csv.DictReader(stream)
+        return [parse_row(r) for r in reader]
+
+# AFTER
+def load_quotes(con):
+    query = "SELECT * FROM quotes ORDER BY code"
+    return [dict(r) for r in con.execute(query)]</code></pre>
+
+<p>The caller still receives a list of quote dicts. Before, it opened a file and parsed every row; after, it asks the table and converts each row. Validation already happened when the rows were stored. The old function is not deleted; it becomes <code>read_csv()</code>.</p>
+
+<h3>Rows become the dicts logic.py expects</h3>
+
+<pre><code>con.row_factory = sqlite3.Row
+query = "SELECT * FROM quotes ORDER BY code"
+quotes = [dict(r) for r in con.execute(query)]
+for key, value in quotes[0].items():
+    print(f"{key:&lt;15}{value!r}")</code></pre>
+
+<pre><code>date           '2026-11-05'
+code           '000660'
+name           'SK하이닉스'
+market         'KOSPI'
+previous_close 200000
+close          198000
+volume         500000</code></pre>
+
+<p>The keys are the column names, in table order. code is still text, with its leading zeros. Prices and volume are int, so no int() calls are needed. analyze() and summarize() accept these rows unchanged.</p>
+
+<h3>replace_quotes(): one transaction</h3>
+
+<pre><code>def replace_quotes(con, quotes):
+    rows = [tuple(q[f] for f in FIELDS)
+            for q in quotes]
+    with con:
+        con.execute("DELETE FROM quotes")
+        con.executemany(INSERT, rows)</code></pre>
+
+<p>Deleting the old snapshot and inserting the new one happen together. FIELDS fixes the column order, the same as the CSV header. A failure inside with con restores the old rows, and the IntegrityError still reaches the caller. main.py catches <code>sqlite3.Error</code> next to ValueError and prints one message.</p>
+
+<h3>Testing with an in-memory database</h3>
+
+<pre><code>class StorageTests(unittest.TestCase):
+    def setUp(self):
+        self.con = connect(":memory:")
+        init_db(self.con)
+
+    def test_failed_replace_keeps_rows(self):
+        replace_quotes(self.con, QUOTES)
+        bad = [dict(QUOTES[0], close=0)]
+        with self.assertRaises(
+                sqlite3.IntegrityError):
+            replace_quotes(self.con, bad)
+        self.assertEqual(
+            len(load_quotes(self.con)), 5)</code></pre>
+
+<p><code>":memory:"</code> is a database with no file, created fresh for every test. setUp builds an empty table in an instant, and tests cannot damage your real market.db. One round-trip test checks storing and loading at once. This is why connect() takes the path as a parameter.</p>
+
+<h3>Running the swapped MVP</h3>
+
+<pre><code>cd 13week/examples/korea_market_sqlite
+python3 -m unittest
+python3 main.py --import-csv data/prices.csv
+python3 main.py --market KOSPI
+python3 main.py --import-csv data/invalid-zero.csv</code></pre>
+
+<p>Import once, and after that the report needs no CSV. <code>--import-csv</code> validates the file, then replaces the snapshot. A run with no options reads market.db (<code>data/market.db</code>) and writes the report. A bad CSV changes neither the table nor the old HTML, and the last command prints "Report not generated".</p>
+
+<p>In this lab the folder is <code>~/week13/examples/korea_market_sqlite</code>. In <a href="korea_market_sqlite.html">korea_market_sqlite</a>, run the commands above in order, use diff to confirm that logic.py and report.py are identical to the Week 11 files, and see that 5 rows and the KOSPI report remain after the failed import. To open the generated report in a browser, run <code>cp docs/index.html /mnt/host/report.html</code> and fetch it with Download.</p>
+
+<h3>Commit the schema, not the database</h3>
+
+<pre><code>git status --short
+git add .gitignore schema.sql storage.py
+git commit -m "Store quotes in SQLite"</code></pre>
+
+<p>market.db is a result; schema.sql is source code. Add <code>*.db</code> to <code>.gitignore</code>, and commit schema.sql and the script that fills the table. Then anyone can rebuild the database with one command. A committed .db file conflicts on every merge, and Git cannot show its diff. git is not available on this virtual machine, so make the commit on your real PC.</p>
+
+<h2>Lab: swap your storage</h2>
+
+<p>Thirty-four minutes; the tests are your safety net. Before editing, run the 18 tests and start green; finish green with the same tests plus yours.</p>
+
+<ul>
+<li>A: run the tests. Expect OK.</li>
+<li>B: add an optional market parameter to <code>load_quotes()</code>. With <code>"ALL"</code>, return every row; otherwise, the rows chosen with WHERE and ?. <code>load_quotes(con)</code> called without market must keep working.</li>
+<li>C: test it with <code>":memory:"</code>. KOSPI returns 3 rows, ALL returns 5, and no argument returns 5.</li>
+<li>D: your project. One table in schema.sql, one save function and one load function. Pass values with ?.</li>
+</ul>
+
+<p>On this virtual machine, edit with <code>nano storage.py</code> and <code>nano test_market.py</code>, and check with <code>python3 -m unittest</code>.</p>
+
+<h3>Your project: one table</h3>
+
+<p>Answer four questions before you write CREATE TABLE. What is one row in your project? Which columns are there, and is each TEXT, INTEGER or REAL? Which columns make the primary key? Which values must the table refuse? Not every project needs a database. If a CSV is enough, write down why.</p>
+
+<h2>Submission and next week</h2>
+
+<p>Evidence first, then the pull request. Submit storage.py using SQLite and the unittest output, your new test and one failure it would catch, and your project's table design (columns, types, key). One branch, one PR, and no .db file in it. Before submitting, check that the 18 existing tests and your tests all pass, that you did not modify logic.py or report.py, and that importing a bad CSV leaves the table and the old HTML as they were. In Week 14, Flask shows these rows in a browser, and a form adds new rows.</p>
+</div><div lang="ko">
+<p>이번 시간에는 저장 계층만 바꾸고 테스트는 모두 통과시킵니다. 행을 고치고(UPDATE·DELETE), 요약하고(COUNT·SUM·AVG·GROUP BY), 여러 변경을 트랜잭션으로 묶은 뒤(전부 아니면 전무), MVP를 데이터베이스 위로 옮깁니다. storage.py가 SQLite를 읽어도 logic.py는 그 사실을 모릅니다. 완료 기준은 테스트 18개 통과, 그리고 규칙은 그대로입니다. SQL 문장은 <a href="sql_changes.html">sql_changes</a>, 교체한 MVP는 <a href="korea_market_sqlite.html">korea_market_sqlite</a>에서 실행합니다.</p>
+
+<h2>복습: market.db의 다섯 행</h2>
+
+<pre><code>import sqlite3
+con = sqlite3.connect("market.db")
+count = "SELECT COUNT(*) FROM quotes"
+print(con.execute(count).fetchone())
+query = "SELECT code, close FROM quotes"
+for row in con.execute(query):
+    print(row)</code></pre>
+
+<pre><code>(5,)
+('005930', 71400)
+('000660', 198000)
+('035420', 200000)
+('247540', 103000)
+('035900', 49000)</code></pre>
+
+<p>1차시에 규칙이 있는 테이블과 다섯 행을 만들었습니다. connect, execute, commit, close의 순서와 ? 자리표시자를 기억합니다. SELECT는 묻기만 하고 테이블을 바꾸지 않습니다. 행이 없으면 sqlite_lab에서 <code>create_db.py</code>를 먼저 실행합니다.</p>
+
+<h3>완료 기준: 같은 테스트, 새 저장소</h3>
+
+<p>SQLite를 아는 모듈은 하나뿐이어야 합니다. <code>logic.py</code>와 <code>report.py</code>는 한 줄도 바뀌지 않습니다. <code>storage.py</code>는 연결(connection)을 중심으로 다시 씁니다. <code>main.py</code>는 연결을 열고 넘기는 몇 줄만 바뀝니다. 12주차의 계약은 교체 뒤에도 유지됩니다.</p>
+
+<h2>ACT 1 · 행 바꾸기: UPDATE와 DELETE</h2>
+
+<p>한 줄로 테이블을 망칠 수 있는 두 문장입니다. UPDATE는 이미 있는 행의 값을 바꾸고, DELETE는 행을 지웁니다. 둘 다 WHERE가 고른 모든 행에 적용되며, WHERE가 없으면 모든 행이 대상입니다.</p>
+
+<h3>WHERE가 있는 UPDATE</h3>
+
+<pre><code>UPDATE = """
+    UPDATE quotes SET close = ?
+    WHERE code = ?
+"""
+cur = con.execute(UPDATE, (72000, "005930"))
+print(cur.rowcount)
+cur = con.execute(UPDATE, (72000, "999999"))
+print(cur.rowcount)</code></pre>
+
+<pre><code>1
+0</code></pre>
+
+<p>SET에 열 이름과 새 값을 쓰고, WHERE는 SELECT에서처럼 행을 고릅니다. <code>rowcount</code>는 바뀐 행의 수입니다. 함정: 틀린 코드는 오류가 아닙니다. 조용히 0행을 바꿉니다.</p>
+
+<h3>잊어버린 WHERE</h3>
+
+<pre><code>cur = con.execute("DELETE FROM quotes")
+print(cur.rowcount)
+print(con.execute(count).fetchone())
+con.rollback()
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>5
+(0,)
+(5,)</code></pre>
+
+<p>짧은 한 줄에 다섯 행이 사라집니다. 아직 커밋하지 않았으므로 <code>rollback()</code>으로 되돌립니다. 앞의 72000 수정도 함께 되돌아갑니다. 지우기 전에 같은 WHERE로 SELECT를 먼저 실행해 봅니다. <a href="sql_changes.html">sql_changes</a>의 둘째 단계가 UPDATE부터 rollback까지를 한 번에 보여 줍니다.</p>
+
+<h2>ACT 2 · 요약하기: 세고 묶기</h2>
+
+<p>행이 아니라 답을 요청합니다. 집계 함수는 여러 행을 값 하나로 만들고, GROUP BY는 그룹마다 답 하나를 줍니다. 4주차에 쓰던 반복문이 SQL 한 줄이 됩니다.</p>
+
+<h3>COUNT, SUM, MAX, AVG</h3>
+
+<pre><code>query = """
+    SELECT COUNT(*), SUM(volume),
+           MAX(close), AVG(close)
+    FROM quotes
+"""
+print(con.execute(query).fetchone())</code></pre>
+
+<pre><code>(5, 2100000, 200000, 124280.0)</code></pre>
+
+<p>질문 네 개에 행 하나가 돌아옵니다. COUNT(*)는 행을 세고, SUM과 AVG에는 숫자 열이 필요합니다. AVG는 INTEGER 열에서도 REAL을 돌려줍니다.</p>
+
+<h3>GROUP BY: 시장마다 한 행</h3>
+
+<pre><code>query = """
+    SELECT market, COUNT(*), SUM(volume)
+    FROM quotes
+    GROUP BY market
+    ORDER BY market
+"""</code></pre>
+
+<pre><code>('KOSDAQ', 2, 300000)
+('KOSPI', 3, 1800000)</code></pre>
+
+<p>행을 시장별로 나눈 뒤 묶음마다 집계합니다. market이 같은 행들이 한 그룹이 됩니다. SELECT의 열은 그룹 열이거나 집계 함수여야 합니다. 결과에도 ORDER BY를 쓸 수 있습니다. 함정: GROUP BY market에 SELECT name을 쓰면 어느 name이 나올까요? 그런 것은 요청하지 않습니다.</p>
+
+<h3>규칙은 어디에 둘까?</h3>
+
+<pre><code>query = """
+    SELECT SUM(close &gt; previous_close),
+           SUM(close &lt; previous_close),
+           SUM(close = previous_close)
+    FROM quotes
+"""</code></pre>
+
+<pre><code>(2, 2, 1)</code></pre>
+
+<p>SQL도 상승·하락·보합을 셀 수 있고, summarize()도 셉니다. 비교식은 참이면 1, 거짓이면 0이므로 비교식의 SUM은 조건이 참인 행의 수입니다. 답은 summarize()와 같습니다. 하지만 규칙의 집은 한 곳이어야 하고, 우리는 테스트가 있는 logic.py로 정했습니다. SQL은 행을 가져옵니다.</p>
+
+<h2>ACT 3 · 트랜잭션: 전부 아니면 전무</h2>
+
+<p>트랜잭션은 함께 성공하거나 함께 취소되는 변경의 묶음입니다. 첫 변경과 함께 시작되고, <code>commit()</code>은 전부를 확정하고, <code>rollback()</code>은 전부를 버립니다. 그 중간 상태는 없습니다.</p>
+
+<h3>반쪽짜리 스냅숏은 없는 것보다 나쁘다</h3>
+
+<p>내일 받은 파일의 한가운데에 잘못된 행이 있다고 해 봅시다. 행마다 커밋하면 아무도 원하지 않은 테이블이 남고, 보고서에 이틀 치가 섞이는데도 정상처럼 보입니다. 트랜잭션 하나로 묶으면 어제의 행이 그대로 남습니다. 실패하면 기존 결과를 보존한다는 12주차의 규칙과 같습니다.</p>
+
+<h3>새 행 둘, 그중 하나는 불량</h3>
+
+<pre><code>INSERT = """
+    INSERT INTO quotes
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+"""
+new_rows = [
+    ("2026-11-06", "005930", "삼성전자",
+     "KOSPI", 71400, 72100, 900000),
+    ("2026-11-06", "000660", "SK하이닉스",
+     "KOSPI", 198000, 0, 450000),
+]</code></pre>
+
+<p>첫째 행은 정상이고 둘째 행은 close가 0이라 CHECK가 거절해야 합니다. 실패한 뒤 테이블의 행은 5, 6, 7개 중 몇 개일까요?</p>
+
+<h3>with con: 커밋 또는 롤백</h3>
+
+<pre><code>try:
+    with con:
+        con.executemany(INSERT, new_rows)
+except sqlite3.IntegrityError as error:
+    print(error)
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>CHECK constraint failed: close &gt; 0
+(5,)</code></pre>
+
+<p>with 블록이 곧 트랜잭션입니다. 블록이 정상적으로 끝나면 커밋하고, 예외가 나면 롤백한 뒤 예외를 다시 전달합니다. 1행은 들어갔다가 2행과 함께 취소됐습니다. 함정: <code>with con</code>은 연결을 닫지 않고 트랜잭션만 끝냅니다. <a href="sql_changes.html">sql_changes</a>에서는 이 코드와, 비교를 위해 행마다 커밋해서 (6,)이 되는 경우를 나란히 실행합니다.</p>
+
+<h2>ACT 4 · 저장 계층 교체하기</h2>
+
+<p>교체에 필요한 조각은 이제 모두 있습니다. SELECT와 <code>dict(row)</code>로 quotes를 읽고, <code>with con</code>과 <code>executemany</code>로 스냅숏을 안전하게 교체합니다. 호출하는 쪽과의 약속은 그대로 두고 안쪽 장치만 새로 바꿉니다.</p>
+
+<ul>
+<li><code>connect()</code>와 <code>init_db()</code>가 파일을 열고 준비한다.</li>
+<li><code>replace_quotes()</code>가 검증된 스냅숏을 저장한다.</li>
+<li><code>load_quotes()</code>는 전과 같은 dict를 돌려준다.</li>
+<li><code>read_csv()</code>는 예전 읽기 함수다. 가져오기용으로 남긴다.</li>
+</ul>
+
+<p>예제 폴더의 storage.py를 열어 이 네 이름을 찾아봅니다(실습 페이지의 파일 목록에 있습니다).</p>
+
+<h3>load_quotes(): 전과 후</h3>
+
+<pre><code># BEFORE
+def load_quotes(path):
+    with open(path, encoding="utf-8-sig",
+              newline="") as stream:
+        reader = csv.DictReader(stream)
+        return [parse_row(r) for r in reader]
+
+# AFTER
+def load_quotes(con):
+    query = "SELECT * FROM quotes ORDER BY code"
+    return [dict(r) for r in con.execute(query)]</code></pre>
+
+<p>호출하는 쪽은 여전히 quote dict의 목록을 받습니다. 전에는 파일을 열고 모든 행을 파싱했고, 후에는 테이블에 묻고 각 행을 변환합니다. 검증은 행을 저장할 때 이미 끝났습니다. 예전 함수는 지우지 않고 <code>read_csv()</code>가 됩니다.</p>
+
+<h3>행이 logic.py가 받는 dict가 된다</h3>
+
+<pre><code>con.row_factory = sqlite3.Row
+query = "SELECT * FROM quotes ORDER BY code"
+quotes = [dict(r) for r in con.execute(query)]
+for key, value in quotes[0].items():
+    print(f"{key:&lt;15}{value!r}")</code></pre>
+
+<pre><code>date           '2026-11-05'
+code           '000660'
+name           'SK하이닉스'
+market         'KOSPI'
+previous_close 200000
+close          198000
+volume         500000</code></pre>
+
+<p>키는 열 이름이고 순서는 테이블의 열 순서입니다. code는 여전히 글자이고 앞자리 0이 남아 있습니다. 가격과 거래량은 int이므로 int()를 부를 필요가 없습니다. analyze()와 summarize()가 이 행을 그대로 받습니다.</p>
+
+<h3>replace_quotes(): 트랜잭션 하나</h3>
+
+<pre><code>def replace_quotes(con, quotes):
+    rows = [tuple(q[f] for f in FIELDS)
+            for q in quotes]
+    with con:
+        con.execute("DELETE FROM quotes")
+        con.executemany(INSERT, rows)</code></pre>
+
+<p>기존 스냅숏 삭제와 새 스냅숏 삽입을 함께 처리합니다. FIELDS가 CSV 헤더와 같은 열 순서를 정합니다. with con 안에서 실패하면 기존 행이 복구되고, IntegrityError는 호출한 쪽으로 그대로 전달됩니다. main.py는 ValueError 옆에서 <code>sqlite3.Error</code>도 잡아 메시지 하나를 출력합니다.</p>
+
+<h3>메모리 데이터베이스로 테스트하기</h3>
+
+<pre><code>class StorageTests(unittest.TestCase):
+    def setUp(self):
+        self.con = connect(":memory:")
+        init_db(self.con)
+
+    def test_failed_replace_keeps_rows(self):
+        replace_quotes(self.con, QUOTES)
+        bad = [dict(QUOTES[0], close=0)]
+        with self.assertRaises(
+                sqlite3.IntegrityError):
+            replace_quotes(self.con, bad)
+        self.assertEqual(
+            len(load_quotes(self.con)), 5)</code></pre>
+
+<p><code>":memory:"</code>는 파일이 없는 데이터베이스이며 테스트마다 새로 만듭니다. setUp이 빈 테이블을 순식간에 만들고, 테스트가 실제 market.db를 망가뜨릴 수 없습니다. 왕복 테스트 하나로 저장과 조회를 함께 확인합니다. connect()가 경로를 매개변수로 받는 이유가 이것입니다.</p>
+
+<h3>교체한 MVP 실행하기</h3>
+
+<pre><code>cd 13week/examples/korea_market_sqlite
+python3 -m unittest
+python3 main.py --import-csv data/prices.csv
+python3 main.py --market KOSPI
+python3 main.py --import-csv data/invalid-zero.csv</code></pre>
+
+<p>한 번 가져오면 그 뒤로 보고서에 CSV가 필요 없습니다. <code>--import-csv</code>는 파일을 검증한 뒤 스냅숏을 교체합니다. 옵션 없이 실행하면 market.db(<code>data/market.db</code>)를 읽어 보고서를 씁니다. 잘못된 CSV는 테이블도 기존 HTML도 바꾸지 않으며, 마지막 명령은 "Report not generated"를 출력합니다.</p>
+
+<p>이 실습에서 폴더는 <code>~/week13/examples/korea_market_sqlite</code>입니다. <a href="korea_market_sqlite.html">korea_market_sqlite</a>에서 위 명령을 차례로 실행하고, logic.py와 report.py가 11주차 파일과 똑같은지 diff로 확인하며, 실패한 가져오기 뒤에도 5행과 KOSPI 보고서가 남는 것을 봅니다. 생성된 보고서는 <code>cp docs/index.html /mnt/host/report.html</code> 후 받기로 내려받아 브라우저에서 엽니다.</p>
+
+<h3>데이터베이스가 아니라 스키마를 커밋한다</h3>
+
+<pre><code>git status --short
+git add .gitignore schema.sql storage.py
+git commit -m "Store quotes in SQLite"</code></pre>
+
+<p>market.db는 결과물이고 schema.sql은 소스 코드입니다. <code>.gitignore</code>에 <code>*.db</code>를 추가하고, schema.sql과 테이블을 채우는 스크립트를 커밋합니다. 그러면 누구나 명령 하나로 데이터베이스를 다시 만들 수 있습니다. 커밋한 .db 파일은 병합할 때마다 충돌하고 Git이 차이를 보여 주지 못합니다. git은 이 가상 머신에 없으므로 커밋은 실제 PC에서 합니다.</p>
+
+<h2>실습: 내 저장소 교체하기</h2>
+
+<p>34분 동안 진행하며, 테스트가 안전망입니다. 고치기 전에 테스트 18개를 실행해 통과에서 시작하고, 같은 테스트에 내 테스트를 더해 통과로 끝냅니다.</p>
+
+<ul>
+<li>A: 테스트를 실행한다. OK가 나와야 한다.</li>
+<li>B: <code>load_quotes()</code>에 선택 매개변수 market을 추가한다. <code>"ALL"</code>이면 모든 행, 아니면 WHERE와 ?로 고른 행. market 없이 부르는 <code>load_quotes(con)</code>도 계속 동작해야 한다.</li>
+<li>C: <code>":memory:"</code>로 테스트한다. KOSPI는 3행, ALL은 5행, 인자 없이 5행.</li>
+<li>D: 내 프로젝트. schema.sql에 테이블 하나, 저장·조회 함수 하나씩. 값은 ?로 넘긴다.</li>
+</ul>
+
+<p>이 가상 머신에서는 <code>nano storage.py</code>, <code>nano test_market.py</code>로 고치고 <code>python3 -m unittest</code>로 확인합니다.</p>
+
+<h3>내 프로젝트: 테이블 하나</h3>
+
+<p>CREATE TABLE을 쓰기 전에 네 가지에 답합니다. 내 프로젝트에서 한 행은 무엇인가? 어떤 열이 있고 각각 TEXT, INTEGER, REAL 중 무엇인가? 어떤 열이 기본 키가 되는가? 테이블이 거절해야 하는 값은 무엇인가? 모든 프로젝트에 데이터베이스가 필요하지는 않습니다. CSV로 충분하면 그 이유를 적습니다.</p>
+
+<h2>제출과 다음 주</h2>
+
+<p>증거가 먼저, 그다음이 풀 리퀘스트입니다. SQLite를 쓰는 storage.py와 unittest 출력, 새로 쓴 테스트와 그 테스트가 잡아내는 실패 하나, 내 프로젝트의 테이블 설계(열, 자료형, 키)를 제출합니다. 브랜치 하나, PR 하나이며 .db 파일은 넣지 않습니다. 제출 전에 기존 테스트 18개와 내 테스트가 모두 통과하는지, logic.py와 report.py를 고치지 않았는지, 잘못된 CSV를 가져오면 테이블과 기존 HTML이 그대로인지 확인합니다. 14주차에는 Flask로 이 행을 브라우저에 보여 주고 폼으로 새 행을 넣습니다.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<p>You built an MVP; now we improve it. It works, so we throw nothing away and change one layer a week. In Weeks 11–12 you built and tested the MVP with CSV in and HTML out. In Week 13 storage moves from a CSV file to SQLite, in Week 14 the report becomes a web page with Flask, and in Week 15 the data arrives from an external API. Your own project gets the same three upgrades.</p>
+
+<p>Today: one table, one file, five questions. We ask why a file is no longer enough (ACT 0), design the quotes table before any Python (ACT 1), open market.db with the built-in sqlite3 module (ACT 2), load the five CSV rows safely with ? placeholders (ACT 3), and ask questions with SELECT, WHERE and ORDER BY (ACT 4). Run the first three acts in <a href="create_db.html">create_db</a> and the questions in <a href="queries.html">queries</a>. Next session this table replaces the CSV reader in the MVP.</p>
+
+<h2>ACT 0 · Why a database?</h2>
+
+<p>Programs forget, but data has to outlive the program. Your phone still shows messages from last year. Where are they kept?</p>
+
+<h3>Three places to keep data</h3>
+
+<ul>
+<li><strong>Variable</strong>: fast, but gone when the program ends.</li>
+<li><strong>File</strong>: it survives, but it is only text, so your code has to do all the rest of the work.</li>
+<li><strong>Database</strong>: it survives, and it checks, searches and protects the data.</li>
+</ul>
+
+<p>A database is still files on disk. The difference is the engine that guards them.</p>
+
+<h3>The MVP so far</h3>
+
+<p>Every run of the MVP starts by reading a text file from the top. <code>storage.py</code> is the only module that touches files; <code>logic.py</code> and <code>report.py</code> never open anything. That separation is why we can change the storage and keep the tests.</p>
+
+<h3>What a CSV cannot do</h3>
+
+<pre><code>import csv
+with open("prices.csv", encoding="utf-8") as f:
+    rows = list(csv.DictReader(f))
+kospi = [r for r in rows
+         if r["market"] == "KOSPI"]
+print(len(rows), len(kospi))
+print(type(rows[0]["close"]))</code></pre>
+
+<pre><code>5 3
+&lt;class 'str'&gt;</code></pre>
+
+<p>A CSV stores text; it answers nothing by itself. Every question means reading all the rows and looping. Every value arrives as str, even the prices. Nothing stops a duplicate row or a missing price.</p>
+
+<h3>One change, whole file</h3>
+
+<pre><code>changed = 0
+for r in rows:
+    if r["code"] == "005930":
+        r["close"] = "72000"
+        changed += 1
+print(changed, "row changed")
+print(len(rows), "rows to write back")</code></pre>
+
+<pre><code>1 row changed
+5 rows to write back</code></pre>
+
+<p>You cannot safely edit just one line in the middle of a text file. So you read every row, change one, and write every row back. A crash during the write leaves half a file. In SQL this is one UPDATE statement that changes one row (Session 2).</p>
+
+<h3>Real data is shared</h3>
+
+<p>A database is the shared memory of an organization. Course sign-up, bank accounts, orders, reservations: many people read and change the same data at the same moment. Everyone must see one correct state, even after a crash. A file helps with none of this: no turns, no undo, no permissions. In Week 14, when Flask turns the MVP into a web app, that web app serves many users at once.</p>
+
+<h3>Two users, one file</h3>
+
+<pre><code>from pathlib import Path
+f = Path("balance.txt")
+f.write_text("100")
+a = int(f.read_text())       # user A reads
+b = int(f.read_text())       # user B reads
+f.write_text(str(a - 50))    # A saves 50
+f.write_text(str(b - 50))    # B saves 50
+print("saved:", f.read_text(), "expected: 0")</code></pre>
+
+<pre><code>saved: 50 expected: 0</code></pre>
+
+<p>The balance is 100, and two people withdraw 50 at the same moment. Both read 100 before either one saves; each subtracts 50 and saves 50. There is no error, but one withdrawal is gone. This is a lost update. A file cannot make writers take turns; a database can. You can run this code in <a href="create_db.html">create_db</a>.</p>
+
+<h3>What a database adds</h3>
+
+<p>Four jobs you would otherwise have to code yourself if you only used files:</p>
+
+<ul>
+<li><strong>Rules</strong>: types and constraints refuse bad rows.</li>
+<li><strong>Questions</strong>: SELECT finds the rows. You write no loop.</li>
+<li><strong>Safe changes</strong>: a change is saved completely or not at all.</li>
+<li><strong>Sharing</strong>: several programs can use one database safely.</li>
+</ul>
+
+<p>Today covers rules and questions, Session 2 covers safe changes, and Week 14 covers sharing, with Flask.</p>
+
+<h3>CSV or database?</h3>
+
+<p>A database is a tool, not an upgrade of CSV. Pick by the job. CSV suits data that is small, read once, opened in Excel or sent to others. A database suits data that changes, gets many questions and has strict rules. Many projects use both: CSV to exchange, a database to keep. Does your project's data change while the program runs?</p>
+
+<h2>ACT 1 · Design the table first</h2>
+
+<p>A database is a file that knows the rules of its data. When designing, ask four questions. What is one row (one stock on one day)? Which columns are needed, and what type is each one? Which columns identify a row? Which values must never be stored? Ten minutes of design here saves an hour of cleaning data later.</p>
+
+<h3>SQLite in one picture</h3>
+
+<p>The whole database is one ordinary file. There is no server to install, start or log in to. <code>sqlite3</code> is part of Python's standard library. The same engine runs inside phones and browsers. You talk to it in SQL, a language for tables. You can check it right now with <code>python3 -c "import sqlite3"</code>. The virtual machine in this lab has no <code>sqlite3</code> command-line shell, so all SQL is run from Python.</p>
+
+<h3>Table, row, column, key</h3>
+
+<ul>
+<li><strong>Table</strong>: one kind of thing. Here, quotes.</li>
+<li><strong>Column</strong>: one named value with one type.</li>
+<li><strong>Row</strong>: one record. Here, one stock on one day.</li>
+<li><strong>Key</strong>: the columns that find exactly one row.</li>
+</ul>
+
+<p>Is code alone enough as the key? Think about tomorrow's prices: the same stock gets a new row every day, so code alone is not enough.</p>
+
+<h3>Choosing column types</h3>
+
+<pre><code>CREATE TABLE quotes (
+    date   TEXT,
+    code   TEXT,
+    name   TEXT,
+    market TEXT,
+    previous_close INTEGER,
+    close  INTEGER,
+    volume INTEGER
+);</code></pre>
+
+<p>The seven CSV fields become seven typed columns. TEXT is for words, dates and codes, INTEGER for whole numbers (prices in KRW and volume), and REAL for decimals (we store none here). SQL keywords are not case-sensitive; writing them in capitals is a habit. Trap: code is TEXT. Stored as a number, 005930 becomes 5930.</p>
+
+<h3>Rules the table enforces</h3>
+
+<p>In Week 12, Python did the validation. The table can refuse too.</p>
+
+<pre><code>CREATE TABLE IF NOT EXISTS quotes (
+    date   TEXT NOT NULL,
+    code   TEXT NOT NULL,
+    name   TEXT NOT NULL,
+    market TEXT NOT NULL,
+    previous_close INTEGER NOT NULL
+        CHECK (previous_close &gt; 0),
+    close  INTEGER NOT NULL
+        CHECK (close &gt; 0),
+    volume INTEGER NOT NULL
+        CHECK (volume &gt;= 0),
+    PRIMARY KEY (date, code)
+);</code></pre>
+
+<ul>
+<li><code>NOT NULL</code>: this column may not be empty.</li>
+<li><code>CHECK</code>: this condition must hold for every row.</li>
+<li><code>PRIMARY KEY (date, code)</code>: no two rows share both values.</li>
+<li><code>IF NOT EXISTS</code>: running the file twice is safe.</li>
+</ul>
+
+<p>This is exactly <code>schema.sql</code> in the lab folder.</p>
+
+<h2>ACT 2 · Connect from Python</h2>
+
+<p>Four calls, which you will type in this order all semester. <code>connect</code> opens the file or creates it, <code>execute</code> sends one SQL statement, <code>commit</code> makes the changes permanent, and <code>close</code> releases the file.</p>
+
+<h3>Create the database file</h3>
+
+<pre><code>import sqlite3
+from pathlib import Path
+
+schema = Path("schema.sql").read_text()
+con = sqlite3.connect("market.db")
+con.executescript(schema)
+con.commit()
+con.close()
+print(Path("market.db").exists())</code></pre>
+
+<pre><code>True</code></pre>
+
+<p>Run it and a new file appears next to your script. <code>connect("market.db")</code> creates the file if it is missing. <code>executescript</code> runs every statement in schema.sql. Nothing is permanent until <code>commit()</code>. Does a second run fail? No, thanks to IF NOT EXISTS.</p>
+
+<h3>INSERT one row</h3>
+
+<pre><code>con = sqlite3.connect("market.db")
+con.execute("""
+    INSERT INTO quotes VALUES
+    ('2026-11-05', '005930', '삼성전자',
+     'KOSPI', 70000, 71400, 1000000)
+""")
+con.commit()
+count = "SELECT COUNT(*) FROM quotes"
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>(1,)</code></pre>
+
+<p>One statement, one row, values in column order. Text values take single quotes in SQL. A triple-quoted string keeps the SQL readable. <code>COUNT(*)</code> asks how many rows there are, and <code>fetchone()</code> returns one row as a tuple.</p>
+
+<h3>Forget commit(), lose the row</h3>
+
+<pre><code>con.execute("""
+    INSERT INTO quotes VALUES
+    ('2026-11-05', '000660', 'SK하이닉스',
+     'KOSPI', 200000, 198000, 500000)
+""")
+con.close()  # no commit!
+con = sqlite3.connect("market.db")
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>(1,)</code></pre>
+
+<p>The second INSERT ran without an error, but the row is not there. An INSERT is pending until commit(), and close() without commit throws pending changes away. No error, no warning. "It worked on my screen" is not "it was saved". In <a href="create_db.html">create_db</a> you can see a row that shows as (6,) within the same connection go back to (5,) when you reopen the database.</p>
+
+<h2>ACT 3 · Load the data safely</h2>
+
+<p>Values never go inside the SQL string. A <code>?</code> marks the place where a value belongs, and Python passes the values separately, as a tuple. <code>executemany</code> repeats one statement for many rows. The table rejects rows that break its rules.</p>
+
+<h3>Placeholders: one ? per value</h3>
+
+<pre><code>INSERT = """
+    INSERT INTO quotes
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+"""
+row = ("2026-11-05", "000660", "SK하이닉스",
+       "KOSPI", 200000, 198000, 500000)
+con.execute(INSERT, row)
+con.commit()
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>(2,)</code></pre>
+
+<p>The SQL text stays fixed; only the values change. Seven columns, so seven question marks, and the second argument is a tuple of values. No quotes around <code>?</code>: sqlite3 handles text and numbers. Keep the statement in a constant and reuse it.</p>
+
+<h3>executemany: load the CSV</h3>
+
+<pre><code>import csv
+with open("prices.csv", encoding="utf-8") as f:
+    rows = [tuple(r.values())
+            for r in csv.DictReader(f)]
+
+con.execute("DELETE FROM quotes")
+con.executemany(INSERT, rows)
+con.commit()
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>(5,)</code></pre>
+
+<p>Five rows, one call, one commit. <code>DELETE FROM quotes</code> clears the two practice rows, and each CSV row becomes a tuple in column order. INTEGER columns store "71400" as the number 71400. In the project, validate with <code>parse_row()</code> before inserting. <code>create_db.py</code> in the lab folder is this whole process; running it prints <code>market.db ready: 5 rows</code> (<a href="create_db.html">create_db</a>).</p>
+
+<h3>The database says no</h3>
+
+<pre><code>try:
+    con.execute(INSERT, row)
+except sqlite3.IntegrityError as error:
+    print(type(error).__name__)
+    print(error)
+print(con.execute(count).fetchone())</code></pre>
+
+<pre><code>IntegrityError
+UNIQUE constraint failed: quotes.date, quotes.code
+(5,)</code></pre>
+
+<p>Inserting the same stock on the same day a second time raises <code>sqlite3.IntegrityError</code> because of <code>PRIMARY KEY (date, code)</code>. Only that statement fails; the stored rows do not change. A zero price fails the same way, through CHECK. You can see both errors in the last step of <a href="create_db.html">create_db</a>.</p>
+
+<h2>ACT 4 · Ask with SELECT</h2>
+
+<p>Say what you want; the database decides how to find it. SELECT picks the columns, WHERE picks the rows, ORDER BY sorts them and LIMIT cuts the list. A query never changes the table. Before the break, check that market.db is in your folder, and run create_db.py if your table is empty.</p>
+
+<h3>SELECT: choose columns</h3>
+
+<pre><code>query = "SELECT code, name, close FROM quotes"
+for row in con.execute(query):
+    print(row)</code></pre>
+
+<pre><code>('005930', '삼성전자', 71400)
+('000660', 'SK하이닉스', 198000)
+('035420', 'NAVER', 200000)
+('247540', '에코프로비엠', 103000)
+('035900', 'JYP Ent.', 49000)</code></pre>
+
+<p>You can loop over the result of execute() directly with a for loop. Each row is a tuple in the order of the columns you asked for. <code>SELECT *</code> means every column, but name the columns when you can. Trap: without ORDER BY, no row order is promised.</p>
+
+<h3>WHERE: choose rows</h3>
+
+<pre><code>query = """
+    SELECT name, close FROM quotes
+    WHERE market = 'KOSDAQ'
+      AND close &gt;= 50000
+"""
+for row in con.execute(query):
+    print(row)</code></pre>
+
+<pre><code>('에코프로비엠', 103000)</code></pre>
+
+<p>Only rows that pass the condition come back. <code>=</code> compares; SQL has no <code>==</code> operator. AND, OR and NOT combine conditions. close is INTEGER, so <code>&gt;=</code> compares numbers. JYP Ent. is also on KOSDAQ; it is missing from the result because its close of 49000 is less than 50000. In <a href="queries.html">queries</a>, the same question is run with two ? placeholders.</p>
+
+<h3>ORDER BY and LIMIT</h3>
+
+<pre><code>query = """
+    SELECT name, volume FROM quotes
+    ORDER BY volume DESC
+    LIMIT 3
+"""</code></pre>
+
+<pre><code>('삼성전자', 1000000)
+('SK하이닉스', 500000)
+('NAVER', 300000)</code></pre>
+
+<p>A ranking is a sort plus a cut. <code>DESC</code> means largest first; <code>ASC</code> (smallest first) is the default. <code>LIMIT 3</code> keeps the first three rows after sorting. Break ties with a second sort column: <code>ORDER BY volume DESC, code</code>.</p>
+
+<h3>Calculate in the query</h3>
+
+<pre><code>query = """
+    SELECT name,
+           (close - previous_close) * 100.0
+           / previous_close AS change_pct
+    FROM quotes
+    ORDER BY change_pct DESC, code
+"""
+for name, pct in con.execute(query):
+    print(f"{pct:+5.1f}% {name}")</code></pre>
+
+<pre><code> +3.0% 에코프로비엠
+ +2.0% 삼성전자
+ +0.0% NAVER
+ -1.0% SK하이닉스
+ -2.0% JYP Ent.</code></pre>
+
+<p>SELECT can compute a new column and name it with AS. The formula is the same as change_pct() in logic.py. Naming it AS change_pct lets ORDER BY use it. Each row unpacks into two variables. Trap: in SQL, integer / integer drops the decimals, so multiply by 100.0 first.</p>
+
+<h3>User input is not SQL</h3>
+
+<pre><code>market = "KOSPI' OR '1'='1"
+bad = f"""SELECT COUNT(*) FROM quotes
+          WHERE market = '{market}'"""
+print(con.execute(bad).fetchone())
+
+good = """SELECT COUNT(*) FROM quotes
+          WHERE market = ?"""
+print(con.execute(good, (market,)).fetchone())</code></pre>
+
+<pre><code>(5,)
+(0,)</code></pre>
+
+<p>One input, two queries, two different answers. The f-string pastes the input into the SQL text, so the quote inside the input rewrites the condition. With <code>?</code>, the input is only ever a value. This is SQL injection: never build SQL with f-strings or <code>+</code>. In <a href="queries.html">queries</a>, print the SQL statement that gets built and you will see the cause.</p>
+
+<h3>Rows you can read by name</h3>
+
+<pre><code>con.row_factory = sqlite3.Row
+query = "SELECT * FROM quotes WHERE code = ?"
+row = con.execute(query, ("005930",)).fetchone()
+print(row["name"], row["close"])
+quote = dict(row)
+print(type(quote["close"]), quote["code"])</code></pre>
+
+<pre><code>삼성전자 71400
+&lt;class 'int'&gt; 005930</code></pre>
+
+<p><code>row[2]</code> is a guess; <code>row["close"]</code> is a fact. <code>sqlite3.Row</code> lets you get values by column name. <code>dict(row)</code> has the same shape as a CSV DictReader row, but this time the prices are already int. That dict is exactly what logic.py expects, and Session 2 uses it.</p>
+
+<h2>Lab: five questions</h2>
+
+<p>Thirty minutes: one table, your own queries. Work in the <code>13week/examples/sqlite_lab</code> folder (<code>~/week13/examples/sqlite_lab</code> in this lab). Q1 is written for you, so read it first. Every value from outside the program goes through a ? placeholder.</p>
+
+<pre><code>cd 13week/examples/sqlite_lab
+python3 create_db.py
+python3 queries.py</code></pre>
+
+<pre><code>market.db ready: 5 rows
+Q1 KOSPI stocks
+   ('SK하이닉스', 198000)
+   ('삼성전자', 71400)
+   ('NAVER', 200000)</code></pre>
+
+<ul>
+<li>A: run create_db.py. Expect 5 rows.</li>
+<li>B: write Q2 to Q5 in queries.py. Q2: the names and volumes of stocks with volume of 300000 or more (largest first). Q3: the names and percentage changes (%) of the top two stocks by percentage change. Q4: the number of stocks that closed below the previous close. Q5: the row for a stock code read with <code>input()</code> ("not found" if there is none).</li>
+<li>C: insert a row of your own and commit(), then insert the same row again. Also try inserting it with close changed to 0.</li>
+<li>D: partner check. No SQL built with f-strings or +, values passed as a tuple (including the comma in <code>(code,)</code>), and commit() called after changing rows.</li>
+</ul>
+
+<p>Stuck on Q3? Reuse the change_pct formula from the slide. Write your code with <code>nano queries.py</code> on the <a href="queries.html">queries</a> page; you can also test Q5 by piping input, as in <code>printf '005930\n' | python3 queries.py</code>.</p>
+
+<h2>Submission and next session</h2>
+
+<p>Hand in what you ran, not what you planned: queries.py with Q2 to Q5 and its printed output, the error message from your rejected duplicate row, and one sentence: why is code TEXT and not INTEGER? Do not submit market.db; it can be rebuilt. Session 2 puts this table behind <code>load_quotes()</code> and keeps all the tests passing.</p>

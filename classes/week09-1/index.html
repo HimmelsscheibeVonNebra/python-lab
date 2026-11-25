@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 9 · Session 1 Objects That Work Together: State Validation, References, Composition and Inheritance · Python Lab" data-title-ko="9주차 1차시 함께 일하는 객체: 상태 검증, 참조, 합성과 상속 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 9 · Session 1 Objects That Work Together: State Validation, References, Composition and Inheritance · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body data-root="../../">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 9 · Session 1</span><span lang="ko">9주차 1차시</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Objects That Work Together: State Validation, References, Composition and Inheritance</span><span lang="ko">함께 일하는 객체: 상태 검증, 참조, 합성과 상속</span></h1>
+    <p><span lang="en">Using BankAccount, SavingsAccount and AccountBook, run code to see how names relate to objects, how methods keep the balance invariant, how composition holds other objects, and how inheritance reuses behavior; then complete withdraw, total_balance and report in the lab.</span><span lang="ko">BankAccount·SavingsAccount·AccountBook으로 이름과 객체의 관계, 잔액 불변식을 지키는 메서드, 다른 객체를 담는 합성, 기능을 물려받는 상속을 실행하며 확인하고, 실습에서 withdraw·total_balance·report를 완성한다.</span></p>
+  </header>
+  <main class="list">
+    <section>
+      <h2><span lang="en">Examples to run</span><span lang="ko">실행해 볼 예제</span></h2>
+      <ul class="cards">
+        <li><a href="week7_review.html"><strong>week7_review</strong><span><span lang="en">Week 7 recap. The validation-free SimpleAccount shows __init__, self and instance state; LabelledAccount shows class variables and how an instance attribute shadows them; the complete classes in models.py show a shared interface. When all the assert checks at the end pass, a completion message is printed.</span><span lang="ko">7주차 복습. 검증 없는 SimpleAccount로 __init__·self·인스턴스 상태를, LabelledAccount로 클래스 변수와 인스턴스 속성의 가림(shadowing)을, models.py의 완성 클래스로 공통 인터페이스를 확인한다. 마지막에 assert 검사가 모두 통과하면 완료 메시지가 나온다.</span></span></a></li>
+        <li><a href="identity.html"><strong>identity</strong><span><span lang="en">Two names can refer to one object. Assignment (alias = a) does not create a new account; it puts another name on the same object. List elements are references to objects too.</span><span lang="ko">두 이름이 한 객체를 가리킬 수 있다. 대입(alias = a)은 새 계좌를 만들지 않고 같은 객체에 이름을 하나 더 붙이며, 리스트 원소도 객체에 대한 참조다.</span></span></a></li>
+        <li><a href="shared_state.html"><strong>shared_state</strong><span><span lang="en">If a mutable list is a class attribute, every instance shares that one list. A list that each instance should have for itself is created on self in __init__.</span><span lang="ko">변경 가능한 리스트를 클래스 속성으로 두면 모든 인스턴스가 그 리스트 하나를 함께 쓴다. 인스턴스마다 따로 가져야 할 리스트는 __init__에서 self에 만든다.</span></span></a></li>
+        <li><a href="validation.html"><strong>validation</strong><span><span lang="en">The constructor rejects invalid starting values with ValueError so that an invalid account is never created, and deposit returns False for any amount that is not a positive integer, leaving the balance unchanged.</span><span lang="ko">생성자는 잘못된 초기값을 ValueError로 거부해 잘못된 계좌가 만들어지지 않게 하고, deposit은 양의 정수가 아닌 금액에 False를 돌려주며 잔액을 바꾸지 않는다.</span></span></a></li>
+        <li><a href="state_checks.html"><strong>state_checks</strong><span><span lang="en">Run deposits and withdrawals in sequence, tracking the return value together with the balance afterward, and use assert to check both success/failure and the resulting state.</span><span lang="ko">입금·출금을 차례로 실행하면서 반환값과 이후 잔액을 함께 추적하고, assert로 성공/실패와 결과 상태를 모두 검사한다.</span></span></a></li>
+        <li><a href="composition.html"><strong>composition</strong><span><span lang="en">AccountBook keeps references to account objects in a list (composition), and whenever it computes a total or a report it hands the work to each account's public methods (delegation).</span><span lang="ko">AccountBook은 계좌 객체에 대한 참조를 리스트에 담고(합성), 합계와 보고서를 계산할 때마다 각 계좌의 공개 메서드에 일을 맡긴다(위임).</span></span></a></li>
+        <li><a href="inheritance.html"><strong>inheritance</strong><span><span lang="en">SavingsAccount inherits from BankAccount, reusing its constructor validation and deposit/withdraw as they are, adds add_bonus, and overrides account_type.</span><span lang="ko">SavingsAccount는 BankAccount를 상속해 생성자 검증과 deposit·withdraw를 그대로 재사용하고, add_bonus를 추가하며 account_type을 재정의한다.</span></span></a></li>
+        <li><a href="full_demo.html"><strong>full_demo</strong><span><span lang="en">The full demo using all three classes together. This is the reference output to compare with the accounts.py you complete in Lab C.</span><span lang="ko">세 클래스를 함께 쓰는 전체 데모. 실습 C에서 자신이 완성한 accounts.py의 출력과 비교할 기준 결과다.</span></span></a></li>
+        <li><a href="accounts_lab.html"><strong>accounts_lab</strong><span><span lang="en">Lab: complete the TODOs in BankAccount.withdraw, AccountBook.total_balance and AccountBook.report. In the starting state the first TODO raises NotImplementedError; once complete, all the checks in check_student.py should pass and the output should match 07_full_demo.</span><span lang="ko">실습: BankAccount.withdraw, AccountBook.total_balance, AccountBook.report의 TODO를 완성한다. 시작 상태에서는 첫 TODO에서 NotImplementedError가 나며, 완성 후에는 check_student.py의 검사가 모두 통과하고 07_full_demo와 같은 출력이 나와야 한다.</span></span></a></li>
+      </ul>
+    </section>
+    <article class="notes">
+<div lang="en">
+<p>In this session we build on the classes and objects from Week 7 to write a program in which several objects work together. The example is a bank account. You will meet the basic account <code>BankAccount</code>, <code>SavingsAccount</code>, which inherits from it and adds a bonus feature, and <code>AccountBook</code>, which collects and manages accounts. There are four goals. First, you should be able to trace how names relate to objects and explain when instance state changes. Second, make constructors and methods keep the balance valid at all times. Third, build an object that holds and uses other objects (composition). Fourth, compare inheritance and composition while looking at running code.</p>
+
+<p>The session runs 120 minutes in total: review 30 minutes, state rules 20 minutes, object collaboration 20 minutes, break 10 minutes, lab 30 minutes and review 10 minutes. The complete classes are in <code>week09/examples/session01-v02/models.py</code>, and each part of the slides can be run as a numbered example file in the same folder.</p>
+
+<h2>1. State and object identity</h2>
+
+<h3>Week 7 recap: class, object and instance</h3>
+
+<p>In <code>a = BankAccount("Minsu", 1000)</code> and <code>b = BankAccount("Jisu", 500)</code>, <code>BankAccount</code> is the class that defines how an account behaves, and <code>a</code> and <code>b</code> refer to two separate account objects. Both objects are instances of <code>BankAccount</code>. An object is already an instance the moment it is created, so there is no extra step that turns an object into an instance.</p>
+
+<pre><code>class SimpleAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+account = SimpleAccount("Minsu", 1000)</code></pre>
+
+<p><code>__init__</code> initializes the newly created instance. <code>self</code> receives that instance, and <code>owner</code> and <code>balance</code> receive the other arguments. This minimal example has no validation; the main model we look at later adds it.</p>
+
+<p>Attributes store state, and methods describe operations on the object. After <code>account.deposit(200)</code>, <code>account.balance</code> becomes 1200.</p>
+
+<h3>Class variables and instance variables</h3>
+
+<pre><code>class LabelledAccount:
+    bank_name = "Python Bank"
+    def __init__(self, owner):
+        self.owner = owner
+
+a = LabelledAccount("Minsu")
+b = LabelledAccount("Jisu")
+LabelledAccount.bank_name = "Campus Bank"
+print(a.bank_name, b.bank_name)   # Campus Bank Campus Bank</code></pre>
+
+<p><code>bank_name</code> belongs to the class, while each instance has its own <code>owner</code>. If you change the class's value, every instance sees the new value. But if you assign through an instance, as in <code>a.bank_name = ...</code>, the class variable does not change; instead a new instance attribute with the same name is created on <code>a</code> only. You can check both cases in turn in <a href="week7_review.html">week7_review</a>.</p>
+
+<h3>Encapsulation and abstraction, inheritance and polymorphism</h3>
+
+<table>
+<thead><tr><th>Principle</th><th>Focus</th><th>Bank-account example</th></tr></thead>
+<tbody>
+<tr><td>Encapsulation</td><td>Related state and rules belong together</td><td><code>_balance</code> and the validated <code>deposit</code>/<code>withdraw</code></td></tr>
+<tr><td>Abstraction</td><td>Callers use only a stable public interface</td><td><code>withdraw(amount)</code> returns success or failure</td></tr>
+<tr><td>Inheritance</td><td>Reuse the behavior of an existing class</td><td><code>SavingsAccount</code> reuses <code>BankAccount</code> operations</td></tr>
+<tr><td>Polymorphism</td><td>The same call behaves differently depending on the object</td><td><code>account_type()</code> gives Standard or Savings</td></tr>
+</tbody>
+</table>
+
+<p>One method can support both encapsulation and abstraction. The underscore in <code>_balance</code> is only a convention meaning internal use, not an access lock, and abstraction does not require you to build an abstract base class.</p>
+
+<p>Recap questions: Is Minsu's account an object, an instance, or both? What does <code>__init__</code> initialize, and who receives <code>self</code>? Which of <code>bank_name</code> and <code>owner</code> differs per instance? Which principle keeps the balance-change rules with the balance? Which principle lets one caller use different account implementations? Answer with a partner first, then justify each answer with one line of code.</p>
+
+<h3>Calling a method and self</h3>
+
+<pre><code>a.deposit(200)
+BankAccount.deposit(a, 200)</code></pre>
+
+<p>Both forms pass <code>a</code> as <code>self</code>. To deposit only once, run only one of them. <code>self</code> is a conventional parameter name, not a Python keyword, and the method reads and changes the instance through <code>self</code>. The same <code>deposit</code> method only changes the object passed as <code>self</code>, so even after <code>a.deposit(200)</code>, <code>b</code>'s balance stays 500.</p>
+
+<h3>Assignment creates another reference</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+alias = a
+alias.withdraw(300)
+print(a.get_balance())   # 700
+print(alias is a)        # True</code></pre>
+
+<p>Assignment only binds another name to the existing object; it does not construct a second <code>BankAccount</code>. Conversely, calling the class twice with the same values creates two separate objects. Even if their attributes look the same, their identity differs, so <code>a is b</code> is False, and withdrawing from <code>a</code> leaves <code>b</code> at 1000.</p>
+
+<p>Predict: after <code>c = a</code> and <code>accounts = [a, b]</code>, what are <code>c.get_balance()</code> and <code>b.get_balance()</code> once you run <code>accounts[0].withdraw(200)</code>? What changes if you then replace <code>accounts[0]</code> with <code>b</code>? Running <a href="identity.html">identity</a> gives 800 and 500, and even after the list slot is replaced, <code>c</code> is still 800. The list slot now points to a different object; the object itself did not change.</p>
+
+<h2>2. Valid state and method contracts</h2>
+
+<h3>The balance invariant</h3>
+
+<p>An invariant is a rule that must hold right after construction and after every public operation. The account rules in this session are:</p>
+
+<ul>
+<li>The balance is a nonnegative integer in the smallest currency unit.</li>
+<li>Deposits and withdrawals accept positive integers only.</li>
+<li>A rejected operation changes nothing.</li>
+<li>The internal <code>_balance</code> changes only through the account's methods.</li>
+</ul>
+
+<p>Question to think about: if <code>amount</code> is negative and <code>balance -= amount</code> runs as is, which rule is broken?</p>
+
+<h3>Validate during initialization</h3>
+
+<pre><code>class BankAccount:
+    def __init__(self, owner, balance=0):
+        if not isinstance(owner, str) or not owner.strip():
+            raise ValueError("owner must be nonblank text")
+        if type(balance) is not int or balance &lt; 0:
+            raise ValueError("balance must be a nonnegative integer")
+        self.owner = owner.strip()
+        self._balance = balance</code></pre>
+
+<p>If invalid starting data comes in, an exception is raised before construction finishes, so an account with an invalid balance is never created at all. The caller can catch the exception, as below, and explain the error or ask for another value. If construction ends with an exception, the assignment <code>account = ...</code> does not happen either.</p>
+
+<pre><code>try:
+    account = BankAccount("Minsu", -100)
+except ValueError as error:
+    print(error)</code></pre>
+
+<p>There is a reason the code uses <code>type(balance) is not int</code> rather than <code>isinstance(balance, int)</code>. In Python, <code>bool</code> is a subclass of <code>int</code>, so <code>isinstance(True, int)</code> is True. This lesson's integer policy does not accept True as an amount, so the check requires exactly <code>int</code>. In <a href="validation.html">validation</a> you can see that a blank name, a negative balance and a True balance are all rejected, and that deposits of 0, -10, 1.5, "10" and True all return False.</p>
+
+<h3>Deposits and withdrawals that preserve the rules</h3>
+
+<pre><code>def deposit(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    self._balance += amount
+    return True
+
+def withdraw(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    if amount &gt; self._balance:
+        return False
+    self._balance -= amount
+    return True</code></pre>
+
+<p>False means "rejected and nothing changed"; True means "the balance changed by amount". The key is to validate before mutating state. A withdrawal has two kinds of failure, an invalid amount and insufficient funds, and both leave the balance unchanged. Withdrawing exactly the balance is allowed.</p>
+
+<h3>Trace state through a sequence</h3>
+
+<table>
+<thead><tr><th>Operation (starting from 1000)</th><th>Return</th><th>Balance afterward</th></tr></thead>
+<tbody>
+<tr><td><code>deposit(200)</code></td><td>True</td><td>1200</td></tr>
+<tr><td><code>withdraw(500)</code></td><td>True</td><td>700</td></tr>
+<tr><td><code>withdraw(900)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(-50)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(700)</code></td><td>True</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>Always read the return value and the new state together. <a href="state_checks.html">state_checks</a> prints exactly this table.</p>
+
+<h3>Encapsulation and public access</h3>
+
+<pre><code>def get_balance(self):
+    return self._balance</code></pre>
+
+<p><code>get_balance</code> shows the result without changing the balance. The leading underscore is an internal-use convention, so Python does not prevent <code>account._balance = -100</code>. Team code should respect the documented public interface. In the second step of <a href="state_checks.html">state_checks</a> you can see -100 actually getting in.</p>
+
+<h3>Small checks for method contracts</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+assert a.withdraw(1200) is False
+assert a.get_balance() == 1000
+assert a.withdraw(1000) is True
+assert a.get_balance() == 0</code></pre>
+
+<p>Check both the success/failure return value and the resulting state. <code>assert</code> is for checks during development; validate user input with conditionals or exceptions.</p>
+
+<h2>3. Objects that collaborate</h2>
+
+<p>The key sentence of this section is "AccountBook has accounts; SavingsAccount is an account."</p>
+
+<h3>Composition: an AccountBook holds accounts</h3>
+
+<pre><code>class AccountBook:
+    def __init__(self):
+        self._accounts = []
+
+    def add_account(self, account):
+        if account in self._accounts:
+            return False
+        self._accounts.append(account)
+        return True</code></pre>
+
+<p>Each AccountBook instance gets its own list, and that list stores references to account objects. Adding the same account again returns False.</p>
+
+<h3>The shared mutable class-attribute trap</h3>
+
+<pre><code>class BadBook:
+    accounts = []
+
+first = BadBook()
+second = BadBook()
+first.accounts.append("Minsu")
+print(second.accounts)   # ["Minsu"]</code></pre>
+
+<p>If a list is a class attribute, every instance shares that one list. Mutable state that each book should have for itself must be created inside <code>__init__</code> as <code>self._accounts</code>. <a href="shared_state.html">shared_state</a> compares the two approaches.</p>
+
+<h3>Delegate to each account</h3>
+
+<pre><code>def total_balance(self):
+    total = 0
+    for account in self._accounts:
+        total += account.get_balance()
+    return total
+
+def report(self):
+    rows = []
+    for account in self._accounts:
+        rows.append((account.owner, account.account_type(),
+                     account.get_balance()))
+    return rows</code></pre>
+
+<p>AccountBook coordinates accounts through their public methods. It does not need to read <code>account._balance</code> directly. The total of an empty book is 0. <code>report</code> returns result data instead of printing, so the caller can decide whether to print it or save it. It must not return the mutable internal account list itself.</p>
+
+<h3>Changes remain visible through references</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+book = AccountBook()
+book.add_account(a)
+a.withdraw(300)
+print(book.total_balance())   # 700</code></pre>
+
+<p><code>book</code> and <code>a</code> refer to the same account object, and the book recalculates the total from the current account state every time. A separately created empty AccountBook still has total 0. In <a href="composition.html">composition</a> you can also see that the <code>report()</code> result (a list of tuples) taken before the withdrawal still says 1000, and only a fresh call shows 700.</p>
+
+<h3>Inheritance: a specialized account</h3>
+
+<pre><code>class SavingsAccount(BankAccount):
+    def __init__(self, owner, balance=0, bonus=100):
+        super().__init__(owner, balance)
+        if type(bonus) is not int or bonus &lt;= 0:
+            raise ValueError("bonus must be a positive integer")
+        self.bonus = bonus
+
+    def add_bonus(self):
+        return self.deposit(self.bonus)</code></pre>
+
+<p>The subclass reuses the base account's validation rules through <code>super().__init__</code> and adds one operation (<code>add_bonus</code>). <code>add_bonus</code> also calls the inherited <code>deposit</code>, so it keeps the same rules.</p>
+
+<h3>Overriding one public operation</h3>
+
+<pre><code>class BankAccount:
+    def account_type(self):
+        return "Standard"
+
+class SavingsAccount(BankAccount):
+    def account_type(self):
+        return "Savings"</code></pre>
+
+<p>A shared method name provides behavior that fits each type. SavingsAccount still supports all of <code>get_balance</code>, <code>deposit</code> and <code>withdraw</code>, so one piece of calling code can use the same operations on different accounts.</p>
+
+<pre><code>accounts = [BankAccount("Minsu", 700),
+            SavingsAccount("Jisu", 600, 100)]
+for account in accounts:
+    print(account.owner, account.account_type(), account.get_balance())
+# Minsu Standard 700
+# Jisu Savings 600</code></pre>
+
+<p>In <a href="inheritance.html">inheritance</a>, check that receiving the bonus twice gives 700, and look at the output of this loop.</p>
+
+<h3>Inheritance and composition</h3>
+
+<table>
+<thead><tr><th>Relationship</th><th>Example</th><th>Responsibility</th></tr></thead>
+<tbody>
+<tr><td>Is an account (is-a)</td><td>SavingsAccount inherits BankAccount</td><td>Preserve the account contract and extend behavior</td></tr>
+<tr><td>Has accounts (has-a)</td><td>AccountBook stores account references</td><td>Coordinate a collection of accounts</td></tr>
+</tbody>
+</table>
+
+<p>AccountBook should not inherit BankAccount just to reuse <code>get_balance</code>, because a book is not an account. Also, when no object state is needed, a dictionary and functions may be enough.</p>
+
+<h3>Checkpoint</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+b = SavingsAccount("Jisu", 500, 100)
+book = AccountBook()
+book.add_account(a)
+book.add_account(b)
+a.withdraw(300)
+b.add_bonus()
+print(book.total_balance())</code></pre>
+
+<p>The total is 700 + 600 = 1300. If you then call <code>a.withdraw(900)</code>, it is rejected for insufficient funds and the total stays the same. <a href="full_demo.html">full_demo</a> prints this whole process.</p>
+
+<h2>4. Lab: complete the account model</h2>
+
+<p>After a 10-minute break, the lab runs for 30 minutes. The slides give the paths <code>9week/examples/session1/accounts.py</code> and <code>9week/labs/session1/accounts.py</code>, but in this web lab they are <code>~/week09/examples/session01-v02/</code> (the complete demo <code>07_full_demo.py</code> and <code>models.py</code>) and <code>~/week09/starter/session01-v02/accounts.py</code> (the lab file). You need Python 3.10 or later; no external packages or data downloads are required. The demo runs as is, and the lab file raises <code>NotImplementedError</code> at a TODO. The lab page is <a href="accounts_lab.html">accounts_lab</a>.</p>
+
+<h3>Lab A: preserve the balance invariant (10 minutes)</h3>
+
+<ul>
+<li>Implement <code>BankAccount.withdraw(amount)</code>.</li>
+<li>Reject nonintegers, zero, negatives and overdrafts.</li>
+<li>Under this lesson's integer policy, reject True as an amount too.</li>
+<li>Rejected calls return False and keep the old balance.</li>
+<li>Accepted calls subtract the amount and return True.</li>
+<li>Also test a withdrawal equal to the balance.</li>
+</ul>
+
+<h3>Lab B: coordinate existing objects (8 minutes)</h3>
+
+<ul>
+<li>Implement <code>AccountBook.total_balance()</code> and <code>report()</code>.</li>
+<li>Read account data through <code>get_balance()</code> and <code>account_type()</code>.</li>
+<li>Empty book: total 0, report <code>[]</code>.</li>
+<li>The report keeps the order in which accounts were added.</li>
+<li>Separate books must be independent.</li>
+<li>Change an account after adding it, then recompute the total.</li>
+</ul>
+
+<h3>Lab C: check the full demo (7 minutes)</h3>
+
+<p>When you run your completed <code>accounts.py</code>, it should print:</p>
+
+<pre><code>Withdraw: True 700
+Rejected: False 700
+Bonus: True 600
+Minsu Standard 700
+Jisu Savings 600
+Total: 1300</code></pre>
+
+<p>Compare the output and add checks for failure cases. <code>check_student.py</code> in the same folder already collects such checks, and once the three TODOs are complete it prints <code>All student checks passed</code>. Edit in the terminal with <code>nano accounts.py</code>; to submit, run <code>cp accounts.py /mnt/host/</code> and download the file from the Download box on the page. Submit <code>accounts.py</code> and a short explanation of one state trace.</p>
+
+<h2>Review and Session 2 preview</h2>
+
+<ol>
+<li>Why does <code>alias.withdraw</code> change what <code>a.get_balance()</code> returns?</li>
+<li>Why does an invalid withdrawal need a state check as well as the False return value?</li>
+<li>Why must each book create its own list in <code>__init__</code>?</li>
+<li>Which relationship uses inheritance, and which uses composition?</li>
+</ol>
+
+<p>In Session 2 you start choosing the objects, data and function contracts for your own project. Be ready to submit your completed script and explain one design choice.</p>
+</div><div lang="ko">
+<p>이번 시간에는 7주차에 배운 클래스와 객체를 바탕으로, 객체 여러 개가 함께 일하는 프로그램을 만듭니다. 예제는 은행 계좌입니다. 기본 계좌 <code>BankAccount</code>, 이를 상속해 보너스 기능을 더한 <code>SavingsAccount</code>, 그리고 계좌들을 모아 관리하는 <code>AccountBook</code>이 등장합니다. 네 가지를 익히는 것이 목표입니다. 첫째, 이름과 객체의 관계를 추적하고 인스턴스 상태가 언제 바뀌는지 설명할 수 있어야 합니다. 둘째, 생성자와 메서드가 잔액을 항상 올바른 값으로 유지하게 만듭니다. 셋째, 다른 객체를 담아 두고 사용하는 객체(합성)를 만듭니다. 넷째, 실행되는 코드를 보면서 상속과 합성을 비교합니다.</p>
+
+<p>수업은 복습 30분, 상태 규칙 20분, 객체 협력 20분, 휴식 10분, 실습 30분, 정리 10분으로 모두 120분입니다. 완성된 클래스는 <code>week09/examples/session01-v02/models.py</code>에 있고, 슬라이드의 각 부분은 같은 폴더의 번호 붙은 예제 파일로 실행해 볼 수 있습니다.</p>
+
+<h2>1. 상태와 객체의 정체성</h2>
+
+<h3>7주차 복습: 클래스, 객체, 인스턴스</h3>
+
+<p><code>a = BankAccount("Minsu", 1000)</code>, <code>b = BankAccount("Jisu", 500)</code>에서 <code>BankAccount</code>는 계좌가 어떻게 동작하는지 정의하는 클래스이고, <code>a</code>와 <code>b</code>는 서로 다른 두 계좌 객체를 가리킵니다. 두 객체는 모두 <code>BankAccount</code>의 인스턴스입니다. 객체는 만들어진 순간 이미 인스턴스이므로, 객체를 인스턴스로 바꾸는 별도의 단계는 없습니다.</p>
+
+<pre><code>class SimpleAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+account = SimpleAccount("Minsu", 1000)</code></pre>
+
+<p><code>__init__</code>은 새로 만들어진 인스턴스를 초기화합니다. <code>self</code>는 그 인스턴스를 받고, <code>owner</code>와 <code>balance</code>는 나머지 인자를 받습니다. 이 최소 예제에는 검증이 없지만, 뒤에서 보는 본 모델에는 검증이 추가됩니다.</p>
+
+<p>속성(attribute)은 상태를 저장하고, 메서드는 그 객체에 대한 동작을 나타냅니다. <code>account.deposit(200)</code> 후 <code>account.balance</code>는 1200이 됩니다.</p>
+
+<h3>클래스 변수와 인스턴스 변수</h3>
+
+<pre><code>class LabelledAccount:
+    bank_name = "Python Bank"
+    def __init__(self, owner):
+        self.owner = owner
+
+a = LabelledAccount("Minsu")
+b = LabelledAccount("Jisu")
+LabelledAccount.bank_name = "Campus Bank"
+print(a.bank_name, b.bank_name)   # Campus Bank Campus Bank</code></pre>
+
+<p><code>bank_name</code>은 클래스에 속하고 <code>owner</code>는 인스턴스마다 따로 있습니다. 클래스의 값을 바꾸면 모든 인스턴스에서 바뀐 값이 보입니다. 하지만 <code>a.bank_name = ...</code>처럼 인스턴스를 통해 대입하면 클래스 변수가 바뀌는 것이 아니라 <code>a</code>에만 같은 이름의 인스턴스 속성이 새로 생깁니다. <a href="week7_review.html">week7_review</a>에서 두 경우를 차례로 확인할 수 있습니다.</p>
+
+<h3>캡슐화와 추상화, 상속과 다형성</h3>
+
+<table>
+<thead><tr><th>원리</th><th>초점</th><th>은행 계좌 예</th></tr></thead>
+<tbody>
+<tr><td>캡슐화</td><td>관련된 상태와 규칙을 한곳에 둔다</td><td><code>_balance</code>와 검증하는 <code>deposit</code>/<code>withdraw</code></td></tr>
+<tr><td>추상화</td><td>호출하는 쪽은 안정된 공개 인터페이스만 쓴다</td><td><code>withdraw(amount)</code>가 성공/실패를 돌려준다</td></tr>
+<tr><td>상속</td><td>기존 클래스의 동작을 재사용한다</td><td><code>SavingsAccount</code>가 <code>BankAccount</code>의 동작을 재사용</td></tr>
+<tr><td>다형성</td><td>같은 호출이 객체에 따라 다르게 동작한다</td><td><code>account_type()</code>이 Standard 또는 Savings</td></tr>
+</tbody>
+</table>
+
+<p>메서드 하나가 캡슐화와 추상화를 동시에 뒷받침할 수 있습니다. <code>_balance</code>의 밑줄은 내부용이라는 관례일 뿐 접근을 막는 장치가 아니며, 추상화를 하려고 꼭 추상 기반 클래스를 만들어야 하는 것도 아닙니다.</p>
+
+<p>복습 질문: Minsu의 계좌는 객체인가요, 인스턴스인가요, 둘 다인가요? <code>__init__</code>은 무엇을 초기화하고 <code>self</code>는 누가 받나요? <code>bank_name</code>과 <code>owner</code> 중 인스턴스마다 다른 것은? 잔액을 바꾸는 규칙을 잔액 곁에 두는 원리는? 한 호출 코드가 서로 다른 계좌 구현을 쓸 수 있게 하는 원리는? 짝과 먼저 답한 뒤, 코드 한 줄로 근거를 대 봅니다.</p>
+
+<h3>메서드 호출과 self</h3>
+
+<pre><code>a.deposit(200)
+BankAccount.deposit(a, 200)</code></pre>
+
+<p>두 형태는 모두 <code>a</code>를 <code>self</code>로 넘깁니다. 입금을 한 번만 하려면 둘 중 하나만 실행해야 합니다. <code>self</code>는 관례적인 매개변수 이름이지 파이썬 키워드가 아니며, 메서드는 <code>self</code>를 통해 그 인스턴스를 읽고 바꿉니다. 같은 <code>deposit</code> 메서드라도 <code>self</code>로 넘어온 객체만 바꾸므로, <code>a.deposit(200)</code> 후에도 <code>b</code>의 잔액은 500 그대로입니다.</p>
+
+<h3>대입은 참조를 하나 더 만든다</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+alias = a
+alias.withdraw(300)
+print(a.get_balance())   # 700
+print(alias is a)        # True</code></pre>
+
+<p>대입은 이미 있는 객체에 이름을 하나 더 붙일 뿐, 두 번째 <code>BankAccount</code>를 만들지 않습니다. 반대로 같은 값으로 클래스를 두 번 호출하면 별개의 객체 두 개가 생깁니다. 속성 값이 같아 보여도 정체성(identity)은 다르므로 <code>a is b</code>는 False이고, <code>a</code>에서 출금해도 <code>b</code>는 1000 그대로입니다.</p>
+
+<p>예측 문제: <code>c = a</code>, <code>accounts = [a, b]</code>로 만든 뒤 <code>accounts[0].withdraw(200)</code>을 하면 <code>c.get_balance()</code>와 <code>b.get_balance()</code>는 무엇일까요? 그 뒤 <code>accounts[0]</code>을 <code>b</code>로 바꾸면 무엇이 달라질까요? <a href="identity.html">identity</a>를 실행하면 800, 500이 나오고, 리스트 칸을 바꾼 뒤에도 <code>c</code>는 여전히 800입니다. 리스트의 칸이 다른 객체를 가리키게 되었을 뿐 객체 자체가 바뀐 것은 아니기 때문입니다.</p>
+
+<h2>2. 올바른 상태와 메서드 계약</h2>
+
+<h3>잔액 불변식</h3>
+
+<p>불변식(invariant)은 생성 직후와 모든 공개 동작 뒤에 항상 성립해야 하는 규칙입니다. 이 수업의 계좌 규칙은 다음과 같습니다.</p>
+
+<ul>
+<li>잔액은 가장 작은 화폐 단위의 0 이상 정수다.</li>
+<li>입금과 출금은 양의 정수만 받는다.</li>
+<li>거부된 동작은 아무것도 바꾸지 않는다.</li>
+<li>내부의 <code>_balance</code>는 계좌의 메서드를 통해서만 바뀐다.</li>
+</ul>
+
+<p>생각해 볼 질문: <code>amount</code>가 음수일 때 <code>balance -= amount</code>를 그대로 실행하면 어떤 규칙이 깨질까요?</p>
+
+<h3>생성할 때 검증하기</h3>
+
+<pre><code>class BankAccount:
+    def __init__(self, owner, balance=0):
+        if not isinstance(owner, str) or not owner.strip():
+            raise ValueError("owner must be nonblank text")
+        if type(balance) is not int or balance &lt; 0:
+            raise ValueError("balance must be a nonnegative integer")
+        self.owner = owner.strip()
+        self._balance = balance</code></pre>
+
+<p>잘못된 초기값이 들어오면 생성이 끝나기 전에 예외가 발생합니다. 그래서 잘못된 잔액을 가진 계좌는 아예 만들어지지 않습니다. 호출하는 쪽에서는 다음처럼 예외를 잡아 설명하거나 다른 값을 다시 요청할 수 있습니다. 생성이 예외로 끝나면 <code>account = ...</code> 대입도 일어나지 않습니다.</p>
+
+<pre><code>try:
+    account = BankAccount("Minsu", -100)
+except ValueError as error:
+    print(error)</code></pre>
+
+<p>여기서 <code>isinstance(balance, int)</code>가 아니라 <code>type(balance) is not int</code>를 쓴 이유가 있습니다. 파이썬의 <code>bool</code>은 <code>int</code>의 하위 클래스라서 <code>isinstance(True, int)</code>가 True입니다. 이 수업의 정수 정책에서는 True를 금액으로 받지 않으므로 정확히 <code>int</code>인지 검사합니다. <a href="validation.html">validation</a>에서 공백 이름, 음수 잔액, True 잔액이 모두 거부되고, 0, -10, 1.5, "10", True 입금이 모두 False인 것을 확인합니다.</p>
+
+<h3>규칙을 지키는 입금과 출금</h3>
+
+<pre><code>def deposit(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    self._balance += amount
+    return True
+
+def withdraw(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    if amount &gt; self._balance:
+        return False
+    self._balance -= amount
+    return True</code></pre>
+
+<p>False는 "거부되었고 아무것도 바뀌지 않았다", True는 "잔액이 amount만큼 바뀌었다"는 뜻입니다. 핵심은 상태를 바꾸기 전에 먼저 검증하는 것입니다. 출금에는 잘못된 금액과 잔액 부족이라는 두 종류의 실패가 있으며, 둘 다 잔액을 그대로 둡니다. 잔액과 정확히 같은 금액을 출금하는 것은 허용됩니다.</p>
+
+<h3>상태 추적</h3>
+
+<table>
+<thead><tr><th>동작 (시작 1000)</th><th>반환값</th><th>이후 잔액</th></tr></thead>
+<tbody>
+<tr><td><code>deposit(200)</code></td><td>True</td><td>1200</td></tr>
+<tr><td><code>withdraw(500)</code></td><td>True</td><td>700</td></tr>
+<tr><td><code>withdraw(900)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(-50)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(700)</code></td><td>True</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>반환값과 새 상태를 항상 함께 읽어야 합니다. <a href="state_checks.html">state_checks</a>가 이 표를 그대로 출력합니다.</p>
+
+<h3>캡슐화와 공개 접근</h3>
+
+<pre><code>def get_balance(self):
+    return self._balance</code></pre>
+
+<p><code>get_balance</code>는 잔액을 바꾸지 않고 결과만 보여 줍니다. 앞의 밑줄은 내부용이라는 관례이므로, 파이썬은 <code>account._balance = -100</code>을 막지 않습니다. 팀 코드에서는 문서로 정한 공개 인터페이스를 존중해야 합니다. <a href="state_checks.html">state_checks</a>의 두 번째 단계에서 실제로 -100이 들어가는 것을 볼 수 있습니다.</p>
+
+<h3>메서드 계약을 확인하는 작은 검사</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+assert a.withdraw(1200) is False
+assert a.get_balance() == 1000
+assert a.withdraw(1000) is True
+assert a.get_balance() == 0</code></pre>
+
+<p>성공/실패 반환값과 그 결과 상태를 모두 검사합니다. <code>assert</code>는 개발 중 확인용이고, 사용자 입력 검증은 조건문이나 예외로 해야 합니다.</p>
+
+<h2>3. 함께 일하는 객체</h2>
+
+<p>이 절의 핵심 문장은 "AccountBook은 계좌들을 가지고 있다(has), SavingsAccount는 계좌이다(is)"입니다.</p>
+
+<h3>합성: AccountBook이 계좌를 담는다</h3>
+
+<pre><code>class AccountBook:
+    def __init__(self):
+        self._accounts = []
+
+    def add_account(self, account):
+        if account in self._accounts:
+            return False
+        self._accounts.append(account)
+        return True</code></pre>
+
+<p>AccountBook 인스턴스마다 자기 리스트가 따로 생기고, 그 리스트에는 계좌 객체에 대한 참조가 저장됩니다. 같은 계좌를 다시 추가하면 False를 돌려줍니다.</p>
+
+<h3>변경 가능한 클래스 속성의 함정</h3>
+
+<pre><code>class BadBook:
+    accounts = []
+
+first = BadBook()
+second = BadBook()
+first.accounts.append("Minsu")
+print(second.accounts)   # ["Minsu"]</code></pre>
+
+<p>리스트를 클래스 속성으로 두면 모든 인스턴스가 리스트 하나를 함께 씁니다. 장부마다 따로 가져야 하는 변경 가능한 상태는 <code>__init__</code> 안에서 <code>self._accounts</code>로 만들어야 합니다. <a href="shared_state.html">shared_state</a>에서 두 방식을 비교합니다.</p>
+
+<h3>각 계좌에 일을 맡기기</h3>
+
+<pre><code>def total_balance(self):
+    total = 0
+    for account in self._accounts:
+        total += account.get_balance()
+    return total
+
+def report(self):
+    rows = []
+    for account in self._accounts:
+        rows.append((account.owner, account.account_type(),
+                     account.get_balance()))
+    return rows</code></pre>
+
+<p>AccountBook은 계좌의 공개 메서드를 통해 계좌들을 조정합니다. <code>account._balance</code>를 직접 읽을 필요가 없습니다. 빈 장부의 합계는 0입니다. <code>report</code>는 출력하지 않고 결과 데이터를 돌려주므로, 호출한 쪽이 출력할지 저장할지 정할 수 있습니다. 이때 내부의 변경 가능한 계좌 리스트를 그대로 돌려주면 안 됩니다.</p>
+
+<h3>참조를 통해 변화가 보인다</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+book = AccountBook()
+book.add_account(a)
+a.withdraw(300)
+print(book.total_balance())   # 700</code></pre>
+
+<p><code>book</code>과 <code>a</code>는 같은 계좌 객체를 가리키고, 장부는 합계를 현재 계좌 상태로부터 매번 다시 계산합니다. 따로 만든 빈 AccountBook의 합계는 여전히 0입니다. <a href="composition.html">composition</a>에서는 출금 전에 받아 둔 <code>report()</code> 결과(튜플 목록)는 1000 그대로이고, 다시 호출한 결과만 700으로 바뀌는 것도 확인할 수 있습니다.</p>
+
+<h3>상속: 특화된 계좌</h3>
+
+<pre><code>class SavingsAccount(BankAccount):
+    def __init__(self, owner, balance=0, bonus=100):
+        super().__init__(owner, balance)
+        if type(bonus) is not int or bonus &lt;= 0:
+            raise ValueError("bonus must be a positive integer")
+        self.bonus = bonus
+
+    def add_bonus(self):
+        return self.deposit(self.bonus)</code></pre>
+
+<p>하위 클래스는 <code>super().__init__</code>으로 기반 계좌의 검증 규칙을 재사용하고, 동작 하나(<code>add_bonus</code>)를 추가합니다. <code>add_bonus</code>도 물려받은 <code>deposit</code>을 호출하므로 같은 규칙을 지킵니다.</p>
+
+<h3>공개 동작 하나를 재정의하기</h3>
+
+<pre><code>class BankAccount:
+    def account_type(self):
+        return "Standard"
+
+class SavingsAccount(BankAccount):
+    def account_type(self):
+        return "Savings"</code></pre>
+
+<p>같은 메서드 이름이 종류에 맞는 동작을 제공합니다. SavingsAccount는 여전히 <code>get_balance</code>, <code>deposit</code>, <code>withdraw</code>를 모두 지원합니다. 그래서 하나의 호출 코드가 서로 다른 계좌에 같은 동작을 쓸 수 있습니다.</p>
+
+<pre><code>accounts = [BankAccount("Minsu", 700),
+            SavingsAccount("Jisu", 600, 100)]
+for account in accounts:
+    print(account.owner, account.account_type(), account.get_balance())
+# Minsu Standard 700
+# Jisu Savings 600</code></pre>
+
+<p><a href="inheritance.html">inheritance</a>에서 보너스를 두 번 받아 700이 되는 것과 이 반복문의 출력을 확인합니다.</p>
+
+<h3>상속과 합성 비교</h3>
+
+<table>
+<thead><tr><th>관계</th><th>예</th><th>책임</th></tr></thead>
+<tbody>
+<tr><td>계좌이다 (is-a)</td><td>SavingsAccount가 BankAccount를 상속</td><td>계좌의 계약을 지키며 동작을 확장</td></tr>
+<tr><td>계좌를 가진다 (has-a)</td><td>AccountBook이 계좌 참조를 저장</td><td>계좌 모음을 조정</td></tr>
+</tbody>
+</table>
+
+<p><code>get_balance</code>를 재사용하겠다고 AccountBook이 BankAccount를 상속해서는 안 됩니다. 장부는 계좌가 아니기 때문입니다. 또한 객체 상태가 필요 없다면 딕셔너리와 함수만으로도 충분할 수 있습니다.</p>
+
+<h3>체크포인트</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+b = SavingsAccount("Jisu", 500, 100)
+book = AccountBook()
+book.add_account(a)
+book.add_account(b)
+a.withdraw(300)
+b.add_bonus()
+print(book.total_balance())</code></pre>
+
+<p>합계는 700 + 600 = 1300입니다. 이어서 <code>a.withdraw(900)</code>을 호출하면 잔액 부족으로 거부되어 합계는 그대로입니다. <a href="full_demo.html">full_demo</a>가 이 과정 전체를 출력합니다.</p>
+
+<h2>4. 실습: 계좌 모델 완성하기</h2>
+
+<p>10분 휴식 후 30분 동안 실습합니다. 슬라이드의 경로는 <code>9week/examples/session1/accounts.py</code>와 <code>9week/labs/session1/accounts.py</code>이지만, 이 웹 실습에서는 각각 <code>~/week09/examples/session01-v02/</code>(완성 데모 <code>07_full_demo.py</code>와 <code>models.py</code>)와 <code>~/week09/starter/session01-v02/accounts.py</code>(실습 파일)입니다. Python 3.10 이상, 외부 패키지나 데이터 다운로드는 필요 없습니다. 데모는 그대로 실행되고, 실습 파일은 TODO에서 <code>NotImplementedError</code>를 일으킵니다. 실습 페이지는 <a href="accounts_lab.html">accounts_lab</a>입니다.</p>
+
+<h3>실습 A: 잔액 불변식 지키기 (10분)</h3>
+
+<ul>
+<li><code>BankAccount.withdraw(amount)</code>를 구현한다.</li>
+<li>정수가 아닌 값, 0, 음수, 잔액 초과를 거부한다.</li>
+<li>이 수업의 정수 정책에 따라 True도 금액으로 받지 않는다.</li>
+<li>거부한 호출은 False를 돌려주고 이전 잔액을 유지한다.</li>
+<li>받아들인 호출은 금액을 빼고 True를 돌려준다.</li>
+<li>잔액과 같은 금액의 출금도 시험해 본다.</li>
+</ul>
+
+<h3>실습 B: 기존 객체 조정하기 (8분)</h3>
+
+<ul>
+<li><code>AccountBook.total_balance()</code>와 <code>report()</code>를 구현한다.</li>
+<li>계좌 데이터는 <code>get_balance()</code>와 <code>account_type()</code>으로 읽는다.</li>
+<li>빈 장부: 합계 0, 보고서 <code>[]</code>.</li>
+<li>보고서는 추가한 순서를 유지한다.</li>
+<li>서로 다른 장부는 독립적이어야 한다.</li>
+<li>계좌를 추가한 뒤 계좌를 바꾸고 합계를 다시 계산해 본다.</li>
+</ul>
+
+<h3>실습 C: 전체 데모 확인 (7분)</h3>
+
+<p>완성한 <code>accounts.py</code>를 실행하면 다음과 같이 나와야 합니다.</p>
+
+<pre><code>Withdraw: True 700
+Rejected: False 700
+Bonus: True 600
+Minsu Standard 700
+Jisu Savings 600
+Total: 1300</code></pre>
+
+<p>출력을 비교하고 실패 경우에 대한 검사를 더해 봅니다. 같은 폴더의 <code>check_student.py</code>가 그런 검사를 미리 모아 둔 파일이며, 세 TODO를 완성하면 <code>All student checks passed</code>가 출력됩니다. 편집은 터미널에서 <code>nano accounts.py</code>로 하고, 제출할 파일은 <code>cp accounts.py /mnt/host/</code> 후 페이지의 받기 상자로 내려받습니다. 제출물은 <code>accounts.py</code>와 상태 추적 하나에 대한 짧은 설명입니다.</p>
+
+<h2>정리와 2차시 예고</h2>
+
+<ol>
+<li>왜 <code>alias.withdraw</code>가 <code>a.get_balance()</code>의 결과를 바꾸나요?</li>
+<li>잘못된 출금에서 False 반환뿐 아니라 상태 검사도 필요한 이유는?</li>
+<li>왜 장부마다 <code>__init__</code>에서 자기 리스트를 만들어야 하나요?</li>
+<li>어떤 관계가 상속이고, 어떤 관계가 합성인가요?</li>
+</ol>
+
+<p>2차시에서는 각자의 프로젝트에서 사용할 객체, 데이터, 함수 계약을 고르기 시작합니다. 완성한 스크립트를 제출하고 설계 선택 하나를 설명할 수 있도록 준비합니다.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>

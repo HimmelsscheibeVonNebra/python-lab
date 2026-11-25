@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="queries — SQLite: Your First Database · Python Lab" data-title-ko="queries — SQLite: 첫 데이터베이스 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>queries — SQLite: Your First Database · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week13/examples/sqlite_lab">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 13 · Session 1</span><span lang="ko">13주차 1차시</span></a><span class="sep">/</span><span>queries</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>queries</h1>
+    <p><span lang="en">The starter file for the five-questions lab. Only Q1 (names and closing prices of KOSPI stocks, ordered by code) is written; Q2 to Q5 are only questions in comments. Run the SELECT examples from the slides to gather what you need for Q2 to Q5. Every value from outside goes in through a ? placeholder.</span><span lang="ko">질문 다섯 개 실습의 시작 파일이다. Q1(KOSPI 종목의 이름과 종가, 코드순)만 작성되어 있고 Q2~Q5는 주석으로 질문만 있다. 슬라이드의 SELECT 예제를 실행해 보며 Q2~Q5를 쓸 재료를 모은다. 바깥에서 온 값은 모두 ? 자리표시자로 넘긴다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week13/examples/sqlite_lab</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week13/examples/sqlite_lab</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="[ -f market.db ] || python3 create_db.py; python3 queries.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: [ -f market.db ] || python3 create_db.py; python3 queries.py">▶</button><code>[ -f market.db ] || python3 create_db.py; python3 queries.py</code></div>
+          <p><span lang="en">Under Q1 KOSPI stocks you get ('SK하이닉스', 198000), ('삼성전자', 71400), ('NAVER', 200000). The order is not by name but ORDER BY code (000660, 005930, 035420). &quot;KOSPI&quot; is passed not inside the SQL string but as the tuple (&quot;KOSPI&quot;,).</span><span lang="ko">Q1 KOSPI stocks 아래에 ('SK하이닉스', 198000), ('삼성전자', 71400), ('NAVER', 200000)이 나온다. 이름순이 아니라 ORDER BY code(000660, 005930, 035420) 순서다. &quot;KOSPI&quot;는 SQL 문자열 안이 아니라 (&quot;KOSPI&quot;,) 튜플로 전달된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT code, name, close FROM quotes&quot;), sep=&quot;\n&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT code, name, close FROM quotes&quot;), sep=&quot;\n&quot;)'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT code, name, close FROM quotes&quot;), sep=&quot;\n&quot;)'</code></div>
+          <p><span lang="en">SELECT picks the columns. Each row comes back as one tuple in the order of the columns you asked for. Without ORDER BY, no order is promised (right now it just happens to look like insertion order).</span><span lang="ko">SELECT는 열을 고른다. 행마다 요청한 열 순서의 튜플 하나가 돌아온다. ORDER BY가 없으면 순서는 보장되지 않는다(지금은 넣은 순서로 보일 뿐이다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(con.execute(&quot;SELECT name, close FROM quotes WHERE market = ? AND close &gt;= ?&quot;, (&quot;KOSDAQ&quot;, 50000)).fetchall())'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(con.execute(&quot;SELECT name, close FROM quotes WHERE market = ? AND close &gt;= ?&quot;, (&quot;KOSDAQ&quot;, 50000)).fetchall())'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(con.execute(&quot;SELECT name, close FROM quotes WHERE market = ? AND close &gt;= ?&quot;, (&quot;KOSDAQ&quot;, 50000)).fetchall())'</code></div>
+          <p><span lang="en">WHERE picks the rows. = compares, and AND combines conditions. The only result is [('에코프로비엠', 103000)]. JYP Ent. is also on KOSDAQ, but its close of 49000 is less than 50000. close is INTEGER, so the comparison is numeric.</span><span lang="ko">WHERE는 행을 고른다. 비교는 =이고 AND로 조건을 묶는다. 결과는 [('에코프로비엠', 103000)]뿐이다. JYP Ent.도 KOSDAQ이지만 종가 49000이 50000보다 작다. close가 INTEGER라서 숫자로 비교된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT name, volume FROM quotes ORDER BY volume DESC LIMIT 3&quot;), sep=&quot;\n&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT name, volume FROM quotes ORDER BY volume DESC LIMIT 3&quot;), sep=&quot;\n&quot;)'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); print(*con.execute(&quot;SELECT name, volume FROM quotes ORDER BY volume DESC LIMIT 3&quot;), sep=&quot;\n&quot;)'</code></div>
+          <p><span lang="en">ORDER BY volume DESC sorts largest first and LIMIT 3 keeps only the first three rows: 삼성전자 1000000, SK하이닉스 500000, NAVER 300000. If there are ties, give a second sort column, as in ORDER BY volume DESC, code.</span><span lang="ko">ORDER BY volume DESC로 큰 값부터 정렬하고 LIMIT 3으로 앞의 세 행만 남긴다: 삼성전자 1000000, SK하이닉스 500000, NAVER 300000. 동점이 있으면 ORDER BY volume DESC, code처럼 둘째 기준을 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); q = &quot;SELECT name, (close - previous_close) * 100.0 / previous_close AS change_pct FROM quotes ORDER BY change_pct DESC, code&quot;; print(*[f&quot;{pct:+5.1f}% {name}&quot; for name, pct in con.execute(q)], sep=&quot;\n&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); q = &quot;SELECT name, (close - previous_close) * 100.0 / previous_close AS change_pct FROM quotes ORDER BY change_pct DESC, code&quot;; print(*[f&quot;{pct:+5.1f}% {name}&quot; for name, pct in con.execute(q)], sep=&quot;\n&quot;)'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); q = &quot;SELECT name, (close - previous_close) * 100.0 / previous_close AS change_pct FROM quotes ORDER BY change_pct DESC, code&quot;; print(*[f&quot;{pct:+5.1f}% {name}&quot; for name, pct in con.execute(q)], sep=&quot;\n&quot;)'</code></div>
+          <p><span lang="en">Inside SELECT, compute the same formula as change_pct() in logic.py, name it with AS and use it in ORDER BY. The output runs from +3.0% 에코프로비엠 to -2.0% JYP Ent. Each row is unpacked into two variables, name and pct.</span><span lang="ko">SELECT 안에서 logic.py의 change_pct()와 같은 식을 계산하고 AS로 이름을 붙여 ORDER BY에 쓴다. +3.0% 에코프로비엠부터 -2.0% JYP Ent.까지 나온다. 각 행을 name, pct 두 변수로 풀어 받았다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;:memory:&quot;); print(con.execute(&quot;SELECT 7 / 2, 7 * 1.0 / 2, (71400 - 70000) / 70000&quot;).fetchone())'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;:memory:&quot;); print(con.execute(&quot;SELECT 7 / 2, 7 * 1.0 / 2, (71400 - 70000) / 70000&quot;).fetchone())'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;:memory:&quot;); print(con.execute(&quot;SELECT 7 / 2, 7 * 1.0 / 2, (71400 - 70000) / 70000&quot;).fetchone())'</code></div>
+          <p><span lang="en">Trap: in SQL, integer / integer drops the decimals. 7 / 2 is 3, 7 * 1.0 / 2 is 3.5, and (71400 - 70000) / 70000, without multiplying by 100.0 first, becomes 0. &quot;:memory:&quot; is a temporary database with no file.</span><span lang="ko">함정: SQL에서 정수 / 정수는 소수점을 버린다. 7 / 2는 3, 7 * 1.0 / 2는 3.5이고, 100.0을 먼저 곱하지 않은 (71400 - 70000) / 70000은 0이 된다. &quot;:memory:&quot;는 파일이 없는 임시 데이터베이스다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c &quot;import sqlite3; con = sqlite3.connect('market.db'); market = \&quot;KOSPI' OR '1'='1\&quot;; bad = f\&quot;SELECT COUNT(*) FROM quotes WHERE market = '{market}'\&quot;; print(bad); print(con.execute(bad).fetchone()); print(con.execute('SELECT COUNT(*) FROM quotes WHERE market = ?', (market,)).fetchone())&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c &quot;import sqlite3; con = sqlite3.connect('market.db'); market = \&quot;KOSPI' OR '1'='1\&quot;; bad = f\&quot;SELECT COUNT(*) FROM quotes WHERE market = '{market}'\&quot;; print(bad); print(con.execute(bad).fetchone()); print(con.execute('SELECT COUNT(*) FROM quotes WHERE market = ?', (market,)).fetchone())&quot;">▶</button><code>python3 -c &quot;import sqlite3; con = sqlite3.connect('market.db'); market = \&quot;KOSPI' OR '1'='1\&quot;; bad = f\&quot;SELECT COUNT(*) FROM quotes WHERE market = '{market}'\&quot;; print(bad); print(con.execute(bad).fetchone()); print(con.execute('SELECT COUNT(*) FROM quotes WHERE market = ?', (market,)).fetchone())&quot;</code></div>
+          <p><span lang="en">SQL injection: an f-string pastes the input into the SQL text, so the quote inside the input rewrites the condition into OR '1'='1'. Reading the printed SQL shows why you get (5,), that is, every row. With ?, the input is only ever a value, and there is no market with that name, so the result is (0,).</span><span lang="ko">SQL 인젝션: f-string은 입력을 SQL 문장 안에 붙여 넣으므로 입력 속 따옴표가 조건을 OR '1'='1'로 바꿔 쓴다. 출력된 SQL을 읽어 보면 (5,), 즉 모든 행이 나온 이유가 보인다. ? 를 쓰면 입력은 언제나 값일 뿐이어서 그런 시장 이름은 없으므로 (0,)이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); con.row_factory = sqlite3.Row; row = con.execute(&quot;SELECT * FROM quotes WHERE code = ?&quot;, (&quot;005930&quot;,)).fetchone(); print(row[&quot;name&quot;], row[&quot;close&quot;]); quote = dict(row); print(type(quote[&quot;close&quot;]), quote[&quot;code&quot;])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); con.row_factory = sqlite3.Row; row = con.execute(&quot;SELECT * FROM quotes WHERE code = ?&quot;, (&quot;005930&quot;,)).fetchone(); print(row[&quot;name&quot;], row[&quot;close&quot;]); quote = dict(row); print(type(quote[&quot;close&quot;]), quote[&quot;code&quot;])'">▶</button><code>python3 -c 'import sqlite3; con = sqlite3.connect(&quot;market.db&quot;); con.row_factory = sqlite3.Row; row = con.execute(&quot;SELECT * FROM quotes WHERE code = ?&quot;, (&quot;005930&quot;,)).fetchone(); print(row[&quot;name&quot;], row[&quot;close&quot;]); quote = dict(row); print(type(quote[&quot;close&quot;]), quote[&quot;code&quot;])'</code></div>
+          <p><span lang="en">With sqlite3.Row you get values by column name, as in row[&quot;close&quot;] instead of row[2]. You get 삼성전자 71400, and in dict(row) the price is already &lt;class 'int'&gt; while the code stays 005930. This dict is exactly the shape logic.py expects (Session 2).</span><span lang="ko">sqlite3.Row를 쓰면 row[2] 대신 row[&quot;close&quot;]처럼 열 이름으로 꺼낸다. 삼성전자 71400, 그리고 dict(row)의 가격은 이미 &lt;class 'int'&gt;, 코드는 005930 그대로다. 이 dict가 logic.py가 받는 바로 그 모양이다(2차시).</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Write Q2 to Q5 yourself with nano queries.py and check them with python3 queries.py. Q5 reads a code with input(), so you can also test it by piping input, as in printf '005930\n' | python3 queries.py. A one-value tuple such as (code,) needs the comma.</span><span lang="ko">Q2~Q5는 nano queries.py로 직접 작성하고 python3 queries.py로 확인한다. Q5는 input()으로 코드를 받으므로 printf '005930\n' | python3 queries.py처럼 입력을 파이프로 넣어 시험할 수도 있다. (code,)처럼 값이 하나인 튜플에는 쉼표가 필요하다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>queries.py <span class="muted"><span lang="en">45 lines</span><span lang="ko">45줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Week 13 Session 1 lab: answer five questions with SELECT.</span>
+<span class="ln"> </span>
+<span class="ln">Run create_db.py first, then: python3 queries.py</span>
+<span class="ln">Q1 is done. Write Q2-Q5. Every value that comes from outside the</span>
+<span class="ln">program goes through a ? placeholder, never into the SQL string.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def show(title, rows):</span>
+<span class="ln">    print(title)</span>
+<span class="ln">    for row in rows:</span>
+<span class="ln">        print(&quot;  &quot;, tuple(row))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    con = sqlite3.connect(BASE / &quot;market.db&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">    # Q1 (example): name and close of every KOSPI stock, by code.</span>
+<span class="ln">    q1 = &quot;&quot;&quot;</span>
+<span class="ln">        SELECT name, close FROM quotes</span>
+<span class="ln">        WHERE market = ?</span>
+<span class="ln">        ORDER BY code</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    show(&quot;Q1 KOSPI stocks&quot;, con.execute(q1, (&quot;KOSPI&quot;,)))</span>
+<span class="ln"> </span>
+<span class="ln">    # Q2: name and volume of stocks with volume &gt;= 300000,</span>
+<span class="ln">    #     largest volume first.</span>
+<span class="ln"> </span>
+<span class="ln">    # Q3: the top 2 gainers: name and change_pct (percent).</span>
+<span class="ln">    #     change_pct = (close - previous_close) * 100.0 / previous_close</span>
+<span class="ln"> </span>
+<span class="ln">    # Q4: how many stocks closed lower than the previous close?</span>
+<span class="ln"> </span>
+<span class="ln">    # Q5: ask for a stock code with input() and print that row,</span>
+<span class="ln">    #     or &quot;not found&quot;. Use a ? placeholder.</span>
+<span class="ln"> </span>
+<span class="ln">    con.close()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>schema.sql <span class="muted"><span lang="en">13 lines</span><span lang="ko">13줄</span></span></summary>
+      <pre class="code"><code><span class="ln">CREATE TABLE IF NOT EXISTS quotes (</span>
+<span class="ln">    date   TEXT NOT NULL,</span>
+<span class="ln">    code   TEXT NOT NULL,</span>
+<span class="ln">    name   TEXT NOT NULL,</span>
+<span class="ln">    market TEXT NOT NULL,</span>
+<span class="ln">    previous_close INTEGER NOT NULL</span>
+<span class="ln">        CHECK (previous_close &gt; 0),</span>
+<span class="ln">    close  INTEGER NOT NULL</span>
+<span class="ln">        CHECK (close &gt; 0),</span>
+<span class="ln">    volume INTEGER NOT NULL</span>
+<span class="ln">        CHECK (volume &gt;= 0),</span>
+<span class="ln">    PRIMARY KEY (date, code)</span>
+<span class="ln">);</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week13/labs/session1/sqlite-queries.md <span class="muted"><span lang="en">44 lines</span><span lang="ko">44줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 13주차 1차 실습 — 질문 다섯 개</span>
+<span class="ln"> </span>
+<span class="ln">이름 / 학번:</span>
+<span class="ln"> </span>
+<span class="ln">작업 폴더: `13week/examples/sqlite_lab` · 제출: 이 파일과 `queries.py` (`market.db`는 내지 않는다)</span>
+<span class="ln"> </span>
+<span class="ln">## A. 데이터베이스 만들기 (5분)</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">python3 create_db.py</span>
+<span class="ln">python3 queries.py</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">- `create_db.py`의 출력:</span>
+<span class="ln">- `schema.sql`에서 한 행을 구별하는 열(기본 키)은 무엇인가?</span>
+<span class="ln"> </span>
+<span class="ln">## B. 쿼리 쓰기 (15분)</span>
+<span class="ln"> </span>
+<span class="ln">`queries.py`의 Q2~Q5를 완성한다. 프로그램 밖에서 온 값은 모두 `?` 자리표시자로 넘긴다.</span>
+<span class="ln"> </span>
+<span class="ln">| 번호 | 질문 | 내가 쓴 SQL | 실행 결과 |</span>
+<span class="ln">|---|---|---|---|</span>
+<span class="ln">| Q2 | 거래량 300000 이상 종목의 이름과 거래량, 큰 순서 | | |</span>
+<span class="ln">| Q3 | 등락률 상위 2개 종목의 이름과 등락률(%) | | |</span>
+<span class="ln">| Q4 | 전일 종가보다 낮게 마감한 종목 수 | | |</span>
+<span class="ln">| Q5 | `input()`으로 받은 종목 코드의 행, 없으면 &quot;not found&quot; | | |</span>
+<span class="ln"> </span>
+<span class="ln">## C. 일부러 실패시키기 (6분)</span>
+<span class="ln"> </span>
+<span class="ln">1. 내가 정한 종목 한 행을 `INSERT`하고 `commit()`한다. 넣은 값:</span>
+<span class="ln">2. 같은 행을 한 번 더 넣는다. 오류 종류와 메시지:</span>
+<span class="ln">3. `close`를 0으로 바꿔 넣어 본다. 오류 메시지:</span>
+<span class="ln"> </span>
+<span class="ln">## D. 짝 확인 (4분)</span>
+<span class="ln"> </span>
+<span class="ln">- [ ] SQL을 f-string이나 `+`로 만든 곳이 없다.</span>
+<span class="ln">- [ ] 값을 넘길 때 튜플을 썼다(`(code,)`의 쉼표 포함).</span>
+<span class="ln">- [ ] 행을 바꾼 뒤 `commit()`을 호출했다.</span>
+<span class="ln"> </span>
+<span class="ln">확인한 사람:</span>
+<span class="ln"> </span>
+<span class="ln">## 한 문장 답</span>
+<span class="ln"> </span>
+<span class="ln">`code` 열은 왜 INTEGER가 아니라 TEXT인가?</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="create_db.html">← create_db</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

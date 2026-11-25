@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Playground · Python Lab" data-title-ko="자유 실습 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playground · Python Lab</title>
+  <script src="js/lang.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="vendor/xterm/xterm.css">
+  <script src="vendor/xterm/xterm.js"></script>
+  <script src="build/libv86.js"></script>
+</head>
+<body data-root="">
+  <div class="topbar">
+    <nav class="crumbs"><a href="index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Playground</span><span lang="ko">자유 실습</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Playground</span><span lang="ko">자유 실습</span></h1>
+    <p><span lang="en">Run code directly in the REPL, or write a <code>.py</code> file in an editor and run it. You can also upload files from your computer and run them.</span><span lang="ko">REPL에서 바로 코드를 실행하거나, 편집기로 <code>.py</code> 파일을 만들어 실행합니다. 내 컴퓨터의 파일을 올려 실행할 수도 있습니다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student</code>. The course code is in <code>week01</code> … and <code>sample</code>. Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>student</code> 사용자로 <code>/home/student</code>에서 시작합니다. 주차별 수업 코드는 <code>week01</code> …, <code>sample</code> 디렉터리에 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <details open>
+        <summary><span lang="en">01 · Getting started with Python</span><span lang="ko">01 · Python 시작하기</span></summary>
+        <p><span lang="en">Check the installed Python version and open the interactive shell (REPL).</span><span lang="ko">설치된 Python 버전을 확인하고 대화형 셸(REPL)을 열어 봅니다.</span></p>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -V" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -V">▶</button><code>python3 -V</code></div>
+          <p><span lang="en">The Python version (python is the same command)</span><span lang="ko">Python 버전 (python도 같은 명령입니다)</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3">▶</button><code>python3</code></div>
+          <p><span lang="en">The interactive shell (REPL): type code after &gt;&gt;&gt;</span><span lang="ko">대화형 셸(REPL). &gt;&gt;&gt; 뒤에 코드를 입력합니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="print(&quot;Hello, Python!&quot;)" title="Run in the terminal / 터미널에서 실행" aria-label="Run: print(&quot;Hello, Python!&quot;)">▶</button><code>print(&quot;Hello, Python!&quot;)</code></div>
+          <p><span lang="en">Run inside the REPL — the result is printed right away</span><span lang="ko">REPL 안에서 실행 — 결과가 바로 출력됩니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="[n * n for n in range(1, 11)]" title="Run in the terminal / 터미널에서 실행" aria-label="Run: [n * n for n in range(1, 11)]">▶</button><code>[n * n for n in range(1, 11)]</code></div>
+          <p><span lang="en">The value of an expression is shown even without print</span><span lang="ko">식의 값은 print 없이도 보입니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="exit()" title="Run in the terminal / 터미널에서 실행" aria-label="Run: exit()">▶</button><code>exit()</code></div>
+          <p><span lang="en">Leave the REPL (Ctrl+D works too)</span><span lang="ko">REPL 종료 (Ctrl+D도 됩니다)</span></p>
+        </li>
+      </ol>
+      </details>
+      <details>
+        <summary><span lang="en">02 · Running a script</span><span lang="ko">02 · 스크립트 실행</span></summary>
+        <p><span lang="en">Run the example files in the home directory. Their source is below.</span><span lang="ko">홈 디렉터리의 예제 파일을 실행합니다. 소스는 아래에 있습니다.</span></p>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls">▶</button><code>ls</code></div>
+          <p><span lang="en">hello.py, grades.py and the course code directories week01 …</span><span lang="ko">hello.py, grades.py와 주차별 수업 코드 디렉터리 week01 …</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 hello.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 hello.py">▶</button><code>python3 hello.py</code></div>
+          <p><span lang="en">When input() asks for your name, type it in the terminal and press Enter</span><span lang="ko">input()이 이름을 물으면 터미널에 입력하고 Enter</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 grades.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 grades.py">▶</button><code>python3 grades.py</code></div>
+          <p><span lang="en">Builds a grades file with a dictionary, a function and the csv module</span><span lang="ko">딕셔너리·함수·csv 모듈로 성적 파일을 만듭니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat grades.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat grades.csv">▶</button><code>cat grades.csv</code></div>
+          <p><span lang="en">The file the program wrote</span><span lang="ko">프로그램이 쓴 파일의 내용</span></p>
+        </li>
+      </ol>
+      </details>
+      <details>
+        <summary><span lang="en">03 · Writing code</span><span lang="ko">03 · 코드 작성하기</span></summary>
+        <p><span lang="en">Create a new file with the nano editor and run it. Save with Ctrl+O → Enter, quit with Ctrl+X. vi is also available.</span><span lang="ko">편집기 nano로 새 파일을 만들고 실행합니다. 저장은 Ctrl+O → Enter, 종료는 Ctrl+X. vi도 있습니다.</span></p>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="nano my_first.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: nano my_first.py">▶</button><code>nano my_first.py</code></div>
+          <p><span lang="en">Type your code, save, and quit</span><span lang="ko">코드를 입력하고 저장한 뒤 종료</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 my_first.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 my_first.py">▶</button><code>python3 my_first.py</code></div>
+          <p><span lang="en">On an error, read the last line of the Traceback and its line number</span><span lang="ko">오류가 나면 Traceback의 마지막 줄과 줄 번호를 확인합니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -i my_first.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -i my_first.py">▶</button><code>python3 -i my_first.py</code></div>
+          <p><span lang="en">Stay in the REPL after the run to inspect variables and functions</span><span lang="ko">실행 후 REPL에 남아 변수와 함수를 직접 확인</span></p>
+        </li>
+      </ol>
+      </details>
+      <details>
+        <summary><span lang="en">04 · Exchanging files</span><span lang="ko">04 · 파일 주고받기</span></summary>
+        <p><span lang="en">Upload .py and .csv files from your computer, run them, and download the results.</span><span lang="ko">내 컴퓨터의 .py·.csv 파일을 올려 실행하고, 결과 파일을 다시 받습니다.</span></p>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls -l /mnt/host" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls -l /mnt/host">▶</button><code>ls -l /mnt/host</code></div>
+          <p><span lang="en">Files you upload appear here</span><span lang="ko">파일 올리기로 올린 파일이 여기에 나타납니다</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cp /mnt/host/*.py ." title="Run in the terminal / 터미널에서 실행" aria-label="Run: cp /mnt/host/*.py .">▶</button><code>cp /mnt/host/*.py .</code></div>
+          <p><span lang="en">Copy them home to run, or run them in place: python3 /mnt/host/file.py</span><span lang="ko">홈 디렉터리로 복사해 실행하거나 python3 /mnt/host/파일.py로 바로 실행</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cp grades.csv /mnt/host/" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cp grades.csv /mnt/host/">▶</button><code>cp grades.csv /mnt/host/</code></div>
+          <p><span lang="en">Copy the file to /mnt/host, type its name in the box above and press Download</span><span lang="ko">받을 파일을 /mnt/host에 복사한 뒤, 위의 입력란에 이름을 적고 받기</span></p>
+        </li>
+      </ol>
+      </details>
+      <p class="callout"><span lang="en">The full standard library plus pandas, numpy, matplotlib and Flask are installed (downloaded on first import; pandas and matplotlib take 10–30 s to load). There is no network, so <code>pip install</code> does not work.</span><span lang="ko">표준 라이브러리 전체와 pandas·numpy·matplotlib·Flask가 들어 있습니다 (처음 import할 때 내려받으며, pandas·matplotlib는 10~30초 걸립니다). 네트워크가 없어 <code>pip install</code>은 할 수 없습니다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Example source</span><span lang="ko">예제 소스</span></h2>
+    <details class="source" open>
+      <summary>hello.py <span class="muted"><span lang="en">9 lines</span><span lang="ko">9줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 첫 파이썬 프로그램: python3 hello.py</span>
+<span class="ln">import platform</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;안녕하세요, Python!&quot;)</span>
+<span class="ln">print(&quot;Python&quot;, platform.python_version(), &quot;on&quot;, platform.machine())</span>
+<span class="ln"> </span>
+<span class="ln">name = input(&quot;이름을 입력하세요: &quot;)</span>
+<span class="ln">print(f&quot;반갑습니다, {name}님!&quot;)</span>
+<span class="ln">print(&quot;1부터 10까지의 합:&quot;, sum(range(1, 11)))</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>grades.py <span class="muted"><span lang="en">24 lines</span><span lang="ko">24줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 리스트, 딕셔너리, 함수, 파일 입출력 예제: python3 grades.py</span>
+<span class="ln">import csv</span>
+<span class="ln">from statistics import mean</span>
+<span class="ln"> </span>
+<span class="ln">scores = {&quot;민수&quot;: [88, 92, 79], &quot;지영&quot;: [95, 90, 98], &quot;현우&quot;: [72, 85, 80]}</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def grade(avg):</span>
+<span class="ln">    if avg &gt;= 90:</span>
+<span class="ln">        return &quot;A&quot;</span>
+<span class="ln">    if avg &gt;= 80:</span>
+<span class="ln">        return &quot;B&quot;</span>
+<span class="ln">    return &quot;C&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">with open(&quot;grades.csv&quot;, &quot;w&quot;, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:</span>
+<span class="ln">    writer = csv.writer(f)</span>
+<span class="ln">    writer.writerow([&quot;이름&quot;, &quot;평균&quot;, &quot;학점&quot;])</span>
+<span class="ln">    for name, values in scores.items():</span>
+<span class="ln">        avg = mean(values)</span>
+<span class="ln">        writer.writerow([name, f&quot;{avg:.1f}&quot;, grade(avg)])</span>
+<span class="ln">        print(f&quot;{name:4} 평균 {avg:5.1f}  학점 {grade(avg)}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;grades.csv 파일을 만들었습니다. cat grades.csv 로 확인하세요.&quot;)</span></code></pre>
+    </details>
+  </section>
+  <script src="js/lab.js"></script>
+</body>
+</html>

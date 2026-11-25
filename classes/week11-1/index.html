@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 11 · Session 1 Writing the Project Documents: Requirement, Feature, Function, UML · Python Lab" data-title-ko="11주차 1차시 프로젝트 문서 쓰기: 요구사항·기능·함수·UML · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 11 · Session 1 Writing the Project Documents: Requirement, Feature, Function, UML · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body data-root="../../">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 11 · Session 1</span><span lang="ko">11주차 1차시</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Writing the Project Documents: Requirement, Feature, Function, UML</span><span lang="ko">프로젝트 문서 쓰기: 요구사항·기능·함수·UML</span></h1>
+    <p><span lang="en">Using the study logger as the example, learn how the four documents (requirements REQ, features FEAT, function contracts FUNC and UML) describe one program from different angles. Run a skeleton that has only contracts and a version with F1 implemented, and carry out each requirement's check yourself at the keyboard.</span><span lang="ko">공부 기록기(study logger)를 예로 요구사항(REQ), 기능(FEAT), 함수 계약(FUNC), UML 네 문서가 한 프로그램을 어떻게 다른 각도에서 설명하는지 익힌다. 계약만 있는 뼈대(skeleton)와 F1이 구현된 버전을 실행하며 각 요구사항의 검사(check)를 키보드로 직접 확인한다.</span></p>
+  </header>
+  <main class="list">
+    <section>
+      <h2><span lang="en">Examples to run</span><span lang="ko">실행해 볼 예제</span></h2>
+      <ul class="cards">
+        <li><a href="study_logger_skeleton.html"><strong>study_logger_skeleton</strong><span><span lang="en">A skeleton that turns the Week 10 design document into code. Every function has a name, parameters and a docstring (the contract), but its body is raise NotImplementedError or a TODO placeholder. See how the document's function table (FUNC) became files and functions as it is.</span><span lang="ko">10주차 설계 문서를 코드로 옮긴 뼈대다. 모든 함수에 이름·매개변수·docstring(계약)은 있지만 본문은 raise NotImplementedError나 TODO 자리 표시다. 문서의 함수 표(FUNC)가 그대로 파일과 함수가 된 모습을 확인한다.</span></span></a></li>
+        <li><a href="study_logger_f1.html"><strong>study_logger_f1</strong><span><span lang="en">A version in which FEAT-01 &quot;Log one entry&quot; works end to end. main() asks for the date, course and minutes, logic.make_record() checks them, and storage.append_record() appends one row to data/study.csv. Type in the requirement document's checks REQ-01 and REQ-02 exactly as written.</span><span lang="ko">FEAT-01 &quot;한 건 기록하기&quot;가 끝까지 동작하는 버전이다. main()이 날짜·과목·분을 묻고, logic.make_record()가 검사한 뒤, storage.append_record()가 data/study.csv에 한 행을 덧붙인다. 요구사항 문서의 검사 REQ-01, REQ-02를 그대로 입력해 본다.</span></span></a></li>
+      </ul>
+    </section>
+    <article class="notes">
+<div lang="en">
+<p>In this session you write the four design documents for your project: Requirement, Feature, Function and UML. The four documents do not describe different programs; they look at <strong>the same program</strong> from four directions. The requirement answers what must hold, the feature what the user sees, the function what the code promises, and UML how they connect. Today's shared example is the study logger from Weeks 9 and 10. On the lab pages you run <a href="study_logger_skeleton.html">study_logger_skeleton</a>, a skeleton with only contracts, and <a href="study_logger_f1.html">study_logger_f1</a>, which implements F1, and carry out the documents' checks yourself.</p>
+
+<p>The session is 120 minutes with a 10-minute break in the middle. The first half covers three documents (requirement, feature, function), the second half UML and traceability, followed by a 46-minute lab in which you write the four documents for your own project.</p>
+
+<h2>Project guidance and document scope</h2>
+
+<p>The project uses only Python 3 and the standard library. Data is kept in a file and results are reported on the screen. Every project is checked on the same three points:</p>
+
+<ul>
+<li>Does it refuse bad input?</li>
+<li>Does it survive a missing file?</li>
+<li>Is the file left unchanged after a failure?</li>
+</ul>
+
+<p>The design covers the problem, the feature scope, the module structure and the data format. The four documents introduced today are a guide; the actual submission items and weights follow the syllabus.</p>
+
+<h3>The role of the four documents</h3>
+
+<table>
+<thead>
+<tr><th>Document</th><th>Question it answers</th><th>What it contains</th></tr>
+</thead>
+<tbody>
+<tr><td>DOC 1 · Requirement</td><td>What must hold?</td><td>The requirements, and a pass/fail criterion for each</td></tr>
+<tr><td>DOC 2 · Feature</td><td>What does the user do?</td><td>How to use it, and the results the user can observe</td></tr>
+<tr><td>DOC 3 · Function</td><td>Which Python function does it?</td><td>Inputs, return value and failure, as a contract</td></tr>
+<tr><td>DOC 4 · UML</td><td>How does it connect?</td><td>Module relations, the order of calls, state changes</td></tr>
+</tbody>
+</table>
+
+<h3>Linking requirements to implementation</h3>
+
+<p>A requirement is a condition to satisfy, and a feature is what the user does to satisfy it. A function is the code's promise, and a check decides whether that promise holds. UML sits under feature and function and shows the structure and flow that connect them.</p>
+
+<blockquote>Rule: use the same ID in every document. Then you can follow one requirement all the way to its code and its check.</blockquote>
+
+<h3>Shared example: the study logger</h3>
+
+<p>There are three basic features: log one entry, reload the file, and show weekly totals per course. The result report prints one line per course, largest first, or, if the entry could not be saved, "Not saved" with the reason. Its duties are to refuse bad input, leave the file unchanged on failure, and survive a missing file.</p>
+
+<pre><code>$ python3 main.py
+Date (YYYY-MM-DD): 2026-11-10
+Course: python
+Minutes: 90
+Saved.
+python   180 min
+stats     45 min</code></pre>
+
+<p>Minutes are a value the student types in. Timing sessions with a clock is an extension.</p>
+
+<h2>DOC 1 · Requirement: the specification</h2>
+
+<p>The requirement document states what must hold, for whom, and how far. Each line must be something you can judge pass or fail.</p>
+
+<ul>
+<li><strong>Purpose and scope</strong>: who has what problem, what the program solves, and where it stops.</li>
+<li><strong>Requirement items</strong>: an ID, the statement, a priority (Must, Should, Could) and a check.</li>
+<li><strong>Functional requirements</strong>: log an entry, apply the input rules, report totals, keep the data.</li>
+<li><strong>Constraints</strong>: standard library only, input checked, file unchanged on failure.</li>
+</ul>
+
+<p>Write only one condition per line. A check must be something a classmate can do at the keyboard.</p>
+
+<h3>Requirement example</h3>
+
+<table>
+<thead>
+<tr><th>ID</th><th>Statement</th><th>Priority</th><th>Check</th></tr>
+</thead>
+<tbody>
+<tr><td>REQ-01</td><td>Save one entry with a date, a course and positive minutes</td><td>Must</td><td>Enter 2026-11-10, python, 90 → one new row in study.csv</td></tr>
+<tr><td>REQ-02</td><td>Reject minutes that are not a positive whole number</td><td>Must</td><td>-30 → Not saved, file unchanged</td></tr>
+<tr><td>REQ-03</td><td>Show weekly totals per course, largest first</td><td>Must</td><td>python 90 + 90, stats 45 → python 180 printed first</td></tr>
+<tr><td>REQ-04</td><td>Keep entries between runs</td><td>Must</td><td>Run twice; the second run counts the first run's entry</td></tr>
+</tbody>
+</table>
+
+<p>Every requirement carries an observable check. No check, no requirement. The statement says <em>what</em>, not <em>how</em>: no function names and no file formats. The check must be something a classmate can try at the keyboard in a minute. The Must requirements are the MVP; Should and Could wait until the MVP runs. These checks become next session's <code>test_logic.py</code>, and the Week 12 test list.</p>
+
+<p>On the lab page <a href="study_logger_f1.html">study_logger_f1</a> you can carry out the checks for REQ-01 and REQ-02 exactly as written. Entering 2026-11-10, python, 90 adds one line to study.csv, and entering -30 prints Not saved and leaves the line count the same.</p>
+
+<h3>Matching requirements to checks</h3>
+
+<p>Give each requirement sentence an input condition and an observable result.</p>
+
+<ul>
+<li><strong>Input condition</strong>: exactly what is typed, or what the file holds before the run.</li>
+<li><strong>Observed result</strong>: what is printed, and what the file contains after the run.</li>
+</ul>
+
+<p>A check that only works if its author stands beside you and explains it is not a check yet.</p>
+
+<h2>DOC 2 · Feature: the user-facing specification</h2>
+
+<p>The feature document describes the program as the user meets it: the command, the questions (prompts), and the results that come back.</p>
+
+<pre><code>FEAT-xx  &lt;name&gt;              basic | extension
+purpose  one sentence
+usage    command, prompts, allowed values
+flow     step 1 ... step n, the normal path
+result   what the user sees on success
+errors   each failure and its message
+serves   REQ-xx, REQ-yy</code></pre>
+
+<ul>
+<li><strong>Identification</strong>: feature ID, name, purpose, and whether it is a basic feature or an extension.</li>
+<li><strong>How to use</strong>: the command, the prompts, the allowed values, the preconditions.</li>
+<li><strong>Behavior and result</strong>: the normal flow and the output the user checks.</li>
+<li><strong>Exceptions and links</strong>: bad input, failures, and the requirement IDs this feature serves.</li>
+</ul>
+
+<h3>Feature example: logging one entry</h3>
+
+<pre><code>FEAT-01  Log one entry                     basic
+purpose  record one study session
+usage    python3 main.py, then three prompts:
+         date YYYY-MM-DD, course, minutes &gt; 0
+flow     check input -&gt; build record
+         -&gt; append one row to data/study.csv
+result   "Saved."
+errors   bad minutes or empty course:
+         "Not saved: &lt;reason&gt;", file unchanged
+         data/ missing: report it, write nothing
+serves   REQ-01, REQ-02, REQ-04</code></pre>
+
+<p>The usage line is what you will actually type in the demo. Write it so that a stranger could follow it. List errors one by one, each with its message; a single line saying "handles errors" is not an error entry. The serves line is the traceability link back to the requirements.</p>
+
+<h3>A feature's normal path and error path</h3>
+
+<p>Define what the user sees on both the good day and the bad day. Both belong in the feature sheet.</p>
+
+<ul>
+<li><strong>Normal path</strong>: four steps, each with something the user can observe.</li>
+<li><strong>Input error</strong>: a sentence with the reason is printed, and nothing is written to the file.</li>
+<li><strong>File error</strong>: the cause is reported, nothing is left half-written, and the program ends cleanly.</li>
+</ul>
+
+<h2>DOC 3 · Function: Python function design</h2>
+
+<p>One function, one contract. Your Week 10 design document already has the fields.</p>
+
+<pre><code>make_record(date: str, course: str,
+            minutes_text: str) -&gt; dict
+module   logic.py       called by main()
+I/O      none           pure   yes
+returns  {"date", "course", "minutes": int}
+fails    ValueError: empty course, or
+         minutes not a whole number above 0</code></pre>
+
+<ul>
+<li><strong>Signature</strong>: name, parameters with types, return type.</li>
+<li><strong>Inputs and results</strong>: allowed values and units, what success returns, and how failure shows.</li>
+<li><strong>Where it runs</strong>: which module it is in and who calls it, and whether it uses the keyboard, a file, or neither.</li>
+<li><strong>Failure and resources</strong>: whether it raises an exception or returns None, and who opens and closes the file.</li>
+</ul>
+
+<h3>Function example: make_record()</h3>
+
+<p>Write the contract in the docstring and the body under it, then add one call that shows the promise is kept.</p>
+
+<pre><code>def make_record(date, course, minutes_text):
+    """Return {"date": str, "course": str,
+    "minutes": int}. The course is trimmed and
+    lower-cased. Raises ValueError if course is
+    empty or minutes_text is not a whole number
+    above 0.
+    """
+    course = course.strip().lower()
+    if not course:
+        raise ValueError("course must not be empty")
+    minutes = int(minutes_text)
+    if minutes &lt;= 0:
+        raise ValueError("minutes must be positive")
+    return {"date": date.strip(), "course": course,
+            "minutes": minutes}
+
+rec = make_record("2026-11-10", " Python ", "90")
+print(rec["course"], repr(rec["minutes"]))</code></pre>
+
+<pre><code>python 90</code></pre>
+
+<p>The input is three strings from <code>input()</code>. Trimming and lower-casing the course happens here and only here. <code>main()</code> calls this function before anything is written. It returns one dict, with minutes as an int. On failure it raises ValueError with a reason, and main prints Not saved and writes nothing. The real implementation is in <code>logic.py</code> of <a href="study_logger_f1.html">study_logger_f1</a> (with the minutes check split out into <code>parse_minutes()</code>), and you can run the same call on the lab page.</p>
+
+<h3>Decomposing into functions</h3>
+
+<p>Six functions, six single responsibilities, named with the verb test from Week 10.</p>
+
+<table>
+<thead>
+<tr><th>Function</th><th>Contract</th></tr>
+</thead>
+<tbody>
+<tr><td><code>parse_minutes()</code></td><td>minutes string → positive int, or ValueError</td></tr>
+<tr><td><code>make_record()</code></td><td>date, course, minutes → one record dict</td></tr>
+<tr><td><code>append_record()</code></td><td>one record → one row in data/study.csv</td></tr>
+<tr><td><code>load_records()</code></td><td>file → list of records, [] if the file is missing</td></tr>
+<tr><td><code>weekly_totals()</code></td><td>list of records → {course: minutes}</td></tr>
+<tr><td><code>format_totals()</code></td><td>totals → list of lines, largest first</td></tr>
+</tbody>
+</table>
+
+<p>Two rule functions, two file functions, one report function, and <code>main()</code>, which calls them. Every name is a verb plus a noun, and each line of the table above is one row of the contract table. If you need "and" to describe a function, split it before you write the contract.</p>
+
+<p>This table turned into code is <a href="study_logger_skeleton.html">study_logger_skeleton</a>. Every function has a name and a docstring, but the bodies are <code>raise NotImplementedError</code> or TODO. It runs (Loaded 0 records), but it does not satisfy the requirements yet.</p>
+
+<h3>Functions and modules: who does what</h3>
+
+<p>Once <code>main()</code> has asked the user, each module answers only one kind of question. None of them asks the user anything.</p>
+
+<ul>
+<li><code>main.py</code> asks, calls and prints. It holds no rules.</li>
+<li><code>logic.py</code> holds the rules and never touches the keyboard or the disk.</li>
+<li><code>storage.py</code> is the only module that opens <code>data/study.csv</code>.</li>
+<li><code>report.py</code> turns results into lines.</li>
+</ul>
+
+<h2>DOC 4 · UML: choosing a diagram by purpose</h2>
+
+<p>You do not need every diagram. Pick the one that answers your reader's question.</p>
+
+<table>
+<thead>
+<tr><th>Reader's question</th><th>Diagram</th></tr>
+</thead>
+<tbody>
+<tr><td>Who uses it, and for what?</td><td>Use case</td></tr>
+<tr><td>Which file imports which?</td><td>Module (component) diagram</td></tr>
+<tr><td>In what order do the calls happen?</td><td>Sequence diagram</td></tr>
+<tr><td>What happens to one entry?</td><td>State (or activity) diagram</td></tr>
+</tbody>
+</table>
+
+<p>The arrows in a module diagram point one way only. An activity diagram shows the steps, including the error branches.</p>
+
+<h3>Use case example</h3>
+
+<p>Draw the user and the goals the system offers: goals, not functions. There is one actor, the student, and the system boundary is the study logger. There are three goals: log an entry, review weekly totals, and find earlier entries again. Function names do not appear here; the order of calls belongs in the sequence diagram.</p>
+
+<h3>Sequence example: one run</h3>
+
+<p>Draw one run of the normal path, with time flowing from top to bottom. Every arrow is a call from your contract table. <code>main()</code> calls logic first, so nothing is written before the record is valid. Each return arrow carries one data shape: a record, a list of records, a totals dict, or a list of lines. Draw the failure path (ValueError) as a separate branch or as a second, shorter diagram.</p>
+
+<h3>State example: one entry</h3>
+
+<p>Four states and one dead end; each transition is a function from the table. Typed → checked by <code>make_record()</code> → saved by <code>append_record()</code> → counted by <code>weekly_totals()</code>. An empty course or bad minutes ends in rejected: "Not saved" is printed and nothing is written. A file error after the check is also reported, and no half-written file is left behind.</p>
+
+<h3>Traceability across documents</h3>
+
+<p>Write the requirement ID in the feature, the function, the diagram and the test, and nothing gets lost. For example, REQ-02 says what must hold (minutes that are not positive are rejected). FEAT-01 shows it to the user, <code>parse_minutes()</code> enforces it, the state diagram draws it, and TEST-02 proves it. A grader, or you in Week 14, can follow this chain in either direction.</p>
+
+<h2>Document review and demo preparation</h2>
+
+<p>Ask five questions before you say the documents are done.</p>
+
+<ol>
+<li><strong>Scope</strong>: are basic features and extensions separated, and is the MVP boundary visible?</li>
+<li><strong>Done</strong>: can each requirement be judged pass/fail by its check?</li>
+<li><strong>Consistency</strong>: do the feature sheet, the function contracts and the UML flow agree with each other?</li>
+<li><strong>Data checks</strong>: have you covered bad input, a missing file, the header row and "file unchanged on failure"?</li>
+<li><strong>Reproduction</strong>: are the setup, the run command, one normal scenario and one error scenario written down?</li>
+</ol>
+
+<h2>Lab: your four documents</h2>
+
+<p>In 46 minutes, write four short documents for your own project, using one ID scheme.</p>
+
+<ul>
+<li>A. Requirements, 12 minutes</li>
+<li>B. The feature sheet for F1, 10 minutes</li>
+<li>C. Function contracts, 10 minutes</li>
+<li>D. One UML diagram, 10 minutes</li>
+<li>Last 4 minutes: swap with a classmate and follow one REQ ID through all four documents.</li>
+</ul>
+
+<h2>Submission and next session</h2>
+
+<p>Submit the four documents today. Keep the REQ and FEAT IDs as they are; these IDs go into your commit messages, test names and README.</p>
+
+<p>Next session moves from design to running code: you make F1 work end to end on a feature branch. Bring a laptop on which your repository is cloned, <code>git status</code> is clean and <code>python3 main.py</code> runs. This web lab has no git, so do the branch and commit work on your real PC; here you only check that the code runs and passes its checks.</p>
+
+<blockquote>Rule: the Must scope is frozen. A new idea becomes a Should or Could line, not a new Must requirement.</blockquote>
+
+<h3>Reference: the GitHub homepage guides</h3>
+
+<p>In Week 11, separate "Your GitHub Homepage" guides for Intel Mac and for Windows were also handed out. They are copy-and-paste exercises to follow on your real PC: in a terminal (Terminal on Mac, PowerShell on Windows) you install Git and the GitHub CLI (<code>gh</code>) (with Homebrew on Mac, WinGet on Windows), log in with <code>gh auth login</code>, and create or clone a <code>username.github.io</code> repository. You have the agent in the Antigravity IDE build a student homepage (About Me, My Python Project, Contact) from <code>index.html</code> and <code>style.css</code>, preview it locally, then <code>git add</code>, <code>git commit</code> and <code>git push</code>, and turn on GitHub Pages from the root (/) of the main branch. For computers where installation gets stuck, the guides also describe a route in which you create the repository in the browser, add <code>index.html</code> and an empty <code>.nojekyll</code> by hand, and deploy from Settings → Pages. This process needs a network and git, so it cannot be done in this web lab's virtual machine; do it on your real PC.</p>
+</div><div lang="ko">
+<p>이번 시간에는 프로젝트의 설계 문서 네 가지를 씁니다. 요구사항(Requirement), 기능(Feature), 함수(Function), UML입니다. 네 문서는 서로 다른 프로그램을 설명하는 것이 아니라 <strong>같은 프로그램</strong>을 네 방향에서 봅니다. 요구사항은 무엇이 성립해야 하는지, 기능은 사용자가 무엇을 보는지, 함수는 코드가 무엇을 약속하는지, UML은 그것들이 어떻게 연결되는지를 답합니다. 오늘의 공통 예제는 9·10주차에 다룬 공부 기록기(study logger)이고, 실습 페이지에서는 계약만 있는 뼈대 <a href="study_logger_skeleton.html">study_logger_skeleton</a>과 F1이 구현된 <a href="study_logger_f1.html">study_logger_f1</a>을 실행하며 문서의 검사(check)를 직접 해 봅니다.</p>
+
+<p>수업은 120분이며 중간에 10분 휴식이 있습니다. 전반에 문서 세 개(요구사항·기능·함수), 후반에 UML과 추적성, 그리고 46분 동안 자기 프로젝트의 네 문서를 쓰는 실습을 합니다.</p>
+
+<h2>프로젝트 안내와 문서의 범위</h2>
+
+<p>프로젝트는 Python 3와 표준 라이브러리만 사용합니다. 데이터는 파일에 보관하고 결과는 화면에 보고합니다. 모든 프로젝트가 공통으로 확인받는 점은 세 가지입니다.</p>
+
+<ul>
+<li>잘못된 입력을 거절하는가</li>
+<li>파일이 없을 때 견디는가</li>
+<li>실패한 뒤에도 파일이 바뀌지 않고 그대로인가</li>
+</ul>
+
+<p>설계 문서는 문제, 기능 범위, 모듈 구조, 데이터 형식을 다룹니다. 오늘 소개하는 네 문서는 길잡이이며, 실제 제출 항목과 배점은 강의계획서를 따릅니다.</p>
+
+<h3>네 문서의 역할</h3>
+
+<table>
+<thead>
+<tr><th>문서</th><th>답하는 질문</th><th>담는 내용</th></tr>
+</thead>
+<tbody>
+<tr><td>DOC 1 · 요구사항</td><td>무엇이 성립해야 하는가?</td><td>요구사항과, 각각의 합격/불합격 기준</td></tr>
+<tr><td>DOC 2 · 기능</td><td>사용자는 무엇을 하는가?</td><td>사용 방법과 사용자가 관찰할 수 있는 결과</td></tr>
+<tr><td>DOC 3 · 함수</td><td>어느 파이썬 함수가 그 일을 하는가?</td><td>입력, 반환값, 실패를 계약으로</td></tr>
+<tr><td>DOC 4 · UML</td><td>어떻게 연결되는가?</td><td>모듈 관계, 호출 순서, 상태 변화</td></tr>
+</tbody>
+</table>
+
+<h3>요구사항과 구현의 연결</h3>
+
+<p>요구사항은 만족해야 할 조건이고, 기능은 그 조건을 만족시키기 위해 사용자가 하는 일입니다. 함수는 코드의 약속이고, 검사(check)는 그 약속이 지켜지는지를 판정합니다. UML은 기능과 함수 아래에서 둘을 잇는 구조와 흐름을 보여 줍니다.</p>
+
+<blockquote>규칙: 모든 문서에서 같은 ID를 씁니다. 그래야 요구사항 하나를 그 코드와 검사까지 따라갈 수 있습니다.</blockquote>
+
+<h3>공통 예제: 공부 기록기</h3>
+
+<p>기본 기능은 세 가지입니다. 한 건 기록하기, 파일 다시 읽기, 과목별 주간 합계 보여 주기. 결과 보고는 과목마다 한 줄씩 큰 값부터 출력하거나, 저장하지 못했으면 이유와 함께 "Not saved"를 출력합니다. 지켜야 할 의무는 잘못된 입력 거절, 실패 시 파일 보존, 파일이 없어도 견디기입니다.</p>
+
+<pre><code>$ python3 main.py
+Date (YYYY-MM-DD): 2026-11-10
+Course: python
+Minutes: 90
+Saved.
+python   180 min
+stats     45 min</code></pre>
+
+<p>분(minutes)은 학생이 직접 입력하는 값입니다. 시계로 시간을 재는 것은 확장 기능입니다.</p>
+
+<h2>DOC 1 · 요구사항: 명세</h2>
+
+<p>요구사항 문서는 무엇이 성립해야 하는지, 누구를 위해, 어디까지인지를 적습니다. 각 줄은 합격 또는 불합격으로 판정할 수 있어야 합니다.</p>
+
+<ul>
+<li><strong>목적과 범위</strong>: 누가 어떤 문제를 겪는지, 프로그램이 무엇을 해결하고 어디서 멈추는지.</li>
+<li><strong>요구사항 항목</strong>: ID, 문장, 우선순위(Must, Should, Could), 검사.</li>
+<li><strong>기능 요구사항</strong>: 한 건 기록, 입력 규칙 적용, 합계 보고, 데이터 보관.</li>
+<li><strong>제약</strong>: 표준 라이브러리만 사용, 입력 검사, 실패 시 파일 불변.</li>
+</ul>
+
+<p>한 줄에는 조건 하나만 씁니다. 검사는 같은 반 친구가 키보드 앞에서 할 수 있는 것이어야 합니다.</p>
+
+<h3>요구사항 예</h3>
+
+<table>
+<thead>
+<tr><th>ID</th><th>문장</th><th>우선순위</th><th>검사</th></tr>
+</thead>
+<tbody>
+<tr><td>REQ-01</td><td>날짜, 과목, 양수 분으로 한 건을 저장한다</td><td>Must</td><td>2026-11-10, python, 90 입력 → study.csv에 새 행 하나</td></tr>
+<tr><td>REQ-02</td><td>양의 정수가 아닌 분은 거절한다</td><td>Must</td><td>-30 → Not saved, 파일 불변</td></tr>
+<tr><td>REQ-03</td><td>과목별 주간 합계를 큰 값부터 보여 준다</td><td>Must</td><td>python 90 + 90, stats 45 → python 180이 먼저 출력</td></tr>
+<tr><td>REQ-04</td><td>실행과 실행 사이에 기록을 유지한다</td><td>Must</td><td>두 번 실행하면 두 번째 실행이 첫 번째 기록을 센다</td></tr>
+</tbody>
+</table>
+
+<p>모든 요구사항에는 관찰할 수 있는 검사가 붙습니다. 검사가 없으면 요구사항이 아닙니다. 문장은 <em>무엇</em>을 말하고 <em>어떻게</em>는 말하지 않습니다. 함수 이름이나 파일 형식은 쓰지 않습니다. 검사는 친구가 1분 안에 키보드로 해 볼 수 있어야 합니다. Must 요구사항이 MVP이며, Should와 Could는 MVP가 돌아간 뒤로 미룹니다. 이 검사들은 다음 차시의 <code>test_logic.py</code>가 되고, 12주차의 테스트 목록이 됩니다.</p>
+
+<p>실습 페이지 <a href="study_logger_f1.html">study_logger_f1</a>에서 REQ-01과 REQ-02의 검사를 그대로 해 볼 수 있습니다. 2026-11-10, python, 90을 넣으면 study.csv의 줄 수가 하나 늘고, -30을 넣으면 Not saved와 함께 줄 수가 그대로입니다.</p>
+
+<h3>요구사항과 검사 맞추기</h3>
+
+<p>요구사항 문장마다 입력 조건과 관찰 가능한 결과를 붙입니다.</p>
+
+<ul>
+<li><strong>입력 조건</strong>: 정확히 무엇을 입력하는지, 또는 실행 전에 파일에 무엇이 들어 있는지.</li>
+<li><strong>관찰 결과</strong>: 무엇이 출력되는지, 그리고 실행 뒤 파일에 무엇이 들어 있는지.</li>
+</ul>
+
+<p>작성자가 옆에서 설명해 줘야 할 수 있는 검사는 아직 검사가 아닙니다.</p>
+
+<h2>DOC 2 · 기능: 사용자 관점의 명세</h2>
+
+<p>기능 문서는 사용자가 만나는 프로그램을 적습니다. 명령, 질문(프롬프트), 그리고 돌아오는 결과입니다.</p>
+
+<pre><code>FEAT-xx  &lt;name&gt;              basic | extension
+purpose  one sentence
+usage    command, prompts, allowed values
+flow     step 1 ... step n, the normal path
+result   what the user sees on success
+errors   each failure and its message
+serves   REQ-xx, REQ-yy</code></pre>
+
+<ul>
+<li><strong>식별</strong>: 기능 ID, 이름, 목적, 기본 기능인지 확장 기능인지.</li>
+<li><strong>사용 방법</strong>: 명령, 프롬프트, 허용되는 값, 사전 조건.</li>
+<li><strong>동작과 결과</strong>: 정상 흐름과 사용자가 확인하는 출력.</li>
+<li><strong>예외와 연결</strong>: 잘못된 입력, 실패, 그리고 이 기능이 충족하는 요구사항 ID.</li>
+</ul>
+
+<h3>기능 예: 한 건 기록하기</h3>
+
+<pre><code>FEAT-01  Log one entry                     basic
+purpose  record one study session
+usage    python3 main.py, then three prompts:
+         date YYYY-MM-DD, course, minutes &gt; 0
+flow     check input -&gt; build record
+         -&gt; append one row to data/study.csv
+result   "Saved."
+errors   bad minutes or empty course:
+         "Not saved: &lt;reason&gt;", file unchanged
+         data/ missing: report it, write nothing
+serves   REQ-01, REQ-02, REQ-04</code></pre>
+
+<p>usage 줄은 시연에서 실제로 입력할 내용입니다. 처음 보는 사람도 따라 할 수 있게 씁니다. 오류는 하나씩, 각각의 메시지와 함께 나열합니다. "오류를 처리한다"는 한 줄은 오류 항목이 아닙니다. serves 줄은 요구사항으로 돌아가는 추적 연결입니다.</p>
+
+<h3>정상 경로와 오류 경로</h3>
+
+<p>좋은 날과 나쁜 날에 사용자가 무엇을 보는지 모두 정의합니다. 둘 다 기능 명세에 들어갑니다.</p>
+
+<ul>
+<li><strong>정상 경로</strong>: 네 단계, 각 단계마다 사용자가 관찰할 수 있는 것이 있습니다.</li>
+<li><strong>입력 오류</strong>: 이유를 담은 문장이 나오고 파일에는 아무것도 쓰지 않습니다.</li>
+<li><strong>파일 오류</strong>: 원인을 알리고, 반쯤 쓴 파일을 남기지 않으며, 프로그램은 깔끔하게 끝납니다.</li>
+</ul>
+
+<h2>DOC 3 · 함수: 파이썬 함수 설계</h2>
+
+<p>함수 하나에 계약 하나입니다. 10주차 설계 문서에 이미 항목이 있습니다.</p>
+
+<pre><code>make_record(date: str, course: str,
+            minutes_text: str) -&gt; dict
+module   logic.py       called by main()
+I/O      none           pure   yes
+returns  {"date", "course", "minutes": int}
+fails    ValueError: empty course, or
+         minutes not a whole number above 0</code></pre>
+
+<ul>
+<li><strong>시그니처</strong>: 이름, 자료형이 붙은 매개변수, 반환 자료형.</li>
+<li><strong>입력과 결과</strong>: 허용되는 값과 단위, 성공하면 무엇을 반환하는지, 실패는 어떻게 드러나는지.</li>
+<li><strong>실행 위치</strong>: 어느 모듈에 있고 누가 호출하는지, 키보드나 파일에 접근하는지 아니면 둘 다 하지 않는지.</li>
+<li><strong>실패와 자원</strong>: 예외를 던지는지 None을 반환하는지, 파일은 누가 열고 닫는지.</li>
+</ul>
+
+<h3>함수 예: make_record()</h3>
+
+<p>계약은 docstring에, 본문은 그 아래에 씁니다. 그리고 약속이 지켜지는 것을 보여 주는 호출 하나를 붙입니다.</p>
+
+<pre><code>def make_record(date, course, minutes_text):
+    """Return {"date": str, "course": str,
+    "minutes": int}. The course is trimmed and
+    lower-cased. Raises ValueError if course is
+    empty or minutes_text is not a whole number
+    above 0.
+    """
+    course = course.strip().lower()
+    if not course:
+        raise ValueError("course must not be empty")
+    minutes = int(minutes_text)
+    if minutes &lt;= 0:
+        raise ValueError("minutes must be positive")
+    return {"date": date.strip(), "course": course,
+            "minutes": minutes}
+
+rec = make_record("2026-11-10", " Python ", "90")
+print(rec["course"], repr(rec["minutes"]))</code></pre>
+
+<pre><code>python 90</code></pre>
+
+<p>입력은 <code>input()</code>에서 온 문자열 세 개입니다. 과목의 공백 제거와 소문자 변환은 여기에서만 합니다. 이 함수는 무엇이든 쓰기 전에 <code>main()</code>이 호출합니다. 반환값은 dict 하나이고 minutes는 int입니다. 실패하면 이유를 담은 ValueError를 던지고, main은 Not saved를 출력하고 아무것도 쓰지 않습니다. <a href="study_logger_f1.html">study_logger_f1</a>의 <code>logic.py</code>에 실제 구현이 있으며(분 검사는 <code>parse_minutes()</code>로 분리), 실습 페이지에서 같은 호출을 실행할 수 있습니다.</p>
+
+<h3>함수로 나누기</h3>
+
+<p>여섯 함수, 여섯 개의 단일 책임입니다. 10주차의 동사 테스트로 이름을 붙입니다.</p>
+
+<table>
+<thead>
+<tr><th>함수</th><th>계약</th></tr>
+</thead>
+<tbody>
+<tr><td><code>parse_minutes()</code></td><td>분 문자열 → 양의 int, 아니면 ValueError</td></tr>
+<tr><td><code>make_record()</code></td><td>날짜, 과목, 분 → 기록 dict 하나</td></tr>
+<tr><td><code>append_record()</code></td><td>기록 하나 → data/study.csv에 한 행</td></tr>
+<tr><td><code>load_records()</code></td><td>파일 → 기록 목록, 파일이 없으면 []</td></tr>
+<tr><td><code>weekly_totals()</code></td><td>기록 목록 → {과목: 분}</td></tr>
+<tr><td><code>format_totals()</code></td><td>합계 → 줄 목록, 큰 값부터</td></tr>
+</tbody>
+</table>
+
+<p>규칙 함수 둘, 파일 함수 둘, 보고 함수 하나, 그리고 이들을 호출하는 <code>main()</code>입니다. 이름은 모두 동사+명사이고, 위 표의 한 줄이 계약 표의 한 행입니다. 함수를 설명하는 데 "그리고"가 필요하다면, 계약을 쓰기 전에 나눕니다.</p>
+
+<p>이 표가 코드가 된 모습이 <a href="study_logger_skeleton.html">study_logger_skeleton</a>입니다. 모든 함수가 이름과 docstring을 갖추었지만 본문은 <code>raise NotImplementedError</code>나 TODO입니다. 실행하면 동작은 하지만(Loaded 0 records) 요구사항은 아직 만족하지 못합니다.</p>
+
+<h3>함수와 모듈: 누가 무엇을 하는가</h3>
+
+<p><code>main()</code>이 사용자에게 묻고 나면, 각 모듈은 한 종류의 질문에만 답합니다. 그중 어느 모듈도 사용자에게 무언가를 묻지 않습니다.</p>
+
+<ul>
+<li><code>main.py</code>는 묻고, 호출하고, 출력합니다. 규칙은 갖지 않습니다.</li>
+<li><code>logic.py</code>는 규칙을 갖고, 키보드나 디스크를 절대 건드리지 않습니다.</li>
+<li><code>storage.py</code>는 <code>data/study.csv</code>를 여는 유일한 모듈입니다.</li>
+<li><code>report.py</code>는 결과를 줄로 바꿉니다.</li>
+</ul>
+
+<h2>DOC 4 · UML: 목적에 따라 다이어그램 고르기</h2>
+
+<p>모든 다이어그램이 필요하지는 않습니다. 읽는 사람의 질문에 답하는 다이어그램 하나를 고릅니다.</p>
+
+<table>
+<thead>
+<tr><th>읽는 사람의 질문</th><th>다이어그램</th></tr>
+</thead>
+<tbody>
+<tr><td>누가 무엇을 위해 쓰는가?</td><td>유스케이스</td></tr>
+<tr><td>어느 파일이 어느 파일을 import하는가?</td><td>모듈(컴포넌트) 다이어그램</td></tr>
+<tr><td>호출은 어떤 순서로 일어나는가?</td><td>시퀀스 다이어그램</td></tr>
+<tr><td>기록 하나에 무슨 일이 일어나는가?</td><td>상태(또는 활동) 다이어그램</td></tr>
+</tbody>
+</table>
+
+<p>모듈 다이어그램의 화살표는 한 방향만 가리킵니다. 활동 다이어그램은 오류 분기를 포함한 단계를 보여 줍니다.</p>
+
+<h3>유스케이스 예</h3>
+
+<p>사용자와, 시스템이 제공하는 목표를 그립니다. 함수가 아니라 목표입니다. 행위자(actor)는 학생 한 명이고, 시스템 경계는 공부 기록기입니다. 목표는 세 가지입니다. 한 건 기록하기, 주간 합계 보기, 예전 기록 다시 찾기. 함수 이름은 여기에 나오지 않습니다. 호출 순서는 시퀀스 다이어그램의 몫입니다.</p>
+
+<h3>시퀀스 예: 한 번의 실행</h3>
+
+<p>정상 경로의 한 번 실행을, 시간이 위에서 아래로 흐르게 그립니다. 모든 화살표는 계약 표에 있는 호출입니다. <code>main()</code>은 logic을 먼저 호출하므로, 기록이 유효해지기 전에는 아무것도 쓰이지 않습니다. 돌아오는 화살표마다 데이터 모양 하나를 나릅니다. 기록, 기록 목록, 합계 dict, 줄 목록입니다. 실패 경로(ValueError)는 별도의 분기로 그리거나, 더 짧은 두 번째 다이어그램으로 그립니다.</p>
+
+<h3>상태 예: 기록 하나</h3>
+
+<p>상태 넷과 막다른 길 하나입니다. 각 전이는 표에 있는 함수입니다. 입력됨(typed) → <code>make_record()</code>가 검사함(checked) → <code>append_record()</code>가 저장함(saved) → <code>weekly_totals()</code>가 셈(counted). 빈 과목이나 잘못된 분이면 거절됨(rejected)으로 끝나고 "Not saved"가 나오며 아무것도 쓰이지 않습니다. 검사를 통과한 뒤에 파일 오류가 나도 보고하고, 반쯤 쓴 파일은 남기지 않습니다.</p>
+
+<h3>문서 간 추적성</h3>
+
+<p>요구사항 ID를 기능, 함수, 다이어그램, 테스트에 모두 적으면 아무것도 잃어버리지 않습니다. 예를 들어 REQ-02는 무엇이 성립해야 하는지(양수가 아닌 분은 거절)를 말합니다. FEAT-01은 그것을 사용자에게 보여 주고, <code>parse_minutes()</code>가 강제하고, 상태 다이어그램이 그리고, TEST-02가 증명합니다. 채점자나 14주차의 내가 이 사슬을 어느 방향으로든 따라갈 수 있습니다.</p>
+
+<h2>문서 검토와 시연 준비</h2>
+
+<p>문서를 끝냈다고 말하기 전에 다섯 가지를 묻습니다.</p>
+
+<ol>
+<li><strong>범위</strong>: 기본 기능과 확장 기능이 나뉘어 있고, MVP의 경계선이 보이는가?</li>
+<li><strong>완료</strong>: 각 요구사항을 그 검사로 합격/불합격 판정할 수 있는가?</li>
+<li><strong>일관성</strong>: 기능 명세, 함수 계약, UML 흐름이 서로 맞는가?</li>
+<li><strong>데이터 검사</strong>: 잘못된 입력, 파일 없음, 헤더 행, "실패 시 파일 불변"을 다루었는가?</li>
+<li><strong>재현</strong>: 준비 과정, 실행 명령, 정상 시나리오 하나와 오류 시나리오 하나가 적혀 있는가?</li>
+</ol>
+
+<h2>실습: 나의 네 문서</h2>
+
+<p>46분 동안 자기 프로젝트의 짧은 문서 네 개를 하나의 ID 체계로 씁니다.</p>
+
+<ul>
+<li>A. 요구사항, 12분</li>
+<li>B. F1의 기능 명세, 10분</li>
+<li>C. 함수 계약, 10분</li>
+<li>D. UML 다이어그램 하나, 10분</li>
+<li>마지막 4분: 친구와 바꿔서 REQ ID 하나를 네 문서 전체에서 따라가 봅니다.</li>
+</ul>
+
+<h2>제출과 다음 차시</h2>
+
+<p>작성한 네 문서는 오늘 제출합니다. REQ와 FEAT ID는 그대로 유지합니다. 이 ID들은 커밋 메시지, 테스트 이름, README에 들어갑니다.</p>
+
+<p>다음 차시는 설계에서 실행되는 코드로 넘어갑니다. F1이 기능 브랜치에서 처음부터 끝까지 동작하게 만듭니다. 저장소가 클론되어 있고 <code>git status</code>가 깨끗하며 <code>python3 main.py</code>가 실행되는 노트북을 가져옵니다. 이 웹 실습에는 git이 없으므로, 브랜치·커밋 작업은 실제 PC에서 하고 여기서는 코드 실행과 검사만 확인합니다.</p>
+
+<blockquote>규칙: Must 범위는 동결합니다. 새 아이디어는 새 Must 요구사항이 아니라 Should나 Could 줄이 됩니다.</blockquote>
+
+<h3>참고: GitHub 홈페이지 만들기 안내</h3>
+
+<p>11주차에는 별도 자료로 Intel Mac용과 Windows용 "Your GitHub Homepage" 안내가 함께 배포되었습니다. 실제 PC에서 따라 하는 복사·붙여넣기 실습으로, 터미널(Mac은 Terminal, Windows는 PowerShell)에서 Git과 GitHub CLI(<code>gh</code>)를 설치하고(Mac은 Homebrew, Windows는 WinGet), <code>gh auth login</code>으로 로그인한 뒤 <code>사용자이름.github.io</code> 저장소를 만들거나 클론합니다. Antigravity IDE의 에이전트에게 <code>index.html</code>과 <code>style.css</code>로 된 학생 홈페이지(About Me, My Python Project, Contact)를 만들게 하고, 로컬에서 미리 본 뒤 <code>git add</code>, <code>git commit</code>, <code>git push</code>하고 GitHub Pages를 main 브랜치의 루트(/)로 켭니다. 설치가 막히는 컴퓨터를 위해 브라우저에서 저장소를 만들고 <code>index.html</code>과 빈 <code>.nojekyll</code>을 직접 추가한 다음 Settings → Pages에서 배포하는 경로도 안내되어 있습니다. 이 과정은 네트워크와 git이 필요하므로 이 웹 실습의 가상 머신에서는 할 수 없고, 실제 PC에서 진행합니다.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>

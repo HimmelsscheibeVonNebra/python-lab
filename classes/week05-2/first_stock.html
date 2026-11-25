@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="first_stock — pandas: Series and DataFrame · Python Lab" data-title-ko="first_stock — pandas: Series와 DataFrame · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>first_stock — pandas: Series and DataFrame · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week05/starter/session2">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 5 · Session 2</span><span lang="ko">5주차 2차시</span></a><span class="sep">/</span><span>first_stock</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>first_stock</h1>
+    <p><span lang="en">Practice 1. From a Series of CODE's closing prices indexed by weekday (Mon–Fri), print the mean, the high, the number of days that closed above the buy price of 10000, and the weekday and close of each such day.</span><span lang="ko">Practice 1. 요일(Mon–Fri)을 index로 가진 CODE의 종가 Series에서 평균, 최고가, 매수가 10000보다 높은 날의 수, 그리고 그런 날의 요일과 종가를 출력한다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week05/starter/session2</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week05/starter/session2</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 first_stock.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 first_stock.py; echo &quot;exit=$?&quot;">▶</button><code>python3 first_stock.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter only builds the Series, so after waiting while pandas loads it prints nothing and ends with exit=0.</span><span lang="ko">스타터는 Series를 만들기만 하므로 pandas를 불러오는 동안 기다린 뒤 아무것도 출력하지 않고 exit=0으로 끝난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/first_stock.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/first_stock.py">▶</button><code>python3 ../../solutions/session2/first_stock.py</code></div>
+          <p><span lang="en">Finished version: Mean: 10260.0, High: 10800, Above buy (10000): 3, followed by the winning days Tue 10200, Thu 10500, Fri 10800. closes[closes &gt; 10000] keeps only the days where the mask is True.</span><span lang="ko">완성본: Mean: 10260.0, High: 10800, Above buy (10000): 3, 그리고 이긴 날 Tue 10200, Thu 10500, Fri 10800. closes[closes &gt; 10000]이 마스크가 True인 날만 남긴다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import pandas as pd; closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]); print(closes); print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax()); print((closes - 10000).tolist())'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import pandas as pd; closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]); print(closes); print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax()); print((closes - 10000).tolist())'">▶</button><code>python3 -c 'import pandas as pd; closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]); print(closes); print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax()); print((closes - 10000).tolist())'</code></div>
+          <p><span lang="en">Printing a Series as is shows the index (weekdays) on the left, the values on the right, and dtype: int64 at the bottom. Reading by label, closes[&quot;Tue&quot;] is 10200, .loc[&quot;Mon&quot;] is 10000, and idxmax() is Fri, the label of the largest value. closes - 10000 produces every day's profit or loss [0, 200, -200, 500, 800] with no loop.</span><span lang="ko">Series를 그대로 출력하면 왼쪽에 index(요일), 오른쪽에 값, 맨 아래에 dtype: int64가 보인다. 라벨로 읽기 closes[&quot;Tue&quot;]는 10200, .loc[&quot;Mon&quot;]은 10000, idxmax()는 가장 큰 값의 라벨 Fri다. closes - 10000은 반복문 없이 모든 날의 손익 [0, 200, -200, 500, 800]을 만든다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>first_stock.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: one stock, one week of closes.</span>
+<span class="ln">You bought CODE at 10,000 on Monday.</span>
+<span class="ln">Tests: Mean: 10260.0, High: 10800,</span>
+<span class="ln">Above buy (10000): 3, winning days</span>
+<span class="ln">Tue 10200, Thu 10500 and Fri 10800.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">closes = pd.Series([10000, 10200, 9800, 10500,</span>
+<span class="ln">                    10800],</span>
+<span class="ln">                   index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;,</span>
+<span class="ln">                          &quot;Thu&quot;, &quot;Fri&quot;])</span>
+<span class="ln"># TODO: print the mean rounded to 1, the high,</span>
+<span class="ln"># the count of closes above the 10000 buy, and</span>
+<span class="ln"># each winning day with its close.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/first_stock.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: one stock, one week of closes.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">closes = pd.Series([10000, 10200, 9800, 10500, 10800],</span>
+<span class="ln">                   index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;])</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;Mean:&quot;, round(closes.mean(), 1))</span>
+<span class="ln">print(&quot;High:&quot;, closes.max())</span>
+<span class="ln">print(&quot;Above buy (10000):&quot;, (closes &gt; 10000).sum())</span>
+<span class="ln">wins = closes[closes &gt; 10000]</span>
+<span class="ln">for day, close in wins.items():</span>
+<span class="ln">    print(day, int(close))</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="positions.html">positions →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

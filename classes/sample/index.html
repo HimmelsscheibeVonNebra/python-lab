@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Flask samples Extending the project into a Flask web app · Python Lab" data-title-ko="Flask 예제 Flask 웹 앱으로 확장하기 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flask samples Extending the project into a Flask web app · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body data-root="../../">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Flask samples</span><span lang="ko">Flask 예제</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Extending the project into a Flask web app</span><span lang="ko">Flask 웹 앱으로 확장하기</span></h1>
+    <p><span lang="en">Three projects that move the validate → analyze → HTML flow of Week 11, Session 2 into a Flask web app: Korean stocks (sample2), US stocks (sample1) and SQLite storage (sample4). Run each as a server inside the virtual machine and send it requests with wget.</span><span lang="ko">11주차 2차시의 검증 → 분석 → HTML 흐름을 Flask 웹 앱으로 옮긴 세 프로젝트. 한국 주식(sample2), 미국 주식(sample1), SQLite 저장(sample4)을 가상 머신 안에서 서버로 띄우고 wget으로 요청해 본다.</span></p>
+  </header>
+  <main class="list">
+    <section>
+      <h2><span lang="en">Examples to run</span><span lang="ko">실행해 볼 예제</span></h2>
+      <ul class="cards">
+        <li><a href="sample2_korea.html"><strong>sample2_korea</strong><span><span lang="en">Korean stock analysis app. app.py receives the request, storage.py reads the CSV, logic.py validates and analyzes it, and templates/index.html (Jinja) draws the page. Check the KOSPI/KOSDAQ filter, the ranking by change, the sample mean and the 400 response to bad input.</span><span lang="ko">한국 주식 분석 앱. app.py가 요청을 받고 storage.py로 CSV를 읽어 logic.py로 검증·분석한 뒤 templates/index.html(Jinja)로 그린다. KOSPI/KOSDAQ 필터, 등락률 순위, 표본 평균, 잘못된 입력의 400 응답을 확인한다.</span></span></a></li>
+        <li><a href="sample1_us.html"><strong>sample1_us</strong><span><span lang="en">A US stock app with the same structure. Prices are stored as whole cents and converted to USD only on screen (scale=100); the markets are NASDAQ/NYSE and codes are uppercase tickers. Compare it with sample2.</span><span lang="ko">같은 구조의 미국 주식 앱. 가격을 정수 센트로 저장하고 화면에서만 USD로 바꾸며(scale=100), 시장은 NASDAQ/NYSE, 코드는 대문자 티커다. sample2와 어디가 다른지 비교한다.</span></span></a></li>
+        <li><a href="sample4_sqlite.html"><strong>sample4_sqlite</strong><span><span lang="en">An app that validates the CSV, stores it in SQLite in one transaction and draws the page from the database. Before flask --app app init-db imports the data there is no database and the page answers 500; edits to the CSV appear only after another import; and an invalid CSV does not erase the existing data.</span><span lang="ko">CSV를 검증한 뒤 SQLite에 한 트랜잭션으로 저장하고, 화면은 DB에서 읽는 앱. flask --app app init-db로 가져오기 전에는 DB가 없어 500이 나고, CSV를 고쳐도 다시 가져와야 반영되며, 잘못된 CSV는 기존 데이터를 지우지 않는다.</span></span></a></li>
+      </ul>
+    </section>
+    <article class="notes">
+<div lang="en">
+<p>The stock MVP from Week 11, Session 2 was a command-line program: it read a CSV (<code>storage.py</code>), validated and analyzed it (<code>logic.py</code>) and wrote an HTML report to a file (<code>report.py</code>). These examples move the same flow into a Flask web app. Instead of writing a report file, the app reads and analyzes the data each time a browser sends a request and builds the HTML on the spot. Start with <a href="sample2_korea.html">sample2_korea</a>, the closest to the lecture, then <a href="sample1_us.html">sample1_us</a> with a different currency and code format, and finish with <a href="sample4_sqlite.html">sample4_sqlite</a>, which stores the data in SQLite. All numbers are fictional class data for 2026-11-05, not live prices.</p>
+
+<h2>Project structure</h2>
+
+<p>All three projects are split into the same four parts. Each file does one job, so you can change the page or the way data is stored without touching the other files.</p>
+
+<table>
+<thead><tr><th>File</th><th>Job</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>Receives HTTP requests, turns errors into status codes (400, 500) and renders the template</td></tr>
+<tr><td><code>storage.py</code></td><td>Reads the CSV. All file I/O lives here</td></tr>
+<tr><td><code>logic.py</code></td><td>Validates one row (<code>parse_row</code>), filters by market and sorts by change (<code>analyze</code>), and summarizes (<code>summarize</code>). Pure functions with no I/O</td></tr>
+<tr><td><code>templates/index.html</code></td><td>The Jinja template that draws the table and the summary</td></tr>
+</tbody>
+</table>
+
+<p>sample4 has one more file, <code>database.py</code>, for SQLite.</p>
+
+<h2>Routes and query strings</h2>
+
+<p><code>@app.get('/')</code> connects GET requests for the address <code>/</code> to the function <code>index()</code>. The chosen market arrives in the query string after the address, <code>?market=KOSPI</code>, and is read with <code>request.args.get('market', 'ALL')</code>. Without a value it defaults to <code>ALL</code>.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>Note that error handling splits into two branches. When the <strong>input</strong> is wrong, such as an unknown market name or a bad CSV row, a <code>ValueError</code> is raised and the app answers 400 (Bad Request). When the problem is on the <strong>server</strong> side, such as an unreadable data file, it answers 500. Either way the program does not crash; it returns a page with the error message.</p>
+
+<h2>Calculation rules</h2>
+
+<p>The change is (close − previous close) / previous close × 100. The computed value is kept unrounded and shown with two decimal places only on screen. The mean is an equal-weight sample mean of the selected stocks, so it is not a market index return. A CSV with only a header is a valid empty sample and shows the mean as N/A, but a missing file is an error.</p>
+
+<ul>
+<li>Korean stocks (sample2, sample4): prices are whole won and volumes whole shares. Codes such as <code>005930</code> are handled as strings to keep the leading 0. Means: ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%.</li>
+<li>US stocks (sample1): prices are stored as whole <strong>cents</strong> and converted to USD on screen (<code>scale=100</code>). The markets are NASDAQ/NYSE and codes are uppercase tickers. The ALL mean is +0.40%.</li>
+</ul>
+
+<h2>Jinja auto-escaping</h2>
+
+<p>Jinja, Flask's template engine, automatically replaces HTML special characters when it prints a value such as <code>{{ row.name }}</code>. So even if a stock name contains a tag like <code>&lt;script&gt;</code>, it is not executed but printed literally as <code>&amp;lt;script&amp;gt;</code>. That is why we don't write code that pastes data straight into the page ourselves.</p>
+
+<h2>Storing data in SQLite (sample4)</h2>
+
+<p>sample4 draws the page from an SQLite database instead of the CSV. Loading the data is not done by a web request but by a separate command, <code>flask --app app init-db</code>, registered with <code>@app.cli.command('init-db')</code>.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>Validate first</strong>: <code>import_snapshot()</code> validates every row before deleting the existing ones. Bad data such as a duplicate code is rejected before the database is touched.</li>
+<li><strong>One transaction</strong>: the delete and the inserts are committed together inside <code>with connection:</code>, so if anything fails the previous data stays.</li>
+<li><strong>Read-only connection</strong>: <code>read_quotes()</code> opens the file with <code>mode=ro</code>. When the database file is missing it fails instead of creating an empty database, and the page tells you to run init-db first.</li>
+<li>After editing the CSV, import it again with <code>init-db</code> to see the change on the page.</li>
+</ul>
+
+<p><code>database.py</code> defines <code>read_quotes()</code> twice. In Python the later definition replaces the earlier one, so the one actually used is the second (<code>mode=ro</code>).</p>
+
+<h2>Running it in this web lab</h2>
+
+<p>On a real PC you create a virtual environment for each project, install Flask with <code>pip install -r requirements.txt</code>, run <code>python app.py</code> and open an address such as <code>http://127.0.0.1:5002</code> in your browser. The virtual machine in this web lab already has Flask, but it has no network connection to the page, so your browser cannot reach its server. The example pages therefore run it like this:</p>
+
+<ul>
+<li>Start the server in the background: <code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></li>
+<li>Send requests from inside the machine with <code>wget</code> and find the lines you need in the HTML with <code>grep</code>.</li>
+<li>Check status codes and error messages with <code>app.test_client()</code>, which sends requests to the app without a server — the usual tool for automated tests.</li>
+<li>Copy the fetched HTML and <code>static/style.css</code> to <code>/mnt/host</code> and save them with <strong>Download</strong> to see the page in your own browser.</li>
+<li>Stop the server with <code>kill %1</code> (on a real PC, <kbd>Ctrl</kbd>+<kbd>C</kbd>).</li>
+</ul>
+
+<p>sample3, which uses the Naver news API, needs an external network and is not included in this lab.</p>
+</div><div lang="ko">
+<p>11주차 2차시에서 만든 주가 MVP는 CSV를 읽고(<code>storage.py</code>), 검증·분석하고(<code>logic.py</code>), HTML 보고서를 파일로 쓰는(<code>report.py</code>) 명령행 프로그램이었습니다. 이 예제들은 같은 흐름을 Flask 웹 앱으로 옮깁니다. 파일로 보고서를 쓰는 대신, 브라우저의 요청이 올 때마다 데이터를 읽고 분석해 그 자리에서 HTML을 만들어 돌려줍니다. 학습 순서는 강의와 가장 가까운 <a href="sample2_korea.html">sample2_korea</a>에서 시작해, 통화와 종목 코드가 다른 <a href="sample1_us.html">sample1_us</a>, 데이터를 SQLite에 저장하는 <a href="sample4_sqlite.html">sample4_sqlite</a> 순서입니다. 모든 수치는 2026-11-05 기준 가상 수업 데이터이며 실시간 시세가 아닙니다.</p>
+
+<h2>프로젝트 구조</h2>
+
+<p>세 프로젝트는 모두 같은 네 부분으로 나뉩니다. 각 파일이 한 가지 일만 하므로, 화면을 바꾸거나 데이터 저장 방식을 바꿀 때 다른 파일은 그대로 둘 수 있습니다.</p>
+
+<table>
+<thead><tr><th>파일</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>HTTP 요청을 받고, 오류를 상태 코드(400, 500)로 바꾸고, 템플릿을 렌더링한다</td></tr>
+<tr><td><code>storage.py</code></td><td>CSV를 읽는다. 파일 입출력은 여기에만 있다</td></tr>
+<tr><td><code>logic.py</code></td><td>한 행을 검증하고(<code>parse_row</code>), 시장으로 거르고 등락률 순으로 정렬하고(<code>analyze</code>), 요약한다(<code>summarize</code>). 입출력이 없는 순수 함수</td></tr>
+<tr><td><code>templates/index.html</code></td><td>Jinja 템플릿. 표와 요약을 그린다</td></tr>
+</tbody>
+</table>
+
+<p>sample4에는 SQLite를 다루는 <code>database.py</code>가 하나 더 있습니다.</p>
+
+<h2>라우트와 쿼리 문자열</h2>
+
+<p><code>@app.get('/')</code>는 주소 <code>/</code>로 오는 GET 요청을 <code>index()</code> 함수에 연결합니다. 시장 선택은 주소 뒤의 쿼리 문자열 <code>?market=KOSPI</code>로 전달되고, <code>request.args.get('market', 'ALL')</code>로 읽습니다. 값이 없으면 기본값 <code>ALL</code>입니다.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>오류 처리가 두 갈래로 나뉜다는 점이 중요합니다. 잘못된 시장 이름이나 잘못된 CSV 행처럼 <strong>입력</strong>이 문제면 <code>ValueError</code>가 나고 400(Bad Request)으로 응답합니다. 데이터 파일을 읽을 수 없는 것처럼 <strong>서버 쪽</strong>이 문제면 500으로 응답합니다. 어느 경우든 프로그램이 죽지 않고 오류 메시지를 담은 화면을 돌려줍니다.</p>
+
+<h2>계산 규칙</h2>
+
+<p>등락률은 (종가 − 전일 종가) / 전일 종가 × 100입니다. 계산값은 반올림하지 않고 유지하며, 화면에서만 소수 둘째 자리로 표시합니다. 평균은 선택된 종목들의 동일 가중 표본 평균이므로 시장 지수 수익률과는 다릅니다. 헤더만 있는 CSV는 유효한 빈 표본으로 보고 평균을 N/A로 표시하지만, 파일이 없으면 오류입니다.</p>
+
+<ul>
+<li>한국 주식(sample2, sample4): 가격은 정수 원, 거래량은 정수 주. <code>005930</code> 같은 코드는 앞의 0을 지키기 위해 문자열로 다룹니다. 평균은 ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</li>
+<li>미국 주식(sample1): 가격을 정수 <strong>센트</strong>로 저장하고 화면에서 USD로 바꿉니다(<code>scale=100</code>). 시장은 NASDAQ/NYSE, 코드는 대문자 티커입니다. ALL 평균은 +0.40%입니다.</li>
+</ul>
+
+<h2>Jinja 자동 escaping</h2>
+
+<p>Flask의 템플릿 엔진 Jinja는 <code>{{ row.name }}</code>처럼 값을 출력할 때 HTML 특수 문자를 자동으로 바꿉니다. 그래서 종목 이름에 <code>&lt;script&gt;</code> 같은 태그가 들어 있어도 실행되지 않고 글자 그대로 <code>&amp;lt;script&amp;gt;</code>로 출력됩니다. 데이터를 화면에 그대로 끼워 넣는 코드를 직접 짜지 않는 이유입니다.</p>
+
+<h2>SQLite에 저장하기 (sample4)</h2>
+
+<p>sample4는 화면을 CSV가 아니라 SQLite 데이터베이스에서 읽습니다. 데이터를 넣는 일은 웹 요청이 아니라 별도의 명령 <code>flask --app app init-db</code>가 맡습니다. 이 명령은 <code>@app.cli.command('init-db')</code>로 등록되어 있습니다.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>검증이 먼저</strong>: <code>import_snapshot()</code>은 모든 행을 검증한 뒤에 기존 행을 지웁니다. 중복 코드 같은 잘못된 데이터는 DB에 손대기 전에 거부됩니다.</li>
+<li><strong>한 트랜잭션</strong>: 삭제와 삽입이 <code>with connection:</code> 안에서 한 번에 커밋되므로, 중간에 실패해도 직전 데이터가 그대로 남습니다.</li>
+<li><strong>읽기 전용 연결</strong>: <code>read_quotes()</code>는 <code>mode=ro</code>로 엽니다. DB 파일이 없을 때 빈 DB를 새로 만들어 버리지 않고 오류를 내므로, 화면은 "먼저 init-db를 실행하세요"라고 안내합니다.</li>
+<li>CSV를 고친 뒤에는 <code>init-db</code>로 다시 가져와야 화면에 반영됩니다.</li>
+</ul>
+
+<p><code>database.py</code>에는 <code>read_quotes()</code>가 두 번 정의되어 있습니다. Python에서는 나중 정의가 앞의 것을 덮어쓰므로 실제로 쓰이는 것은 두 번째(<code>mode=ro</code>) 정의입니다.</p>
+
+<h2>이 웹 실습에서 실행하기</h2>
+
+<p>실제 PC에서는 프로젝트마다 가상환경을 만들고 <code>pip install -r requirements.txt</code>로 Flask를 설치한 뒤 <code>python app.py</code>로 실행하고, 브라우저에서 <code>http://127.0.0.1:5002</code> 같은 주소를 엽니다. 이 웹 실습의 가상 머신에는 Flask가 이미 들어 있지만, 페이지와 네트워크로 연결되어 있지 않아 내 브라우저로 서버에 접속할 수는 없습니다. 그래서 예제 페이지에서는 다음과 같이 실행합니다.</p>
+
+<ul>
+<li>서버를 백그라운드로 띄웁니다: <code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></li>
+<li>가상 머신 안에서 <code>wget</code>으로 요청을 보내고, 응답 HTML에서 필요한 줄을 <code>grep</code>으로 찾습니다.</li>
+<li>서버 없이 앱에 요청을 보내는 <code>app.test_client()</code>로 상태 코드와 오류 메시지를 확인합니다. 자동 테스트에서 흔히 쓰는 방법입니다.</li>
+<li>받은 HTML과 <code>static/style.css</code>를 <code>/mnt/host</code>에 복사하고 <strong>받기</strong>로 내려받으면, 내 브라우저에서 화면 모양을 볼 수 있습니다.</li>
+<li>서버는 <code>kill %1</code>로 끕니다 (실제 PC에서는 <kbd>Ctrl</kbd>+<kbd>C</kbd>).</li>
+</ul>
+
+<p>네이버 뉴스 API를 쓰는 sample3은 외부 네트워크가 필요하므로 이 실습에는 넣지 않았습니다.</p>
+</div>
+    </article>
+  </main>
+</body>
+</html>

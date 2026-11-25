@@ -1,0 +1,299 @@
+<p>이번 시간에는 pandas를 처음 다룹니다. 지난 시간의 NumPy 배열은 위치(2행 0열)로 답하지만, 실제 데이터는 이름(CODE, 화요일, 종가)으로 묻습니다. pandas는 배열 위에 라벨과 표를 얹은 도구입니다. 오늘의 이야기는 "주식 거래 첫 주"입니다. 주식 한 종목의 한 주를 Series로 추적하고, 포트폴리오 전체를 DataFrame으로 다루면서 선택·필터·정렬·통계를 익힙니다. 실습 프로그램은 <a href="first_stock.html">first_stock</a>, <a href="positions.html">positions</a>, <a href="my_portfolio.html">my_portfolio</a>, <a href="trade_log.html">trade_log</a>, <a href="price_report.html">price_report</a>입니다.</p>
+
+<p>웹 실습의 가상 머신에서는 <code>import pandas</code>에 10–30초가 걸립니다. 프로그램을 실행했는데 한동안 아무 반응이 없어도 기다리면 됩니다.</p>
+
+<h2>복습: NumPy에서 pandas로</h2>
+
+<p>어제는 NumPy 배열, 벡터 연산, 마스크를 배웠습니다. pandas의 Series 안에는 NumPy 배열이 들어 있어서 <code>.values</code>로 꺼내 볼 수 있습니다. 과제 <code>guessing.py</code>는 오늘까지입니다.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes.values)   # a NumPy array inside</code></pre>
+
+<h3>pandas가 필요한 이유</h3>
+
+<p>어제의 배열은 같은 종류의 숫자만 담습니다. 포트폴리오에는 종목 코드(문자열), 주식 수, 가격이 섞여 있고, 열마다 이름이, 행마다 라벨이 필요합니다. pandas는 이런 데이터를 다루는 표준 도구입니다.</p>
+
+<table>
+<thead>
+<tr><th>질문</th><th>NumPy</th><th>pandas</th></tr>
+</thead>
+<tbody>
+<tr><td>같은 계산</td><td>가능</td><td>가능(안에 배열이 있음)</td></tr>
+<tr><td>섞인 자료형</td><td>dtype 하나</td><td>열마다 자료형</td></tr>
+<tr><td>행 이름</td><td>0, 1, 2</td><td>원하는 라벨</td></tr>
+</tbody>
+</table>
+
+<h3>pandas 설치: pip</h3>
+
+<p>pandas는 NumPy와 같은 방법으로 설치합니다. 내 PC에서는 터미널(Python 안이 아님)에서 <code>pip install pandas</code>를 실행하고, Colab에는 이미 들어 있습니다. 이 웹 실습의 가상 머신에도 pandas가 미리 설치되어 있으며 네트워크가 없어 pip은 쓸 수 없습니다. 관례적으로 <code>import pandas as pd</code>로 불러옵니다(NumPy의 <code>np</code>처럼).</p>
+
+<pre><code>$ pip install pandas
+Successfully installed pandas-2.2.3 ...
+
+import pandas as pd   # pd, like np</code></pre>
+
+<h2>Series: 라벨이 붙은 열</h2>
+
+<h3>Series 만들기</h3>
+
+<p>Series는 값 한 열입니다. <code>pd.Series([...])</code>로 리스트에서 만듭니다. 여기서는 CODE 종목의 종가(원)입니다. <code>tolist()</code>로 다시 리스트로 바꿀 수 있습니다.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes)
+print(closes.tolist())   # [10000, ...]</code></pre>
+
+<h3>반복문 없는 벡터 연산</h3>
+
+<p>월요일에 CODE를 10,000원에 샀다고 합시다. <code>closes - 10000</code>은 날마다의 손익을 한 번에 계산합니다. <code>mean</code>, <code>max</code>, <code>min</code>, <code>sum</code>도 열 전체를 한 번에 집계합니다. 마스크(True/False)의 합은 True의 개수이므로 오른 날의 수가 됩니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800])
+print((closes - 10000).tolist())   # [0, 200, ...]
+print(closes.mean())               # 10260.0
+print(closes.max())                # 10800
+print((closes &gt; 10000).sum())      # 3</code></pre>
+
+<h3>index: 행의 이름</h3>
+
+<p>index는 각 행의 라벨입니다. 기본값은 위치 0, 1, 2, 3이고, <code>index=</code>로 요일 이름을 줄 수 있습니다. 대괄호와 <code>.loc</code>은 라벨로 읽습니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes["Tue"])       # 10200
+print(closes.loc["Mon"])   # 10000</code></pre>
+
+<h3>마스크: 원하는 것만 남기기</h3>
+
+<p>비교는 날마다 True/False를 돌려주고, NumPy와 똑같이 동작합니다. <code>closes[mask]</code>는 이긴 날만 남깁니다. 조건을 결합할 때는 괄호와 <code>&amp;</code>가 필요합니다.</p>
+
+<pre><code>mask = closes &gt; 10000
+print(closes[mask].tolist())   # [10200, ...]
+print(closes[mask].mean())     # 10500.0
+print(mask.tolist())           # False, True, ...</code></pre>
+
+<h3>Practice 1: 한 종목, 한 주</h3>
+
+<p><a href="first_stock.html">first_stock</a>을 엽니다. 스타터에는 CODE의 월–금 종가가 들어 있습니다. 반올림한 평균, 최고가, 매수가(10,000)보다 높게 끝난 날의 수, 그리고 그런 날마다 요일과 종가를 출력합니다(5분). 페이지의 마지막 단계에서 Series를 그대로 출력하면 index와 값이 어떻게 보이는지도 확인할 수 있습니다.</p>
+
+<pre><code>Mean: 10260.0
+High: 10800
+Above buy (10000): 3
+Tue 10200
+Thu 10500
+Fri 10800</code></pre>
+
+<h2>DataFrame: 열로 이루어진 표</h2>
+
+<h3>DataFrame 만들기</h3>
+
+<p>DataFrame은 행과 열로 된 표입니다. 여기서는 금요일 저녁의 포트폴리오입니다. 길이가 같은 리스트들의 dict로 만들며, 각 열은 하나의 index를 공유하는 Series입니다. CODE는 어제의 상점 CodeShop입니다.</p>
+
+<pre><code>import pandas as pd
+
+portfolio = pd.DataFrame({
+    "ticker": ["CODE", "TEA", "ROBO"],
+    "shares": [10, 40, 5],
+    "buy": [10000, 5000, 40000],
+    "close": [10800, 4800, 45000],
+})
+print(portfolio)</code></pre>
+
+<h3>표를 만드는 두 가지 방법</h3>
+
+<p>리스트의 dict(열마다 키 하나)와 dict의 리스트(거래마다 dict 하나) 모두 같은 표를 만듭니다. 행 dict들은 같은 키를 가져야 합니다.</p>
+
+<pre><code>trades = [
+    {"ticker": "CODE", "shares": 10},
+    {"ticker": "TEA", "shares": 40},
+]
+log = pd.DataFrame(trades)
+print(log.shape)   # (2, 2)</code></pre>
+
+<h3>첫 확인: shape, head, columns</h3>
+
+<p><code>df.shape</code>는 (행, 열)이며 위 포트폴리오는 (3, 4)입니다. <code>df.head(n)</code>은 앞쪽 행을, <code>df.tail(n)</code>은 뒤쪽 행을 미리 보여 주고, <code>df.columns</code>는 열 이름을 나열합니다.</p>
+
+<pre><code>print(portfolio.shape)            # (3, 4)
+print(portfolio.head(2))
+print(portfolio.columns.tolist())</code></pre>
+
+<h3>열 선택</h3>
+
+<p>열 하나 <code>portfolio["close"]</code>는 Series입니다. 여러 열은 대괄호 안에 이름의 리스트를 넣으며(대괄호 두 겹), 리스트의 순서가 열 순서가 됩니다. 이름이 단순하면 <code>df.col</code> 형태도 됩니다.</p>
+
+<pre><code>tickers = portfolio["ticker"]
+print(tickers.tolist())   # ['CODE', ...]
+
+friday = portfolio[["ticker", "close"]]
+print(friday.shape)       # (3, 2)</code></pre>
+
+<h3>위치로 행 선택: iloc</h3>
+
+<p><code>iloc</code>은 위치로 행을 고릅니다. <code>portfolio.iloc[0]</code>은 첫 거래, <code>iloc[0:2]</code>는 여러 행, 음수는 끝에서부터 셉니다.</p>
+
+<pre><code>print(portfolio.iloc[0])
+print(portfolio.iloc[0:2])
+print(portfolio.iloc[-1]["ticker"])   # ROBO</code></pre>
+
+<p><a href="my_portfolio.html">my_portfolio</a> 페이지의 마지막 단계에서 이 3종목 표와 <code>head</code>, <code>columns</code>, <code>iloc</code>, <code>describe</code>의 출력을 직접 볼 수 있습니다.</p>
+
+<h3>중간 점검</h3>
+
+<ul>
+<li>Series와 DataFrame: 열 하나인가, 표인가?</li>
+<li>마스크는 정확히 무엇을 남기는가? True인 위치의 행(값)입니다.</li>
+<li>왜 모든 열 리스트의 길이가 같아야 하는가? 모든 열이 하나의 index를 공유하기 때문입니다.</li>
+</ul>
+
+<h2>정렬과 통계</h2>
+
+<h3>정렬: sort_values</h3>
+
+<p><code>sort_values("close")</code>는 한 열을 기준으로 정렬하고, <code>ascending=False</code>는 큰 것부터 놓습니다. 정렬 키와 함께 행 전체가 이동합니다. 정렬은 새 표를 돌려주므로 원래 표는 그대로입니다.</p>
+
+<pre><code>ranked = portfolio.sort_values("close", ascending=False)
+print(ranked["ticker"].tolist())
+# ['ROBO', 'CODE', 'TEA']</code></pre>
+
+<h3>열 하나의 통계</h3>
+
+<p>Series의 열 연산이 그대로 통합니다. <code>describe()</code>는 count, mean, std, min, max, 사분위수를 한꺼번에 보여 줍니다. <code>round(x, 2)</code>로 보고서를 깔끔하게 만듭니다.</p>
+
+<pre><code>closes = portfolio["close"]
+print(closes.max())              # 45000
+print(round(closes.mean(), 1))   # 20200.0
+print(closes.describe())</code></pre>
+
+<h3>가장 큰 행은 어디에: idxmax</h3>
+
+<p><code>idxmax()</code>는 가장 큰 값의 라벨을 돌려줍니다. NumPy의 <code>argsort</code>가 위치로 순위를 매겼다면 <code>idxmax</code>는 이름을 알려 줍니다. <code>.loc[label]</code>로 그 행 전체를 읽을 수 있으며, Series에도 표의 열에도 똑같이 쓸 수 있습니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes.idxmax())           # Fri
+print(closes[closes.idxmax()])   # 10800</code></pre>
+
+<h2>열 추가와 세기</h2>
+
+<h3>기존 열로 새 열 만들기</h3>
+
+<p>대입하면 표에 열이 추가됩니다. invested는 산 금액(주식 수 × 매수가), profit은 (종가 − 매수가) × 주식 수입니다. 벡터 연산이 모든 행을 한 번에 채우고, 표 자체가 바뀝니다.</p>
+
+<pre><code>shares = portfolio["shares"]
+buy = portfolio["buy"]
+close = portfolio["close"]
+
+portfolio["invested"] = shares * buy
+portfolio["profit"] = (close - buy) * shares
+print(portfolio["profit"].tolist())
+# [8000, -8000, 25000]</code></pre>
+
+<h3>범주 세기: value_counts</h3>
+
+<p><code>value_counts()</code>는 값마다 몇 번 나왔는지 세고, 많은 것부터 돌려줍니다. 매매 일지에서 buy와 sell을 세는 데 쓰며, 문자열이든 라벨이든 어떤 열에도 쓸 수 있습니다.</p>
+
+<pre><code>actions = pd.Series(["buy", "sell", "buy", "buy", "sell", "buy"])
+print(actions.value_counts())
+# buy: 4, sell: 2</code></pre>
+
+<h3>행 전체 거르기</h3>
+
+<p>열에 대한 마스크는 행 전체를 거릅니다. 종가가 매수가보다 높은 행만 남기면 CODE와 ROBO가 남습니다. 마스크는 <code>(a) &amp; (b)</code>, <code>(a) | (b)</code>로 결합합니다. 결과를 새 변수에 담으면 원래 표는 안전합니다.</p>
+
+<pre><code>win = portfolio["close"] &gt; portfolio["buy"]
+winners = portfolio[win]
+print(winners["ticker"].tolist())   # ['CODE', 'ROBO']
+print(winners.shape)                # (2, 4)</code></pre>
+
+<h3>Practice 2: 포지션 순위</h3>
+
+<p><a href="positions.html">positions</a>를 엽니다. <code>profit = (close - buy) * shares</code> 열을 추가하고, 수익이 큰 순서로 종목과 수익을 출력한 뒤, 1위 종목과 수익이 난 종목 수를 출력합니다(5분). <code>idxmax</code>가 행을 찾고, 마스크가 나머지를 셉니다.</p>
+
+<pre><code>['ROBO', 'MLBK', 'CODE', 'TEA']
+[25000, 15000, 8000, -8000]
+Top: ROBO
+Winners: 3</code></pre>
+
+<h2>실습</h2>
+
+<h3>Lab 1: 포트폴리오 보고서</h3>
+
+<p><a href="my_portfolio.html">my_portfolio</a>에서 표의 shape를 출력하고, <code>value = shares * close</code> 열을 추가해 평가액 목록, 가장 큰 보유 종목, 평균 평가액을 출력합니다.</p>
+
+<pre><code>Shape: (5, 4)
+Value: [108000, 192000, 225000, 75000, 84000]
+Top holding: ROBO
+Mean value: 136800.0</code></pre>
+
+<p>확인할 점: shape는 (5, 4), 즉 다섯 행 네 열이며 눈으로 셀 필요가 없습니다. value는 반복문 없이 벡터 곱 한 번으로 만든 열입니다. <code>idxmax</code>와 <code>.loc</code>이 ROBO(225,000원)를 찾고, <code>round(..., 1)</code>로 평균(684,000 / 5)을 정리합니다.</p>
+
+<h3>Lab 2: 매매 일지</h3>
+
+<p><a href="trade_log.html">trade_log</a>에서 <code>value_counts</code>로 action을 세어 이름과 횟수를 출력하고, 총 거래 금액과 큰 거래(40,000원 이상)의 종류를 출력합니다.</p>
+
+<pre><code>Actions: ['buy', 'sell']
+Counts: [6, 4]
+Traded: 340000
+Big trades: ['buy', 'buy', 'buy', 'buy']</code></pre>
+
+<p>확인할 점: 횟수는 많은 것부터 나오므로 buy 6, sell 4입니다. Traded는 amount 열 전체의 합이고(거래당 평균 34,000원), 마스크가 40,000원 이상 거래 네 건을 남기는데 모두 buy입니다. 거르기는 원래 일지를 건드리지 않습니다.</p>
+
+<h3>Lab 3(과제): 한 주 돌아보기</h3>
+
+<p><a href="price_report.html">price_report</a>에서 FIT의 월–금 종가 다섯 개를 <code>input()</code>으로 읽어, 요일을 index로 하는 Series를 만들고 평균, 최고가, 최고가인 요일, 평균보다 높은 날의 수를 출력합니다. 입력은 정수 형식이라고 가정합니다.</p>
+
+<pre><code>Close Mon: 4200
+Close Tue: 4350
+Close Wed: 4100
+Close Thu: 4400
+Close Fri: 4300
+Mean: 4270.0
+High: 4400
+Best day: Thu 4400
+Above mean: 3</code></pre>
+
+<p>먼저 읽고, 변환한 다음 Series를 만듭니다. <code>days</code>와 값 리스트는 같은 순서를 공유하고, mean, max, idxmax, 마스크가 네 가지 답을 줍니다. index가 가격 목록을 보고서로 바꿔 줍니다. 슬라이드의 예는 입력 대신 문자열 리스트를 쓰지만, 과제 프로그램은 <code>input()</code>으로 읽습니다. 웹 실습에서는 <code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py</code>로 입력을 한꺼번에 넣어 볼 수 있습니다.</p>
+
+<pre><code>import pandas as pd
+
+days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+typed = ["4200", "4350", "4100", "4400", "4300"]
+
+values = []
+for text in typed:
+    values.append(int(text))
+closes = pd.Series(values, index=days)
+
+print(closes.mean())     # 4270.0
+print(closes.idxmax())   # Thu</code></pre>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li><code>pip install</code>은 Python 안이 아니라 터미널에서 실행합니다.</li>
+<li>DataFrame의 열 리스트는 길이가 모두 같아야 합니다.</li>
+<li>대괄호 한 겹으로 열 하나를 고르면 Series, 두 겹(이름 리스트)이면 DataFrame입니다.</li>
+<li>마스크를 결합할 때는 양쪽을 각각 괄호로 감쌉니다.</li>
+</ul>
+
+<p>실행 전에 돌려받을 자료형을 말해 보고, 디버깅할 때는 먼저 <code>df.shape</code>를 출력해 무엇을 가지고 있는지 확인합니다.</p>
+
+<h2>확인 퀴즈와 제출</h2>
+
+<ol>
+<li><strong>pandas를 설치하는 명령은?</strong> 터미널에서 <code>pip install pandas</code>.</li>
+<li><strong>라벨이 붙은 열 하나를 담는 pandas 자료형은?</strong> Series.</li>
+<li><strong><code>df["close"]</code>의 자료형은?</strong> Series.</li>
+<li><strong>가장 큰 값의 라벨을 돌려주는 호출은?</strong> <code>idxmax()</code>.</li>
+<li><strong><code>df[df["profit"] &gt; 0]</code>은 무엇을 주는가?</strong> profit이 양수인 행만 남긴 DataFrame.</li>
+</ol>
+
+<p>제출: <code>first_stock.py</code>, <code>positions.py</code>, <code>my_portfolio.py</code>, <code>trade_log.py</code>. <code>price_report.py</code>는 다음 시간까지입니다. 프로그램마다 테스트 사례를 세 개 이상 주석으로 기록합니다.</p>
+
+<h2>다음 시간: 파일과 클래스</h2>
+
+<p>텍스트 파일을 <code>for</code> 반복으로 한 줄씩 읽고, 프로그램이 끝난 뒤에도 남는 결과를 저장합니다. 그다음 클래스로 나만의 자료형을 설계합니다. <code>my_portfolio.py</code>를 잘 보관해 두세요. 그 표가 6주차에 CSV 파일이 됩니다.</p>

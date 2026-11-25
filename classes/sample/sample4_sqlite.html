@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="sample4_sqlite — Extending the project into a Flask web app · Python Lab" data-title-ko="sample4_sqlite — Flask 웹 앱으로 확장하기 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sample4_sqlite — Extending the project into a Flask web app · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="sample/sample4">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Flask samples</span><span lang="ko">Flask 예제</span></a><span class="sep">/</span><span>sample4_sqlite</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>sample4_sqlite</h1>
+    <p><span lang="en">An app that validates the CSV, stores it in SQLite in one transaction and draws the page from the database. Before flask --app app init-db imports the data there is no database and the page answers 500; edits to the CSV appear only after another import; and an invalid CSV does not erase the existing data.</span><span lang="ko">CSV를 검증한 뒤 SQLite에 한 트랜잭션으로 저장하고, 화면은 DB에서 읽는 앱. flask --app app init-db로 가져오기 전에는 DB가 없어 500이 나고, CSV를 고쳐도 다시 가져와야 반영되며, 잘못된 CSV는 기존 데이터를 지우지 않는다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/sample/sample4</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/sample/sample4</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'">▶</button><code>python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'</code></div>
+          <p><span lang="en">instance/market.sqlite3 does not exist yet. read_quotes() opens it with mode=ro, so instead of creating an empty database it fails, and the page answers 500 with a hint.</span><span lang="ko">아직 instance/market.sqlite3가 없다. read_quotes()가 mode=ro로 열어 빈 DB를 새로 만들지 않고 오류를 내므로 500과 안내 메시지가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; ls -l instance" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; ls -l instance">▶</button><code>flask --app app init-db &amp;&amp; ls -l instance</code></div>
+          <p><span lang="en">A command registered with @app.cli.command('init-db'). It validates the CSV, and import_snapshot() fills the quotes table in one transaction: Imported 5 quotes.</span><span lang="ko">@app.cli.command('init-db')로 등록한 명령. CSV를 검증하고 import_snapshot()이 한 트랜잭션으로 quotes 테이블을 채운다: Imported 5 quotes.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'">▶</button><code>python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'</code></div>
+          <p><span lang="en">Query the stored rows directly. Codes are stored as TEXT, so leading zeros such as 000660 are kept.</span><span lang="ko">DB에 저장된 행을 직접 조회한다. 코드는 TEXT로 저장되어 000660처럼 앞의 0이 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 app.py &gt; server.log 2&gt;&amp;1 &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 app.py &gt; server.log 2&gt;&amp;1 &amp;">▶</button><code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></div>
+          <p><span lang="en">Start the server on port 5004. The page now reads the database, not the CSV.</span><span lang="ko">포트 5004에서 서버를 띄운다. 이제 화면은 CSV가 아니라 DB에서 읽는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html">▶</button><code>until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html</code></div>
+          <p><span lang="en">Sample mean +0.40% — the same data as sample2, so the same result.</span><span lang="ko">표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'">▶</button><code>sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'</code></div>
+          <p><span lang="en">Changing Samsung Electronics' close to 77000 in the CSV leaves the page at +0.40%, because the page reads the database.</span><span lang="ko">CSV에서 삼성전자 종가를 77000으로 바꿔도 화면은 그대로 +0.40%다. 화면은 DB를 읽기 때문이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'">▶</button><code>flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'</code></div>
+          <p><span lang="en">After another import the change shows: Samsung's change goes from +2% to +10%, so the mean becomes +2.00%.</span><span lang="ko">다시 가져오면 반영된다. 삼성전자 등락률이 +2%에서 +10%로 바뀌어 평균이 +2.00%가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'">▶</button><code>sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'</code></div>
+          <p><span lang="en">Appending a copy of a stock's row fails validation (duplicate code). Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks.</span><span lang="ko">같은 종목 줄을 하나 더 붙이면 검증(duplicate code)에서 실패한다. 검증이 DELETE보다 먼저이고 저장은 한 트랜잭션이므로, DB에는 직전의 5종목이 그대로 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stop the server. Reloading the page restores the CSV and the database.</span><span lang="ko">서버를 끈다. 페이지를 새로 고치면 CSV와 DB가 처음 상태로 돌아간다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>app.py <span class="muted"><span lang="en">41 lines</span><span lang="ko">41줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Flask routes: input → analysis → escaped Jinja view.&quot;&quot;&quot;</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from flask import Flask, render_template, request</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import load_quotes</span>
+<span class="ln">from database import read_quotes, import_snapshot</span>
+<span class="ln">import sqlite3</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln">app.config['DATA_PATH'] = BASE / 'data/prices.csv'</span>
+<span class="ln">app.config['DATABASE'] = BASE / 'instance/market.sqlite3'</span>
+<span class="ln"> </span>
+<span class="ln">@app.get('/')</span>
+<span class="ln">def index():</span>
+<span class="ln">    market = request.args.get('market', 'ALL')</span>
+<span class="ln">    rows, summary, day, error, status = [], summarize([]), None, None, 200</span>
+<span class="ln">    try:</span>
+<span class="ln">        quotes = read_quotes(app.config['DATABASE'])</span>
+<span class="ln">        rows = analyze(quotes, market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0]['date'] if quotes else None</span>
+<span class="ln">    except ValueError as exc:</span>
+<span class="ln">        error, status = str(exc), 400</span>
+<span class="ln">    except (OSError, sqlite3.Error):</span>
+<span class="ln">        error, status = 'DB를 읽을 수 없습니다. 먼저 flask --app app init-db를 실행하세요.', 500</span>
+<span class="ln">    return render_template('index.html', title='SQLite 한국 주식 분석',</span>
+<span class="ln">        currency='KRW', scale=1, database=True,</span>
+<span class="ln">        markets=MARKETS, market=market, rows=rows, summary=summary,</span>
+<span class="ln">        day=day, error=error), status</span>
+<span class="ln"> </span>
+<span class="ln">@app.cli.command('init-db')</span>
+<span class="ln">def init_db():</span>
+<span class="ln">    &quot;&quot;&quot;Validate CSV, then transactionally replace the stored snapshot.&quot;&quot;&quot;</span>
+<span class="ln">    quotes = load_quotes(app.config['DATA_PATH'])</span>
+<span class="ln">    analyze(quotes, 'ALL')</span>
+<span class="ln">    import_snapshot(app.config['DATABASE'], quotes)</span>
+<span class="ln">    print(f&quot;Imported {len(quotes)} quotes.&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    app.run(host='127.0.0.1', port=5004)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>database.py <span class="muted"><span lang="en">48 lines</span><span lang="ko">48줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;SQLite connections are short-lived; imports commit as one transaction.&quot;&quot;&quot;</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, analyze, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def import_snapshot(path, quotes):</span>
+<span class="ln">    # Validate before deleting any existing rows, including calls outside Flask CLI.</span>
+<span class="ln">    quotes = [parse_row({key: str(row[key]) for key in FIELDS}) for row in quotes]</span>
+<span class="ln">    analyze(quotes, 'ALL')</span>
+<span class="ln">    Path(path).parent.mkdir(parents=True, exist_ok=True)</span>
+<span class="ln">    connection = sqlite3.connect(path)</span>
+<span class="ln">    try:</span>
+<span class="ln">        with connection:</span>
+<span class="ln">            connection.execute('''CREATE TABLE IF NOT EXISTS quotes (</span>
+<span class="ln">                date TEXT NOT NULL, code TEXT PRIMARY KEY, name TEXT NOT NULL,</span>
+<span class="ln">                market TEXT NOT NULL CHECK(market IN ('KOSPI','KOSDAQ')),</span>
+<span class="ln">                previous_close INTEGER NOT NULL CHECK(previous_close &gt; 0),</span>
+<span class="ln">                close INTEGER NOT NULL CHECK(close &gt; 0),</span>
+<span class="ln">                volume INTEGER NOT NULL CHECK(volume &gt;= 0))''')</span>
+<span class="ln">            connection.execute('DELETE FROM quotes')</span>
+<span class="ln">            connection.executemany(</span>
+<span class="ln">                'INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)',</span>
+<span class="ln">                [tuple(row[key] for key in FIELDS) for row in quotes])</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def read_quotes(path):</span>
+<span class="ln">    # mode=rw prevents an accidental empty database on a missing path.</span>
+<span class="ln">    connection = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=rw', uri=True)</span>
+<span class="ln">    connection.row_factory = sqlite3.Row</span>
+<span class="ln">    try:</span>
+<span class="ln">        rows = connection.execute('SELECT * FROM quotes ORDER BY code').fetchall()</span>
+<span class="ln">        return [parse_row({key: str(row[key]) for key in FIELDS}) for row in rows]</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def read_quotes(path):</span>
+<span class="ln">    # Read-only connection prevents a request from creating an empty DB by accident.</span>
+<span class="ln">    connection = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True)</span>
+<span class="ln">    try:</span>
+<span class="ln">        connection.row_factory = sqlite3.Row</span>
+<span class="ln">        rows = connection.execute('SELECT * FROM quotes ORDER BY code').fetchall()</span>
+<span class="ln">        return [parse_row({key: str(row[key]) for key in FIELDS}) for row in rows]</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">65 lines</span><span lang="ko">65줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; prices are integer KRW.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;KOSPI&quot;, &quot;KOSDAQ&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if len(code) != 6 or not code.isascii() or not code.isdigit():</span>
+<span class="ln">        raise ValueError(&quot;code must be six ASCII digits&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and KOSPI/KOSDAQ market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, KOSPI or KOSDAQ&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">23 lines</span><span lang="ko">23줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CSV input and atomic HTML output; all file I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/prices.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>README.md <span class="muted"><span lang="en">51 lines</span><span lang="ko">51줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># Sample 4: SQLite 주가 저장·분석</span>
+<span class="ln"> </span>
+<span class="ln">Python 3.10 이상과 Flask를 사용합니다. 이 폴더만 복사해도 실행할 수 있습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실행</span>
+<span class="ln"> </span>
+<span class="ln">저장소 루트에서:</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd Sample/sample4</span>
+<span class="ln">python3 -m venv .venv</span>
+<span class="ln">source .venv/bin/activate</span>
+<span class="ln">python -m pip install -r requirements.txt</span>
+<span class="ln">flask --app app init-db</span>
+<span class="ln">python app.py</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">Windows PowerShell에서는 활성화 명령을 `.venv\Scripts\Activate.ps1`로 바꿉니다.</span>
+<span class="ln">브라우저에서 http://127.0.0.1:5004 을 엽니다. Ctrl+C로 종료합니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실습 흐름</span>
+<span class="ln"> </span>
+<span class="ln">1. `data/prices.csv`를 확인합니다. 모든 수치는 2026-11-05 기준 **가상 수업 데이터**입니다.</span>
+<span class="ln">2. 웹에서 시장을 선택하여 등락률 순위와 상승·하락·보합 수를 비교합니다.</span>
+<span class="ln">3. CSV의 종가를 바꾸어 다시 조회합니다. SQLite 예제는 변경 후 `flask --app app init-db`로 다시 가져와야 반영됩니다.</span>
+<span class="ln">4. 0인 가격이나 중복 코드를 넣고 오류 처리를 확인합니다.</span>
+<span class="ln"> </span>
+<span class="ln">등락률 = (종가 − 전일 종가) / 전일 종가 × 100. 같은 가격 기준을 사용하며,</span>
+<span class="ln">계산값은 유지하고 화면에서만 소수 둘째 자리로 표시합니다.</span>
+<span class="ln">평균은 선택된 종목의 동일 가중 표본 평균이며 시장 지수 수익률이 아닙니다.</span>
+<span class="ln"> </span>
+<span class="ln">`app.py`: HTTP 요청과 오류 처리 → `storage.py`: CSV 읽기 → `logic.py`: 검증·분석 → `templates/index.html`: Jinja 렌더링.</span>
+<span class="ln">Jinja 자동 escaping을 사용하며 종목명에 HTML을 넣어도 실행하지 않습니다.</span>
+<span class="ln">헤더만 있는 CSV는 유효한 빈 표본(평균 N/A), 파일 누락은 오류입니다.</span>
+<span class="ln"> </span>
+<span class="ln">한국 가격은 정수 원(KRW), 거래량은 정수 주입니다. 005930 같은 코드를 문자열로 유지합니다. ALL 평균 +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</span>
+<span class="ln"> </span>
+<span class="ln">## SQLite</span>
+<span class="ln"> </span>
+<span class="ln">`database.py`가 Python 표준 라이브러리 sqlite3를 사용합니다. 별도 DB 서버가 필요 없습니다.</span>
+<span class="ln">`flask --app app init-db`가 CSV 전체를 검증한 후 `instance/market.sqlite3`를 만듭니다.</span>
+<span class="ln">웹 요청은 CSV 대신 SQLite를 조회합니다. 초기화 전에는 안내 오류를 보여 줍니다.</span>
+<span class="ln">재실행하면 기존 스냅샷을 한 트랜잭션에서 교체하며, 검증/쓰기 실패 시 기존 데이터가 보존됩니다.</span>
+<span class="ln">SQL에는 매개변수 바인딩을 사용합니다. 종목 코드는 TEXT 기본키입니다.</span>
+<span class="ln">이 예제는 단일 날짜 스냅샷 저장이며 여러 날짜의 가격 이력은 저장하지 않습니다.</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">python -m sqlite3 instance/market.sqlite3 &quot;SELECT code, name, close FROM quotes;&quot;</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">위 조회 CLI는 Python 3.12 이상에서 사용할 수 있습니다.</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="sample1_us.html">← sample1_us</a>
+    <span></span>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

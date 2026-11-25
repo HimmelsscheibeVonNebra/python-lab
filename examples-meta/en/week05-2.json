@@ -1,0 +1,43 @@
+{
+  "title": "pandas: Series and DataFrame",
+  "summary": "Analyze a week of stock trades with Series (a labeled column) and DataFrame (a table). Filter with masks, sort with sort_values, and summarize with idxmax, value_counts and mean. The step that imports pandas takes about 10–30 seconds in the virtual machine.",
+  "examples": {
+    "first_stock": {
+      "summary": "Practice 1. From a Series of CODE's closing prices indexed by weekday (Mon–Fri), print the mean, the high, the number of days that closed above the buy price of 10000, and the weekday and close of each such day.",
+      "steps": [
+        "The starter only builds the Series, so after waiting while pandas loads it prints nothing and ends with exit=0.",
+        "Finished version: Mean: 10260.0, High: 10800, Above buy (10000): 3, followed by the winning days Tue 10200, Thu 10500, Fri 10800. closes[closes > 10000] keeps only the days where the mask is True.",
+        "Printing a Series as is shows the index (weekdays) on the left, the values on the right, and dtype: int64 at the bottom. Reading by label, closes[\"Tue\"] is 10200, .loc[\"Mon\"] is 10000, and idxmax() is Fri, the label of the largest value. closes - 10000 produces every day's profit or loss [0, 200, -200, 500, 800] with no loop."
+      ]
+    },
+    "positions": {
+      "summary": "Practice 2. Add a profit = (close - buy) * shares column to a DataFrame of four stocks, then print the tickers and profits sorted from largest profit, the top stock, and the number of stocks that made a profit.",
+      "steps": [
+        "The starter only builds the table and prints nothing.",
+        "Finished version: ['ROBO', 'MLBK', 'CODE', 'TEA'] and [25000, 15000, 8000, -8000]. With sort_values(\"profit\", ascending=False) whole rows move along with the sort key. The ticker of the row found with idxmax gives Top: ROBO, and the number of Trues in the mask gives Winners: 3."
+      ]
+    },
+    "my_portfolio": {
+      "summary": "Lab 1. From a Friday-evening portfolio table of five stocks, print its shape, add a value = shares * close column, and print the list of values, the largest holding and the mean value.",
+      "steps": [
+        "The starter prints nothing.",
+        "Finished version: Shape: (5, 4) means 5 rows and 4 columns (printed before value was added). Value: [108000, 192000, 225000, 75000, 84000] is a column made with a single multiplication, followed by Top holding: ROBO and Mean value: 136800.0 (684000 divided by 5).",
+        "Prints the three-stock table from the slides. The 0, 1, 2 on the far left is the default index. head(2) is the first two rows, columns is the list of column names, and iloc[-1] is the last row (ROBO). describe() shows count, mean (20200.0), std, min, the quartiles and max (45000) all at once."
+      ]
+    },
+    "trade_log": {
+      "summary": "Lab 2. From a journal of ten trades, count the buys and sells with value_counts, and print the total amount traded and the kinds of the big trades (40000 won or more).",
+      "steps": [
+        "The starter prints nothing.",
+        "Finished version: value_counts counts from most to least frequent, so Actions: ['buy', 'sell'] and Counts: [6, 4]. Traded: 340000 is the sum of the amount column, and Big trades shows that the four trades kept by the amount >= 40000 mask are all buys."
+      ]
+    },
+    "price_report": {
+      "summary": "Lab 3 (take-home). Read FIT's five Mon–Fri closing prices with input(), build a Series indexed by weekday, and print the mean, the high, the day of the high, and the number of days above the mean.",
+      "steps": [
+        "Runs the program with the five values fed in ahead of time (you can also run it yourself and type them one by one). The starter only reads the input, so only the prompts Close Mon: … Close Fri: come out, run together.",
+        "Finished version: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3 (4350, 4400, 4300). values and days are in the same order, so Series(values, index=days) pairs each weekday with its value."
+      ]
+    }
+  }
+}

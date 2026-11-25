@@ -1,0 +1,401 @@
+<p>Last session you drew the program. Today you give it a home and a history. One fifth of the project grade (design and Git workflow, 20%) comes from the story your commits tell. The session has three acts and a lab. In Act 1 (commit), you make save points with a message and put a copy on GitHub. In Act 2 (branch), you try new work without breaking main. In Act 3 (pull request), you review your own work before it is merged. In the lab you create your own repository, your first feature branch and your first merged pull request.</p>
+
+<p><strong>About this web lab environment:</strong> the virtual machine on this page has no git, network or browser. So every <code>git</code> command and all GitHub work in this session must be done on your own PC, where <code>git --version</code> works. Here you can look at the contents (modules, README, .gitignore) and output of the starter-repo, the lab's starting point, in <a href="starter_repo.html">starter_repo</a>, and practice reading the change format that <code>git diff</code> shows by using <code>diff -u</code>. The slides' <code>labs/session2/starter-repo/</code> is <code>~/week10/starter/session2/starter-repo/</code> in this environment.</p>
+
+<h2>Why Git when you work alone?</h2>
+
+<p>Even if nobody else edits your code, Git earns its place.</p>
+
+<ul>
+<li>An undo button for the whole project.</li>
+<li>Proof of process: Git workflow is part of a 20% component.</li>
+<li>A main branch that always runs, ready for the demo.</li>
+<li>You can continue your work on any computer.</li>
+</ul>
+
+<p>Trap: a single commit called "final" in Week 15 proves nothing.</p>
+
+<h3>Four places your code lives</h3>
+
+<p>Every Git command moves changes between these four places.</p>
+
+<ol>
+<li>Working folder: the files you edit in VS Code.</li>
+<li>Staging area: the changes you picked for the next commit.</li>
+<li>Local repository: every commit, inside the hidden <code>.git</code> folder.</li>
+<li>GitHub: a copy of the repository online.</li>
+</ol>
+
+<h2>Act 1 · Commit: save points with a message</h2>
+
+<p>We review Week 8 in ten minutes (init, status, add, commit, log, diff, push), then cover <code>.gitignore</code>, which keeps junk out, and the habits that earn points.</p>
+
+<h3>Once per computer: who are you?</h3>
+
+<pre><code>git config --global user.name "Jiwoo Park"
+git config --global user.email "jiwoo@example.com"
+git config --global init.defaultBranch main
+git config user.name</code></pre>
+
+<p>Git signs every commit with a name and an email. Set them once per laptop, using the email of your GitHub account. Always name the first branch of a new project main. The last command prints the name you set (<code>Jiwoo Park</code>) to check the result.</p>
+
+<h3>Start the repository</h3>
+
+<pre><code>mkdir study-logger
+cd study-logger
+git init
+git status</code></pre>
+
+<pre><code>Initialized empty Git repository in .../study-logger/.git/
+On branch main
+No commits yet
+Untracked files:
+  .gitignore
+  README.md
+  main.py</code></pre>
+
+<p>Run <code>git init</code> once per project, inside the project folder. It creates the hidden <code>.git</code> folder, but nothing is saved yet. <code>git status</code> tells you what Git sees, so run it constantly. Predict: the folder also holds <code>__pycache__</code>, so why is it not in the list? The answer is <code>.gitignore</code>, in the next section.</p>
+
+<h3>.gitignore: what never goes in</h3>
+
+<pre><code># Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors and operating systems
+.vscode/
+.DS_Store
+
+# Secrets: never commit these
+.env
+*.key</code></pre>
+
+<p>It is a text file of patterns, and files that match a pattern are invisible to Git. Python rebuilds generated files (<code>__pycache__</code>, <code>.pyc</code>), each computer makes its own virtual environment (<code>.venv</code>), and system junk (<code>.DS_Store</code>, <code>Thumbs.db</code>) is not needed. Never, ever include secrets (<code>.env</code>, keys, passwords). Trap: a password you pushed once is public even if you delete it later. You must change the password.</p>
+
+<p>In <a href="starter_repo.html">starter_repo</a>, running <code>python3 main.py</code> creates a new <code>__pycache__</code> folder, which you can see with <code>ls -a</code>. The starter-repo's <code>.gitignore</code> uses exactly these patterns to hide that folder from Git.</p>
+
+<h3>add, then commit</h3>
+
+<pre><code>git add .
+git commit -m "Add project skeleton"
+git status</code></pre>
+
+<pre><code>[main (root-commit) c4f930b] Add project skeleton
+ 3 files changed, 5 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 main.py
+On branch main
+nothing to commit, working tree clean</code></pre>
+
+<p><code>add</code> picks the changes and <code>commit</code> saves them with a message. <code>git add .</code> stages everything that is not ignored, and <code>git commit -m</code> saves one snapshot with a sentence. After the commit, the working tree is clean.</p>
+
+<h3>A commit message is a sentence</h3>
+
+<p>The grader reads your log. Make it read like a diary of decisions.</p>
+
+<table>
+<thead><tr><th>Messages that prove nothing</th><th>Messages that tell a story</th></tr></thead>
+<tbody>
+<tr><td><code>update</code></td><td><code>Add load_records stub</code></td></tr>
+<tr><td><code>asdf</code></td><td><code>Reject negative minutes in parse_minutes</code></td></tr>
+<tr><td><code>final final2</code></td><td><code>Show weekly totals sorted by minutes</code></td></tr>
+</tbody>
+</table>
+
+<p>Start with a verb in the imperative (Add, Fix, Reject, Rename) and say what changed in about 50 characters. Put one logical change in each commit. Commit when a small step works, and before you try something risky.</p>
+
+<h3>See what changed: diff and log</h3>
+
+<pre><code>git diff
+git commit -am "Print the week in the banner"
+git log --oneline</code></pre>
+
+<pre><code>@@ -1 +1,2 @@
+ print("Study logger")
++print("Week 10 skeleton")
+[main 71b8a6e] Print the week in the banner
+ 1 file changed, 1 insertion(+)
+71b8a6e Print the week in the banner
+c4f930b Add project skeleton</code></pre>
+
+<p>Before you commit, look; after you commit, check. <code>git diff</code> shows unstaged changes line by line: <code>+</code> is an added line, <code>-</code> a removed line, and <code>@@</code> the location. <code>git commit -am</code> stages tracked files and commits them in one move. <code>git log --oneline</code> shows one line per commit, newest first. Trap: <code>-a</code> skips new files. A newly created <code>storage.py</code> still needs <code>git add</code>.</p>
+
+<p>The last step of <a href="starter_repo.html">starter_repo</a> changes one line of <code>report.py</code> and compares before and after with <code>diff -u</code>. Its output format (<code>---</code>, <code>+++</code>, <code>@@</code>, and <code>-</code>/<code>+</code> lines) is the same as <code>git diff</code>, so it is good reading practice.</p>
+
+<h3>Put it on GitHub</h3>
+
+<pre><code>git remote add origin \
+  https://github.com/jiwoo-park/study-logger.git
+git push -u origin main</code></pre>
+
+<pre><code>To https://github.com/jiwoo-park/study-logger.git
+ * [new branch]      main -&gt; main
+branch 'main' set up to track 'origin/main'.</code></pre>
+
+<p>On github.com, create a repository with New repository, but leave it empty, with no README or .gitignore. Public or private is fine; if it is private, add the instructor as a collaborator. Connect the remote only once, use <code>push -u</code> the first time, and plain <code>git push</code> after that.</p>
+
+<h3>Two push errors you will meet</h3>
+
+<pre><code>! [rejected]        main -&gt; main (fetch first)
+error: failed to push some refs to 'github.com/...'
+
+remote: Support for password authentication was removed on August 13, 2021.
+fatal: Authentication failed</code></pre>
+
+<p>Both are common on the first day, and both have a short fix. <strong>Rejected</strong>: you ticked "Add a README" on GitHub, so GitHub has a commit your laptop does not. Run <code>git pull --rebase origin main</code>, then push again. <strong>Authentication failed</strong>: GitHub does not accept account passwords on the command line. Sign in through VS Code (Source Control, Publish) or use <code>gh auth login</code>.</p>
+
+<h2>Act 2 · Branch: a safe place to try</h2>
+
+<p>main always runs; new work happens next door. Make one branch per feature and merge it when it works. Then we look at what conflicts look like and how to end them.</p>
+
+<h3>Why branch when you are alone?</h3>
+
+<p>A branch is a second line of commits that main does not see until you merge. main stays demo-ready at every moment. Each Must feature gets its own short-lived branch. A failed experiment is just one deleted branch, not a broken project. The graph shows the grader exactly how each feature was built.</p>
+
+<h3>Create a branch and work on it</h3>
+
+<pre><code>git switch -c feature/save-records
+git add storage.py
+git commit -m "Add load_records stub"
+ls</code></pre>
+
+<pre><code>Switched to a new branch 'feature/save-records'
+[feature/save-records d05376a] Add load_records stub
+ 1 file changed, 2 insertions(+)
+ create mode 100644 storage.py
+README.md  __pycache__  main.py  storage.py</code></pre>
+
+<p><code>switch -c</code> creates the branch and moves you onto it. Commits now land on <code>feature/save-records</code>, not main, and the new file <code>storage.py</code> exists on this branch.</p>
+
+<h3>Where did storage.py go?</h3>
+
+<pre><code>git switch main
+ls</code></pre>
+
+<pre><code>Switched to branch 'main'
+README.md  __pycache__  main.py</code></pre>
+
+<p><code>git switch</code> changes the files in your folder to match the branch. <code>storage.py</code> is safe inside a commit on the feature branch, and main has not seen it yet. That is the point. Predict: what will <code>ls</code> show after <code>git switch feature/save-records</code>?</p>
+
+<h3>Merge: bring the work home</h3>
+
+<pre><code>git merge feature/save-records
+git branch -d feature/save-records
+git log --oneline --graph</code></pre>
+
+<pre><code>Updating 71b8a6e..d05376a
+Fast-forward
+ storage.py | 2 ++
+Deleted branch feature/save-records (was d05376a).
+* d05376a Add load_records stub
+* 71b8a6e Print the week in the banner
+* c4f930b Add project skeleton</code></pre>
+
+<p>When the feature works, merge it from main. If main had no new commits, this is a fast-forward: main just moves up. Delete the merged branch; its commits stay in main. <code>log --graph</code> draws the history.</p>
+
+<h3>Branch names and habits</h3>
+
+<pre><code>git branch</code></pre>
+
+<pre><code>  feature/report-title
+* main</code></pre>
+
+<p>A good branch name is a to-do item: <code>feature/save-records</code>, <code>fix/negative-minutes</code>. One feature per branch, merged within days. <code>git branch</code> lists the branches, and <code>*</code> marks the current one. Commit before you switch branches. Make a habit of checking the branch name shown in the bottom-left corner of VS Code before you type.</p>
+
+<h3>When two edits collide</h3>
+
+<pre><code>git merge feature/report-title
+git status --short
+cat report.py</code></pre>
+
+<pre><code>CONFLICT (content): Merge conflict in report.py
+Automatic merge failed; fix conflicts and then commit the result.
+UU report.py
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+TITLE = "Minutes per course"
+=======
+TITLE = "Study time this week"
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/report-title</code></pre>
+
+<p>The same line was changed differently on two branches: main changed TITLE to "Minutes per course" and <code>feature/report-title</code> changed it to "Study time this week". Git will not guess; it stops and marks the file. <code>UU</code> means unmerged. From <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> to <code>=======</code> is the current branch's (main's) content, and below it, up to <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>, is the content of the branch being merged in.</p>
+
+<h3>Resolve in three moves</h3>
+
+<pre><code>git add report.py
+git commit -m "Merge report title: keep both ideas"
+git log --oneline --graph</code></pre>
+
+<pre><code>*   f84e248 Merge report title: keep both ideas
+|\
+| * dd6fc23 Rename report title
+* | b7d071f Clarify report title
+|/
+* 7846ed1 Add report title</code></pre>
+
+<p>A conflict is a question, and you answer it by editing the file. First, keep the line you want and delete all three marker lines. Second, <code>git add</code> the file to say "answered". Third, <code>git commit</code> to finish the merge. VS Code shows Accept Current, Accept Incoming and Accept Both buttons above each conflict.</p>
+
+<h3>Practice: make a conflict on purpose (7 minutes)</h3>
+
+<pre><code>mkdir conflict-practice &amp;&amp; cd conflict-practice
+git init
+echo "Hello" &gt; title.txt
+git add title.txt &amp;&amp; git commit -m "Add title"
+git switch -c feature/greeting
+echo "Hello, class" &gt; title.txt
+git commit -am "Greet the class"
+git switch main
+echo "Hi" &gt; title.txt
+git commit -am "Shorten the title"
+git merge feature/greeting</code></pre>
+
+<p>Do this in a scratch folder, not in your project. Make a repository with title.txt and commit it, change the line on a branch and commit, then change the same line differently on main and commit. Then merge, resolve, add and commit, and check with <code>git log --oneline --graph</code>. (This practice also needs git, so do it on your own PC.)</p>
+
+<h3>Break</h3>
+
+<p>Take ten minutes; when you come back, open github.com and sign in. After the break we cover pull requests on your own repository, and in the lab you create a repository, a feature branch and a merged pull request.</p>
+
+<h2>Act 3 · Pull request: review your own work</h2>
+
+<p>A pull request (PR) is a merge with a conversation attached. It lives on GitHub, between your branch and main, and it is where you explain, check and get feedback.</p>
+
+<h3>Why a pull request in a solo project?</h3>
+
+<p>Even if nobody needs to approve it, a PR is the best record of your work. The description says what changed and why, in your own words. The Files changed tab makes you read your own diff. The instructor can comment on a specific line of your code. Each feature becomes one link that ties together branch, commits, review and merge.</p>
+
+<h3>Push the branch, open the PR</h3>
+
+<pre><code>git switch -c feature/append-record
+git add storage.py
+git commit -m "Add append_record with header"
+git push -u origin feature/append-record</code></pre>
+
+<pre><code>remote: Create a pull request for
+remote: 'feature/append-record' on GitHub:
+remote: https://github.com/jiwoo-park/
+remote: study-logger/pull/new/feature/append-record
+ * [new branch]      feature/append-record</code></pre>
+
+<p>This time we do not merge on the laptop. We push the branch and let GitHub merge. Set base to main and compare to your feature branch. Write the title like a commit message, saying what the feature does, and fill the description with the following four headings.</p>
+
+<h3>A PR description that earns points</h3>
+
+<pre><code>## What
+Add append_record() in storage.py (F1).
+## Why
+Contract: write the header only if the file is new.
+## How I checked
+Ran main.py twice -&gt; one header, two rows.
+## Not in this PR
+Sorted totals come in feature/sort-totals.</code></pre>
+
+<ul>
+<li>What: the change, linked to a feature ID.</li>
+<li>Why: the contract or acceptance criterion from your design document.</li>
+<li>How I checked: the command you ran and what it printed.</li>
+<li>Not in this PR: what is left for the next branch.</li>
+</ul>
+
+<p>Two minutes to write, and a whole feature is explained. The contract of the example <code>append_record</code> ("write the header only when the file is newly created") is implemented in Session 1's study_logger <code>storage.py</code>.</p>
+
+<h3>The self-review checklist</h3>
+
+<p>Read the Files changed tab as if a stranger wrote the code.</p>
+
+<ul>
+<li><code>python3 main.py</code> still runs from a fresh terminal.</li>
+<li>Every new function matches its contract and docstring.</li>
+<li>No leftover debug <code>print()</code> or commented-out experiments.</li>
+<li>No ignored files (<code>__pycache__</code>, <code>.venv</code>, <code>.env</code>) slipped in.</li>
+<li>Only one feature in this PR.</li>
+</ul>
+
+<p>If you find a problem, fix it on the same branch and push again. The PR updates automatically.</p>
+
+<h3>Merge, then sync your laptop</h3>
+
+<pre><code>git switch main
+git pull
+git branch -d feature/append-record</code></pre>
+
+<pre><code>Updating d05376a..e2a91c4
+Fast-forward
+ storage.py | 9 +++++++++
+Deleted branch feature/append-record (was 5a0c7e1).</code></pre>
+
+<p>On GitHub, click Merge pull request, then Delete branch. Your laptop does not know until you pull. On the laptop, go back to main, pull and delete the local branch, then start the next feature branch from the updated main. Trap: skip <code>git pull</code> and your next branch starts from the old main.</p>
+
+<h3>The weekly loop</h3>
+
+<p>One loop per Must feature: pull, branch, commit a few times, push, pull request, merge, pull. Weeks 11–13 are three or four loops. Small loops finish; giant branches rot. The grader sees this rhythm in your history.</p>
+
+<h2>Lab: your repository, your first PR (30 minutes)</h2>
+
+<p>The goal is to leave with two links: your repository and a merged pull request. You can see the contents of the starter repository in <a href="starter_repo.html">starter_repo</a>, but the lab itself needs git and GitHub, so do it on your own PC.</p>
+
+<h3>Step 1: the repository (10 minutes)</h3>
+
+<pre><code>cd my-project
+git init
+git add .
+git commit -m "Add project skeleton"
+git remote add origin \
+  https://github.com/&lt;you&gt;/my-project.git
+git push -u origin main</code></pre>
+
+<p>Copy the starter into a folder named after your project and write a one-sentence goal at the top of README.md. Run <code>python3 main.py</code> once and it prints <code>Loaded 0 records</code> (you can see the same output in the second step of <a href="starter_repo.html">starter_repo</a>). Create an empty repository with the same name on GitHub, then commit, connect and push.</p>
+
+<h3>Step 2: the feature branch (12 minutes)</h3>
+
+<pre><code># A stub: final name, full contract, no body yet
+def make_record(date, course, minutes_text):
+    """Return one record dict.
+
+    Raises ValueError if course is empty
+    or minutes is not positive.
+    """
+    raise NotImplementedError("make_record")</code></pre>
+
+<p>Turn your design document into stubs. Create a branch with <code>git switch -c feature/skeleton</code>, rename the stub functions to the names in your design document, and copy each contract into its docstring. Leave the bodies as TODO. Commit at least twice with real messages, check that <code>python3 main.py</code> still runs, and push the branch. The starter-repo's <code>logic.parse_value</code> is exactly this kind of stub: it has a contract but its body is <code>raise NotImplementedError</code>, and since <code>main.py</code> does not call it yet, the program still runs.</p>
+
+<h3>Step 3: pull request and merge (8 minutes)</h3>
+
+<pre><code>$ git log --oneline --graph
+*   3b8e0f1 Merge pull request #1 from you/feature/skeleton
+|\
+| * 9c41d2a Copy contracts into docstrings
+| * 52f7a90 Rename stubs to design names
+|/
+* 1a6c3e8 Add project skeleton</code></pre>
+
+<p>Open a PR from <code>feature/skeleton</code> into main and fill in What, Why, How I checked and Not in this PR. Go through the self-review checklist on the Files changed tab, then merge and delete the branch. After that, run <code>git switch main</code> and <code>git pull</code>.</p>
+
+<h3>When Git says no</h3>
+
+<p>Read the last line of the message; it usually contains the fix.</p>
+
+<table>
+<thead><tr><th>Message</th><th>Cause and fix</th></tr></thead>
+<tbody>
+<tr><td><code>not a git repository</code></td><td>Wrong folder. cd into the project folder.</td></tr>
+<tr><td><code>nothing to commit</code></td><td>You did not save the file, or forgot git add.</td></tr>
+<tr><td><code>src refspec main does not match any</code></td><td>Make the first commit before pushing.</td></tr>
+<tr><td><code>Authentication failed</code></td><td>Sign in through VS Code or gh auth login.</td></tr>
+<tr><td><code>Your branch is behind</code></td><td>Run git pull, then continue.</td></tr>
+</tbody>
+</table>
+
+<p><code>git status</code> answers most questions. Run it before and after every command.</p>
+
+<h2>Check questions and Week 11</h2>
+
+<ol>
+<li>What does <code>git add</code> do that <code>git commit</code> does not?</li>
+<li>Name four files or folders that belong in .gitignore in this course.</li>
+<li>Why keep main working when nobody else uses your repository?</li>
+<li>What are the three moves that end a merge conflict?</li>
+<li>What must you run on your laptop after merging on GitHub?</li>
+</ol>
+
+<p>Submit your repository URL, the link to your merged PR and the output of <code>git log --oneline --graph</code> via the LMS. If the repository is private, add the instructor as a collaborator first. The Must scope is now frozen, and new ideas go to Should or Could. In Week 11 you implement each Must feature with one branch and one pull request. This is individual work, so every commit in your repository must be your own.</p>

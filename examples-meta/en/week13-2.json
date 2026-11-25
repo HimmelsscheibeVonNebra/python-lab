@@ -1,0 +1,34 @@
+{
+  "title": "From CSV to SQLite: Swapping the Storage Layer",
+  "summary": "Run UPDATE and DELETE with WHERE, rowcount and rollback, the aggregates COUNT, SUM, AVG and GROUP BY, and transactions grouped with with con (all or nothing) on market.db. Then run korea_market_sqlite, where only storage.py of the Week 11 MVP has been switched to SQLite, and check that all 18 tests pass without a single line of logic.py or report.py changing, and that a bad import preserves both the table and the old HTML.",
+  "examples": {
+    "sql_changes": {
+      "summary": "Change rows, summarize them and group changes into transactions in Session 1's market.db (five rows in quotes). Each step starts from five clean rows rebuilt by create_db.py.",
+      "notes": "This virtual machine has no sqlite3 command-line shell or database GUI, so run SQL with python3 -c or small scripts. If there are no rows, run python3 create_db.py first.",
+      "steps": [
+        "Recap: (5,) and the codes and closing prices of the five stocks. SELECT only asks; it never changes the table.",
+        "An UPDATE with WHERE changes one row (1). The wrong code 999999 is not an error; it silently changes 0 rows. A DELETE with a forgotten WHERE deletes all 5 rows, leaving (0,). Nothing has been committed yet, so rollback() brings it back to (5,), and the earlier 72000 update is undone too, so the close is (71400,).",
+        "Aggregate functions turn many rows into one value. One tuple comes back, (5, 2100000, 200000, 124280.0), and AVG returns a REAL even for an INTEGER column. GROUP BY market gives one row per market: ('KOSDAQ', 2, 300000), ('KOSPI', 3, 1800000).",
+        "A comparison is 1 when true and 0 when false, so its SUM is the number of rows where the condition holds. (2, 2, 1) matches summarize(): 2 up, 2 down, 1 flat. Even so, the rule's one home is logic.py, which has the tests; SQL's job is to fetch rows.",
+        "Of the two rows in the next day's snapshot, the second has close 0. If an exception occurs inside a with con block, it rolls back and re-raises the exception. After CHECK constraint failed: close > 0 the row count is (5,): the first row was cancelled together with the second. with con does not close the connection; it only ends the transaction.",
+        "For comparison: committing row by row gives (6,) after the same error. A half snapshot remains, with only the 2026-11-06 삼성전자 row added, so the report mixes two days yet looks correct. The final create_db.py restores the five rows."
+      ]
+    },
+    "korea_market_sqlite": {
+      "summary": "Only storage.py of the Week 11 MVP has changed. connect() and init_db() open and prepare data/market.db, replace_quotes() replaces a validated snapshot in one transaction, and load_quotes(con) returns the same list of quote dicts as before. The old CSV reader remains as read_csv() and is used by --import-csv. In main.py only a few lines that open and pass the connection have changed.",
+      "notes": "The slides' cd 13week/examples/korea_market_sqlite is ~/week13/examples/korea_market_sqlite in this lab. Do Lab B (adding WHERE market = ? to load_quotes(con, market=\"ALL\")) and C (adding :memory: tests) with nano storage.py and nano test_market.py, and check with python3 -m unittest. Do git add/commit in the repository on your real PC.",
+      "steps": [
+        "Start green: Ran 18 tests, OK. The 12 MarketTests from Week 11 are joined by 6 StorageTests (test_13 to test_18). StorageTests creates a fresh empty database for each test with connect(\":memory:\") in setUp, so it never touches the real market.db.",
+        "Evidence for the completion criteria: the rules (logic.py) and the display (report.py) do not differ by a single character from Week 11. storage.py is the only module that knows about SQLite.",
+        "connect, init_db, replace_quotes, load_quotes, read_csv, write_html. The four names the slides ask you to find are here. write_html is the same atomic replacement as in Week 11.",
+        "Before any import, the table is empty. init_db() creates the table and writes a valid empty report from the empty sample, so it is (0 stocks). market.db has newly appeared in data/.",
+        "read_csv() validates the CSV exactly as in Week 11, then replace_quotes() replaces the snapshot. Generated … (5 stocks).",
+        "Now the report (3 stocks) is built from market.db alone, without the CSV. Enter /mnt/host/report.html in the Download box to fetch it, and you will see the same KOSPI report as in Week 11 (average +0.33%).",
+        "One row returned by load_quotes(). Because of ORDER BY code the first row is 000660. The keys follow the table's column order, code is a string that keeps its leading zero, and prices and volume are already int. analyze() and summarize() accept this dict unchanged.",
+        "A bad CSV: Report not generated: CSV row 2: previous_close must be >= 1, with exit code 1. It is rejected at the read_csv() stage, so the table has 5 rows kept and the HTML is still the KOSPI report from just before.",
+        "A header-only CSV is a valid empty snapshot, so it empties the table and produces a (0 stocks) report. Importing prices.csv again restores (5 stocks).",
+        "It contains *.db. market.db is a result; schema.sql and the code that fills the table are the source. Anyone can rebuild the database with a single python3 main.py --import-csv data/prices.csv."
+      ]
+    }
+  }
+}

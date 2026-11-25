@@ -1,0 +1,6 @@
+#!/bin/busybox sh
+# First process of the initramfs (kernel cmdline: rdinit=/init).
+# The Alpine packages were unpacked without running their install scripts,
+# so create the BusyBox applet links here, then hand over to BusyBox init.
+/bin/busybox --install -s
+exec /sbin/init

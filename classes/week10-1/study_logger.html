@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="study_logger — From Proposal to Design: Decomposition, Contracts, Modules · Python Lab" data-title-ko="study_logger — 제안서에서 설계로: 분해, 계약, 모듈 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>study_logger — From Proposal to Design: Decomposition, Contracts, Modules · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week10/examples/session1/study_logger">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 10 · Session 1</span><span lang="ko">10주차 1차시</span></a><span class="sep">/</span><span>study_logger</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>study_logger</h1>
+    <p><span lang="en">The finished study-time logger. main.py only asks, calls and shows; the rules live in logic.py (no I/O), files in storage.py, and the text for the screen in report.py. test_logic.py is a check file that writes the Week 9 acceptance criteria as asserts.</span><span lang="ko">공부 시간 기록기의 완성 예제. main.py는 묻고·호출하고·보여 주기만 하고, 규칙은 logic.py(입출력 없음), 파일은 storage.py, 화면용 문장은 report.py가 맡는다. test_logic.py는 9주차 수용 기준을 assert로 적은 검사 파일이다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week10/examples/session1/study_logger</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week10/examples/session1/study_logger</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls; cat data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls; cat data/study.csv">▶</button><code>ls; cat data/study.csv</code></div>
+          <p><span lang="en">The same as the project-folder layout on the slide: code files at the top level, data in data/. The CSV has the header date,course,minutes and 2 sample rows.</span><span lang="ko">슬라이드의 프로젝트 폴더 구조와 같다: 코드 파일은 맨 위에, 데이터는 data/에 있다. CSV는 date,course,minutes 헤더와 표본 2행이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-10-26\nPython \n60\n' | python3 main.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-10-26\nPython \n60\n' | python3 main.py">▶</button><code>printf '2026-10-26\nPython \n60\n' | python3 main.py</code></div>
+          <p><span lang="en">The three input lines (date, course, minutes) were fed in with printf. You can also run python3 main.py yourself and type them. Even with mixed case and a space as in 'Python ', make_record's strip().lower() turns it into python, so it is added to the same course: python 150 min, stats 45 min. report.py sorts the output from the largest total down.</span><span lang="ko">입력 세 줄(날짜, 과목, 분)을 printf로 넣었다. 직접 python3 main.py를 실행해 입력해도 된다. 'Python '처럼 대문자와 공백이 섞여도 make_record가 strip().lower()로 python이 되어 같은 과목으로 합산된다: python 150 min, stats 45 min. report.py가 큰 합계부터 정렬해 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-10-26\nart\n-30\n' | python3 main.py; printf '2026-10-26\nart\nabc\n' | python3 main.py; wc -l data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-10-26\nart\n-30\n' | python3 main.py; printf '2026-10-26\nart\nabc\n' | python3 main.py; wc -l data/study.csv">▶</button><code>printf '2026-10-26\nart\n-30\n' | python3 main.py; printf '2026-10-26\nart\nabc\n' | python3 main.py; wc -l data/study.csv</code></div>
+          <p><span lang="en">logic only raises ValueError; main decides the sentence the user sees (Not saved: ...). For -30 it is our own message; for abc it is the invalid literal message from int(). Neither is saved, so the file stays at the header plus 3 rows, 4 lines.</span><span lang="ko">logic은 ValueError를 일으키기만 하고, 사용자에게 보여 줄 문장(Not saved: ...)은 main이 정한다. -30은 우리가 쓴 메시지, abc는 int()가 낸 invalid literal 메시지다. 두 번 모두 저장되지 않아 파일은 헤더+3행, 4줄 그대로다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 test_logic.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 test_logic.py">▶</button><code>python3 test_logic.py</code></div>
+          <p><span lang="en">This checks only the logic functions, with no keyboard and no files. It takes less than a second and you can rerun it after every change. All checks passed. means the acceptance criteria pass.</span><span lang="ko">키보드도 파일도 없이 logic 함수만 검사한다. 1초도 걸리지 않으며 변경할 때마다 다시 돌릴 수 있다. All checks passed.가 나오면 수용 기준이 통과한 것이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from logic import parse_minutes; print(parse_minutes(&quot;45&quot;)); print(parse_minutes.__doc__.splitlines()[0])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from logic import parse_minutes; print(parse_minutes(&quot;45&quot;)); print(parse_minutes.__doc__.splitlines()[0])'">▶</button><code>python3 -c 'from logic import parse_minutes; print(parse_minutes(&quot;45&quot;)); print(parse_minutes.__doc__.splitlines()[0])'</code></div>
+          <p><span lang="en">The docstring is the contract. Its first line says what is returned: Return text as a positive whole number of minutes.</span><span lang="ko">docstring이 곧 계약이다. 첫 줄은 무엇을 돌려주는지를 말한다: Return text as a positive whole number of minutes.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from logic import make_record, weekly_totals; from report import format_totals; rows = [make_record(&quot;2026-10-24&quot;, &quot;python&quot;, &quot;90&quot;), make_record(&quot;2026-10-25&quot;, &quot;Stats&quot;, &quot;45&quot;)]; print(rows[1]); print(&quot;\n&quot;.join(format_totals(weekly_totals(rows))))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from logic import make_record, weekly_totals; from report import format_totals; rows = [make_record(&quot;2026-10-24&quot;, &quot;python&quot;, &quot;90&quot;), make_record(&quot;2026-10-25&quot;, &quot;Stats&quot;, &quot;45&quot;)]; print(rows[1]); print(&quot;\n&quot;.join(format_totals(weekly_totals(rows))))'">▶</button><code>python3 -c 'from logic import make_record, weekly_totals; from report import format_totals; rows = [make_record(&quot;2026-10-24&quot;, &quot;python&quot;, &quot;90&quot;), make_record(&quot;2026-10-25&quot;, &quot;Stats&quot;, &quot;45&quot;)]; print(rows[1]); print(&quot;\n&quot;.join(format_totals(weekly_totals(rows))))'</code></div>
+          <p><span lang="en">The example from the slide 'Importing your own files'. logic.py and report.py in the same folder are imported by module name. One record is a dict with fixed keys ({'date': ..., 'course': 'stats', 'minutes': 45}, minutes is an int), all records are a list of dicts, and the totals are a dict from course to minutes.</span><span lang="ko">슬라이드 '내 파일 import하기'의 예다. 같은 폴더의 logic.py, report.py를 모듈 이름으로 불러온다. 한 레코드는 고정된 키를 가진 dict({'date': ..., 'course': 'stats', 'minutes': 45}, minutes는 int), 전체 레코드는 dict의 list, 합계는 과목→분 dict다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import csv; rows = list(csv.DictReader(open(&quot;data/study.csv&quot;, newline=&quot;&quot;))); print(rows[0][&quot;course&quot;], repr(rows[0][&quot;minutes&quot;])); print(rows[0][&quot;minutes&quot;] + rows[1][&quot;minutes&quot;])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import csv; rows = list(csv.DictReader(open(&quot;data/study.csv&quot;, newline=&quot;&quot;))); print(rows[0][&quot;course&quot;], repr(rows[0][&quot;minutes&quot;])); print(rows[0][&quot;minutes&quot;] + rows[1][&quot;minutes&quot;])'">▶</button><code>python3 -c 'import csv; rows = list(csv.DictReader(open(&quot;data/study.csv&quot;, newline=&quot;&quot;))); print(rows[0][&quot;course&quot;], repr(rows[0][&quot;minutes&quot;])); print(rows[0][&quot;minutes&quot;] + rows[1][&quot;minutes&quot;])'</code></div>
+          <p><span lang="en">csv.DictReader uses the header as keys, but every value is a str. '90' + '45' becomes 9045, not 135. That is why storage.load_records converts with int() once, right after reading.</span><span lang="ko">csv.DictReader는 헤더를 키로 쓰지만 값은 모두 str이다. '90' + '45'는 135가 아니라 9045가 된다. 그래서 storage.load_records가 읽자마자 int()로 한 번 변환해 둔다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="mkdir -p /tmp/trap; echo 'x = 1' &gt; /tmp/trap/csv.py; cd /tmp/trap; python3 -c 'import csv; print(csv.__file__, hasattr(csv, &quot;DictReader&quot;))'; cd -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: mkdir -p /tmp/trap; echo 'x = 1' &gt; /tmp/trap/csv.py; cd /tmp/trap; python3 -c 'import csv; print(csv.__file__, hasattr(csv, &quot;DictReader&quot;))'; cd -">▶</button><code>mkdir -p /tmp/trap; echo 'x = 1' &gt; /tmp/trap/csv.py; cd /tmp/trap; python3 -c 'import csv; print(csv.__file__, hasattr(csv, &quot;DictReader&quot;))'; cd -</code></div>
+          <p><span lang="en">Import trap 1: if you name a file after a standard-library module, your own file hides the real module. /tmp/trap/csv.py is loaded and has no DictReader (False). If this happens in a project, you get AttributeError: module 'csv' has no attribute 'DictReader'. Rename the file and delete __pycache__ to fix it.</span><span lang="ko">import 함정 1: 표준 라이브러리 이름으로 파일을 만들면 자기 파일이 진짜 모듈을 가린다. /tmp/trap/csv.py가 불려 와 DictReader가 없다(False). 프로젝트에서 이런 일이 생기면 AttributeError: module 'csv' has no attribute 'DictReader'가 난다. 파일 이름을 바꾸고 __pycache__를 지우면 해결된다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Step 2 adds one row (2026-10-26,python,60) to data/study.csv. To return to the original state, reload the page. The test_logic.py in this folder is not unittest but a script listing asserts, so run it with python3 test_logic.py.</span><span lang="ko">단계 2는 data/study.csv에 한 행(2026-10-26,python,60)을 추가한다. 처음 상태로 돌리려면 페이지를 새로 고친다. 이 폴더의 test_logic.py는 unittest가 아니라 assert를 나열한 스크립트이므로 python3 test_logic.py로 실행한다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">26 lines</span><span lang="ko">26줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Study logger: log one study session, then show the weekly totals.&quot;&quot;&quot;</span>
+<span class="ln">from logic import make_record, weekly_totals</span>
+<span class="ln">from report import format_totals</span>
+<span class="ln">from storage import append_record, load_records</span>
+<span class="ln"> </span>
+<span class="ln">DATA = &quot;data/study.csv&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    date = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">    course = input(&quot;Course: &quot;)</span>
+<span class="ln">    minutes = input(&quot;Minutes: &quot;)</span>
+<span class="ln">    try:</span>
+<span class="ln">        record = make_record(date, course, minutes)</span>
+<span class="ln">    except ValueError as error:</span>
+<span class="ln">        print(&quot;Not saved:&quot;, error)</span>
+<span class="ln">    else:</span>
+<span class="ln">        append_record(DATA, record)</span>
+<span class="ln">        print(&quot;Saved.&quot;)</span>
+<span class="ln">    totals = weekly_totals(load_records(DATA))</span>
+<span class="ln">    for line in format_totals(totals):</span>
+<span class="ln">        print(line)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">37 lines</span><span lang="ko">37줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Rules of the study logger. No input(), print() or open() in this file.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_minutes(text):</span>
+<span class="ln">    &quot;&quot;&quot;Return text as a positive whole number of minutes.</span>
+<span class="ln"> </span>
+<span class="ln">    Raises ValueError if text is not a whole number or is not above 0.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    minutes = int(text)</span>
+<span class="ln">    if minutes &lt;= 0:</span>
+<span class="ln">        raise ValueError(f&quot;minutes must be positive, got {minutes}&quot;)</span>
+<span class="ln">    return minutes</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def make_record(date, course, minutes_text):</span>
+<span class="ln">    &quot;&quot;&quot;Return one record: {&quot;date&quot;: str, &quot;course&quot;: str, &quot;minutes&quot;: int}.</span>
+<span class="ln"> </span>
+<span class="ln">    The course is stored in lower case. Raises ValueError for an empty</span>
+<span class="ln">    course or invalid minutes.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    course = course.strip().lower()</span>
+<span class="ln">    if not course:</span>
+<span class="ln">        raise ValueError(&quot;course must not be empty&quot;)</span>
+<span class="ln">    return {&quot;date&quot;: date.strip(), &quot;course&quot;: course,</span>
+<span class="ln">            &quot;minutes&quot;: parse_minutes(minutes_text)}</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def weekly_totals(records):</span>
+<span class="ln">    &quot;&quot;&quot;Return {course: total minutes} for a list of records.</span>
+<span class="ln"> </span>
+<span class="ln">    An empty list returns {}. The input list is not changed.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    totals = {}</span>
+<span class="ln">    for record in records:</span>
+<span class="ln">        course = record[&quot;course&quot;]</span>
+<span class="ln">        totals[course] = totals.get(course, 0) + record[&quot;minutes&quot;]</span>
+<span class="ln">    return totals</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">30 lines</span><span lang="ko">30줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Reading and writing study.csv. The only file that touches the disk.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_records(path):</span>
+<span class="ln">    &quot;&quot;&quot;Return every row of the CSV file as a record dict.</span>
+<span class="ln"> </span>
+<span class="ln">    minutes is converted to int. A missing file returns [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    path = Path(path)</span>
+<span class="ln">    if not path.exists():</span>
+<span class="ln">        return []</span>
+<span class="ln">    with open(path, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:</span>
+<span class="ln">        return [{&quot;date&quot;: row[&quot;date&quot;], &quot;course&quot;: row[&quot;course&quot;],</span>
+<span class="ln">                 &quot;minutes&quot;: int(row[&quot;minutes&quot;])}</span>
+<span class="ln">                for row in csv.DictReader(f)]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def append_record(path, record):</span>
+<span class="ln">    &quot;&quot;&quot;Append one record to the CSV file, writing the header if the file is new.&quot;&quot;&quot;</span>
+<span class="ln">    path = Path(path)</span>
+<span class="ln">    is_new = not path.exists()</span>
+<span class="ln">    with open(path, &quot;a&quot;, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:</span>
+<span class="ln">        writer = csv.DictWriter(f, fieldnames=FIELDS)</span>
+<span class="ln">        if is_new:</span>
+<span class="ln">            writer.writeheader()</span>
+<span class="ln">        writer.writerow(record)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Turning results into text for the screen.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_totals(totals):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per course, largest total first: &quot;python   90 min&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    ordered = sorted(totals.items(), key=lambda item: item[1], reverse=True)</span>
+<span class="ln">    return [f&quot;{course:&lt;8}{minutes:&gt;4} min&quot; for course, minutes in ordered]</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>test_logic.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Acceptance criteria from the week 9 proposal, written as checks.&quot;&quot;&quot;</span>
+<span class="ln">from logic import make_record, parse_minutes, weekly_totals</span>
+<span class="ln"> </span>
+<span class="ln">sample = [make_record(&quot;2026-10-24&quot;, &quot;python&quot;, &quot;90&quot;),</span>
+<span class="ln">          make_record(&quot;2026-10-25&quot;, &quot;Stats &quot;, &quot;45&quot;)]</span>
+<span class="ln">assert weekly_totals(sample) == {&quot;python&quot;: 90, &quot;stats&quot;: 45}</span>
+<span class="ln">assert weekly_totals([]) == {}</span>
+<span class="ln">for bad in [&quot;-30&quot;, &quot;0&quot;, &quot;abc&quot;]:</span>
+<span class="ln">    try:</span>
+<span class="ln">        parse_minutes(bad)</span>
+<span class="ln">    except ValueError:</span>
+<span class="ln">        pass</span>
+<span class="ln">    else:</span>
+<span class="ln">        raise AssertionError(f&quot;{bad!r} was accepted&quot;)</span>
+<span class="ln">print(&quot;All checks passed.&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/study.csv <span class="muted"><span lang="en">3 lines</span><span lang="ko">3줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,course,minutes</span>
+<span class="ln">2026-10-24,python,90</span>
+<span class="ln">2026-10-25,stats,45</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="refactor_lab.html">refactor_lab →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

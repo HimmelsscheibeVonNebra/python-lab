@@ -1,0 +1,17 @@
+{
+  "title": "Your Project Has a History: Commits, Branches, Pull Requests",
+  "summary": "Covers Git's four places (working folder, staging area, local repository, GitHub), init, add, commit, log, diff and push, .gitignore, branches, merging and conflict resolution, and GitHub pull requests. This web lab environment has no git or network, so do the Git commands on your own PC; here you look at the structure and behavior of the lab's starter-repo.",
+  "examples": {
+    "starter_repo": {
+      "summary": "The skeleton repository you copy into your own project folder in lab step 1 to make your first commit. It has Session 1's module layout (main, logic, storage, report, data/) plus a README and .gitignore; the functions are stubs with only a contract (docstring) and a TODO body.",
+      "notes": "This virtual machine has no git, network or browser, so git init, commit and push, branches and GitHub pull requests cannot be run here. Do the lab on your own PC, where git --version works. The last step modifies report.py, so reload the page to return to the original state.",
+      "steps": [
+        ".gitignore starts with a dot, so it only shows up with ls -a. This follows the slide's rule that README.md and .gitignore go in together from the very first commit.",
+        "This prints Loaded 0 records, the check output for lab step 1. That is because storage.load_records still returns only an empty list and report.format_summary returns TODO: summary. Even with TODO bodies, main.py must run.",
+        "After running, a new __pycache__ folder has appeared (the compiled output of the imported modules). Generated files like this match the __pycache__/ and *.pyc patterns in .gitignore, so they do not show up in git status. .venv/, .vscode/, .DS_Store and the secrets .env and *.key are not committed either.",
+        "A stub has its final name and its full contract, but its body is raise NotImplementedError. main.py does not call this function yet, so the program still runs. In lab step 2 you replace this name and docstring with the functions from your own design document.",
+        "This imitates the format git diff shows, using diff -u. Lines starting with - were removed, lines with + were added, and @@ gives the location. On a real PC you would check this change with git diff and save it with git commit -am \"...\". The second line of main.py's output changes to No records yet."
+      ]
+    }
+  }
+}

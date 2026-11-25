@@ -1,0 +1,310 @@
+<p>In Week 1 we look at what kind of language Python, which we will use for the next 16 weeks, is and how it runs, then set up a development environment and write our first programs. The first 2 hours are theory: a Python overview, the development environment (VS Code, virtual environments with venv, Google Colab), variables and data types, input and output with <code>print()</code> and <code>input()</code>, and type conversion. The second 2 hours are practice: you set up your development environment (<a href="lab1_setup.html">lab1_setup</a>) and then complete, in order, a greeting program (<a href="hello.html">hello</a>), an input and calculation program (<a href="calc.html">calc</a>) and a BMI calculator (<a href="bmi.html">bmi</a>). At the end of class you submit three <code>.py</code> files.</p>
+
+<p>We also go over the plan for the whole course. Weeks 1–8 cover the Python core syntax, and weeks 9–16 are a team term project.</p>
+
+<h2>Python Overview</h2>
+
+<h3>What Is Python?</h3>
+
+<p>Python was created by Guido van Rossum and first released in 1991. Its features are:</p>
+
+<ul>
+<li>It is a <strong>high-level, general-purpose language</strong>. The syntax is clear and readable, and reads almost like English.</li>
+<li>It is an <strong>interpreted language</strong>. Code runs line by line, with no separate compile step.</li>
+<li>It is <strong>dynamically typed</strong>. You do not declare a type when you create a variable.</li>
+<li>Besides a huge standard library, there are more than 500,000 packages on PyPI.</li>
+<li>The current version is Python 3. Python 2 was retired in 2020.</li>
+</ul>
+
+<p>The slides compare the same greeting in Python and Java. Python needs two lines, while Java needs a class and a <code>main</code> method to be declared.</p>
+
+<pre><code># Python reads almost like English
+name = "Python"
+print("Hello,", name)
+
+# Java needs a lot more to say the same
+# public class Main {
+#     public static void main(String[] a) {
+#         System.out.println("Hello, Java");
+#     }
+# }</code></pre>
+
+<h3>Why Learn Python?</h3>
+
+<p>Python is used in many fields. In data and AI, with pandas, NumPy, matplotlib, scikit-learn, PyTorch and TensorFlow, it has become the default language of data science. In web and automation, it is used for web frameworks such as Django, Flask and FastAPI, and for scripts, bots, web scraping and glue code between systems. It is also widely used in education and scientific computing, games, DevOps and cloud tooling, and is consistently #1 in language rankings.</p>
+
+<p>Another important point is that its beginner-friendly syntax lets you focus on problem solving instead of language details. In this course, both the core syntax (weeks 1–8) and the team project (weeks 9–16) use Python alone.</p>
+
+<h3>How Python Runs Your Code</h3>
+
+<p>Source code (<code>.py</code>) is first compiled to bytecode, and this bytecode is executed by the Python Virtual Machine. This happens automatically, so to you it feels as if the file runs directly. There are three ways to use Python.</p>
+
+<ul>
+<li><strong>Interactive mode (REPL)</strong>: type <code>python3</code> in a terminal and the <code>&gt;&gt;&gt;</code> prompt appears. Enter statements one at a time and see the results instantly. Leave with <code>exit()</code>.</li>
+<li><strong>Script mode</strong>: save the code in a file and run it with <code>python3 file.py</code>.</li>
+<li><strong>Notebook mode</strong> (Colab, Jupyter): code runs cell by cell, combining both styles.</li>
+</ul>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3              # interactive mode
+&gt;&gt;&gt; 2 + 3
+5
+&gt;&gt;&gt; print("hi")
+hi
+&gt;&gt;&gt; exit()
+$ python3 hello.py     # script mode
+Hello, World!</code></pre>
+
+<p>Check your version with <code>python3 --version</code>. On Windows the command is usually <code>python</code> or <code>py</code>. This web lab's Python is 3.14.10, so only the version number differs; everything you learn in this course works the same. You can try checking the version and using interactive mode yourself in the <a href="lab1_setup.html">lab1_setup</a> example.</p>
+
+<h2>Development Environment</h2>
+
+<h3>Three Options</h3>
+
+<table>
+<thead><tr><th>Environment</th><th>Features</th></tr></thead>
+<tbody>
+<tr><td>Local: Python + VS Code</td><td>Full control, and it works offline. Best for real projects and assignments, and our main setup in class.</td></tr>
+<tr><td>Virtual environment (venv)</td><td>One isolated set of packages per project. It avoids version conflicts and is standard practice for every project.</td></tr>
+<tr><td>Google Colab</td><td>Runs in the browser, with nothing to install. A free GPU is available for heavier work; great for quick experiments and data work.</td></tr>
+</tbody>
+</table>
+
+<p>VS Code and venv are recommended for assignments; think of Colab as a backup for when you are away from your laptop. All three are the same Python, so everything you learn works the same everywhere.</p>
+
+<p>This web lab can be seen as a fourth option. A small Linux runs inside the browser, and you use Python in its terminal. Like Colab, there is nothing to install, and like VS Code's built-in terminal, you run programs in the terminal with <code>python3 file.py</code>. Files are edited with the <code>nano</code> editor.</p>
+
+<h3>Setting Up VS Code</h3>
+
+<p>VS Code is an editor you install and use on a real PC. The steps are:</p>
+
+<ol>
+<li>Install Python 3.x from python.org. On Windows, be sure to tick <strong>Add python.exe to PATH</strong>.</li>
+<li>Install VS Code from code.visualstudio.com.</li>
+<li>Add the Python extension by Microsoft from the Extensions view.</li>
+<li>Open your working folder (e.g. <code>python-week1</code>) with <strong>File → Open Folder…</strong>.</li>
+<li>Press <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> and select the interpreter with <strong>Python: Select Interpreter</strong>.</li>
+<li>Create <code>hello.py</code>, then press the ▶ Run button or run it in the terminal.</li>
+</ol>
+
+<p>Open the built-in terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd> on Windows/Linux and <kbd>Cmd</kbd> + <kbd>`</kbd> on macOS. The selected interpreter is shown in the bottom-right status bar.</p>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3 hello.py
+Hello, World!</code></pre>
+
+<h3>Virtual Environments with venv</h3>
+
+<p>A virtual environment gives each project its own Python packages, isolated from the system. For example, even if two projects need different versions of pandas, they do not conflict. venv is built into Python, so there is nothing extra to install. Always activate the virtual environment before <code>pip install</code>; VS Code detects the <code>.venv</code> folder automatically. When you use Git, add <code>.venv/</code> to <code>.gitignore</code> and share a <code>requirements.txt</code> instead.</p>
+
+<pre><code># 1. Create (inside your project folder)
+$ python3 -m venv .venv
+# 2. Activate
+$ source .venv/bin/activate     # macOS/Linux
+&gt; .venv\Scripts\activate        # Windows
+# 3. Install packages
+(.venv) $ pip install requests
+# 4. Leave the environment
+(.venv) $ deactivate</code></pre>
+
+<p>This lab has no network and no pip, so you cannot <code>pip install</code>. You can still go through creating and activating a virtual environment exactly as it is, using <code>python3 -m venv --without-pip</code>. After activation, the <code>python</code> command points to the interpreter inside <code>.venv</code>, and after <code>deactivate</code> it goes back to the original (<a href="lab1_setup.html">lab1_setup</a>). In the BusyBox shell, use the equivalent <code>.</code> command instead of <code>source</code>.</p>
+
+<h3>Google Colab</h3>
+
+<p>Colab (colab.research.google.com) is Jupyter notebooks hosted by Google. You need only a browser and a Google account, and a notebook consists of code cells and text (Markdown) cells. Run a cell with <kbd>Shift</kbd> + <kbd>Enter</kbd>. Popular libraries are pre-installed, and a free GPU/TPU is available for heavier work. Notebooks (<code>.ipynb</code>) are saved to Google Drive and shared like a Google Doc. However, the runtime resets after idle time, so save your files to Drive.</p>
+
+<pre><code># In a Colab code cell
+print("Hello from Colab!")
+
+# Shell commands start with !
+!python --version
+!pip install some-package
+
+# Variables persist between cells
+x = 10</code></pre>
+
+<p>Colab is used in a real browser with a Google account. In this lab, run the same code in the terminal instead of a Colab cell. Colab's <code>!</code> commands are the same as shell commands typed in this lab's terminal without the <code>!</code>.</p>
+
+<h2>Variables and Data Types</h2>
+
+<h3>Variables</h3>
+
+<p>A variable is a name that refers to a value stored in memory. It is created by an assignment of the form <code>name = value</code>; there is no declaration keyword. Assigning again changes the value, and can even change the type. You can also assign to several variables at once using commas.</p>
+
+<pre><code>age = 20
+height = 175.5
+name = "Kim"
+is_student = True
+
+age = age + 1          # 21
+age = "twenty-one"     # now a string!
+
+# Multiple assignment
+x, y = 10, 20
+MAX_SCORE = 100        # a constant</code></pre>
+
+<p>Variable names follow these rules:</p>
+
+<ul>
+<li>Only letters, digits and the underscore (<code>_</code>) are allowed, and a name cannot start with a digit.</li>
+<li>Names are case-sensitive. <code>age</code> and <code>Age</code> are different variables.</li>
+<li>Keywords such as <code>if</code>, <code>for</code> and <code>class</code> cannot be used as names.</li>
+<li>By convention, variables use <code>snake_case</code> and constants use <code>UPPER_CASE</code>.</li>
+</ul>
+
+<h3>Basic Data Types</h3>
+
+<table>
+<thead><tr><th>Type</th><th>Examples</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>int</code></td><td><code>42</code>, <code>-7</code>, <code>0</code></td><td>Whole numbers, with unlimited size.</td></tr>
+<tr><td><code>float</code></td><td><code>3.14</code>, <code>2.0</code>, <code>1e-3</code></td><td>Decimal numbers (64-bit floating point)</td></tr>
+<tr><td><code>str</code></td><td><code>"hello"</code>, <code>'a'</code></td><td>Text, in single or double quotes.</td></tr>
+<tr><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>Logical values. Note the capital first letter.</td></tr>
+<tr><td><code>NoneType</code></td><td><code>None</code></td><td>The absence of a value.</td></tr>
+</tbody>
+</table>
+
+<p>Check a value's type with <code>type(x)</code>. For example, <code>type(3.14)</code> gives <code>&lt;class 'float'&gt;</code>. The type decides which operations are allowed. <code>"3" + "3"</code> concatenates the strings into <code>"33"</code>, but <code>"3" + 3</code> tries to add a string and an integer, so it is an error (TypeError). You can check the five types and this error yourself in <a href="lab1_setup.html">lab1_setup</a>.</p>
+
+<h2>Input and Output</h2>
+
+<h3>Output with print()</h3>
+
+<p><code>print()</code> writes values to the screen. If you pass several values separated by commas, they are printed separated by one space. <code>sep=</code> changes the separator, and <code>end=</code> changes the line ending (default: newline).</p>
+
+<p>An f-string (<code>f"..."</code>) is the modern way to embed values directly in text. A variable or expression written inside braces is replaced by its value. You can also add a format specifier inside the braces: <code>{x:.2f}</code> gives two decimal places, and <code>{n:,}</code> adds thousands separators.</p>
+
+<pre><code>print("Hello", "World")          # Hello World
+print("A", "B", sep="-")         # A-B
+print("same line", end=" ")
+print("continues")
+
+name, score = "Kim", 95.5
+print(f"{name} scored {score}")  # Kim scored 95.5
+print(f"{score:.1f} pts")        # 95.5 pts
+print(f"{1234567:,}")            # 1,234,567</code></pre>
+
+<p>You can see the output of this code in the <a href="hello.html">hello</a> example.</p>
+
+<h3>Input with input()</h3>
+
+<p><code>input(prompt)</code> shows the prompt, waits until the user types something, and returns what they typed. The returned value is <strong>always a string</strong>, even when the user types a number. So to do arithmetic, you must first convert it with <code>int()</code> or <code>float()</code>. <code>"3" + "4"</code> is not 7 but the concatenation <code>"34"</code>.</p>
+
+<pre><code>name = input("Your name: ")
+print(f"Hi, {name}!")
+
+age = input("Your age: ")
+print(type(age))      # &lt;class 'str'&gt;
+print(age + 1)        # TypeError!
+
+age = int(input("Your age: "))
+print(age + 1)        # works now</code></pre>
+
+<p>The typical pattern for reading a number is <code>n = int(input("Number: "))</code>.</p>
+
+<p>The example steps in this lab pipe the input in beforehand, as in <code>printf '8\n2\n' | python3 calc.py</code>. Done this way, the values you enter are not shown on screen, so the prompts run together on one line. If you want to type the input on the keyboard yourself, run just <code>python3 calc.py</code>, type a value and press <kbd>Enter</kbd>.</p>
+
+<h3>Type Conversion (Casting)</h3>
+
+<table>
+<thead><tr><th>Function</th><th>Input → Output</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>int()</code></td><td><code>"42"</code> → <code>42</code>, <code>3.9</code> → <code>3</code></td><td>Truncates the fractional part of a float. <code>int("3.5")</code> is an error.</td></tr>
+<tr><td><code>float()</code></td><td><code>"3.5"</code> → <code>3.5</code>, <code>7</code> → <code>7.0</code></td><td>Accepts integers and numeric strings.</td></tr>
+<tr><td><code>str()</code></td><td><code>42</code> → <code>"42"</code>, <code>3.5</code> → <code>"3.5"</code></td><td>Needed before joining a number with text.</td></tr>
+<tr><td><code>bool()</code></td><td><code>0</code>, <code>""</code>, <code>None</code> → <code>False</code></td><td>Everything else becomes <code>True</code>.</td></tr>
+</tbody>
+</table>
+
+<p>Implicit conversion happens in arithmetic: <code>int + float</code> gives a <code>float</code>. Between strings and numbers, however, conversion is the programmer's job. For example, to turn <code>"3.5"</code> into an integer you go through two steps, as in <code>int(float("3.5"))</code>. In the type conversion steps of <a href="lab1_setup.html">lab1_setup</a>, check that <code>int(3.9)</code> becomes 3 and that <code>int("3.5")</code> raises a ValueError.</p>
+
+<h2>Lab 1: Set Up Your Environment</h2>
+
+<p>On a real PC, you do the following:</p>
+
+<ol>
+<li>Install Python 3.x and confirm with <code>python3 --version</code>.</li>
+<li>Install VS Code and the Python extension.</li>
+<li>Create a folder <code>python-week1</code> and open it in VS Code.</li>
+<li>Create a virtual environment <code>.venv</code> and activate it.</li>
+<li>Select the <code>.venv</code> interpreter in the bottom-right status bar of VS Code.</li>
+<li>Create a new notebook in Google Colab as a backup.</li>
+</ol>
+
+<pre><code>$ mkdir python-week1
+$ cd python-week1
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+(.venv) $ python --version
+Python 3.12.4
+(.venv) $ code .
+# Windows: .venv\Scripts\activate</code></pre>
+
+<p>You are done when the terminal prompt starts with <code>(.venv)</code> and VS Code shows the <code>.venv</code> interpreter. The VS Code and Colab steps must be done on a real PC and browser, but creating the folder, creating the virtual environment, activating and deactivating it, and checking the version can all be tried as they are in <a href="lab1_setup.html">lab1_setup</a>. <code>code .</code> is the command that opens VS Code, so it is not used in this lab.</p>
+
+<h2>Lab 2: Hello, World!</h2>
+
+<p>Create <code>hello.py</code>, type in the following program and run it. In VS Code, use the ▶ button or <code>python hello.py</code> in the terminal; in Colab, put the same code in a cell and run it with <kbd>Shift</kbd> + <kbd>Enter</kbd>.</p>
+
+<pre><code># hello.py
+print("Hello, World!")
+print("Hello, Python!")
+
+# Your turn
+print("Name:", "Kim Minsu")
+print("Major:", "Computer Science")
+print("Week", 1, "of", 16)</code></pre>
+
+<p>Next, extend it to store your name, your major and today's date in variables and print each on a separate line. The TODOs in the starter code ask for the same thing: the two Hello lines, three string variables holding your name, major and date, the labels <code>Name:</code>, <code>Major:</code> and <code>Date:</code>, and <code>Week 1 of 16</code> made with a <code>print()</code> that takes several arguments.</p>
+
+<p>Finally, remove a quotation mark and read the error message. Without the closing quotation mark you get <code>SyntaxError: unterminated string literal</code>, and the <code>^</code> mark points to the problem. If there is a syntax error, not a single line of the program runs. This is shown in the <a href="hello.html">hello</a> example.</p>
+
+<h2>Lab 3: Input &amp; Calculation</h2>
+
+<p>Read two numbers with <code>input()</code> and print their sum, difference, product and quotient. Show the quotient to two decimal places with an f-string.</p>
+
+<pre><code># calc.py
+a = float(input("First number: "))
+b = float(input("Second number: "))
+print(f"{a} + {b} = {a + b}")
+print(f"{a} - {b} = {a - b}")
+print(f"{a} * {b} = {a * b}")
+print(f"{a} / {b} = {a / b:.2f}")</code></pre>
+
+<p>Because the values are converted with <code>float()</code>, entering 8 and 2 gives a decimal point, as in <code>8.0 + 2.0 = 10.0</code>. With 7 and 3, the quotient 2.333... is shown as <code>2.33</code>. The starter code reads the two inputs as plain strings, so start by converting them to <code>float</code>.</p>
+
+<p>There are two challenges. First, also print floor division <code>//</code>, remainder <code>%</code> and exponent <code>**</code>. Second, see what happens when the second number is 0. The sum, difference and product are printed, but the program stops at the division with a <code>ZeroDivisionError</code>. How to handle this error is covered in Week 5. You can run both in the <a href="calc.html">calc</a> example.</p>
+
+<h2>Lab 4: BMI Calculator</h2>
+
+<p>BMI is weight (kg) divided by the square of height (m). Read the height in cm and the weight in kg, convert the height to m, and print the BMI to one decimal place.</p>
+
+<pre><code># bmi.py
+height_cm = float(input("Height (cm): "))
+weight = float(input("Weight (kg): "))
+height_m = height_cm / 100
+bmi = weight / (height_m ** 2)
+print(f"Height: {height_m:.2f} m")
+print(f"Weight: {weight:.1f} kg")
+print(f"Your BMI is {bmi:.1f}")</code></pre>
+
+<p>Tested with 175 cm and 70 kg, the BMI should be 22.9 (<a href="bmi.html">bmi</a>). As a challenge that previews Week 2, also print a category based on the BMI. By the Asia-Pacific standard, below 18.5 is Underweight, 18.5–22.9 is Normal, 23–24.9 is Overweight, and 25 or above is Obese.</p>
+
+<h2>Summary and Next Week</h2>
+
+<p>Today we learned:</p>
+
+<ul>
+<li>Python is interpreted, dynamically typed and readable.</li>
+<li>The tools are VS Code + venv locally and Colab in the browser.</li>
+<li>Variables and the core types <code>int</code>, <code>float</code>, <code>str</code> and <code>bool</code>.</li>
+<li>Output with <code>print()</code> and f-strings; <code>input()</code> always returns a <code>str</code>.</li>
+<li>Type conversion with <code>int()</code>, <code>float()</code>, <code>str()</code> and <code>bool()</code>.</li>
+</ul>
+
+<p>For homework, submit <code>hello.py</code>, <code>calc.py</code> and <code>bmi.py</code> to the LMS before the next class. As the starter code says, leave test inputs and expected results as comments at the bottom of each file. To bring a file you made in this lab to your own computer, copy it with <code>cp hello.py /mnt/host/</code> and then use the page's Download box.</p>
+
+<p>In Week 2 we learn arithmetic, comparison and logical operators, string indexing, slicing and methods, and <code>if</code> / <code>elif</code> / <code>else</code> conditionals, and we write string processing, grade classification, rock-paper-scissors and leap year programs.</p>

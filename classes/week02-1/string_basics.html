@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="string_basics — Operators, Strings &amp; Conditionals (Theory) · Python Lab" data-title-ko="string_basics — 연산자, 문자열, 조건문 (이론) · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>string_basics — Operators, Strings &amp; Conditionals (Theory) · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week02/solutions">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 2 · Session 1</span><span lang="ko">2주차 1차시</span></a><span class="sep">/</span><span>string_basics</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>string_basics</h1>
+    <p><span lang="en">Run string indices and negative indices, IndexError, slicing and reversing, immutability, strip, lower, upper, replace, split and in, string joining and f-strings, and the receipt example. At the end, run a string processing program that combines them (the solution to Session 2, Lab 1).</span><span lang="ko">문자열 인덱스와 음수 인덱스, IndexError, 슬라이싱과 역순, 불변성, strip·lower·upper·replace·split과 in, 문자열 연결과 f-string, 영수증 예제를 실행한다. 마지막에 이를 조합한 문자열 처리 프로그램(2차시 실습 1의 답안)을 돌린다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week02/solutions</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week02/solutions</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'text = &quot;Python&quot;; print(len(text), text[0], text[2], text[-1], text[-2])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'text = &quot;Python&quot;; print(len(text), text[0], text[2], text[-1], text[-2])'">▶</button><code>python3 -c 'text = &quot;Python&quot;; print(len(text), text[0], text[2], text[-1], text[-2])'</code></div>
+          <p><span lang="en">Length 6, first character P (index 0), text[2] is t, and the negative indices -1 and -2 count from the end: n, o.</span><span lang="ko">길이 6, 첫 글자 P(인덱스 0), text[2]는 t, 음수 인덱스 -1과 -2는 끝에서부터 n, o다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">With length 6, the valid indices are 0 to 5. text[5] is n, and text[6] is IndexError: string index out of range.</span><span lang="ko">길이 6이면 유효한 인덱스는 0~5다. text[5]는 n이고, text[6]은 IndexError: string index out of range다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">In a one-character string the first and last characters are the same (True). An empty string has no valid index, so it is an IndexError.</span><span lang="ko">한 글자 문자열은 첫 글자와 마지막 글자가 같다(True). 빈 문자열에는 유효한 인덱스가 없어 IndexError다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'text = &quot;Python&quot;; print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'text = &quot;Python&quot;; print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])'">▶</button><code>python3 -c 'text = &quot;Python&quot;; print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])'</code></div>
+          <p><span lang="en">Py, thon, Pyth, Pto, nohtyP, Python. The stop index is not included, and a slice past the end, [:99], is cut at the end without an error.</span><span lang="ko">Py, thon, Pyth, Pto, nohtyP, Python. stop 인덱스는 포함되지 않고, 범위를 넘는 슬라이스 [:99]는 오류 없이 끝까지 잘린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'text = &quot;PYTHON&quot;; print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'text = &quot;PYTHON&quot;; print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))'">▶</button><code>python3 -c 'text = &quot;PYTHON&quot;; print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))'</code></div>
+          <p><span lang="en">Answers to the exercise: YTH, PYT, HON, YHN, NOHTYP. When start and stop are equal the result is an empty string, shown by repr as ''.</span><span lang="ko">연습 문제의 답: YTH, PYT, HON, YHN, NOHTYP. start와 stop이 같으면 빈 문자열이고 repr로 ''가 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'text = &quot;Python&quot;; text = &quot;J&quot; + text[1:]; print(text); text[0] = &quot;J&quot;' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'text = &quot;Python&quot;; text = &quot;J&quot; + text[1:]; print(text); text[0] = &quot;J&quot;' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'text = &quot;Python&quot;; text = &quot;J&quot; + text[1:]; print(text); text[0] = &quot;J&quot;' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">Building a new string gives Jython. Strings are immutable, so assigning to text[0] gives TypeError: 'str' object does not support item assignment.</span><span lang="ko">새 문자열을 만들면 Jython이 된다. 문자열은 불변이라 text[0]에 대입하면 TypeError: 'str' object does not support item assignment다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;)); print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;)); print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)'">▶</button><code>python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;)); print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)'</code></div>
+          <p><span lang="en">Methods return a new string. split() makes the list ['Hello', 'Python'], and in is case-sensitive: True, False.</span><span lang="ko">메서드는 새 문자열을 돌려준다. split()은 ['Hello', 'Python'] 리스트를 만들고, in은 대소문자를 구별해 True, False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); lowered = clean.lower(); slug = lowered.replace(&quot; &quot;, &quot;-&quot;); print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); lowered = clean.lower(); slug = lowered.replace(&quot; &quot;, &quot;-&quot;); print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)'">▶</button><code>python3 -c 'raw = &quot;  Hello Python  &quot;; clean = raw.strip(); lowered = clean.lower(); slug = lowered.replace(&quot; &quot;, &quot;-&quot;); print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)'</code></div>
+          <p><span lang="en">A text-cleaning pipeline: strip affects only the ends, while replace also changes the space in the middle, giving hello-python. The original raw is unchanged.</span><span lang="ko">문자열 정리 과정: strip은 양끝만, replace는 가운데 공백까지 바꿔 hello-python이 된다. 원래 raw는 그대로 남아 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'name = &quot;Mina&quot;; score = 87.5; print(&quot;Hi, &quot; + name); print(&quot;-&quot; * 5); print(&quot;Score: &quot; + str(score)); print(f&quot;{name}: {score:.2f}&quot;); print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'name = &quot;Mina&quot;; score = 87.5; print(&quot;Hi, &quot; + name); print(&quot;-&quot; * 5); print(&quot;Score: &quot; + str(score)); print(f&quot;{name}: {score:.2f}&quot;); print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)'">▶</button><code>python3 -c 'name = &quot;Mina&quot;; score = 87.5; print(&quot;Hi, &quot; + name); print(&quot;-&quot; * 5); print(&quot;Score: &quot; + str(score)); print(f&quot;{name}: {score:.2f}&quot;); print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)'</code></div>
+          <p><span lang="en">+ joins and * repeats. To join a number with +, you need str(). After normalizing the input, &quot; YES &quot; equals &quot;yes&quot; (True).</span><span lang="ko">+는 연결, *는 반복이다. 숫자를 +로 붙이려면 str()이 필요하다. 입력을 정규화하면 &quot; YES &quot;도 &quot;yes&quot;와 같다(True).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'item = &quot;Notebook&quot;; price = 2.5; quantity = 3; total = price * quantity; print(f&quot;Item: {item}&quot;); print(f&quot;Quantity: {quantity}&quot;); print(f&quot;Total: {total:.2f}&quot;); print(total)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'item = &quot;Notebook&quot;; price = 2.5; quantity = 3; total = price * quantity; print(f&quot;Item: {item}&quot;); print(f&quot;Quantity: {quantity}&quot;); print(f&quot;Total: {total:.2f}&quot;); print(total)'">▶</button><code>python3 -c 'item = &quot;Notebook&quot;; price = 2.5; quantity = 3; total = price * quantity; print(f&quot;Item: {item}&quot;); print(f&quot;Quantity: {quantity}&quot;); print(f&quot;Total: {total:.2f}&quot;); print(total)'</code></div>
+          <p><span lang="en">The receipt example: the display is Total: 7.50, but the total variable still holds the number 7.5.</span><span lang="ko">영수증 예제: 표시는 Total: 7.50이지만 total 변수에는 여전히 숫자 7.5가 들어 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '  Python  \n' | python3 strings.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '  Python  \n' | python3 strings.py">▶</button><code>printf '  Python  \n' | python3 strings.py</code></div>
+          <p><span lang="en">A program that combines strip, len, upper, [::-1] and an empty-string check. Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.</span><span lang="ko">strip, len, upper, [::-1], 빈 문자열 검사를 조합한 프로그램이다. Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.</span></p>
+        </li>
+      </ol>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>strings.py <span class="muted"><span lang="en">17 lines</span><span lang="ko">17줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 reference solution: string manipulation.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Text: &quot;).strip()</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;Length: {len(text)}&quot;)</span>
+<span class="ln">print(f&quot;Upper: {text.upper()}&quot;)</span>
+<span class="ln">print(f&quot;Reverse: {text[::-1]}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">if text:</span>
+<span class="ln">    print(f&quot;First: {text[0]}&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;No text entered&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># &quot;  Python  &quot; -&gt; Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P</span>
+<span class="ln"># &quot; A &quot; -&gt; Length: 1, Upper: A, Reverse: A, First: A</span>
+<span class="ln"># &quot;   &quot; -&gt; Length: 0, empty Upper/Reverse, No text entered</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <a href="operators.html">← operators</a>
+    <a href="conditionals.html">conditionals →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "class": "sample",
+  "label": "Flask 예제",
+  "title": "Flask 웹 앱으로 확장하기",
+  "summary": "11주차 2차시의 검증 → 분석 → HTML 흐름을 Flask 웹 앱으로 옮긴 세 프로젝트. 한국 주식(sample2), 미국 주식(sample1), SQLite 저장(sample4)을 가상 머신 안에서 서버로 띄우고 wget으로 요청해 본다.",
+  "examples": [
+    {
+      "name": "sample2_korea",
+      "source": "sample/sample2/app.py",
+      "also": ["sample/sample2/logic.py", "sample/sample2/storage.py", "sample/sample2/templates/index.html", "sample/sample2/data/prices.csv", "sample/sample2/README.md"],
+      "summary": "한국 주식 분석 앱. app.py가 요청을 받고 storage.py로 CSV를 읽어 logic.py로 검증·분석한 뒤 templates/index.html(Jinja)로 그린다. KOSPI/KOSDAQ 필터, 등락률 순위, 표본 평균, 잘못된 입력의 400 응답을 확인한다.",
+      "steps": [
+        { "cmd": "cat data/prices.csv", "note": "2026-11-05 하루치 가상 데이터 5종목. 가격은 정수 원(KRW)이고 005930 같은 종목 코드는 앞의 0을 지키기 위해 문자열로 다룬다." },
+        { "cmd": "python3 app.py > server.log 2>&1 &", "note": "개발 서버를 백그라운드(&)로 띄운다. 주소는 http://127.0.0.1:5002 이며, 이 가상 머신 안에서만 접속할 수 있다. Flask를 불러오는 데 10초 정도 걸린다." },
+        { "cmd": "until wget -qO page.html http://127.0.0.1:5002/ 2>/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^<]*' page.html", "note": "서버가 응답할 때까지 기다렸다가 첫 화면(시장 ALL)을 page.html로 받는다. 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%." },
+        { "cmd": "wget -qO- 'http://127.0.0.1:5002/?market=KOSPI' | grep -o '종목 [0-9]*개[^<]*'", "note": "?market=KOSPI 쿼리 문자열이 request.args.get('market')으로 전달된다. KOSPI 3종목의 평균은 +0.33%." },
+        { "cmd": "wget -qO- 'http://127.0.0.1:5002/?market=KOSDAQ' | grep -o '종목 [0-9]*개[^<]*'", "note": "KOSDAQ 2종목의 평균은 +0.50%. 평균은 선택된 종목의 동일 가중 표본 평균이지 시장 지수 수익률이 아니다." },
+        { "cmd": "wget -qO- 'http://127.0.0.1:5002/?market=BAD'; echo \"exit=$?\"", "note": "모르는 시장은 analyze()가 ValueError를 내고 app.py가 400 BAD REQUEST로 응답한다. wget은 오류 응답의 본문을 보여 주지 않는다." },
+        { "cmd": "python3 -c 'from app import app; r = app.test_client().get(\"/?market=BAD\"); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^400$' -e 'alert\">[^<]*'", "note": "test_client()는 서버를 띄우지 않고 앱에 요청을 보낸다. 상태 코드 400과 화면에 표시되는 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 확인한다." },
+        { "cmd": "tail -n 4 server.log", "note": "서버 로그에 요청마다 경로와 상태 코드(200, 200, 200, 400)가 한 줄씩 남는다. test_client() 요청은 서버를 거치지 않으므로 여기에 없다." },
+        { "cmd": "sed 's#/static/style.css#style.css#' page.html > /mnt/host/sample2.html && cp static/style.css /mnt/host/ && ls -l /mnt/host/", "note": "받은 화면을 내 브라우저로 보려면 sample2.html과 style.css를 위 입력란에서 하나씩 받기로 저장한 뒤(같은 폴더) sample2.html을 연다. 서버 주소의 /static/ 경로를 파일 이름으로 바꿔 두었다." },
+        { "cmd": "kill %1; sleep 1; tail -n 1 server.log", "note": "백그라운드 서버(작업 1번)를 끈다. 실제 PC에서는 터미널에서 Ctrl+C로 끈다." }
+      ],
+      "slow": true,
+      "expect": "표본 평균 +0.33%",
+      "notes": "실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습의 가상 머신은 페이지와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수 없으므로, 가상 머신 안의 wget과 test_client()로 요청을 보낸다."
+    },
+    {
+      "name": "sample1_us",
+      "source": "sample/sample1/app.py",
+      "also": ["sample/sample1/logic.py", "sample/sample1/storage.py", "sample/sample1/templates/index.html", "sample/sample1/data/prices.csv", "sample/sample1/README.md"],
+      "summary": "같은 구조의 미국 주식 앱. 가격을 정수 센트로 저장하고 화면에서만 USD로 바꾸며(scale=100), 시장은 NASDAQ/NYSE, 코드는 대문자 티커다. sample2와 어디가 다른지 비교한다.",
+      "steps": [
+        { "cmd": "cat data/prices.csv", "note": "가격 22000은 220.00달러다. 부동소수점 오차를 피하려고 금액을 정수 센트로 저장한다." },
+        { "cmd": "diff ../sample2/logic.py logic.py", "note": "두 앱의 차이는 logic.py의 시장 목록(MARKETS)과 종목 코드 검사(6자리 숫자 ↔ 대문자 티커)뿐이다. 나머지 흐름은 같다." },
+        { "cmd": "python3 app.py > server.log 2>&1 &", "note": "포트 5001에서 서버를 띄운다." },
+        { "cmd": "until wget -qO page.html http://127.0.0.1:5001/ 2>/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^<]*' page.html", "note": "ALL: 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%." },
+        { "cmd": "grep -o '<td>[0-9,.]*</td>' page.html | head -n 4", "note": "등락률 1위 종목(NVDA)의 전일 종가 140.00과 종가 144.20이 보인다. 템플릿이 row.close / scale로 센트를 달러로 바꾼다." },
+        { "cmd": "wget -qO- 'http://127.0.0.1:5001/?market=NYSE' | grep -o '종목 [0-9]*개[^<]*'", "note": "NYSE 2종목: JPM(보합)과 KO(하락). 평균 -1.00%." },
+        { "cmd": "kill %1", "note": "서버를 끈다." }
+      ],
+      "slow": true,
+      "expect": "표본 평균 -1.00%"
+    },
+    {
+      "name": "sample4_sqlite",
+      "source": "sample/sample4/app.py",
+      "also": ["sample/sample4/database.py", "sample/sample4/logic.py", "sample/sample4/storage.py", "sample/sample4/data/prices.csv", "sample/sample4/README.md"],
+      "summary": "CSV를 검증한 뒤 SQLite에 한 트랜잭션으로 저장하고, 화면은 DB에서 읽는 앱. flask --app app init-db로 가져오기 전에는 DB가 없어 500이 나고, CSV를 고쳐도 다시 가져와야 반영되며, 잘못된 CSV는 기존 데이터를 지우지 않는다.",
+      "steps": [
+        { "cmd": "python3 -c 'from app import app; r = app.test_client().get(\"/\"); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert\">[^<]*'", "note": "아직 instance/market.sqlite3가 없다. read_quotes()가 mode=ro로 열어 빈 DB를 새로 만들지 않고 오류를 내므로 500과 안내 메시지가 나온다." },
+        { "cmd": "flask --app app init-db && ls -l instance", "note": "@app.cli.command('init-db')로 등록한 명령. CSV를 검증하고 import_snapshot()이 한 트랜잭션으로 quotes 테이블을 채운다: Imported 5 quotes." },
+        { "cmd": "python3 -c 'import sqlite3; c = sqlite3.connect(\"instance/market.sqlite3\"); print(c.execute(\"SELECT code, close FROM quotes ORDER BY code\").fetchall())'", "note": "DB에 저장된 행을 직접 조회한다. 코드는 TEXT로 저장되어 000660처럼 앞의 0이 남는다." },
+        { "cmd": "python3 app.py > server.log 2>&1 &", "note": "포트 5004에서 서버를 띄운다. 이제 화면은 CSV가 아니라 DB에서 읽는다." },
+        { "cmd": "until wget -qO page.html http://127.0.0.1:5004/ 2>/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^<]*' page.html", "note": "표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다." },
+        { "cmd": "sed -i 's/70000,71400/70000,77000/' data/prices.csv && wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^<]*'", "note": "CSV에서 삼성전자 종가를 77000으로 바꿔도 화면은 그대로 +0.40%다. 화면은 DB를 읽기 때문이다." },
+        { "cmd": "flask --app app init-db && wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^<]*'", "note": "다시 가져오면 반영된다. 삼성전자 등락률이 +2%에서 +10%로 바뀌어 평균이 +2.00%가 된다." },
+        { "cmd": "sed -n 2p data/prices.csv >> data/prices.csv; flask --app app init-db 2>&1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^<]*'", "note": "같은 종목 줄을 하나 더 붙이면 검증(duplicate code)에서 실패한다. 검증이 DELETE보다 먼저이고 저장은 한 트랜잭션이므로, DB에는 직전의 5종목이 그대로 남는다." },
+        { "cmd": "kill %1", "note": "서버를 끈다. 페이지를 새로 고치면 CSV와 DB가 처음 상태로 돌아간다." }
+      ],
+      "slow": true,
+      "expect": "표본 평균 +2.00%"
+    }
+  ]
+}

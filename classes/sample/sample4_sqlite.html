@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sample4_sqlite — Extending the project into a Flask web app · Python Lab</title>
+  <link rel="icon" href="data:,">
   <script src="../../js/lang.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
@@ -33,6 +34,16 @@
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
       <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
       <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/sample/sample4</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/sample/sample4</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
     </section>
     <aside class="guide">
@@ -40,7 +51,7 @@
       <ol class="steps">
         <li>
           <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
-          <p><span lang="en">Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV.</span><span lang="ko">서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다.</span></p>
+          <p><span lang="en">Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV. There is no database yet, so the preview panel shows an error page.</span><span lang="ko">서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다. 아직 DB가 없어 미리보기 창에는 오류 화면이 뜬다.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
@@ -53,6 +64,10 @@
         <li>
           <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
           <p><span lang="en">Now HTTP 200. Sample mean +0.40% — the same data as sample2, so the same result.</span><span lang="ko">이제 HTTP 200. 표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web show /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show /">▶</button><code>web show /</code></div>
+          <p><span lang="en">After creating the database, reopen the page in the preview panel to see the change (the Open button by the address box works too).</span><span lang="ko">DB를 만든 뒤에는 미리보기 창도 다시 열어야 바뀐 화면이 보인다(주소 칸의 열기 버튼도 된다).</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /">▶</button><code>sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /</code></div>

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>flask_hello — Extending the project into a Flask web app · Python Lab</title>
+  <link rel="icon" href="data:,">
   <script src="../../js/lang.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
@@ -33,6 +34,16 @@
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
       <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
       <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/flask_hello</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/flask_hello</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
     </section>
     <aside class="guide">
@@ -40,15 +51,19 @@
       <ol class="steps">
         <li>
           <div class="cmd"><button type="button" data-cmd="web start app.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start app.py">▶</button><code>web start app.py</code></div>
-          <p><span lang="en">Start app.py as a background server and wait until it is ready (about 10 seconds). You should see Ready: http://127.0.0.1:5000.</span><span lang="ko">app.py를 백그라운드 서버로 띄우고 준비될 때까지 기다린다(10초 정도). Ready: http://127.0.0.1:5000 이 나오면 된다.</span></p>
+          <p><span lang="en">Start app.py as a background server (about 10 seconds). When it is ready, the app preview panel opens under the terminal with the first page. The preview panel plays the browser's role in this lab.</span><span lang="ko">app.py를 백그라운드 서버로 띄운다(10초 정도). 준비되면 터미널 아래에 앱 미리보기 창이 열리고 첫 화면이 보인다. 미리보기 창이 이 실습의 브라우저 역할을 한다.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
           <p><span lang="en">Send a request to the address /. The HTML returned by home(), the function marked @app.get(&quot;/&quot;), is shown as text. HTTP 200 means success.</span><span lang="ko">주소 /로 요청을 보낸다. @app.get(&quot;/&quot;)가 붙은 home()이 돌려준 HTML이 글자로 보인다. HTTP 200은 성공이라는 뜻이다.</span></p>
         </li>
         <li>
+          <div class="cmd"><button type="button" data-cmd="web show '/hello?name=Mina'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show '/hello?name=Mina'">▶</button><code>web show '/hello?name=Mina'</code></div>
+          <p><span lang="en">web show puts an address in the preview panel; web get shows the same page as text in the terminal.</span><span lang="ko">web show는 주소를 미리보기 창에 띄운다. web get은 같은 화면을 터미널에 글자로 보여 준다.</span></p>
+        </li>
+        <li>
           <div class="cmd"><button type="button" data-cmd="web get '/hello?name=Mina'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/hello?name=Mina'">▶</button><code>web get '/hello?name=Mina'</code></div>
-          <p><span lang="en">name=Mina after the ? is the query string. hello() reads it with request.args.get(&quot;name&quot;) and builds Hello, Mina!.</span><span lang="ko">? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(&quot;name&quot;)으로 읽어 Hello, Mina!를 만든다.</span></p>
+          <p><span lang="en">name=Mina after the ? is the query string. hello() reads it with request.args.get(&quot;name&quot;) and builds Hello, Mina!. Typing /hello?name=Mina in the preview panel's address box and pressing Open does the same.</span><span lang="ko">? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(&quot;name&quot;)으로 읽어 Hello, Mina!를 만든다. 미리보기 창의 주소 칸에 /hello?name=Mina를 넣고 열기를 눌러도 같다.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get /hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /hello">▶</button><code>web get /hello</code></div>
@@ -72,7 +87,7 @@
         </li>
       </ol>
       <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
-      <p class="callout"><span lang="en">web is a helper command made for this lab (type web alone to see its usage). On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser. This virtual machine has no network link to your browser, so the same requests are sent from the terminal.</span><span lang="ko">web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다. 이 가상 머신은 내 브라우저와 네트워크로 연결되어 있지 않아, 같은 요청을 터미널에서 보낸다.</span></p>
+      <p class="callout"><span lang="en">web is a helper command made for this lab (type web alone to see its usage). While the server runs, the app preview panel under the terminal plays the browser's role. On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser.</span><span lang="ko">web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 서버가 켜져 있는 동안 터미널 아래 앱 미리보기 창이 브라우저 역할을 한다. 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다.</span></p>
     </aside>
   </main>
   <section class="sources">

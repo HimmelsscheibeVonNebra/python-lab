@@ -11,15 +11,19 @@
       "steps": [
         {
           "cmd": "web start app.py",
-          "note": "app.py를 백그라운드 서버로 띄우고 준비될 때까지 기다린다(10초 정도). Ready: http://127.0.0.1:5000 이 나오면 된다."
+          "note": "app.py를 백그라운드 서버로 띄운다(10초 정도). 준비되면 터미널 아래에 앱 미리보기 창이 열리고 첫 화면이 보인다. 미리보기 창이 이 실습의 브라우저 역할을 한다."
         },
         {
           "cmd": "web get /",
           "note": "주소 /로 요청을 보낸다. @app.get(\"/\")가 붙은 home()이 돌려준 HTML이 글자로 보인다. HTTP 200은 성공이라는 뜻이다."
         },
         {
+          "cmd": "web show '/hello?name=Mina'",
+          "note": "web show는 주소를 미리보기 창에 띄운다. web get은 같은 화면을 터미널에 글자로 보여 준다."
+        },
+        {
           "cmd": "web get '/hello?name=Mina'",
-          "note": "? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(\"name\")으로 읽어 Hello, Mina!를 만든다."
+          "note": "? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(\"name\")으로 읽어 Hello, Mina!를 만든다. 미리보기 창의 주소 칸에 /hello?name=Mina를 넣고 열기를 눌러도 같다."
         },
         {
           "cmd": "web get /hello",
@@ -44,7 +48,7 @@
       ],
       "slow": true,
       "expect": "Hello, Mina!",
-      "notes": "web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다. 이 가상 머신은 내 브라우저와 네트워크로 연결되어 있지 않아, 같은 요청을 터미널에서 보낸다."
+      "notes": "web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 서버가 켜져 있는 동안 터미널 아래 앱 미리보기 창이 브라우저 역할을 한다. 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다."
     },
     {
       "name": "sample2_korea",
@@ -64,7 +68,7 @@
         },
         {
           "cmd": "web start",
-          "note": "app.py를 서버로 띄운다. 주소는 http://127.0.0.1:5002 이다."
+          "note": "app.py를 서버로 띄운다(포트 5002). 터미널 아래 미리보기 창에 첫 화면이 열린다. 창 안에서 시장을 고르고 조회를 누르면 실제 브라우저처럼 화면이 바뀐다."
         },
         {
           "cmd": "web get /",
@@ -72,7 +76,7 @@
         },
         {
           "cmd": "web get '/?market=KOSPI'",
-          "note": "?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%."
+          "note": "?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%. 미리보기 창에서 KOSPI를 골라 조회했을 때 주소 칸에 나오는 주소와 같다."
         },
         {
           "cmd": "web get '/?market=KOSDAQ'",
@@ -81,6 +85,10 @@
         {
           "cmd": "web get '/?market=BAD'",
           "note": "모르는 시장은 analyze()가 ValueError를 내고 app.py가 HTTP 400으로 답한다. 프로그램이 죽지 않고 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 화면에 보여 준다."
+        },
+        {
+          "cmd": "web show '/?market=BAD'",
+          "note": "오류 화면도 미리보기 창에서 볼 수 있다: HTTP 400과 빨간 오류 메시지."
         },
         {
           "cmd": "web log",
@@ -97,7 +105,7 @@
       ],
       "slow": true,
       "expect": "표본 평균 +0.33%",
-      "notes": "실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 web 명령으로 같은 요청을 터미널에서 보낸다."
+      "notes": "실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 터미널 아래의 앱 미리보기 창이 그 브라우저 역할을 한다."
     },
     {
       "name": "sample1_us",
@@ -121,7 +129,7 @@
         },
         {
           "cmd": "web start",
-          "note": "포트 5001에서 서버를 띄운다."
+          "note": "포트 5001에서 서버를 띄운다. 미리보기 창에서 NASDAQ/NYSE를 골라 보자."
         },
         {
           "cmd": "web get /",
@@ -153,7 +161,7 @@
       "steps": [
         {
           "cmd": "web start",
-          "note": "서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다."
+          "note": "서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다. 아직 DB가 없어 미리보기 창에는 오류 화면이 뜬다."
         },
         {
           "cmd": "web get /",
@@ -166,6 +174,10 @@
         {
           "cmd": "web get /",
           "note": "이제 HTTP 200. 표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다."
+        },
+        {
+          "cmd": "web show /",
+          "note": "DB를 만든 뒤에는 미리보기 창도 다시 열어야 바뀐 화면이 보인다(주소 칸의 열기 버튼도 된다)."
         },
         {
           "cmd": "sed -i 's/70000,71400/70000,77000/' data/prices.csv && web get /",

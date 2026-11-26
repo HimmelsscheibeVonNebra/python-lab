@@ -49,7 +49,7 @@
     vga_bios: { url: root + "bios/vgabios.bin" },
     bzimage: { url: root + "images/bzImage" },
     initrd: { url: root + "images/rootfs.cpio.gz" },
-    cmdline: "console=ttyS0 rdinit=/init loglevel=4" + (labDir ? " lab.dir=" + labDir : ""),
+    cmdline: "console=ttyS0 rdinit=/init loglevel=1" + (labDir ? " lab.dir=" + labDir : ""),
     // 9p filesystem, mounted at /mnt/9p in the guest.  Only the file list
     // (fs.json) is loaded at boot; a file's contents are fetched when the
     // guest first opens it.
@@ -178,4 +178,165 @@
       });
     }
   });
+
+  // ---------------------------------------------------------------- app preview
+  //
+  // A Flask app in the guest listens on 127.0.0.1 only, and the guest has no
+  // network link to this page.  "web start" (/usr/local/bin/web in the guest)
+  // therefore also runs a bridge that talks to the page through the shared 9p
+  // folder /mnt/host/.web (= /host/.web here):
+  //   server.json   exists while an app runs           (guest writes)
+  //   show.json     "web show PATH" asks us to show PATH (guest writes)
+  //   req-<id>.json one request from this panel         (we write)
+  //   res-<id>.json its answer, CSS and images inlined  (guest writes)
+  const preview = document.getElementById("preview");
+  if (preview) {
+    const frame = document.getElementById("preview-frame");
+    const pathInput = document.getElementById("preview-path");
+    const info = document.getElementById("preview-info");
+    const decoder = new TextDecoder();
+    const t = (texts) => (window.labLang ? window.labLang.t(texts) : texts.en);
+    let server = null;          // server.json of the running app
+    let lastShow = null;        // seq of the last show.json handled
+    let current = "/";          // path shown in the frame
+    let seq = 0;
+    let busy = false;
+    let queued = null;          // the latest request made while one was loading
+    let lastInfo = null;
+
+    const setInfo = (texts) => {
+      lastInfo = texts;
+      info.textContent = t(texts);
+    };
+    document.addEventListener("langchange", () => lastInfo && setInfo(lastInfo));
+
+    const readJson = async (p) => {
+      try {
+        return JSON.parse(decoder.decode(await emulator.read_file(p)));
+      } catch (e) {
+        return null;           // missing (or, rarely, being replaced)
+      }
+    };
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+    async function navigate(path, method = "GET", body = null, type = null) {
+      if (!server) return;
+      if (busy) {
+        queued = [path, method, body, type];
+        return;
+      }
+      busy = true;
+      const id = `${Date.now()}-${++seq}`;
+      setInfo({ en: `Loading ${path} …`, ko: `불러오는 중: ${path} …` });
+      try {
+        const req = { method, path, body, type };
+        await emulator.create_file(`/host/.web/req-${id}.json`, encoder.encode(JSON.stringify(req)));
+        let res = null;
+        for (let i = 0; i < 800 && !res; i++) {     // up to ~2 minutes
+          await sleep(150);
+          res = await readJson(`/host/.web/res-${id}.json`);
+        }
+        if (!res) throw new Error("timeout");
+        render(res);
+      } catch (err) {
+        setInfo({ en: "The app did not answer — is it still running? (web log)", ko: "앱이 응답하지 않습니다 — 서버가 켜져 있나요? (web log)" });
+      } finally {
+        busy = false;
+        if (queued) {
+          const next = queued;
+          queued = null;
+          navigate(...next);
+        }
+      }
+    }
+
+    function render(res) {
+      current = res.path || "/";
+      pathInput.value = current;
+      const type = res.type || "";
+      if (type.startsWith("text/html")) {
+        frame.srcdoc = res.body;
+      } else if (res.body64 && type.startsWith("image/")) {
+        frame.srcdoc = `<img src="data:${type};base64,${res.body64}" alt="">`;
+      } else {
+        frame.srcdoc = `<pre style="white-space:pre-wrap">${escHtml(res.body ?? "(binary data)")}</pre>`;
+      }
+      const ok = res.status >= 200 && res.status < 400;
+      setInfo({
+        en: res.status ? `HTTP ${res.status}${ok ? "" : " (error)"} · ${current}` : res.body,
+        ko: res.status ? `HTTP ${res.status}${ok ? "" : " (오류)"} · ${current}` : res.body,
+      });
+    }
+
+    // Links and forms inside the preview go back through the bridge.  The
+    // frame is sandboxed without scripts, so only these handlers (ours) run.
+    const resolve = (href) => {
+      const u = new URL(href, "http://app" + current);
+      return u.host === "app" || u.hostname === "127.0.0.1" || u.hostname === "localhost"
+        ? u.pathname + u.search
+        : null;
+    };
+    frame.addEventListener("load", () => {
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      doc.addEventListener("click", (ev) => {
+        const a = ev.target.closest && ev.target.closest("a[href]");
+        if (!a) return;
+        ev.preventDefault();
+        const href = a.getAttribute("href");
+        if (href.startsWith("#")) return;
+        const p = resolve(href);
+        if (p) navigate(p);
+        else setInfo({ en: `External links do not open here: ${href}`, ko: `외부 링크는 여기서 열 수 없습니다: ${href}` });
+      });
+      doc.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const form = ev.target;
+        const params = new URLSearchParams(new FormData(form, ev.submitter || undefined));
+        const method = (form.getAttribute("method") || "get").toUpperCase();
+        const action = resolve(form.getAttribute("action") || current.split("?")[0]) || "/";
+        if (method === "GET") navigate(action.split("?")[0] + (params.toString() ? "?" + params : ""));
+        else navigate(action, method, params.toString(), "application/x-www-form-urlencoded");
+      });
+    });
+
+    // Rebooting forgets the app (the guest clears /mnt/host/.web at boot).
+    document.getElementById("reset").addEventListener("click", () => {
+      server = null;
+      preview.hidden = true;
+    });
+
+    document.getElementById("preview-form").addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      let p = pathInput.value.trim() || "/";
+      p = p.replace(/^https?:\/\/[^/]+/, "");
+      navigate(p.startsWith("/") ? p : "/" + p);
+    });
+
+    // Watch for an app starting or stopping, and for "web show".
+    (async function watch() {
+      for (;;) {
+        await sleep(1000);
+        if (!ready) continue;
+        const now = await readJson("/host/.web/server.json");
+        if (now && (!server || now.started !== server.started)) {
+          server = now;
+          preview.hidden = false;
+          preview.classList.remove("stopped");
+          document.getElementById("preview-port").textContent = `127.0.0.1:${now.port}`;
+          navigate("/");
+        } else if (!now && server) {
+          server = null;
+          preview.classList.add("stopped");
+          setInfo({ en: "The app has stopped (web start to run it again)", ko: "앱이 꺼졌습니다 (다시 띄우려면 web start)" });
+        }
+        const show = server && (await readJson("/host/.web/show.json"));
+        if (show && show.seq !== lastShow) {
+          lastShow = show.seq;
+          navigate(show.path);
+        }
+      }
+    })();
+  }
 })();

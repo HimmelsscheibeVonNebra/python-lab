@@ -111,6 +111,7 @@ function layout({ title, root, labDir, crumbs, body, withLab }) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(full(title.en))}</title>
+  <link rel="icon" href="data:,">
   <script src="${root}js/lang.js"></script>
   <link rel="stylesheet" href="${root}css/style.css">
 ${withLab ? `  <link rel="stylesheet" href="${root}vendor/xterm/xterm.css">
@@ -141,6 +142,16 @@ const machine = (hint) => `    <section class="machine">
         <span id="status" role="status">${bothText("Loading…", "준비 중…")}</span>
       </div>
       <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong>${bothText("App preview", "앱 미리보기")}</strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit">${bothText("Open", "열기")}</button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
       <p class="hint">${both(hint)}</p>
     </section>`;
 

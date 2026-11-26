@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sample2_korea — Extending the project into a Flask web app · Python Lab</title>
+  <link rel="icon" href="data:,">
   <script src="../../js/lang.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
@@ -33,6 +34,16 @@
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
       <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
       <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/sample/sample2</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/sample/sample2</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
     </section>
     <aside class="guide">
@@ -44,7 +55,7 @@
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
-          <p><span lang="en">Start app.py as a server. Its address is http://127.0.0.1:5002.</span><span lang="ko">app.py를 서버로 띄운다. 주소는 http://127.0.0.1:5002 이다.</span></p>
+          <p><span lang="en">Start app.py as a server (port 5002). The first page opens in the preview panel under the terminal. Choose a market there and press 조회 (Search): the page changes just like in a real browser.</span><span lang="ko">app.py를 서버로 띄운다(포트 5002). 터미널 아래 미리보기 창에 첫 화면이 열린다. 창 안에서 시장을 고르고 조회를 누르면 실제 브라우저처럼 화면이 바뀐다.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
@@ -52,7 +63,7 @@
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSPI'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSPI'">▶</button><code>web get '/?market=KOSPI'</code></div>
-          <p><span lang="en">?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%.</span><span lang="ko">?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%.</span></p>
+          <p><span lang="en">?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%. It is the same address the preview panel's address box shows after you choose KOSPI there.</span><span lang="ko">?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%. 미리보기 창에서 KOSPI를 골라 조회했을 때 주소 칸에 나오는 주소와 같다.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSDAQ'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSDAQ'">▶</button><code>web get '/?market=KOSDAQ'</code></div>
@@ -61,6 +72,10 @@
         <li>
           <div class="cmd"><button type="button" data-cmd="web get '/?market=BAD'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=BAD'">▶</button><code>web get '/?market=BAD'</code></div>
           <p><span lang="en">For an unknown market, analyze() raises ValueError and app.py answers HTTP 400. The program does not crash; it shows the error message (market must be ALL, KOSPI or KOSDAQ) on the page.</span><span lang="ko">모르는 시장은 analyze()가 ValueError를 내고 app.py가 HTTP 400으로 답한다. 프로그램이 죽지 않고 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 화면에 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web show '/?market=BAD'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show '/?market=BAD'">▶</button><code>web show '/?market=BAD'</code></div>
+          <p><span lang="en">Error pages show in the preview panel too: HTTP 400 and a red error message.</span><span lang="ko">오류 화면도 미리보기 창에서 볼 수 있다: HTTP 400과 빨간 오류 메시지.</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="web log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web log">▶</button><code>web log</code></div>
@@ -76,7 +91,7 @@
         </li>
       </ol>
       <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
-      <p class="callout"><span lang="en">On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the web command sends the same requests from the terminal.</span><span lang="ko">실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 web 명령으로 같은 요청을 터미널에서 보낸다.</span></p>
+      <p class="callout"><span lang="en">On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the app preview panel under the terminal plays that browser's role.</span><span lang="ko">실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 터미널 아래의 앱 미리보기 창이 그 브라우저 역할을 한다.</span></p>
     </aside>
   </main>
   <section class="sources">

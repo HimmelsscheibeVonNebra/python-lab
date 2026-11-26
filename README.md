@@ -60,10 +60,22 @@ pandas·numpy·matplotlib·Flask와 그 의존 라이브러리는 기본 이미�
 
 ### Flask
 
-Flask 서버는 게스트 안에서만 접속할 수 있습니다 (페이지와 게스트 사이에 네트워크가 없음). 그래서 실습용 도우미 명령 `web`(`rootfs/overlay/usr/local/bin/web`, 표준 라이브러리만 쓰는 Python 스크립트)을 둡니다.
+Flask 서버는 게스트의 `127.0.0.1`에서만 접속할 수 있습니다 (게스트 커널에 네트워크 카드 드라이버가 없고, 페이지와 게스트 사이에 네트워크가 없음). 그래서 실습용 도우미 명령 `web`(`rootfs/overlay/usr/local/bin/web`, 표준 라이브러리만 쓰는 Python 스크립트)과 페이지의 **앱 미리보기** 창을 둡니다.
+
+**앱 미리보기 (9p 다리)** — `web start`는 앱과 함께 작은 다리 프로세스를 띄웁니다. 다리와 페이지(`js/lab.js`)는 9p 공유 폴더 `/mnt/host/.web`(페이지 쪽 경로 `/host/.web`)의 JSON 파일로 대화합니다.
+
+| 파일 | 쓰는 쪽 | 내용 |
+|---|---|---|
+| `server.json` | 게스트 | 앱이 실행 중일 때만 존재: `{port, app, started}` → 페이지가 미리보기 창을 연다 |
+| `req-<id>.json` | 페이지 | 요청 `{method, path, body, type}` (창 안의 링크·폼, 주소 칸) |
+| `res-<id>.json` | 게스트 | 응답 `{status, path, type, body}`. HTML에는 앱의 CSS와 그림을 넣어 줌 |
+| `show.json` | 게스트 | `web show PATH` → 페이지가 그 주소를 연다 |
+
+페이지는 응답 HTML을 스크립트를 막은 iframe(`sandbox="allow-same-origin allow-forms"`)에 그리고, 링크 클릭과 폼 제출을 가로채 다시 요청 파일로 보냅니다. 요청 하나에 0.2–1초 걸립니다. 게스트는 부팅할 때 `.web`을 지웁니다.
 
 ```sh
-web start [app.py]     # 서버를 백그라운드로 띄우고 준비될 때까지 기다림
+web start [app.py]     # 서버를 백그라운드로 띄우고 준비될 때까지 기다림 → 미리보기 창이 열림
+web show '/?market=KOSPI'  # 미리보기 창에 띄우기
 web get '/?market=KOSPI'   # 상태 코드와 화면을 글자로 (표는 한 행씩)
 web html /             # HTML 원문
 web save page.html     # CSS를 넣은 HTML 한 파일로 /mnt/host에 저장 → 받기

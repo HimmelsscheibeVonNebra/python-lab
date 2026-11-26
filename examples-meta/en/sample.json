@@ -5,14 +5,15 @@
   "examples": {
     "sample2_korea": {
       "summary": "Korean stock analysis app. app.py receives the request, storage.py reads the CSV, logic.py validates and analyzes it, and templates/index.html (Jinja) draws the page. Check the KOSPI/KOSDAQ filter, the ranking by change, the sample mean and the 400 response to bad input.",
-      "notes": "On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the web command sends the same requests from the terminal.",
+      "notes": "On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the app preview panel under the terminal plays that browser's role.",
       "steps": [
         "A one-day (2026-11-05) fictional snapshot of 5 stocks. Prices are whole won (KRW), and codes such as 005930 are handled as strings to keep the leading 0.",
-        "Start app.py as a server. Its address is http://127.0.0.1:5002.",
+        "Start app.py as a server (port 5002). The first page opens in the preview panel under the terminal. Choose a market there and press 조회 (Search): the page changes just like in a real browser.",
         "The first page (market ALL). The summary is 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%, and the table is sorted by change, largest first.",
-        "?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%.",
+        "?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%. It is the same address the preview panel's address box shows after you choose KOSPI there.",
         "The mean of the 2 KOSDAQ stocks is +0.50%. It is an equal-weight sample mean of the selected stocks, not a market index return.",
         "For an unknown market, analyze() raises ValueError and app.py answers HTTP 400. The program does not crash; it shows the error message (market must be ALL, KOSPI or KOSDAQ) on the page.",
+        "Error pages show in the preview panel too: HTTP 400 and a red error message.",
         "One line per request with its address and status code (200, 200, 200, 400).",
         "Save the page, CSS included, as one HTML file in /mnt/host. Type sample2.html in the box above and press Download to open it in your own browser.",
         "Stop the server."
@@ -23,7 +24,7 @@
       "steps": [
         "A price of 22000 is $220.00. Amounts are stored as whole cents to avoid floating-point errors.",
         "The only differences between the two apps are in logic.py: the market list (MARKETS) and the code check (six digits ↔ uppercase ticker). The rest of the flow is the same.",
-        "Start the server on port 5001.",
+        "Start the server on port 5001. Try choosing NASDAQ/NYSE in the preview panel.",
         "Prices in the table are shown in dollars (NVIDIA 140.00 → 144.20). The template turns cents into dollars with row.close / scale. The mean is +0.40%.",
         "NYSE has 2 stocks: JPM (flat) and KO (down). Mean -1.00%.",
         "Stop the server."
@@ -32,10 +33,11 @@
     "sample4_sqlite": {
       "summary": "An app that validates the CSV, stores it in SQLite in one transaction and draws the page from the database. Before flask --app app init-db imports the data there is no database and the page answers 500; edits to the CSV appear only after another import; and an invalid CSV does not erase the existing data.",
       "steps": [
-        "Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV.",
+        "Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV. There is no database yet, so the preview panel shows an error page.",
         "There is no database yet (instance/market.sqlite3), so you get HTTP 500 with the hint to run flask --app app init-db first.",
         "The command that validates the CSV and loads it into the database in one transaction: Imported 5 quotes. It is fine to run it while the server is running.",
         "Now HTTP 200. Sample mean +0.40% — the same data as sample2, so the same result.",
+        "After creating the database, reopen the page in the preview panel to see the change (the Open button by the address box works too).",
         "Changing Samsung Electronics' close to 77000 in the CSV leaves the page at +0.40%, because the page reads the database.",
         "After another import the change shows: Samsung's change goes from +2% to +10%, so the mean becomes +2.00%.",
         "Appending a copy of a stock's row fails validation: ValueError: duplicate code in snapshot.",
@@ -45,11 +47,12 @@
     },
     "flask_hello": {
       "summary": "The smallest Flask app: two addresses (routes), each connected to one function, and a value read from the query string. Learn how to start a server and send it requests with the web command first.",
-      "notes": "web is a helper command made for this lab (type web alone to see its usage). On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser. This virtual machine has no network link to your browser, so the same requests are sent from the terminal.",
+      "notes": "web is a helper command made for this lab (type web alone to see its usage). While the server runs, the app preview panel under the terminal plays the browser's role. On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser.",
       "steps": [
-        "Start app.py as a background server and wait until it is ready (about 10 seconds). You should see Ready: http://127.0.0.1:5000.",
+        "Start app.py as a background server (about 10 seconds). When it is ready, the app preview panel opens under the terminal with the first page. The preview panel plays the browser's role in this lab.",
         "Send a request to the address /. The HTML returned by home(), the function marked @app.get(\"/\"), is shown as text. HTTP 200 means success.",
-        "name=Mina after the ? is the query string. hello() reads it with request.args.get(\"name\") and builds Hello, Mina!.",
+        "web show puts an address in the preview panel; web get shows the same page as text in the terminal.",
+        "name=Mina after the ? is the query string. hello() reads it with request.args.get(\"name\") and builds Hello, Mina!. Typing /hello?name=Mina in the preview panel's address box and pressing Open does the same.",
         "Without name, get() uses its default \"world\": Hello, world!",
         "web html shows the raw HTML. Thanks to escape(), <b> became &lt;b&gt;, so the tag you typed is shown as text instead of being run.",
         "For an address that does not exist, Flask answers HTTP 404 (Not Found).",

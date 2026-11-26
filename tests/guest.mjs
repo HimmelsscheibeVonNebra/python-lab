@@ -25,7 +25,7 @@ export async function bootGuest(labDir = "") {
     bzimage: { url: p("images/bzImage") },
     initrd: { url: p("images/rootfs.cpio.gz") },
     // Same command line and 9p filesystem as js/lab.js
-    cmdline: "console=ttyS0 rdinit=/init loglevel=4" + (labDir ? " lab.dir=" + labDir : ""),
+    cmdline: "console=ttyS0 rdinit=/init loglevel=1" + (labDir ? " lab.dir=" + labDir : ""),
     filesystem: {
       basefs: p("images/9p/fs.json"),
       baseurl: p("images/9p/base") + "/",

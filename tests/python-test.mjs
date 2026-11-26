@@ -70,6 +70,29 @@ try {
 
   r = await sh(`cd ~/sample/sample2 && python3 -c 'from app import app; r = app.test_client().get("/?market=KOSPI"); print("flask", r.status_code, "+0.33%" in r.get_data(as_text=True))'; cd`, 240_000);
   check("Flask app answers through test_client()", r.out.includes("flask 200 True"), r.out);
+  // App preview bridge: the page writes /host/.web/req-*.json, "web start"'s
+  // bridge answers in res-*.json (js/lab.js does the same in the browser).
+  r = await sh("cd ~/flask_hello && web start app.py; cd", 240_000);
+  {
+    const readJson = async (f) => { try { return JSON.parse(new TextDecoder().decode(await guest.readFile(f))); } catch { return null; } };
+    // Like the page: wait for the bridge to announce the app first.
+    let server = null;
+    for (let i = 0; i < 100 && !server; i++) {
+      await new Promise((ok) => setTimeout(ok, 200));
+      server = await readJson("/host/.web/server.json");
+    }
+    await guest.createFile("/host/.web/req-t1.json", new TextEncoder().encode(JSON.stringify({ method: "GET", path: "/hello?name=Bridge" })));
+    let res = null;
+    for (let i = 0; i < 200 && !res; i++) {
+      await new Promise((ok) => setTimeout(ok, 150));
+      res = await readJson("/host/.web/res-t1.json");
+    }
+    check("app preview bridge answers the page's request",
+      server && server.port === 5000 && res && res.status === 200 && res.body.includes("Hello, Bridge!"), r.out + JSON.stringify(res));
+  }
+  r = await sh("web stop; test ! -e /mnt/host/.web/server.json && echo bridge-cleared");
+  check("web stop clears the preview state", r.out.includes("bridge-cleared"), r.out);
+
   r = await sh("python3 -m http.server 8765 >/dev/null 2>&1 & sleep 4; wget -qO- http://127.0.0.1:8765/ | grep -c href; kill %1");
   check("loopback networking (127.0.0.1)", /^[1-9]\d*$/m.test(r.out), r.out);
 

@@ -94,12 +94,17 @@ python app.py</code></pre>
 
 <h2>이 웹 실습에서 실행하기</h2>
 
-<p>실제 PC에서는 프로젝트마다 가상환경을 만들고 <code>pip install -r requirements.txt</code>로 Flask를 설치한 뒤 <code>python app.py</code>로 실행하고, 브라우저에서 <code>http://127.0.0.1:5002</code> 같은 주소를 엽니다. 이 웹 실습의 가상 머신에는 Flask가 이미 들어 있지만, 내 브라우저와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수는 없습니다. 대신 실습용 도우미 명령 <code>web</code>으로 같은 요청을 터미널에서 보냅니다.</p>
+<p>실제 PC에서는 프로젝트마다 가상환경을 만들고 <code>pip install -r requirements.txt</code>로 Flask를 설치한 뒤 <code>python app.py</code>로 실행하고, 브라우저에서 <code>http://127.0.0.1:5002</code> 같은 주소를 엽니다. 이 웹 실습의 가상 머신에는 Flask가 이미 들어 있지만, 내 브라우저와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수는 없습니다. 대신 실습용 도우미 명령 <code>web</code>을 씁니다. <code>web start</code>로 서버를 띄우면 터미널 아래에 <strong>앱 미리보기</strong> 창이 열립니다. 이 창이 브라우저 역할을 해서, 링크를 누르거나 폼에서 시장을 고르고 조회를 누르면 요청이 가상 머신 안의 서버로 전달되고 응답 화면이 다시 그려집니다. 창 위의 주소 칸에 <code>/?market=KOSPI</code> 같은 주소를 넣고 열기를 눌러도 됩니다. 서버를 끄면 창이 흐려집니다.</p>
+
+<p>미리보기 창은 공유 폴더 <code>/mnt/host/.web</code>를 통해 요청과 응답을 파일로 주고받으므로, 요청 하나에 0.2~1초쯤 걸립니다. 앱의 CSS와 그림은 응답에 함께 넣어 보여 주고, 앱 페이지의 JavaScript는 실행하지 않습니다.</p>
+
+<p>터미널에서 쓸 수 있는 명령은 다음과 같습니다.</p>
 
 <table>
 <thead><tr><th>명령</th><th>하는 일</th></tr></thead>
 <tbody>
-<tr><td><code>web start</code></td><td>현재 디렉터리의 <code>app.py</code>를 서버로 띄우고 준비될 때까지 기다린다 (10초 정도)</td></tr>
+<tr><td><code>web start</code></td><td>현재 디렉터리의 <code>app.py</code>를 서버로 띄우고 준비될 때까지 기다린다 (10초 정도). 준비되면 미리보기 창이 열린다</td></tr>
+<tr><td><code>web show /</code></td><td>주소를 미리보기 창에 띄운다</td></tr>
 <tr><td><code>web get /</code></td><td>주소로 요청을 보내고 상태 코드와 화면 내용을 글자로 보여 준다. 표는 한 행씩 <code>|</code>로 나눠 보인다</td></tr>
 <tr><td><code>web get '/?market=KOSPI'</code></td><td>쿼리 문자열이 있는 주소는 작은따옴표로 감싼다</td></tr>
 <tr><td><code>web html /</code></td><td>HTML 원문을 그대로 보여 준다</td></tr>

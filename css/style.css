@@ -250,3 +250,13 @@ html[data-lang="ko"] body [lang="en"] { display: none !important; }
 .lang-switch button { border: 0; border-radius: 0; padding: 3px 10px; font-size: 13px; background: var(--panel); color: var(--muted); }
 .lang-switch button + button { border-left: 1px solid var(--border); }
 .lang-switch button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+/* ---- Flask app preview (js/lab.js, "web start" in the guest) ---- */
+
+.preview { margin-top: 12px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.preview-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.preview-bar input { flex: 1 1 12em; min-width: 8em; font: 14px "SF Mono", Menlo, Consolas, monospace; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+.preview-bar button { padding: 4px 12px; }
+#preview-info { flex-basis: 100%; font-size: 13px; }
+.preview iframe { display: block; width: 100%; height: 460px; border: 0; background: #fff; }
+.preview.stopped iframe { opacity: 0.45; }

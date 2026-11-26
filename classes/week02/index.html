@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Week 2 · Python Lab</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
   <script src="../../js/lang.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
@@ -13,16 +13,40 @@
 </head>
 <body data-root="../../" data-lab-dir="week02/solutions">
   <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 2</span><span lang="ko">2주차</span></span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    <div class="topbar-inner">
+      <a class="brand" href="../../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <nav class="weeknav" aria-label="Weeks / 주차">
+        <span class="weeknav-label"><span lang="en">Week</span><span lang="ko">주차</span></span>
+        <a href="../../classes/week01/index.html" title="Week 1 / 1주차 — Python Overview &amp; Development Environment">1</a>
+        <a href="../../classes/week02/index.html" aria-current="page" title="Week 2 / 2주차 — Operators, Strings &amp; Conditionals (Theory) · Operators, Strings &amp; Conditionals (Practice)">2</a>
+        <a href="../../classes/week03/index.html" title="Week 3 / 3주차 — Loops · Functions">3</a>
+        <a href="../../classes/week05/index.html" title="Week 5 / 5주차 — Modules and the Standard Library · pandas: Series and DataFrame">5</a>
+        <a href="../../classes/week06/index.html" title="Week 6 / 6주차 — Files, Classes, Charts">6</a>
+        <a href="../../classes/week07/index.html" title="Week 7 / 7주차 — Object-Oriented Programming">7</a>
+        <a href="../../classes/week09/index.html" title="Week 9 / 9주차 — Objects That Work Together: State Validation, References, Composition and Inheritance · From Exercises to a Solo Project: Topic Selection and Requirements Analysis">9</a>
+        <a href="../../classes/week10/index.html" title="Week 10 / 10주차 — From Proposal to Design: Decomposition, Contracts, Modules · Your Project Has a History: Commits, Branches, Pull Requests">10</a>
+        <a href="../../classes/week11/index.html" title="Week 11 / 11주차 — Writing the Project Documents: Requirement, Feature, Function, UML · Korean Stock Market Analysis: From Scenario to a Web Report MVP">11</a>
+        <a href="../../classes/week12/index.html" title="Week 12 / 12주차 — Debugging and Regression Tests · Validation, Feature Tests and Code Review">12</a>
+        <a href="../../classes/week13/index.html" title="Week 13 / 13주차 — SQLite: Your First Database · From CSV to SQLite: Swapping the Storage Layer · Introduction to Database Systems">13</a>
+        <a href="../../classes/sample/index.html" title="Flask samples / Flask 예제 — Extending the project into a Flask web app">Flask</a>
+        <span class="weeknav-sep" aria-hidden="true"></span>
+        <a href="../../playground.html"><span lang="en">Playground</span><span lang="ko">자유 실습</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
     </div>
   </div>
-  <header>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Week 2 · 2 sessions · 7 examples</span><span lang="ko">2주차 · 2차시 · 예제 7개</span></span>
+      <nav class="weekpager" aria-label="Previous and next week / 이전·다음 주차"><a class="prev" href="../week01/index.html">← <span lang="en">Week 1</span><span lang="ko">1주차</span></a><a class="next" href="../week03/index.html"><span lang="en">Week 3</span><span lang="ko">3주차</span> →</a></nav>
+    </div>
     <h1><span lang="en">Week 2</span><span lang="ko">2주차</span></h1>
     <ul class="sessions">
-      <li><a href="#notes-week02-1"><strong><span lang="en">Session 1 · Operators, Strings &amp; Conditionals (Theory)</span><span lang="ko">1차시 · 연산자, 문자열, 조건문 (이론)</span></strong></a> <span lang="en">Run short pieces of code for arithmetic, comparison and logical operators and precedence, string indexing, slicing and methods, and if / elif / else, and check the results predicted on the slides.</span><span lang="ko">산술·비교·논리 연산자와 우선순위, 문자열 인덱싱·슬라이싱·메서드, if / elif / else를 짧은 코드로 직접 실행해 슬라이드의 예상 결과를 확인한다.</span></li>
-      <li><a href="#notes-week02-2"><strong><span lang="en">Session 2 · Operators, Strings &amp; Conditionals (Practice)</span><span lang="ko">2차시 · 연산자, 문자열, 조건문 (실습)</span></strong></a> <span lang="en">Complete four programs, string processing, a grade classifier, rock-paper-scissors and a leap-year calculator, and test them with boundary values and invalid input.</span><span lang="ko">문자열 처리, 성적 분류, 가위바위보, 윤년 계산 네 프로그램을 완성하고 경계값과 잘못된 입력으로 테스트한다.</span></li>
+      <li><a href="#notes-week02-1"><span class="sess-label"><span lang="en">Session 1</span><span lang="ko">1차시</span></span><strong><span lang="en">Operators, Strings &amp; Conditionals (Theory)</span><span lang="ko">연산자, 문자열, 조건문 (이론)</span></strong><span class="sess-sum"><span lang="en">Run short pieces of code for arithmetic, comparison and logical operators and precedence, string indexing, slicing and methods, and if / elif / else, and check the results predicted on the slides.</span><span lang="ko">산술·비교·논리 연산자와 우선순위, 문자열 인덱싱·슬라이싱·메서드, if / elif / else를 짧은 코드로 직접 실행해 슬라이드의 예상 결과를 확인한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
+      <li><a href="#notes-week02-2"><span class="sess-label"><span lang="en">Session 2</span><span lang="ko">2차시</span></span><strong><span lang="en">Operators, Strings &amp; Conditionals (Practice)</span><span lang="ko">연산자, 문자열, 조건문 (실습)</span></strong><span class="sess-sum"><span lang="en">Complete four programs, string processing, a grade classifier, rock-paper-scissors and a leap-year calculator, and test them with boundary values and invalid input.</span><span lang="ko">문자열 처리, 성적 분류, 가위바위보, 윤년 계산 네 프로그램을 완성하고 경계값과 잘못된 입력으로 테스트한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
     </ul>
   </header>
   <main>
@@ -36,7 +60,10 @@
         </form>
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
       <section id="preview" class="preview" hidden>
         <form id="preview-form" class="preview-bar">
           <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
@@ -2763,6 +2790,7 @@ else:
 <p>다음 주에는 <code>for</code>와 <code>while</code> 반복문, <code>range()</code>, <code>break</code>와 <code>continue</code>를 배웁니다. 슬라이드의 예고에는 리스트·튜플·딕셔너리·집합도 있지만, 3주차 자료에 따르면 이 자료 구조는 4주차에 다루고 3주차 2차시에는 함수를 배웁니다. 미리 생각해 볼 질문은 "사용자가 그만두겠다고 할 때까지 가위바위보를 반복하려면 어떻게 해야 할까?"입니다.</p>
 </div>
     </article>
+  </div>
   <script src="../../js/lab.js"></script>
 </body>
 </html>

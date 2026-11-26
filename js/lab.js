@@ -38,9 +38,11 @@
 
   // Status line in the page's language; re-drawn when the reader switches.
   // setStatus({ en, ko })
+  let ready = false;            // the guest shell is up
   let lastStatus = null;
   function setStatus(texts) {
     lastStatus = texts;
+    statusEl.dataset.state = ready ? "ready" : "booting";
     statusEl.textContent = window.labLang ? window.labLang.t(texts) : texts.en;
   }
   document.addEventListener("langchange", () => {
@@ -59,7 +61,7 @@
     fontFamily: '"SF Mono", Menlo, Consolas, "DejaVu Sans Mono", "D2Coding", monospace',
     cursorBlink: true,
     scrollback: 5000,
-    theme: { background: "#0e1116", foreground: "#d6dbe4" },
+    theme: { background: "#0f141b", foreground: "#d6dbe4" },
   });
   term.open(termEl);
 
@@ -90,7 +92,6 @@
   // Guest -> terminal (batched per frame; raw bytes so UTF-8 decodes correctly)
   let pending = [];
   let tail = "";
-  let ready = false;
 
   let recent = "";              // the last output, to see whether the shell waits at its prompt
 

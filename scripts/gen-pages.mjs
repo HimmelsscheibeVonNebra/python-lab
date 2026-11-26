@@ -98,14 +98,39 @@ const classOrder = (c) => (/^week\d/.test(c.class) ? "0" : "1") + c.class;
 
 // ---------------------------------------------------------------- templates
 
-// title: { en, ko } plain text.  crumbs: [{ text: {en, ko} | string, href }]
-function layout({ title, root, labDir, crumbs, body, withLab }) {
-  const crumbHtml = crumbs
-    .map((c) => {
-      const text = typeof c.text === "string" ? esc(c.text) : bothText(c.text.en, c.text.ko);
-      return c.href ? `<a href="${esc(c.href)}">${text}</a>` : `<span>${text}</span>`;
-    })
-    .join('<span class="sep">/</span>');
+// Short address of a week page: w9/ -> classes/week09/, flask/ -> classes/sample/
+const shortOf = (week) => (week.n ? `w${week.n}` : week.key === "sample" ? "flask" : week.key);
+
+// The bar at the top of every page: home, every week (one click away from
+// anywhere), the playground and the language switch.
+// current: a week key, "playground" or "home".
+function topbar(root, current) {
+  const link = (href, text, here, title) =>
+    `<a href="${href}"${here ? ' aria-current="page"' : ""}${title ? ` title="${esc(title)}"` : ""}>${text}</a>`;
+  return `  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="${root}index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>${SITE}</span></a>
+      <nav class="weeknav" aria-label="Weeks / 주차">
+        <span class="weeknav-label">${bothText("Week", "주차")}</span>
+${weeks
+  .map((w) => {
+    const l = weekLabel(w);
+    const titles = w.classes.map((c) => c.en.title ?? c.title).join(" · ");
+    return `        ${link(`${root}classes/${w.key}/index.html`, w.n ? String(w.n) : "Flask", w.key === current, `${l.en} / ${l.ko} — ${titles}`)}`;
+  })
+  .join("\n")}
+        <span class="weeknav-sep" aria-hidden="true"></span>
+        ${link(`${root}playground.html`, bothText("Playground", "자유 실습"), current === "playground")}
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// title: { en, ko } plain text.
+function layout({ title, root, labDir, current, body, withLab }) {
   const full = (s) => (s === SITE ? SITE : `${s} · ${SITE}`);
   return `<!DOCTYPE html>
 <html lang="en" data-lang="en" data-title-en="${esc(full(title.en))}" data-title-ko="${esc(full(title.ko))}">
@@ -113,7 +138,7 @@ function layout({ title, root, labDir, crumbs, body, withLab }) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(full(title.en))}</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
   <script src="${root}js/lang.js"></script>
   <link rel="stylesheet" href="${root}css/style.css">
 ${withLab ? `  <link rel="stylesheet" href="${root}vendor/xterm/xterm.css">
@@ -121,13 +146,10 @@ ${withLab ? `  <link rel="stylesheet" href="${root}vendor/xterm/xterm.css">
   <script src="${root}build/libv86.js"></script>
 ` : ""}</head>
 <body data-root="${root}"${labDir ? ` data-lab-dir="${esc(labDir)}"` : ""}>
-  <div class="topbar">
-    <nav class="crumbs">${crumbHtml}</nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
+${topbar(root, current)}
+  <div class="page">
 ${body}
+  </div>
 ${withLab ? `  <script src="${root}js/lab.js"></script>\n` : ""}</body>
 </html>
 `;
@@ -143,7 +165,10 @@ const machine = (hint) => `    <section class="machine">
         </form>
         <span id="status" role="status">${bothText("Loading…", "준비 중…")}</span>
       </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
       <section id="preview" class="preview" hidden>
         <form id="preview-form" class="preview-bar">
           <strong>${bothText("App preview", "앱 미리보기")}</strong>
@@ -334,7 +359,7 @@ const redirect = (to) => `<!DOCTYPE html>
   <meta http-equiv="refresh" content="0; url=${esc(to)}">
   <link rel="icon" href="data:,">
   <title>${SITE}</title>
-  <script>location.replace(${JSON.stringify(to)});</script>
+  <script>location.replace(${JSON.stringify(to)} + (${JSON.stringify(to.includes("#"))} ? "" : location.hash));</script>
 </head>
 <body><p><a href="${esc(to)}">${esc(to)}</a></p></body>
 </html>
@@ -408,18 +433,30 @@ ${both({ en: `\n${en}\n`, ko: `\n${ko}\n` }, "div")}
     .filter(Boolean)
     .join("\n");
 
+  const at = weeks.indexOf(week);
+  const prev = weeks[at - 1];
+  const next = weeks[at + 1];
+  const pagerLink = (w, dir) => {
+    if (!w) return "<span></span>";
+    const l = weekLabel(w);
+    return `<a class="${dir}" href="../${w.key}/index.html">${dir === "prev" ? "← " : ""}${bothText(l.en, l.ko)}${dir === "next" ? " →" : ""}</a>`;
+  };
+  const counts = {
+    en: `${week.classes.length > 1 ? `${week.classes.length} sessions · ` : ""}${entries.length} example${entries.length === 1 ? "" : "s"}`,
+    ko: `${week.classes.length > 1 ? `${week.classes.length}차시 · ` : ""}예제 ${entries.length}개`,
+  };
   const h1 = single
     ? { en: `${label.en} — ${titleOf(week.classes[0]).en}`, ko: `${label.ko} — ${titleOf(week.classes[0]).ko}` }
     : label;
   const intro = single
-    ? `<p>${bothText(txt(week.classes[0].en.summary, week.classes[0].summary).en, week.classes[0].summary)}</p>`
+    ? `<p class="lead">${bothText(txt(week.classes[0].en.summary, week.classes[0].summary).en, week.classes[0].summary)} <a href="#notes-${esc(week.classes[0].class)}">${bothText("Lecture notes ↓", "강의 내용 ↓")}</a></p>`
     : `<ul class="sessions">
 ${week.classes
   .map((cls) => {
     const sl = sessionLabel(cls);
     const t = titleOf(cls);
     const sm = txt(cls.en.summary, cls.summary);
-    return `      <li><a href="#notes-${esc(cls.class)}"><strong>${bothText(`${sl.en} · ${t.en}`, `${sl.ko} · ${t.ko}`)}</strong></a> ${bothText(sm.en, sm.ko)}</li>`;
+    return `      <li><a href="#notes-${esc(cls.class)}"><span class="sess-label">${bothText(sl.en, sl.ko)}</span><strong>${bothText(t.en, t.ko)}</strong><span class="sess-sum">${bothText(sm.en, sm.ko)}</span><span class="sess-more">${bothText("Lecture notes ↓", "강의 내용 ↓")}</span></a></li>`;
   })
   .join("\n")}
     </ul>`;
@@ -431,8 +468,12 @@ ${week.classes
       root: "../../",
       labDir: dirOf(entries[0].ex),
       withLab: true,
-      crumbs: [{ text: SITE, href: "../../index.html" }, { text: label }],
-      body: `  <header>
+      current: week.key,
+      body: `  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow">${week.n ? bothText(`${label.en} · ${counts.en}`, `${label.ko} · ${counts.ko}`) : bothText(counts.en, counts.ko)}</span>
+      <nav class="weekpager" aria-label="Previous and next week / 이전·다음 주차">${pagerLink(prev, "prev")}${pagerLink(next, "next")}</nav>
+    </div>
     <h1>${bothText(h1.en, h1.ko)}</h1>
     ${intro}
   </header>
@@ -457,6 +498,9 @@ ${notes}`,
     })
   );
   pageCount++;
+
+  // Short address: w9/ (#ex= is kept)
+  write(`${shortOf(week)}/index.html`, redirect(`../classes/${week.key}/index.html`));
 
   // Old addresses: classes/<class>/index.html and classes/<class>/<example>.html
   for (const cls of week.classes) {
@@ -518,8 +562,8 @@ write(
     title: txt("Playground", "자유 실습"),
     root: "",
     withLab: true,
-    crumbs: [{ text: SITE, href: "index.html" }, { text: txt("Playground", "자유 실습") }],
-    body: `  <header>
+    current: "playground",
+    body: `  <header class="page-head">
     <h1>${bothText("Playground", "자유 실습")}</h1>
     <p>${both({
       en: "Run code directly in the REPL, or write a <code>.py</code> file in an editor and run it. You can also upload files from your computer and run them.",
@@ -561,50 +605,100 @@ function pythonVersion() {
   return exists(f) ? read(f).trim() : "3";
 }
 
+const exampleCount = weeks.reduce((n, w) => n + exampleIds(w).length, 0);
+
 write(
   "index.html",
   layout({
     title: txt(SITE, SITE),
     root: "",
-    crumbs: [{ text: SITE }],
-    body: `  <header>
-    <h1>${SITE} — ${bothText("Basic Programming Using Python", "파이썬 기초 프로그래밍")}</h1>
-    <p>${bothText(
-      `Run the course examples in your browser with nothing to install. Each week's page boots one 32-bit x86 Linux with Python ${pythonVersion()} inside your browser; switch between that week's examples without rebooting.`,
-      `설치 없이 브라우저에서 Linux를 부팅해 수업 예제를 실행합니다. 주차마다 한 페이지에서 32비트 x86 Linux와 Python ${pythonVersion()}를 한 번 부팅하고, 그 주의 예제를 재부팅 없이 바꿔 가며 실행합니다.`
-    )}</p>
+    current: "home",
+    body: `  <header class="hero">
+    <div class="hero-text">
+      <p class="eyebrow">${bothText("Basic Programming Using Python · 2026", "파이썬 기초 프로그래밍 · 2026")}</p>
+      <h1>${bothText("Run every class example in your browser", "수업 예제를 브라우저에서 바로 실행")}</h1>
+      <p class="lead">${bothText(
+        `Nothing to install. Each week's page boots a small Linux with Python ${pythonVersion()} right in your browser — pick an example and press ▶ to type its commands into the terminal.`,
+        `설치할 것이 없습니다. 주차 페이지를 열면 브라우저 안에서 Python ${pythonVersion()}가 든 작은 Linux가 부팅되고, 예제를 고른 뒤 ▶를 누르면 명령이 터미널에 입력됩니다.`
+      )}</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#weeks">${bothText("Browse the weeks", "주차 둘러보기")}</a>
+        <a class="btn" href="playground.html">${bothText("Open the playground", "자유 실습 열기")}</a>
+      </div>
+      <p class="hero-stats">${bothText(
+        `${weeks.filter((w) => w.n).length} weeks · ${classes.length} sessions · ${exampleCount} examples · Flask apps`,
+        `${weeks.filter((w) => w.n).length}개 주차 · ${classes.length}개 차시 · 예제 ${exampleCount}개 · Flask 앱`
+      )}</p>
+    </div>
+    <div class="hero-term" aria-hidden="true">
+      <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+      <pre><span class="p">student@python-lab:~$</span> python3 hello.py
+What is your name? Mina
+Hello, Mina!
+<span class="p">student@python-lab:~$</span> python3 -c 'print(sum(range(1, 11)))'
+55
+<span class="p">student@python-lab:~$</span> <span class="cursor"> </span></pre>
+    </div>
   </header>
-  <main class="list">
-    <section>
-      <h2>${bothText("Playground", "자유 실습")}</h2>
-      <ul class="cards">
-        <li><a href="playground.html"><strong>python3 · nano · ${bothText("file exchange", "파일 주고받기")}</strong><span>${bothText(
-          "The REPL, writing and running scripts, uploading your files and downloading results.",
-          "REPL, 스크립트 작성과 실행, 내 컴퓨터의 파일 올리기와 결과 받기."
-        )}</span></a></li>
-      </ul>
-    </section>
+
+  <section class="howto" aria-label="How to use / 사용법">
+    <ol>
+      <li><span class="n">1</span><div><strong>${bothText("Pick a week", "주차 고르기")}</strong><p>${bothText(
+        "Use the week numbers in the bar at the top of every page, or the cards below.",
+        "모든 페이지 맨 위의 주차 번호나 아래 카드를 누릅니다."
+      )}</p></div></li>
+      <li><span class="n">2</span><div><strong>${bothText("Choose an example", "예제 고르기")}</strong><p>${bothText(
+        "All of the week's examples share one machine; switching just changes directory.",
+        "그 주의 예제는 한 머신을 같이 씁니다. 바꾸면 디렉터리만 옮겨 갑니다."
+      )}</p></div></li>
+      <li><span class="n">3</span><div><strong>${bothText("Press ▶", "▶ 누르기")}</strong><p>${both({
+        en: "Each step's command is typed into the terminal. Edit with <code>nano</code> and run it again.",
+        ko: "단계마다 명령이 터미널에 입력됩니다. <code>nano</code>로 고쳐 다시 실행해 보세요.",
+      })}</p></div></li>
+    </ol>
+    <p class="tip">${both({
+      en: `Short addresses: add <code>w9/</code> to the site address for Week 9 (<code>w1/</code> … <code>w13/</code>, <code>flask/</code>), and <code>#ex=</code> plus an example name to open it directly, e.g. <a href="w9/#ex=composition"><code>w9/#ex=composition</code></a>.`,
+      ko: `짧은 주소: 사이트 주소 뒤에 <code>w9/</code>를 붙이면 9주차입니다 (<code>w1/</code> … <code>w13/</code>, <code>flask/</code>). <code>#ex=</code>와 예제 이름을 더하면 그 예제가 바로 열립니다. 예: <a href="w9/#ex=composition"><code>w9/#ex=composition</code></a>`,
+    })}</p>
+  </section>
+
+  <main class="list" id="weeks">
+    <div class="week-grid">
 ${weeks
   .map((week) => {
     const label = weekLabel(week);
     const entries = exampleIds(week);
     const href = `classes/${week.key}/index.html`;
-    return `    <section>
-      <h2><a href="${href}">${week.classes.length === 1
-        ? bothText(`${label.en} — ${week.classes[0].en.title ?? week.classes[0].title}`, `${label.ko} — ${week.classes[0].title}`)
-        : bothText(label.en, label.ko)}</a></h2>
-${week.classes
-  .map((cls) => {
-    const sl = sessionLabel(cls);
-    return `      ${week.classes.length === 1 ? "" : `<h3>${bothText(`${sl.en} · ${cls.en.title ?? cls.title}`, `${sl.ko} · ${cls.title}`)}</h3>\n      `}<p class="muted">${bothText(cls.en.summary, cls.summary)}</p>
-      <ul class="chips">
-${entries.filter((e) => e.cls === cls).map((e) => `        <li><a href="${href}#ex=${e.id}">${esc(e.ex.name)}</a></li>`).join("\n")}
-      </ul>`;
+    return `      <article class="week-card${week.n ? "" : " special"}">
+        <a class="week-card-head" href="${href}">
+          <span class="wk-num">${week.n ? week.n : "F"}</span>
+          <span class="wk-name">${bothText(label.en, label.ko)}<small>${bothText(
+            `${week.classes.length > 1 ? `${week.classes.length} sessions · ` : ""}${entries.length} examples`,
+            `${week.classes.length > 1 ? `${week.classes.length}차시 · ` : ""}예제 ${entries.length}개`
+          )}</small></span>
+          <span class="wk-go" aria-hidden="true">→</span>
+        </a>
+        <ul class="wk-sessions">
+${week.classes.map((cls) => `          <li>${bothText(cls.en.title ?? cls.title, cls.title)}</li>`).join("\n")}
+        </ul>
+        <ul class="chips">
+${entries.map((e) => `          <li><a href="${href}#ex=${e.id}">${esc(e.ex.name)}</a></li>`).join("\n")}
+        </ul>
+        <p class="wk-short"><code>${shortOf(week)}/</code></p>
+      </article>`;
   })
   .join("\n")}
-    </section>`;
-  })
-  .join("\n")}
+      <article class="week-card special">
+        <a class="week-card-head" href="playground.html">
+          <span class="wk-num">&gt;_</span>
+          <span class="wk-name">${bothText("Playground", "자유 실습")}<small>python3 · nano · ${bothText("file exchange", "파일 주고받기")}</small></span>
+          <span class="wk-go" aria-hidden="true">→</span>
+        </a>
+        <ul class="wk-sessions">
+          <li>${bothText("The REPL, writing and running scripts, uploading your files and downloading results.", "REPL, 스크립트 작성과 실행, 내 컴퓨터의 파일 올리기와 결과 받기.")}</li>
+        </ul>
+      </article>
+    </div>
   </main>`,
   })
 );

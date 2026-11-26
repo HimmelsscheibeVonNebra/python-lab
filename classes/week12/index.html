@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Week 12 · Python Lab</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
   <script src="../../js/lang.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
@@ -13,16 +13,40 @@
 </head>
 <body data-root="../../" data-lab-dir="week12/examples/debug_lab">
   <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 12</span><span lang="ko">12주차</span></span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    <div class="topbar-inner">
+      <a class="brand" href="../../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <nav class="weeknav" aria-label="Weeks / 주차">
+        <span class="weeknav-label"><span lang="en">Week</span><span lang="ko">주차</span></span>
+        <a href="../../classes/week01/index.html" title="Week 1 / 1주차 — Python Overview &amp; Development Environment">1</a>
+        <a href="../../classes/week02/index.html" title="Week 2 / 2주차 — Operators, Strings &amp; Conditionals (Theory) · Operators, Strings &amp; Conditionals (Practice)">2</a>
+        <a href="../../classes/week03/index.html" title="Week 3 / 3주차 — Loops · Functions">3</a>
+        <a href="../../classes/week05/index.html" title="Week 5 / 5주차 — Modules and the Standard Library · pandas: Series and DataFrame">5</a>
+        <a href="../../classes/week06/index.html" title="Week 6 / 6주차 — Files, Classes, Charts">6</a>
+        <a href="../../classes/week07/index.html" title="Week 7 / 7주차 — Object-Oriented Programming">7</a>
+        <a href="../../classes/week09/index.html" title="Week 9 / 9주차 — Objects That Work Together: State Validation, References, Composition and Inheritance · From Exercises to a Solo Project: Topic Selection and Requirements Analysis">9</a>
+        <a href="../../classes/week10/index.html" title="Week 10 / 10주차 — From Proposal to Design: Decomposition, Contracts, Modules · Your Project Has a History: Commits, Branches, Pull Requests">10</a>
+        <a href="../../classes/week11/index.html" title="Week 11 / 11주차 — Writing the Project Documents: Requirement, Feature, Function, UML · Korean Stock Market Analysis: From Scenario to a Web Report MVP">11</a>
+        <a href="../../classes/week12/index.html" aria-current="page" title="Week 12 / 12주차 — Debugging and Regression Tests · Validation, Feature Tests and Code Review">12</a>
+        <a href="../../classes/week13/index.html" title="Week 13 / 13주차 — SQLite: Your First Database · From CSV to SQLite: Swapping the Storage Layer · Introduction to Database Systems">13</a>
+        <a href="../../classes/sample/index.html" title="Flask samples / Flask 예제 — Extending the project into a Flask web app">Flask</a>
+        <span class="weeknav-sep" aria-hidden="true"></span>
+        <a href="../../playground.html"><span lang="en">Playground</span><span lang="ko">자유 실습</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
     </div>
   </div>
-  <header>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Week 12 · 2 sessions · 4 examples</span><span lang="ko">12주차 · 2차시 · 예제 4개</span></span>
+      <nav class="weekpager" aria-label="Previous and next week / 이전·다음 주차"><a class="prev" href="../week11/index.html">← <span lang="en">Week 11</span><span lang="ko">11주차</span></a><a class="next" href="../week13/index.html"><span lang="en">Week 13</span><span lang="ko">13주차</span> →</a></nav>
+    </div>
     <h1><span lang="en">Week 12</span><span lang="ko">12주차</span></h1>
     <ul class="sessions">
-      <li><a href="#notes-week12-1"><strong><span lang="en">Session 1 · Debugging and Regression Tests</span><span lang="ko">1차시 · 디버깅과 회귀 테스트</span></strong></a> <span lang="en">Practise the debugging loop (reproduce → diagnose → record → fix → re-verify) on market_rules.py, which contains three deliberate defects. Reproduce each failure with a small fixed input, inspect variable state with the traceback and pdb, then fix the defects one at a time and watch how the unittest results change.</span><span lang="ko">의도적인 결함 세 개가 든 market_rules.py로 디버깅의 반복 과정(재현 → 진단 → 기록 → 수정 → 재검증)을 연습한다. 고정된 작은 입력으로 실패를 재현하고, traceback과 pdb로 변수 상태를 확인한 뒤, 결함을 한 번에 하나씩 고치며 unittest 결과가 어떻게 바뀌는지 관찰한다.</span></li>
-      <li><a href="#notes-week12-2"><strong><span lang="en">Session 2 · Validation, Feature Tests and Code Review</span><span lang="ko">2차시 · 입력 검증과 기능 테스트·코드 리뷰</span></strong></a> <span lang="en">Starting from the 12 existing tests of the Week 11 MVP, run experiments on validation at the CSV input boundary, the difference between a failure and a valid empty result, exit codes, and preserving the old report on failure. Compare predictions with observations in the three playground.py activities (verdict, csv, rescue), and design the contract and test cases for a new feature: a minimum-volume filter.</span><span lang="ko">11주차 MVP의 기존 테스트 12개에서 출발해, CSV가 들어오는 경계에서의 검증, 실패와 정상 빈 결과의 구분, 종료 코드, 실패 시 기존 보고서 보존을 실험으로 확인한다. playground.py의 세 활동(verdict·csv·rescue)으로 예측과 실제를 비교하고, 최소 거래량 필터라는 새 기능의 계약과 테스트 사례를 설계한다.</span></li>
+      <li><a href="#notes-week12-1"><span class="sess-label"><span lang="en">Session 1</span><span lang="ko">1차시</span></span><strong><span lang="en">Debugging and Regression Tests</span><span lang="ko">디버깅과 회귀 테스트</span></strong><span class="sess-sum"><span lang="en">Practise the debugging loop (reproduce → diagnose → record → fix → re-verify) on market_rules.py, which contains three deliberate defects. Reproduce each failure with a small fixed input, inspect variable state with the traceback and pdb, then fix the defects one at a time and watch how the unittest results change.</span><span lang="ko">의도적인 결함 세 개가 든 market_rules.py로 디버깅의 반복 과정(재현 → 진단 → 기록 → 수정 → 재검증)을 연습한다. 고정된 작은 입력으로 실패를 재현하고, traceback과 pdb로 변수 상태를 확인한 뒤, 결함을 한 번에 하나씩 고치며 unittest 결과가 어떻게 바뀌는지 관찰한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
+      <li><a href="#notes-week12-2"><span class="sess-label"><span lang="en">Session 2</span><span lang="ko">2차시</span></span><strong><span lang="en">Validation, Feature Tests and Code Review</span><span lang="ko">입력 검증과 기능 테스트·코드 리뷰</span></strong><span class="sess-sum"><span lang="en">Starting from the 12 existing tests of the Week 11 MVP, run experiments on validation at the CSV input boundary, the difference between a failure and a valid empty result, exit codes, and preserving the old report on failure. Compare predictions with observations in the three playground.py activities (verdict, csv, rescue), and design the contract and test cases for a new feature: a minimum-volume filter.</span><span lang="ko">11주차 MVP의 기존 테스트 12개에서 출발해, CSV가 들어오는 경계에서의 검증, 실패와 정상 빈 결과의 구분, 종료 코드, 실패 시 기존 보고서 보존을 실험으로 확인한다. playground.py의 세 활동(verdict·csv·rescue)으로 예측과 실제를 비교하고, 최소 거래량 필터라는 새 기능의 계약과 테스트 사례를 설계한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
     </ul>
   </header>
   <main>
@@ -36,7 +60,10 @@
         </form>
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
       <section id="preview" class="preview" hidden>
         <form id="preview-form" class="preview-bar">
           <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
@@ -2409,6 +2436,7 @@ class RescueTests(unittest.TestCase):
 <p>기존 MVP가 계속 실행되는지 마지막으로 확인합니다. 다음 수업에서는 검증된 규칙 위에 데이터 처리나 UI를 확장합니다.</p>
 </div>
     </article>
+  </div>
   <script src="../../js/lab.js"></script>
 </body>
 </html>

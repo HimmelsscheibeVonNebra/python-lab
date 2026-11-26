@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Playground · Python Lab</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
   <script src="js/lang.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="vendor/xterm/xterm.css">
@@ -13,12 +13,32 @@
 </head>
 <body data-root="">
   <div class="topbar">
-    <nav class="crumbs"><a href="index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Playground</span><span lang="ko">자유 실습</span></span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    <div class="topbar-inner">
+      <a class="brand" href="index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <nav class="weeknav" aria-label="Weeks / 주차">
+        <span class="weeknav-label"><span lang="en">Week</span><span lang="ko">주차</span></span>
+        <a href="classes/week01/index.html" title="Week 1 / 1주차 — Python Overview &amp; Development Environment">1</a>
+        <a href="classes/week02/index.html" title="Week 2 / 2주차 — Operators, Strings &amp; Conditionals (Theory) · Operators, Strings &amp; Conditionals (Practice)">2</a>
+        <a href="classes/week03/index.html" title="Week 3 / 3주차 — Loops · Functions">3</a>
+        <a href="classes/week05/index.html" title="Week 5 / 5주차 — Modules and the Standard Library · pandas: Series and DataFrame">5</a>
+        <a href="classes/week06/index.html" title="Week 6 / 6주차 — Files, Classes, Charts">6</a>
+        <a href="classes/week07/index.html" title="Week 7 / 7주차 — Object-Oriented Programming">7</a>
+        <a href="classes/week09/index.html" title="Week 9 / 9주차 — Objects That Work Together: State Validation, References, Composition and Inheritance · From Exercises to a Solo Project: Topic Selection and Requirements Analysis">9</a>
+        <a href="classes/week10/index.html" title="Week 10 / 10주차 — From Proposal to Design: Decomposition, Contracts, Modules · Your Project Has a History: Commits, Branches, Pull Requests">10</a>
+        <a href="classes/week11/index.html" title="Week 11 / 11주차 — Writing the Project Documents: Requirement, Feature, Function, UML · Korean Stock Market Analysis: From Scenario to a Web Report MVP">11</a>
+        <a href="classes/week12/index.html" title="Week 12 / 12주차 — Debugging and Regression Tests · Validation, Feature Tests and Code Review">12</a>
+        <a href="classes/week13/index.html" title="Week 13 / 13주차 — SQLite: Your First Database · From CSV to SQLite: Swapping the Storage Layer · Introduction to Database Systems">13</a>
+        <a href="classes/sample/index.html" title="Flask samples / Flask 예제 — Extending the project into a Flask web app">Flask</a>
+        <span class="weeknav-sep" aria-hidden="true"></span>
+        <a href="playground.html" aria-current="page"><span lang="en">Playground</span><span lang="ko">자유 실습</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
     </div>
   </div>
-  <header>
+  <div class="page">
+  <header class="page-head">
     <h1><span lang="en">Playground</span><span lang="ko">자유 실습</span></h1>
     <p><span lang="en">Run code directly in the REPL, or write a <code>.py</code> file in an editor and run it. You can also upload files from your computer and run them.</span><span lang="ko">REPL에서 바로 코드를 실행하거나, 편집기로 <code>.py</code> 파일을 만들어 실행합니다. 내 컴퓨터의 파일을 올려 실행할 수도 있습니다.</span></p>
   </header>
@@ -33,7 +53,10 @@
         </form>
         <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
       </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
       <section id="preview" class="preview" hidden>
         <form id="preview-form" class="preview-bar">
           <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
@@ -176,6 +199,7 @@
 <span class="ln">print(&quot;grades.csv 파일을 만들었습니다. cat grades.csv 로 확인하세요.&quot;)</span></code></pre>
     </details>
   </section>
+  </div>
   <script src="js/lab.js"></script>
 </body>
 </html>

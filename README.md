@@ -4,6 +4,7 @@
 [Linux Lab](../LinuxSystemProgramming_Lab/linux-kernel-lab/)과 같은 구조(v86 에뮬레이터 + xterm.js + 정적 파일)이며, 정적 파일만으로 동작하므로 GitHub Pages에 그대로 배포됩니다. C 컴파일러(gcc)와 커널 모듈 실습은 넣지 않았습니다.
 
 - **주차별 페이지** — `classes/weekNN/index.html` 하나에 그 주의 모든 차시가 들어 있습니다. 페이지를 열면 가상 머신을 한 번 부팅하고, 오른쪽에서 예제를 고르면 재부팅 없이 실행 순서와 소스만 바뀌고 터미널에서 그 예제의 디렉터리로 `cd`합니다 (Flask 앱이 켜져 있으면 `web stop`도). 주소의 `#ex=<예제 이름>`으로 처음 예제를 고를 수 있고, 아래에 차시별 강의 내용(슬라이드를 풀어 쓴 글)이 있습니다. 예전 주소 `classes/<주차-차시>/…`는 새 페이지로 넘겨 줍니다.
+- **찾아가기** — 모든 페이지 맨 위 막대에 주차 번호(1 2 3 5 … 13, Flask)와 자유 실습이 있어 어디서든 한 번에 이동합니다. 주차 페이지 오른쪽 위에는 이전·다음 주차 버튼이 있습니다. 짧은 주소 `w9/`(→ `classes/week09/`), `flask/`(→ `classes/sample/`)도 있으며 `#ex=`를 붙이면 그 예제가 바로 열립니다 (예: `w9/#ex=composition`).
 - **실행 순서** — ▶ 버튼을 누르면 명령이 터미널에 입력됩니다. 짧은 Python 코드는 한 줄짜리 `python3 -c '…; …'` 대신 `python3 - <<'EOF'` … `EOF`처럼 여러 줄로 적어 코드 그대로 읽히게 합니다. 수업 코드 전체가 `/home/student/week01` … 에 들어 있습니다.
 - **Flask 예제** — `classes/sample/`. 강의 저장소 `Sample/`의 sample1·sample2·sample4 (네이버 API를 쓰는 sample3은 제외).
 - **자유 실습** — `playground.html`. REPL, `nano`로 스크립트 작성, 파일 올리기/받기.
@@ -11,7 +12,8 @@
 ## 구성
 
 ```text
-index.html, playground.html, classes/   생성된 페이지 (scripts/gen-pages.mjs 출력)
+index.html, playground.html, classes/,  생성된 페이지 (scripts/gen-pages.mjs 출력;
+w1/ … w13/, flask/                     w9/ 등은 주차 페이지로 넘겨 주는 짧은 주소)
 css/, js/lab.js, js/lang.js             스타일과 공용 스크립트 (v86 + xterm.js, 파일 올리기/받기, 언어 선택)
 build/, bios/, vendor/xterm/            v86, SeaBIOS/VGA BIOS, xterm.js   (Linux Lab에서 복사)
 images/bzImage                          Linux 6.12 i686 커널              (Linux Lab에서 복사)

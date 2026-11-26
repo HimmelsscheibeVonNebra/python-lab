@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""web: run a Flask app inside the lab and look at its pages from the terminal.
+
+The lab's virtual machine has no network link to your browser, so instead of
+opening http://127.0.0.1:5000 in a browser you use:
+
+    web start [app.py]     start the app in the background; wait until ready
+    web get [PATH]         request PATH (default /) and print the page as text
+    web html [PATH]        print the raw HTML instead
+    web save FILE [PATH]   save the page (CSS included) as /mnt/host/FILE,
+                           then download FILE with the page's Download box
+    web log                show the server's log (one line per request)
+    web stop               stop the app
+
+Examples:  web get '/?market=KOSPI'      web save report.html
+"""
+import html.parser
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+
+STATE = "/tmp/web-server"          # .pid, .port, .log
+LOG = STATE + ".log"
+
+
+def read_state(name):
+    try:
+        with open(f"{STATE}.{name}") as f:
+            return f.read().strip()
+    except OSError:
+        return None
+
+
+def running():
+    pid = read_state("pid")
+    if not pid:
+        return None
+    try:
+        os.kill(int(pid), 0)
+        return int(pid)
+    except (OSError, ValueError):
+        return None
+
+
+def base_url():
+    port = read_state("port")
+    if not port or not running():
+        sys.exit("No server is running. Start one first: web start app.py")
+    return f"http://127.0.0.1:{port}"
+
+
+def fetch(path):
+    """Return (status, body text) for PATH on the running server."""
+    if not path.startswith("/"):
+        path = "/" + path
+    try:
+        with urllib.request.urlopen(base_url() + path, timeout=120) as r:
+            return r.status, r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode("utf-8", "replace")
+    except urllib.error.URLError as e:
+        sys.exit(f"Could not connect: {e.reason}")
+
+
+class TextView(html.parser.HTMLParser):
+    """HTML -> readable terminal text: headings, lines, table rows."""
+
+    BLOCKS = {"p", "div", "h1", "h2", "h3", "h4", "header", "section", "li",
+              "form", "small", "br", "tr", "table", "ul", "ol", "footer"}
+
+    def __init__(self):
+        super().__init__()
+        self.lines, self.line, self.row = [], "", None
+        self.skip = 0
+        self.cell = None
+
+    def flush(self):
+        text = " ".join(self.line.split())
+        if text:
+            self.lines.append(text)
+        self.line = ""
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("style", "script", "select", "title"):
+            self.skip += 1
+        elif tag == "tr":
+            self.flush()
+            self.row = []
+        elif tag in ("td", "th") and self.row is not None:
+            self.cell = ""
+        elif tag in self.BLOCKS:
+            self.flush()
+        if tag in ("h1", "h2", "h3"):
+            self.line += "# " if tag == "h1" else "## "
+
+    def handle_endtag(self, tag):
+        if tag in ("style", "script", "select", "title"):
+            self.skip = max(0, self.skip - 1)
+        elif tag in ("td", "th") and self.row is not None and self.cell is not None:
+            self.row.append(" ".join(self.cell.split()))
+            self.cell = None
+        elif tag == "tr" and self.row is not None:
+            self.lines.append(" | ".join(self.row))
+            self.row = None
+        elif tag in self.BLOCKS:
+            self.flush()
+
+    def handle_data(self, data):
+        if self.skip:
+            return
+        if self.cell is not None:
+            self.cell += data
+        elif self.row is None:
+            self.line += data
+
+    def text(self):
+        self.flush()
+        return "\n".join(self.lines)
+
+
+def cmd_start(args):
+    app = args[0] if args else "app.py"
+    if running():
+        sys.exit(f"A server is already running ({base_url()}). Stop it first: web stop")
+    if not os.path.exists(app):
+        sys.exit(f"No {app} in {os.getcwd()}")
+    log = open(LOG, "w")
+    proc = subprocess.Popen([sys.executable, "-u", app], stdout=log, stderr=subprocess.STDOUT,
+                            stdin=subprocess.DEVNULL, start_new_session=True)
+    with open(STATE + ".pid", "w") as f:
+        f.write(str(proc.pid))
+    print(f"Starting {app} (Flask takes about 10 seconds to load) ...", flush=True)
+    for _ in range(240):
+        time.sleep(0.5)
+        with open(LOG) as f:
+            out = f.read()
+        m = re.search(r"Running on http://127\.0\.0\.1:(\d+)", out)
+        if m:
+            with open(STATE + ".port", "w") as f:
+                f.write(m.group(1))
+            print(f"Ready: http://127.0.0.1:{m.group(1)}   (web get /  ·  web stop)")
+            return
+        if proc.poll() is not None:
+            print(out.rstrip())
+            sys.exit(f"{app} stopped before the server was ready (exit {proc.returncode})")
+    sys.exit("The server did not start within 2 minutes; see: web log")
+
+
+def cmd_get(args, raw=False):
+    status, body = fetch(args[0] if args else "/")
+    print(f"HTTP {status}")
+    if raw:
+        print(body)
+    else:
+        view = TextView()
+        view.feed(body)
+        print(view.text())
+
+
+def cmd_save(args):
+    if not args:
+        sys.exit("usage: web save FILE [PATH]")
+    name, path = args[0], (args[1] if len(args) > 1 else "/")
+    status, body = fetch(path)
+
+    def inline(m):
+        href = m.group(1)
+        _, css = fetch(href) if href.startswith("/") else (0, "")
+        return f"<style>\n{css}\n</style>" if css else m.group(0)
+
+    body = re.sub(r'<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>', inline, body)
+    target = name if "/" in name else os.path.join("/mnt/host", name)
+    with open(target, "w", encoding="utf-8") as f:
+        f.write(body)
+    print(f"HTTP {status} — saved {target} ({len(body.encode())} bytes)")
+    if target.startswith("/mnt/host/"):
+        print(f"Download it: type {target[len('/mnt/host/'):]} in the page's Download box (받기).")
+
+
+def cmd_log(args):
+    try:
+        with open(LOG) as f:
+            print(f.read().rstrip())
+    except OSError:
+        print("No server log yet.")
+
+
+def cmd_stop(args):
+    pid = running()
+    if not pid:
+        print("No server is running.")
+        return
+    os.killpg(pid, signal.SIGTERM)
+    for name in ("pid", "port"):
+        try:
+            os.remove(f"{STATE}.{name}")
+        except OSError:
+            pass
+    print("Server stopped.")
+
+
+def main():
+    cmds = {"start": cmd_start, "get": cmd_get, "html": lambda a: cmd_get(a, raw=True),
+            "save": cmd_save, "log": cmd_log, "stop": cmd_stop}
+    if len(sys.argv) < 2 or sys.argv[1] not in cmds:
+        print(__doc__.strip())
+        sys.exit(0 if len(sys.argv) < 2 else 2)
+    cmds[sys.argv[1]](sys.argv[2:])
+
+
+if __name__ == "__main__":
+    main()

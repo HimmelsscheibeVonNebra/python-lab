@@ -1,22 +1,21 @@
 {
   "label": "Flask samples",
   "title": "Extending the project into a Flask web app",
-  "summary": "Three projects that move the validate → analyze → HTML flow of Week 11, Session 2 into a Flask web app: Korean stocks (sample2), US stocks (sample1) and SQLite storage (sample4). Run each as a server inside the virtual machine and send it requests with wget.",
+  "summary": "Move the validate → analyze → HTML flow of Week 11, Session 2 into Flask web apps. Start with the smallest app (flask_hello), then run Korean stocks (sample2), US stocks (sample1) and SQLite storage (sample4) as servers inside the virtual machine and send them requests with the web command.",
   "examples": {
     "sample2_korea": {
       "summary": "Korean stock analysis app. app.py receives the request, storage.py reads the CSV, logic.py validates and analyzes it, and templates/index.html (Jinja) draws the page. Check the KOSPI/KOSDAQ filter, the ranking by change, the sample mean and the 400 response to bad input.",
-      "notes": "On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. The virtual machine in this web lab has no network connection to the page, so a browser cannot reach its server; requests are sent from inside the machine with wget and test_client() instead.",
+      "notes": "On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the web command sends the same requests from the terminal.",
       "steps": [
         "A one-day (2026-11-05) fictional snapshot of 5 stocks. Prices are whole won (KRW), and codes such as 005930 are handled as strings to keep the leading 0.",
-        "Start the development server in the background (&). Its address is http://127.0.0.1:5002 and it can only be reached from inside this virtual machine. Loading Flask takes about 10 seconds.",
-        "Wait until the server answers, then save the first page (market ALL) as page.html: 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%.",
-        "The query string ?market=KOSPI reaches the app through request.args.get('market'). The mean of the 3 KOSPI stocks is +0.33%.",
+        "Start app.py as a server. Its address is http://127.0.0.1:5002.",
+        "The first page (market ALL). The summary is 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%, and the table is sorted by change, largest first.",
+        "?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%.",
         "The mean of the 2 KOSDAQ stocks is +0.50%. It is an equal-weight sample mean of the selected stocks, not a market index return.",
-        "For an unknown market, analyze() raises ValueError and app.py answers 400 BAD REQUEST. wget does not show the body of an error response.",
-        "test_client() sends a request to the app without starting a server. Check the status code 400 and the error message shown on the page (market must be ALL, KOSPI or KOSDAQ).",
-        "The server log has one line per request with its path and status code (200, 200, 200, 400). test_client() requests bypass the server, so they are not here.",
-        "To view the page in your own browser, download sample2.html and style.css one at a time with the box above (into the same folder) and open sample2.html. The server's /static/ path was rewritten to the file name.",
-        "Stop the background server (job 1). On a real PC you stop it with Ctrl+C in its terminal."
+        "For an unknown market, analyze() raises ValueError and app.py answers HTTP 400. The program does not crash; it shows the error message (market must be ALL, KOSPI or KOSDAQ) on the page.",
+        "One line per request with its address and status code (200, 200, 200, 400).",
+        "Save the page, CSS included, as one HTML file in /mnt/host. Type sample2.html in the box above and press Download to open it in your own browser.",
+        "Stop the server."
       ]
     },
     "sample1_us": {
@@ -25,8 +24,7 @@
         "A price of 22000 is $220.00. Amounts are stored as whole cents to avoid floating-point errors.",
         "The only differences between the two apps are in logic.py: the market list (MARKETS) and the code check (six digits ↔ uppercase ticker). The rest of the flow is the same.",
         "Start the server on port 5001.",
-        "ALL: 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%.",
-        "The top-ranked stock (NVDA) shows its previous close 140.00 and close 144.20. The template turns cents into dollars with row.close / scale.",
+        "Prices in the table are shown in dollars (NVIDIA 140.00 → 144.20). The template turns cents into dollars with row.close / scale. The mean is +0.40%.",
         "NYSE has 2 stocks: JPM (flat) and KO (down). Mean -1.00%.",
         "Stop the server."
       ]
@@ -34,15 +32,29 @@
     "sample4_sqlite": {
       "summary": "An app that validates the CSV, stores it in SQLite in one transaction and draws the page from the database. Before flask --app app init-db imports the data there is no database and the page answers 500; edits to the CSV appear only after another import; and an invalid CSV does not erase the existing data.",
       "steps": [
-        "instance/market.sqlite3 does not exist yet. read_quotes() opens it with mode=ro, so instead of creating an empty database it fails, and the page answers 500 with a hint.",
-        "A command registered with @app.cli.command('init-db'). It validates the CSV, and import_snapshot() fills the quotes table in one transaction: Imported 5 quotes.",
-        "Query the stored rows directly. Codes are stored as TEXT, so leading zeros such as 000660 are kept.",
-        "Start the server on port 5004. The page now reads the database, not the CSV.",
-        "Sample mean +0.40% — the same data as sample2, so the same result.",
+        "Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV.",
+        "There is no database yet (instance/market.sqlite3), so you get HTTP 500 with the hint to run flask --app app init-db first.",
+        "The command that validates the CSV and loads it into the database in one transaction: Imported 5 quotes. It is fine to run it while the server is running.",
+        "Now HTTP 200. Sample mean +0.40% — the same data as sample2, so the same result.",
         "Changing Samsung Electronics' close to 77000 in the CSV leaves the page at +0.40%, because the page reads the database.",
         "After another import the change shows: Samsung's change goes from +2% to +10%, so the mean becomes +2.00%.",
-        "Appending a copy of a stock's row fails validation (duplicate code). Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks.",
+        "Appending a copy of a stock's row fails validation: ValueError: duplicate code in snapshot.",
+        "Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks (mean +2.00%).",
         "Stop the server. Reloading the page restores the CSV and the database."
+      ]
+    },
+    "flask_hello": {
+      "summary": "The smallest Flask app: two addresses (routes), each connected to one function, and a value read from the query string. Learn how to start a server and send it requests with the web command first.",
+      "notes": "web is a helper command made for this lab (type web alone to see its usage). On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser. This virtual machine has no network link to your browser, so the same requests are sent from the terminal.",
+      "steps": [
+        "Start app.py as a background server and wait until it is ready (about 10 seconds). You should see Ready: http://127.0.0.1:5000.",
+        "Send a request to the address /. The HTML returned by home(), the function marked @app.get(\"/\"), is shown as text. HTTP 200 means success.",
+        "name=Mina after the ? is the query string. hello() reads it with request.args.get(\"name\") and builds Hello, Mina!.",
+        "Without name, get() uses its default \"world\": Hello, world!",
+        "web html shows the raw HTML. Thanks to escape(), <b> became &lt;b&gt;, so the tag you typed is shown as text instead of being run.",
+        "For an address that does not exist, Flask answers HTTP 404 (Not Found).",
+        "The server log has one line per request with its address and status code (200, 404).",
+        "Stop the server. After editing app.py, run web stop and then web start again so the new code is used."
       ]
     }
   }

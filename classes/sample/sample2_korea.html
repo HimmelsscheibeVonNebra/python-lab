@@ -43,44 +43,40 @@
           <p><span lang="en">A one-day (2026-11-05) fictional snapshot of 5 stocks. Prices are whole won (KRW), and codes such as 005930 are handled as strings to keep the leading 0.</span><span lang="ko">2026-11-05 하루치 가상 데이터 5종목. 가격은 정수 원(KRW)이고 005930 같은 종목 코드는 앞의 0을 지키기 위해 문자열로 다룬다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 app.py &gt; server.log 2&gt;&amp;1 &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 app.py &gt; server.log 2&gt;&amp;1 &amp;">▶</button><code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></div>
-          <p><span lang="en">Start the development server in the background (&amp;). Its address is http://127.0.0.1:5002 and it can only be reached from inside this virtual machine. Loading Flask takes about 10 seconds.</span><span lang="ko">개발 서버를 백그라운드(&amp;)로 띄운다. 주소는 http://127.0.0.1:5002 이며, 이 가상 머신 안에서만 접속할 수 있다. Flask를 불러오는 데 10초 정도 걸린다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
+          <p><span lang="en">Start app.py as a server. Its address is http://127.0.0.1:5002.</span><span lang="ko">app.py를 서버로 띄운다. 주소는 http://127.0.0.1:5002 이다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="until wget -qO page.html http://127.0.0.1:5002/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: until wget -qO page.html http://127.0.0.1:5002/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html">▶</button><code>until wget -qO page.html http://127.0.0.1:5002/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html</code></div>
-          <p><span lang="en">Wait until the server answers, then save the first page (market ALL) as page.html: 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%.</span><span lang="ko">서버가 응답할 때까지 기다렸다가 첫 화면(시장 ALL)을 page.html로 받는다. 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">The first page (market ALL). The summary is 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%, and the table is sorted by change, largest first.</span><span lang="ko">첫 화면(시장 ALL). 요약은 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%이고, 표는 등락률이 큰 순서다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="wget -qO- 'http://127.0.0.1:5002/?market=KOSPI' | grep -o '종목 [0-9]*개[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wget -qO- 'http://127.0.0.1:5002/?market=KOSPI' | grep -o '종목 [0-9]*개[^&lt;]*'">▶</button><code>wget -qO- 'http://127.0.0.1:5002/?market=KOSPI' | grep -o '종목 [0-9]*개[^&lt;]*'</code></div>
-          <p><span lang="en">The query string ?market=KOSPI reaches the app through request.args.get('market'). The mean of the 3 KOSPI stocks is +0.33%.</span><span lang="ko">?market=KOSPI 쿼리 문자열이 request.args.get('market')으로 전달된다. KOSPI 3종목의 평균은 +0.33%.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSPI'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSPI'">▶</button><code>web get '/?market=KOSPI'</code></div>
+          <p><span lang="en">?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%.</span><span lang="ko">?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="wget -qO- 'http://127.0.0.1:5002/?market=KOSDAQ' | grep -o '종목 [0-9]*개[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wget -qO- 'http://127.0.0.1:5002/?market=KOSDAQ' | grep -o '종목 [0-9]*개[^&lt;]*'">▶</button><code>wget -qO- 'http://127.0.0.1:5002/?market=KOSDAQ' | grep -o '종목 [0-9]*개[^&lt;]*'</code></div>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSDAQ'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSDAQ'">▶</button><code>web get '/?market=KOSDAQ'</code></div>
           <p><span lang="en">The mean of the 2 KOSDAQ stocks is +0.50%. It is an equal-weight sample mean of the selected stocks, not a market index return.</span><span lang="ko">KOSDAQ 2종목의 평균은 +0.50%. 평균은 선택된 종목의 동일 가중 표본 평균이지 시장 지수 수익률이 아니다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="wget -qO- 'http://127.0.0.1:5002/?market=BAD'; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wget -qO- 'http://127.0.0.1:5002/?market=BAD'; echo &quot;exit=$?&quot;">▶</button><code>wget -qO- 'http://127.0.0.1:5002/?market=BAD'; echo &quot;exit=$?&quot;</code></div>
-          <p><span lang="en">For an unknown market, analyze() raises ValueError and app.py answers 400 BAD REQUEST. wget does not show the body of an error response.</span><span lang="ko">모르는 시장은 analyze()가 ValueError를 내고 app.py가 400 BAD REQUEST로 응답한다. wget은 오류 응답의 본문을 보여 주지 않는다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=BAD'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=BAD'">▶</button><code>web get '/?market=BAD'</code></div>
+          <p><span lang="en">For an unknown market, analyze() raises ValueError and app.py answers HTTP 400. The program does not crash; it shows the error message (market must be ALL, KOSPI or KOSDAQ) on the page.</span><span lang="ko">모르는 시장은 analyze()가 ValueError를 내고 app.py가 HTTP 400으로 답한다. 프로그램이 죽지 않고 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 화면에 보여 준다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from app import app; r = app.test_client().get(&quot;/?market=BAD&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^400$' -e 'alert&quot;&gt;[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from app import app; r = app.test_client().get(&quot;/?market=BAD&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^400$' -e 'alert&quot;&gt;[^&lt;]*'">▶</button><code>python3 -c 'from app import app; r = app.test_client().get(&quot;/?market=BAD&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^400$' -e 'alert&quot;&gt;[^&lt;]*'</code></div>
-          <p><span lang="en">test_client() sends a request to the app without starting a server. Check the status code 400 and the error message shown on the page (market must be ALL, KOSPI or KOSDAQ).</span><span lang="ko">test_client()는 서버를 띄우지 않고 앱에 요청을 보낸다. 상태 코드 400과 화면에 표시되는 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 확인한다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web log">▶</button><code>web log</code></div>
+          <p><span lang="en">One line per request with its address and status code (200, 200, 200, 400).</span><span lang="ko">요청마다 주소와 상태 코드(200, 200, 200, 400)가 한 줄씩 남는다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="tail -n 4 server.log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: tail -n 4 server.log">▶</button><code>tail -n 4 server.log</code></div>
-          <p><span lang="en">The server log has one line per request with its path and status code (200, 200, 200, 400). test_client() requests bypass the server, so they are not here.</span><span lang="ko">서버 로그에 요청마다 경로와 상태 코드(200, 200, 200, 400)가 한 줄씩 남는다. test_client() 요청은 서버를 거치지 않으므로 여기에 없다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web save sample2.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web save sample2.html">▶</button><code>web save sample2.html</code></div>
+          <p><span lang="en">Save the page, CSS included, as one HTML file in /mnt/host. Type sample2.html in the box above and press Download to open it in your own browser.</span><span lang="ko">화면을 CSS까지 담은 HTML 한 파일로 /mnt/host에 저장한다. 위 입력란에 sample2.html을 적고 받기를 누르면 내 브라우저에서 열어 볼 수 있다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="sed 's#/static/style.css#style.css#' page.html &gt; /mnt/host/sample2.html &amp;&amp; cp static/style.css /mnt/host/ &amp;&amp; ls -l /mnt/host/" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed 's#/static/style.css#style.css#' page.html &gt; /mnt/host/sample2.html &amp;&amp; cp static/style.css /mnt/host/ &amp;&amp; ls -l /mnt/host/">▶</button><code>sed 's#/static/style.css#style.css#' page.html &gt; /mnt/host/sample2.html &amp;&amp; cp static/style.css /mnt/host/ &amp;&amp; ls -l /mnt/host/</code></div>
-          <p><span lang="en">To view the page in your own browser, download sample2.html and style.css one at a time with the box above (into the same folder) and open sample2.html. The server's /static/ path was rewritten to the file name.</span><span lang="ko">받은 화면을 내 브라우저로 보려면 sample2.html과 style.css를 위 입력란에서 하나씩 받기로 저장한 뒤(같은 폴더) sample2.html을 연다. 서버 주소의 /static/ 경로를 파일 이름으로 바꿔 두었다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="kill %1; sleep 1; tail -n 1 server.log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1; sleep 1; tail -n 1 server.log">▶</button><code>kill %1; sleep 1; tail -n 1 server.log</code></div>
-          <p><span lang="en">Stop the background server (job 1). On a real PC you stop it with Ctrl+C in its terminal.</span><span lang="ko">백그라운드 서버(작업 1번)를 끈다. 실제 PC에서는 터미널에서 Ctrl+C로 끈다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server.</span><span lang="ko">서버를 끈다.</span></p>
         </li>
       </ol>
       <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
-      <p class="callout"><span lang="en">On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. The virtual machine in this web lab has no network connection to the page, so a browser cannot reach its server; requests are sent from inside the machine with wget and test_client() instead.</span><span lang="ko">실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습의 가상 머신은 페이지와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수 없으므로, 가상 머신 안의 wget과 test_client()로 요청을 보낸다.</span></p>
+      <p class="callout"><span lang="en">On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the web command sends the same requests from the terminal.</span><span lang="ko">실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 web 명령으로 같은 요청을 터미널에서 보낸다.</span></p>
     </aside>
   </main>
   <section class="sources">
@@ -269,7 +265,7 @@
     </details>
   </section>
   <nav class="pager">
-    <span></span>
+    <a href="flask_hello.html">← flask_hello</a>
     <a href="sample1_us.html">sample1_us →</a>
   </nav>
   <script src="../../js/lab.js"></script>

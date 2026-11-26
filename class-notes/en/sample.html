@@ -1,4 +1,31 @@
-<p>The stock MVP from Week 11, Session 2 was a command-line program: it read a CSV (<code>storage.py</code>), validated and analyzed it (<code>logic.py</code>) and wrote an HTML report to a file (<code>report.py</code>). These examples move the same flow into a Flask web app. Instead of writing a report file, the app reads and analyzes the data each time a browser sends a request and builds the HTML on the spot. Start with <a href="sample2_korea.html">sample2_korea</a>, the closest to the lecture, then <a href="sample1_us.html">sample1_us</a> with a different currency and code format, and finish with <a href="sample4_sqlite.html">sample4_sqlite</a>, which stores the data in SQLite. All numbers are fictional class data for 2026-11-05, not live prices.</p>
+<p>The stock MVP from Week 11, Session 2 was a command-line program: it read a CSV (<code>storage.py</code>), validated and analyzed it (<code>logic.py</code>) and wrote an HTML report to a file (<code>report.py</code>). These examples move the same flow into a Flask web app. Instead of writing a report file, the app reads and analyzes the data each time a browser sends a request and builds the HTML on the spot. First learn how to start a server and send it requests with <a href="flask_hello.html">flask_hello</a>, the smallest app with two routes; then <a href="sample2_korea.html">sample2_korea</a>, the closest to the lecture, then <a href="sample1_us.html">sample1_us</a> with a different currency and code format, and finish with <a href="sample4_sqlite.html">sample4_sqlite</a>, which stores the data in SQLite. All numbers are fictional class data for 2026-11-05, not live prices.</p>
+
+<h2>The smallest Flask app</h2>
+
+<p>A Flask app is an <code>app</code> object made with <code>Flask(__name__)</code>, with connections (routes) attached that say "when a request comes to this address, run this function". The string the function returns becomes the response HTML.</p>
+
+<pre><code>from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.get("/")
+def home():
+    return "&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;"
+
+@app.get("/hello")
+def hello():
+    name = request.args.get("name", "world")
+    return f"&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;"</code></pre>
+
+<ul>
+<li><code>@app.get("/hello")</code>: connects GET requests for the address <code>/hello</code> to <code>hello()</code>.</li>
+<li><code>request.args.get("name", "world")</code>: reads the value from the <code>?name=Mina</code> part of the address (the query string), with a default when it is missing.</li>
+<li><code>escape(name)</code>: replaces special characters in a value the user sent before it goes into the HTML, so a tag they typed is not run.</li>
+<li>For an address with no route, Flask answers 404 (Not Found).</li>
+</ul>
+
+<p>The stock apps below have the same structure, except that they use a template file instead of building strings, and split the work across several files.</p>
 
 <h2>Project structure</h2>
 
@@ -67,14 +94,19 @@ python app.py</code></pre>
 
 <h2>Running it in this web lab</h2>
 
-<p>On a real PC you create a virtual environment for each project, install Flask with <code>pip install -r requirements.txt</code>, run <code>python app.py</code> and open an address such as <code>http://127.0.0.1:5002</code> in your browser. The virtual machine in this web lab already has Flask, but it has no network connection to the page, so your browser cannot reach its server. The example pages therefore run it like this:</p>
+<p>On a real PC you create a virtual environment for each project, install Flask with <code>pip install -r requirements.txt</code>, run <code>python app.py</code> and open an address such as <code>http://127.0.0.1:5002</code> in your browser. The virtual machine in this web lab already has Flask, but it has no network link to your browser, so your browser cannot reach its server. Instead, the lab's helper command <code>web</code> sends the same requests from the terminal.</p>
 
-<ul>
-<li>Start the server in the background: <code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></li>
-<li>Send requests from inside the machine with <code>wget</code> and find the lines you need in the HTML with <code>grep</code>.</li>
-<li>Check status codes and error messages with <code>app.test_client()</code>, which sends requests to the app without a server — the usual tool for automated tests.</li>
-<li>Copy the fetched HTML and <code>static/style.css</code> to <code>/mnt/host</code> and save them with <strong>Download</strong> to see the page in your own browser.</li>
-<li>Stop the server with <code>kill %1</code> (on a real PC, <kbd>Ctrl</kbd>+<kbd>C</kbd>).</li>
-</ul>
+<table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>web start</code></td><td>Starts <code>app.py</code> in the current directory as a server and waits until it is ready (about 10 seconds)</td></tr>
+<tr><td><code>web get /</code></td><td>Sends a request and shows the status code and the page as text; tables are shown one row per line, split by <code>|</code></td></tr>
+<tr><td><code>web get '/?market=KOSPI'</code></td><td>Put an address with a query string in single quotes</td></tr>
+<tr><td><code>web html /</code></td><td>Shows the raw HTML</td></tr>
+<tr><td><code>web save file.html</code></td><td>Saves the page, CSS included, in <code>/mnt/host</code>. Type its name in the box above and press <strong>Download</strong> to open it in your own browser</td></tr>
+<tr><td><code>web log</code></td><td>The server log (address and status code of each request)</td></tr>
+<tr><td><code>web stop</code></td><td>Stops the server. After editing the code, run <code>web stop</code> and then <code>web start</code> again</td></tr>
+</tbody>
+</table>
 
 <p>sample3, which uses the Naver news API, needs an external network and is not included in this lab.</p>

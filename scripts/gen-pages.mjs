@@ -17,7 +17,8 @@
 //     "class": "week03-1", "title": "...", "summary": "...",
 //     "examples": [{
 //       "name": "even_sum",                       page name (also the file slug)
-//       "source": "week03/starter/session1/even_sum.py",   under course/
+//       "source": "week03/starter/session1/even_sum.py",   under course/ (or
+//                                                 rootfs/overlay/home/student/)
 //       "dir": "week03/starter/session1",         start directory (default:
 //                                                 the source's directory)
 //       "also": ["week03/solutions/session1/even_sum.py"],  more files to show
@@ -75,6 +76,11 @@ function both(t, tag = "span") {
 }
 // Same, from plain text.
 const bothText = (en, ko, tag) => both({ en: esc(en ?? ko), ko: esc(ko) }, tag);
+
+// Example files: course/<path>, or the lab's own files in the student's home
+// (rootfs/overlay/home/student/<path>, e.g. flask_hello/app.py).
+const homeFile = (rel) =>
+  exists(path.join("course", rel)) ? path.join("course", rel) : path.join("rootfs/overlay/home/student", rel);
 
 const slugOf = (ex) => ex.name.replace(/[^A-Za-z0-9_.-]+/g, "-");
 const dirOf = (ex) => ex.dir || path.posix.dirname(ex.source);
@@ -312,9 +318,9 @@ ${notesKo ? `    <article class="notes">\n${both({ en: `\n${notesEn}\n`, ko: `\n
     const dir = dirOf(ex);
     const files = [ex.source, ...(ex.also || [])];
     for (const f of files) {
-      if (!exists(path.join("course", f))) throw new Error(`${cls.class}/${ex.name}: no course/${f}`);
+      if (!exists(homeFile(f))) throw new Error(`${cls.class}/${ex.name}: no course/${f}`);
     }
-    if (!exists(path.join("course", dir))) throw new Error(`${cls.class}/${ex.name}: no course/${dir}`);
+    if (!exists(homeFile(dir))) throw new Error(`${cls.class}/${ex.name}: no course/${dir}`);
     const steps = ex.steps.map((s, k) => ({
       cmd: s.cmd,
       note: s.note ? txt((ex.en.steps || [])[k], s.note) : undefined,
@@ -355,7 +361,7 @@ ${ex.manual ? callout({
   </main>
   <section class="sources">
     <h2>${bothText("Source", "소스")}</h2>
-${files.map((f, k) => sourceHtml(shownName(f, dir), read(path.join("course", f)), k === 0)).join("\n")}
+${files.map((f, k) => sourceHtml(shownName(f, dir), read(homeFile(f)), k === 0)).join("\n")}
   </section>
   <nav class="pager">
     ${prev ? `<a href="${slugOf(prev)}.html">← ${esc(prev.name)}</a>` : "<span></span>"}

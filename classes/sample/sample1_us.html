@@ -47,23 +47,19 @@
           <p><span lang="en">The only differences between the two apps are in logic.py: the market list (MARKETS) and the code check (six digits ↔ uppercase ticker). The rest of the flow is the same.</span><span lang="ko">두 앱의 차이는 logic.py의 시장 목록(MARKETS)과 종목 코드 검사(6자리 숫자 ↔ 대문자 티커)뿐이다. 나머지 흐름은 같다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 app.py &gt; server.log 2&gt;&amp;1 &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 app.py &gt; server.log 2&gt;&amp;1 &amp;">▶</button><code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></div>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
           <p><span lang="en">Start the server on port 5001.</span><span lang="ko">포트 5001에서 서버를 띄운다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="until wget -qO page.html http://127.0.0.1:5001/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: until wget -qO page.html http://127.0.0.1:5001/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html">▶</button><code>until wget -qO page.html http://127.0.0.1:5001/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html</code></div>
-          <p><span lang="en">ALL: 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%.</span><span lang="ko">ALL: 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Prices in the table are shown in dollars (NVIDIA 140.00 → 144.20). The template turns cents into dollars with row.close / scale. The mean is +0.40%.</span><span lang="ko">표의 가격이 달러로 보인다(NVIDIA 140.00 → 144.20). 템플릿이 row.close / scale로 센트를 달러로 바꾼다. 평균은 +0.40%.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="grep -o '&lt;td&gt;[0-9,.]*&lt;/td&gt;' page.html | head -n 4" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -o '&lt;td&gt;[0-9,.]*&lt;/td&gt;' page.html | head -n 4">▶</button><code>grep -o '&lt;td&gt;[0-9,.]*&lt;/td&gt;' page.html | head -n 4</code></div>
-          <p><span lang="en">The top-ranked stock (NVDA) shows its previous close 140.00 and close 144.20. The template turns cents into dollars with row.close / scale.</span><span lang="ko">등락률 1위 종목(NVDA)의 전일 종가 140.00과 종가 144.20이 보인다. 템플릿이 row.close / scale로 센트를 달러로 바꾼다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="wget -qO- 'http://127.0.0.1:5001/?market=NYSE' | grep -o '종목 [0-9]*개[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wget -qO- 'http://127.0.0.1:5001/?market=NYSE' | grep -o '종목 [0-9]*개[^&lt;]*'">▶</button><code>wget -qO- 'http://127.0.0.1:5001/?market=NYSE' | grep -o '종목 [0-9]*개[^&lt;]*'</code></div>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=NYSE'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=NYSE'">▶</button><code>web get '/?market=NYSE'</code></div>
           <p><span lang="en">NYSE has 2 stocks: JPM (flat) and KO (down). Mean -1.00%.</span><span lang="ko">NYSE 2종목: JPM(보합)과 KO(하락). 평균 -1.00%.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
           <p><span lang="en">Stop the server.</span><span lang="ko">서버를 끈다.</span></p>
         </li>
       </ol>

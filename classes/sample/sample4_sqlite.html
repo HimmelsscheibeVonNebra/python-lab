@@ -39,39 +39,39 @@
       <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
       <ol class="steps">
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'">▶</button><code>python3 -c 'from app import app; r = app.test_client().get(&quot;/&quot;); print(r.status_code); print(r.get_data(as_text=True))' | grep -o -e '^500$' -e 'alert&quot;&gt;[^&lt;]*'</code></div>
-          <p><span lang="en">instance/market.sqlite3 does not exist yet. read_quotes() opens it with mode=ro, so instead of creating an empty database it fails, and the page answers 500 with a hint.</span><span lang="ko">아직 instance/market.sqlite3가 없다. read_quotes()가 mode=ro로 열어 빈 DB를 새로 만들지 않고 오류를 내므로 500과 안내 메시지가 나온다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
+          <p><span lang="en">Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV.</span><span lang="ko">서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; ls -l instance" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; ls -l instance">▶</button><code>flask --app app init-db &amp;&amp; ls -l instance</code></div>
-          <p><span lang="en">A command registered with @app.cli.command('init-db'). It validates the CSV, and import_snapshot() fills the quotes table in one transaction: Imported 5 quotes.</span><span lang="ko">@app.cli.command('init-db')로 등록한 명령. CSV를 검증하고 import_snapshot()이 한 트랜잭션으로 quotes 테이블을 채운다: Imported 5 quotes.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">There is no database yet (instance/market.sqlite3), so you get HTTP 500 with the hint to run flask --app app init-db first.</span><span lang="ko">아직 DB(instance/market.sqlite3)가 없어 HTTP 500과 함께 &quot;먼저 flask --app app init-db를 실행하세요&quot;라는 안내가 나온다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'">▶</button><code>python3 -c 'import sqlite3; c = sqlite3.connect(&quot;instance/market.sqlite3&quot;); print(c.execute(&quot;SELECT code, close FROM quotes ORDER BY code&quot;).fetchall())'</code></div>
-          <p><span lang="en">Query the stored rows directly. Codes are stored as TEXT, so leading zeros such as 000660 are kept.</span><span lang="ko">DB에 저장된 행을 직접 조회한다. 코드는 TEXT로 저장되어 000660처럼 앞의 0이 남는다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db">▶</button><code>flask --app app init-db</code></div>
+          <p><span lang="en">The command that validates the CSV and loads it into the database in one transaction: Imported 5 quotes. It is fine to run it while the server is running.</span><span lang="ko">CSV를 검증하고 한 트랜잭션으로 DB에 넣는 명령이다: Imported 5 quotes. 서버를 켜 둔 채로 실행해도 된다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="python3 app.py &gt; server.log 2&gt;&amp;1 &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 app.py &gt; server.log 2&gt;&amp;1 &amp;">▶</button><code>python3 app.py &gt; server.log 2&gt;&amp;1 &amp;</code></div>
-          <p><span lang="en">Start the server on port 5004. The page now reads the database, not the CSV.</span><span lang="ko">포트 5004에서 서버를 띄운다. 이제 화면은 CSV가 아니라 DB에서 읽는다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Now HTTP 200. Sample mean +0.40% — the same data as sample2, so the same result.</span><span lang="ko">이제 HTTP 200. 표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html">▶</button><code>until wget -qO page.html http://127.0.0.1:5004/ 2&gt;/dev/null; do sleep 1; done; grep -o '종목 [0-9]*개[^&lt;]*' page.html</code></div>
-          <p><span lang="en">Sample mean +0.40% — the same data as sample2, so the same result.</span><span lang="ko">표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'">▶</button><code>sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'</code></div>
+          <div class="cmd"><button type="button" data-cmd="sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /">▶</button><code>sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /</code></div>
           <p><span lang="en">Changing Samsung Electronics' close to 77000 in the CSV leaves the page at +0.40%, because the page reads the database.</span><span lang="ko">CSV에서 삼성전자 종가를 77000으로 바꿔도 화면은 그대로 +0.40%다. 화면은 DB를 읽기 때문이다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'">▶</button><code>flask --app app init-db &amp;&amp; wget -qO- http://127.0.0.1:5004/ | grep -o '표본 평균 [^&lt;]*'</code></div>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; web get /">▶</button><code>flask --app app init-db &amp;&amp; web get /</code></div>
           <p><span lang="en">After another import the change shows: Samsung's change goes from +2% to +10%, so the mean becomes +2.00%.</span><span lang="ko">다시 가져오면 반영된다. 삼성전자 등락률이 +2%에서 +10%로 바뀌어 평균이 +2.00%가 된다.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'">▶</button><code>sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1; wget -qO- http://127.0.0.1:5004/ | grep -o '종목 [0-9]*개[^&lt;]*'</code></div>
-          <p><span lang="en">Appending a copy of a stock's row fails validation (duplicate code). Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks.</span><span lang="ko">같은 종목 줄을 하나 더 붙이면 검증(duplicate code)에서 실패한다. 검증이 DELETE보다 먼저이고 저장은 한 트랜잭션이므로, DB에는 직전의 5종목이 그대로 남는다.</span></p>
+          <div class="cmd"><button type="button" data-cmd="sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1">▶</button><code>sed -n 2p data/prices.csv &gt;&gt; data/prices.csv; flask --app app init-db 2&gt;&amp;1 | tail -n 1</code></div>
+          <p><span lang="en">Appending a copy of a stock's row fails validation: ValueError: duplicate code in snapshot.</span><span lang="ko">같은 종목 줄을 하나 더 붙이면 검증에서 실패한다: ValueError: duplicate code in snapshot.</span></p>
         </li>
         <li>
-          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks (mean +2.00%).</span><span lang="ko">검증이 DELETE보다 먼저이고 저장은 한 트랜잭션이므로, DB에는 직전의 5종목(평균 +2.00%)이 그대로 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
           <p><span lang="en">Stop the server. Reloading the page restores the CSV and the database.</span><span lang="ko">서버를 끈다. 페이지를 새로 고치면 CSV와 DB가 처음 상태로 돌아간다.</span></p>
         </li>
       </ol>

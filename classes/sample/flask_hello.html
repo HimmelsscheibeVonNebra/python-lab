@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="flask_hello — Extending the project into a Flask web app · Python Lab" data-title-ko="flask_hello — Flask 웹 앱으로 확장하기 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>flask_hello — Extending the project into a Flask web app · Python Lab</title>
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="flask_hello">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Flask samples</span><span lang="ko">Flask 예제</span></a><span class="sep">/</span><span>flask_hello</span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1>flask_hello</h1>
+    <p><span lang="en">The smallest Flask app: two addresses (routes), each connected to one function, and a value read from the query string. Learn how to start a server and send it requests with the web command first.</span><span lang="ko">가장 작은 Flask 앱. 주소(라우트) 두 개가 각각 함수 하나에 연결되고, 쿼리 문자열로 값을 받는다. 서버를 띄우고 web 명령으로 요청을 보내는 방법을 먼저 익힌다.</span></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/flask_hello</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/flask_hello</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
+      <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web start app.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start app.py">▶</button><code>web start app.py</code></div>
+          <p><span lang="en">Start app.py as a background server and wait until it is ready (about 10 seconds). You should see Ready: http://127.0.0.1:5000.</span><span lang="ko">app.py를 백그라운드 서버로 띄우고 준비될 때까지 기다린다(10초 정도). Ready: http://127.0.0.1:5000 이 나오면 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Send a request to the address /. The HTML returned by home(), the function marked @app.get(&quot;/&quot;), is shown as text. HTTP 200 means success.</span><span lang="ko">주소 /로 요청을 보낸다. @app.get(&quot;/&quot;)가 붙은 home()이 돌려준 HTML이 글자로 보인다. HTTP 200은 성공이라는 뜻이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/hello?name=Mina'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/hello?name=Mina'">▶</button><code>web get '/hello?name=Mina'</code></div>
+          <p><span lang="en">name=Mina after the ? is the query string. hello() reads it with request.args.get(&quot;name&quot;) and builds Hello, Mina!.</span><span lang="ko">? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(&quot;name&quot;)으로 읽어 Hello, Mina!를 만든다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /hello">▶</button><code>web get /hello</code></div>
+          <p><span lang="en">Without name, get() uses its default &quot;world&quot;: Hello, world!</span><span lang="ko">name이 없으면 get()의 기본값 &quot;world&quot;를 쓴다: Hello, world!</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'">▶</button><code>web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'</code></div>
+          <p><span lang="en">web html shows the raw HTML. Thanks to escape(), &lt;b&gt; became &amp;lt;b&amp;gt;, so the tag you typed is shown as text instead of being run.</span><span lang="ko">web html은 HTML 원문을 보여 준다. escape() 덕분에 &lt;b&gt;가 &amp;lt;b&amp;gt;로 바뀌어, 입력한 태그가 실행되지 않고 글자로 표시된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /nothing" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /nothing">▶</button><code>web get /nothing</code></div>
+          <p><span lang="en">For an address that does not exist, Flask answers HTTP 404 (Not Found).</span><span lang="ko">없는 주소는 Flask가 HTTP 404(Not Found)로 답한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web log">▶</button><code>web log</code></div>
+          <p><span lang="en">The server log has one line per request with its address and status code (200, 404).</span><span lang="ko">서버 로그: 요청마다 주소와 상태 코드(200, 404)가 한 줄씩 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server. After editing app.py, run web stop and then web start again so the new code is used.</span><span lang="ko">서버를 끈다. app.py를 고친 뒤에는 web stop → web start로 다시 띄워야 바뀐 코드가 적용된다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      <p class="callout"><span lang="en">web is a helper command made for this lab (type web alone to see its usage). On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser. This virtual machine has no network link to your browser, so the same requests are sent from the terminal.</span><span lang="ko">web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다. 이 가상 머신은 내 브라우저와 네트워크로 연결되어 있지 않아, 같은 요청을 터미널에서 보낸다.</span></p>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <details class="source" open>
+      <summary>app.py <span class="muted"><span lang="en">21 lines</span><span lang="ko">21줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;The smallest Flask app: two routes.  Run: web start app.py&quot;&quot;&quot;</span>
+<span class="ln">from flask import Flask, request</span>
+<span class="ln">from markupsafe import escape</span>
+<span class="ln"> </span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">@app.get(&quot;/&quot;)</span>
+<span class="ln">def home():</span>
+<span class="ln">    return &quot;&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">@app.get(&quot;/hello&quot;)</span>
+<span class="ln">def hello():</span>
+<span class="ln">    name = request.args.get(&quot;name&quot;, &quot;world&quot;)</span>
+<span class="ln">    # escape(): a name like &lt;b&gt;hi&lt;/b&gt; is shown as text, not run as HTML</span>
+<span class="ln">    return f&quot;&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    app.run(host=&quot;127.0.0.1&quot;, port=5000)</span></code></pre>
+    </details>
+  </section>
+  <nav class="pager">
+    <span></span>
+    <a href="sample2_korea.html">sample2_korea →</a>
+  </nav>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

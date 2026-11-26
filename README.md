@@ -60,7 +60,18 @@ pandas·numpy·matplotlib·Flask와 그 의존 라이브러리는 기본 이미�
 
 ### Flask
 
-`python3 app.py &`로 띄운 서버는 게스트 안에서만 접속할 수 있습니다 (페이지와 게스트 사이에 네트워크가 없음). 예제 페이지는 `wget -qO- http://127.0.0.1:5002/`과 `app.test_client()`로 요청하고, 받은 HTML과 CSS를 **받기**로 내려받아 내 브라우저에서 보게 합니다. 패키지의 실행 파일은 9p에 넣지 않으므로 `flask` 명령은 `rootfs/overlay/usr/bin/flask`(`python3 -m flask`)로 제공합니다.
+Flask 서버는 게스트 안에서만 접속할 수 있습니다 (페이지와 게스트 사이에 네트워크가 없음). 그래서 실습용 도우미 명령 `web`(`rootfs/overlay/usr/local/bin/web`, 표준 라이브러리만 쓰는 Python 스크립트)을 둡니다.
+
+```sh
+web start [app.py]     # 서버를 백그라운드로 띄우고 준비될 때까지 기다림
+web get '/?market=KOSPI'   # 상태 코드와 화면을 글자로 (표는 한 행씩)
+web html /             # HTML 원문
+web save page.html     # CSS를 넣은 HTML 한 파일로 /mnt/host에 저장 → 받기
+web log                # 서버 로그
+web stop
+```
+
+Flask 예제 차시는 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/student/flask_hello/app.py`, 강의 저장소가 아니라 이 실습의 파일)로 시작합니다. 생성기는 예제 파일을 `course/`에서 찾고, 없으면 `rootfs/overlay/home/student/`에서 찾습니다. 패키지의 실행 파일은 9p에 넣지 않으므로 `flask` 명령은 `rootfs/overlay/usr/bin/flask`(`python3 -m flask`)로 제공합니다.
 
 ## 언어 (영어/한국어)
 

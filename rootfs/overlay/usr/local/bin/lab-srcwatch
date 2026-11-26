@@ -1,0 +1,42 @@
+#!/bin/sh
+# Keeps the page's "Source" section in step with the files in the guest.
+#
+# The page (js/lab.js) writes the files it shows, one absolute path per
+# line, to /mnt/host/.srcwatch.  Every second this loop checks their size
+# and modification time; when anything changed it copies the files to
+# /mnt/host/.src/f<N> and then writes /mnt/host/.src/index:
+#
+#   <N> <mtime>.<size> <path>      (or "<N> missing <path>")
+#
+# The page polls the index and redraws a source when its line changes.
+# Started by /etc/inittab; uses BusyBox only (no Python: it runs all the time).
+
+H=/mnt/9p/host
+D=$H/.src
+[ -d "$H" ] || exit 0
+mkdir -p "$D" && chmod 777 "$D"
+prev=""
+while sleep 1; do
+	[ -s "$H/.srcwatch" ] || continue
+	list=$(cat "$H/.srcwatch" 2>/dev/null)
+	index=""
+	i=0
+	for f in $list; do
+		i=$((i + 1))
+		sig=$(stat -c '%Y.%s' "$f" 2>/dev/null) || sig=missing
+		index="$index$i $sig $f
+"
+	done
+	[ "$index" = "$prev" ] && continue
+	i=0
+	for f in $list; do
+		i=$((i + 1))
+		if [ -f "$f" ]; then
+			cp "$f" "$D/f$i.tmp" 2>/dev/null && mv -f "$D/f$i.tmp" "$D/f$i"
+		else
+			rm -f "$D/f$i"
+		fi
+	done
+	printf '%s' "$index" > "$D/index.tmp" && mv -f "$D/index.tmp" "$D/index"
+	prev=$index
+done

@@ -1,0 +1,67 @@
+{
+  "title": "Files · Exceptions · JSON",
+  "summary": "Handle paths with pathlib and read and write files with open() and with. Deal with errors using try/except/else/finally, and signal them with raise, your own exception classes and raise ... from. Build a save file with json, and an importer that skips bad lines with csv's DictReader/DictWriter.",
+  "examples": {
+    "paths": {
+      "summary": "Look around the notes folder with pathlib's Path: check it with exists() and is_dir(), list what is inside with iterdir(), pick only matching files with glob() and rglob() and read them with read_text(encoding=\"utf-8\"). Join paths with the / operator, take them apart with name, stem, suffix and parent, and write a Korean text file with write_text.",
+      "steps": [
+        "The practice folder: notes holds three files (memo.txt, scores.csv, todo.txt) and a subfolder archive, which holds old.txt.",
+        "iterdir() returns only what is directly inside the folder, in no fixed order, so the program sorts it. glob(\"*.txt\") finds the two .txt files directly in notes; rglob(\"*.txt\") also finds archive/old.txt. The Korean file reads fine with encoding=\"utf-8\": '오늘 할 일' comes out as written.",
+        "The / operator joins path pieces into notes/archive/old.txt (no need to glue \"/\" onto strings yourself). name is old.txt, stem is old, suffix is .txt and parent is notes/archive. with_suffix only builds a new path with another extension; it does not touch the file. A relative path is relative to the current folder (Path.cwd()), and resolve() turns it into an absolute path such as /home/student/files/paths/notes/archive/old.txt.",
+        "write_text creates the file or overwrites it completely, and returns the number of characters written: 12. On disk it takes 22 bytes, because in UTF-8 each Korean character is 3 bytes (5×3 + 1 + 5 + 1). Running it again overwrites the file, so the result is the same.",
+        "Checking with exists() before reading keeps a missing file from stopping the program (a later example does the same with try/except). mkdir(parents=True, exist_ok=True) creates the in-between folder out as well, and raises no error if the folder already exists. hello.txt and out now appear in the listing.",
+        "Remove the practice file and folders to get back to the starting state."
+      ]
+    },
+    "file_modes": {
+      "summary": "Compare open()'s modes r, w, a and x. diary.py appends one line from the command line to the end of diary.txt in \"a\" mode, then loops over the file object with for and prints the whole diary with line numbers. Then see that w empties a file, x refuses to overwrite one, and a file is closed when its with block ends.",
+      "steps": [
+        "First delete diary.txt to start clean. \"a\" mode creates the file if it does not exist: 1: 오늘 파이썬으로 파일을 썼다.",
+        "\"a\" adds after the existing content, so there are now two lines. write() does not add a newline, so the program writes entry + \"\\n\". When printing, rstrip() removes the \\n at the end of each line so no blank lines sneak in.",
+        "\"w\" erases the whole file the moment it is opened. The two earlier lines are gone and only '새 일기장\\n' remains. Losing data by opening an existing file with \"w\" is a common mistake.",
+        "\"x\" only creates new files; if the file exists it raises FileExistsError: [Errno 17] File exists: 'diary.txt'. That makes it safe for files that must not be overwritten. The rm at the end deletes fresh.txt so pressing the button again gives the same result.",
+        "A file from a bare open() stays open until you call close(). A with block closes it the moment the block ends, even if an error happens inside: inside with: False, after with: True. Reading a closed file gives ValueError: I/O operation on closed file.",
+        "Three ways to write: write() writes exactly the string you give it (a and b end up on one line), print(..., file=f) follows the same rules as on screen, newline included, and writelines() writes a list one after another (newlines are up to you). Reading: read() gives the whole text, readline() one line, readlines() a list of the remaining lines. A file object remembers where it stopped, so readlines() after readline() no longer has the first line."
+      ]
+    },
+    "exceptions": {
+      "summary": "Learn how try/except/else/finally flows. calc.py splits each input line \"a b\" and computes a / b; a bad line has its ValueError or ZeroDivisionError caught separately, the reason is printed, and the program goes on with the next line. Also catch KeyError and FileNotFoundError, and finally read the traceback of an uncaught error from the bottom up.",
+      "steps": [
+        "Feed in five lines. Line 2 raises ZeroDivisionError, line 3 the ValueError from int('ten'), and line 4 has only one number, so unpacking into a_text, b_text raises ValueError (not enough values to unpack). Each line has its own try, so the bad lines do not stop the rest: 2 done, 3 skipped. Only the lines that succeeded are printed, from else.",
+        "Watch the order. On success it is try → else → finally; on failure try → except → finally. finally always runs just before the function ends, even when there is a return, which is why clean-up code such as closing a file goes there.",
+        "Looking up a missing key with [] raises KeyError; printing the exception caught with as e shows the missing key 'mango'. If the key may simply be absent, get(key, default) is simpler: 0.",
+        "Opening a missing file raises FileNotFoundError. The exception object carries information: e.filename is nope.txt and the message is [Errno 2] No such file or directory: 'nope.txt'. Instead of checking with exists() first, you just open the file and handle the failure.",
+        "An uncaught error stops the program and leaves a traceback. Mina: 84.0 was printed, but the program stopped at Joon, so Sora never appears. The bottom line, ZeroDivisionError: division by zero, says what went wrong; the line just above (line 5, in average) says where; the lines above that say who called it (line 9 in report, and at the top line 13, report(\"Joon\", [])). The ~~~^^^ marks point at the part of the line that failed."
+      ]
+    },
+    "custom_errors": {
+      "summary": "Raise exceptions yourself with raise. bank.py defines BankError, a subclass of Exception, and its subclass InsufficientFunds; it raises ValueError for an invalid amount and InsufficientFunds when the balance is too low. config.py turns low-level errors such as a missing file or a non-number into raise ConfigError(...) from e, so the caller only has one exception to catch (exception chaining).",
+      "steps": [
+        "Four withdrawals from a balance of 10000. -500 hits the ValueError raised by withdraw; 20000 hits InsufficientFunds. The shortfall of 13000 is computed from e.amount and e.balance, stored in the exception object. A failed withdrawal leaves the balance alone, so the last one (7000) succeeds and the balance becomes 0.",
+        "except BankError also catches its subclass InsufficientFunds. Putting all of a module's errors under one parent class lets the caller catch them as broadly or as narrowly as it needs. The chain is InsufficientFunds → BankError → Exception: True True.",
+        "Reads four settings files: 8080 succeeds, eighty raises ValueError, 99999 is raised directly by the range check, and nope.txt raises FileNotFoundError. The caller handles them all with one except ConfigError. The original error linked with from e stays in e.__cause__ (None for the one raised directly).",
+        "Leave ConfigError uncaught and you get two tracebacks in a row: the cause at the top (ValueError: invalid literal for int()...), then The above exception was the direct cause of the following exception:, and the final error ConfigError at the bottom. from shows the cause alongside the new error instead of hiding it."
+      ]
+    },
+    "json_save": {
+      "summary": "Build a game save file in JSON. save.py reads save.json with json.load (catching FileNotFoundError when it is missing and JSONDecodeError when it is broken, and starting a new game), adds one score, and saves it again with json.dump(..., ensure_ascii=False, indent=2) so people can read it. With dumps/loads, see how Python values map to JSON values and which values cannot be saved.",
+      "steps": [
+        "Start by deleting the save file. With no file, FileNotFoundError is caught and a new game is created; the first score, 120, is saved: 민지: play 1, score 120, best 120.",
+        "Each run reads save.json, changes it and writes it back, so the record carries over: play 3, best 150. The file is indented thanks to indent=2, and \"민지\" stays in Korean because of ensure_ascii=False. Python's True and lists are stored as JSON true and [ ] (best started as None, JSON null, and is now a number).",
+        "dumps turns a value into a JSON string and loads turns it back (the s is for string). The tuple becomes the list [\"a\", \"b\"], None becomes null, and the number key 1 becomes the string \"1\", so the value that comes back is not equal to the original (False). Without ensure_ascii=False, Korean is escaped as \\ubbfc\\uc9c0: not wrong, but hard for people to read.",
+        "JSON only has strings, numbers, true/false, null, arrays and objects. A set or a date raises TypeError: Object of type ... is not JSON serializable, so store a list or a string such as \"2026-03-02\" instead. In the other direction, JSON strings must use double quotes: single quotes, as in a Python dict, raise JSONDecodeError.",
+        "Make a half-written file, as if saving had been cut off. json.load raises JSONDecodeError; save.py catches it, reports where the file is broken (line 1 column 29), and goes on with a new game. Without the except, one bad save file would keep the game from starting at all."
+      ]
+    },
+    "csv_import": {
+      "summary": "Import a score CSV that has bad lines mixed in, robustly. importer.py gets each line as a dict from csv.DictReader and checks it in parse(), which raises its own BadRow exception when something is wrong. main catches BadRow, reports the line number and the reason, and moves on; only the good rows are written to clean.csv with csv.DictWriter. A missing input file ends with an error message and exit code 1.",
+      "steps": [
+        "Ten lines follow the header. Mixed in are an empty score (서연), a score that is not a number (eighty), one out of range (105), a line with a missing column (지우), an empty name and a line with an extra column (유나). \"Kim, Jiwoo\" has a comma in the name, so it is wrapped in double quotes. The line numbers added by cat -n are the same line numbers the importer reports.",
+        "split(\",\") also cuts at the comma inside the quotes and makes four pieces; the csv module reads \"Kim, Jiwoo\" as one field. DictReader uses the header as keys and gives one dict per line, with every value a string. A missing column has the value None; extra columns go into a list under the key None. The file is opened with newline=\"\", as the csv documentation recommends.",
+        "Each of the six bad lines is reported with its reason (the line number is the file's line, counting the header as 1), and only the four good rows are kept: 4 rows saved to clean.csv, 6 skipped. Every line has its own try, so one bad line does not stop the whole import.",
+        "The output written by DictWriter: writeheader() writes the first line and writerows() the rest. \"Kim, Jiwoo\", which contains a comma, is wrapped in quotes again automatically. Running again overwrites the file in \"w\" mode, so you get the same file.",
+        "With no input file the program prints error: nope.csv not found instead of a traceback and ends with exit code 1 (failure). Shell scripts and other programs can tell success from failure by this code."
+      ]
+    }
+  }
+}

@@ -22,6 +22,6 @@ dir=$(sed -n 's/.*lab\.dir=\([^ ]*\).*/\1/p' /proc/cmdline)
 [ -n "$dir" ] && [ -d "$HOME/$dir" ] && cd "$HOME/$dir"
 # Flask pages: fetch the Flask zip (9p) in the background while the reader
 # looks around, so the first "web start" does not wait for the network.
-case "$dir" in flask_hello*|sample*) [ -e /opt/py/flask.zip ] && (cat /opt/py/flask.zip > /dev/null 2>&1 &) ;; esac
+case "$dir" in web*) [ -e /opt/py/flask.zip ] && (cat /opt/py/flask.zip > /dev/null 2>&1 &) ;; esac
 unset dir
 printf '\n  Python Lab -- %s   %s\n\n' "$(python3 -V)" "$(pwd)"

@@ -1,0 +1,425 @@
+<p>This topic is networking. For two programs to exchange data they have to agree on where the other one is (an IP address and a port), which channel to use (TCP or UDP), and how to interpret the bytes that arrive (a protocol such as HTTP). We start by building the smallest possible server and client with the <code>socket</code> module, and on top of that we write an HTTP request by hand to see that HTTP is really an agreement written in plain text. Then we do the same in a few lines with the standard library's <code>urllib.request</code> and <code>http.server</code>, build a small API server that exchanges JSON, and finally look at handling network errors and at UDP. The practice programs are <a href="echo.html">echo</a>, <a href="raw_http.html">raw_http</a>, <a href="fetch.html">fetch</a>, <a href="json_api.html">json_api</a>, <a href="errors.html">errors</a> and <a href="udp.html">udp</a>.</p>
+
+<blockquote>The virtual machine in this lab has no network card, so it cannot reach the internet. Instead, server and client run on the same machine and talk over loopback (127.0.0.1, the machine itself), which every computer has. The code works unchanged on a real network; what changes on a real PC is summarised near the end.</blockquote>
+
+<h2>Clients and Servers</h2>
+
+<p>Most network programs play one of two roles. A <strong>server</strong> waits at a known place for requests and answers them; a <strong>client</strong> makes the first contact and sends a request. A web browser is a client, the program that hands out a web site is a server. One computer can run both at the same time, and that is exactly what we do in this lab.</p>
+
+<pre><code>  client                              server
+  (makes contact)                     (waits)
+       |  ---- request ---------&gt;      |
+       |  &lt;--- response ---------      |</code></pre>
+
+<h2>IP Addresses, Ports and Loopback</h2>
+
+<h3>IP Address: Which Computer</h3>
+
+<p>An IP address is the number that identifies a computer (strictly, a network device) on a network. An IPv4 address is four numbers from 0 to 255 joined by dots, like <code>192.168.0.12</code>. Names that are easy for people to remember (<code>www.python.org</code>) are turned into IP addresses by a service called DNS. The oldest name list of all is the file <code>/etc/hosts</code>.</p>
+
+<h3>Port: Which Program on That Computer</h3>
+
+<p>Several servers can run on one computer at once, so an IP address alone is not enough. A port, a number from 0 to 65535, says which program on the computer the data is for. If the IP address is the building's street address, the port is the flat number. That is why an address always travels as an <code>(IP, port)</code> pair, and in Python it is written as a tuple such as <code>("127.0.0.1", 5000)</code>. Only one program at a time can hold a given port.</p>
+
+<table>
+<thead>
+<tr><th>Port</th><th>Common use</th></tr>
+</thead>
+<tbody>
+<tr><td>22</td><td>SSH (remote login)</td></tr>
+<tr><td>80</td><td>HTTP (the web)</td></tr>
+<tr><td>443</td><td>HTTPS (the encrypted web)</td></tr>
+<tr><td>5000, 8000, 8080</td><td>Numbers development servers like to use; in this lab the echo server, the file server and the API server</td></tr>
+</tbody>
+</table>
+
+<p>Ports below 1024 need administrator rights to open, so practice servers usually pick a number of 1024 or above.</p>
+
+<h3>Loopback: 127.0.0.1 and localhost</h3>
+
+<p><code>127.0.0.1</code> is a special address meaning "this very computer", and its name is <code>localhost</code>. Data sent there never goes out on a cable; the operating system turns it straight around. So you can test servers and clients without any internet. The first step of <a href="echo.html">echo</a>, <code>ip addr</code>, shows that this virtual machine has nothing but <code>lo</code> (loopback).</p>
+
+<h3>Thinking in Layers</h3>
+
+<p>Network communication is built from layers, each doing one job. An upper layer does not need to know how the layer below does its work. In this topic we work directly with the top two.</p>
+
+<table>
+<thead>
+<tr><th>Layer</th><th>Job</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Application</td><td>The format and order of what is exchanged (the protocol)</td><td>HTTP, our own echo rule</td></tr>
+<tr><td>Transport</td><td>Carries bytes to a program (a port)</td><td>TCP, UDP</td></tr>
+<tr><td>Internet</td><td>Finds the way to a computer (an IP address)</td><td>IP</td></tr>
+<tr><td>Link</td><td>Sends over an actual wire or radio</td><td>Ethernet, Wi-Fi, loopback</td></tr>
+</tbody>
+</table>
+
+<h2>TCP Sockets: an Echo Server and Client</h2>
+
+<h3>What Is a Socket?</h3>
+
+<p>A socket is the end point where a program meets the network. Just as opening a file gives you a file object to read and write, creating a socket gives you a socket object to send and receive bytes. <code>socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code> creates "a TCP socket using IPv4 addresses". TCP sets up a connection first and guarantees that the bytes you send arrive complete and in order, a bit like a phone call.</p>
+
+<h3>The Calls on Each Side</h3>
+
+<table>
+<thead>
+<tr><th>Server</th><th>Client</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>socket()</code></td><td><code>socket()</code></td><td>Create a socket</td></tr>
+<tr><td><code>bind((HOST, PORT))</code></td><td></td><td>Claim this address and port</td></tr>
+<tr><td><code>listen()</code></td><td></td><td>Get ready to take connections</td></tr>
+<tr><td><code>accept()</code></td><td><code>connect((HOST, PORT))</code></td><td>The connection is made; accept waits until a client arrives</td></tr>
+<tr><td><code>recv(1024)</code></td><td><code>sendall(data)</code></td><td>The client sends, the server receives</td></tr>
+<tr><td><code>sendall(data)</code></td><td><code>recv(1024)</code></td><td>The server answers, the client receives</td></tr>
+<tr><td><code>close()</code></td><td><code>close()</code></td><td>Close the connection (<code>with</code> does it for you)</td></tr>
+</tbody>
+</table>
+
+<h3>Reading the Server</h3>
+
+<pre><code>import socket
+
+HOST = "127.0.0.1"   # loopback: only programs on this computer can connect
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((HOST, PORT))
+    server.listen()
+    print(f"[server] listening on {HOST}:{PORT}")
+
+    while True:
+        conn, addr = server.accept()          # waits for the next client
+        with conn:
+            data = conn.recv(1024)            # bytes, at most 1024 of them
+            conn.sendall(data)                # echo the same bytes back</code></pre>
+
+<p>The server socket (<code>server</code>) is only a doorkeeper. Each time a client connects, <code>accept()</code> returns a new socket <code>conn</code> just for that client, plus the client's address <code>addr</code>; the actual conversation happens over <code>conn</code>. Thanks to <code>while True</code> the server goes back to waiting for the next client after each one. <code>SO_REUSEADDR</code> avoids an "address already in use" error when you stop the server and start it again right away.</p>
+
+<h3>Reading the Client</h3>
+
+<pre><code>import socket
+import sys
+
+message = " ".join(sys.argv[1:]) or "hello"
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+    client.connect(("127.0.0.1", 5000))
+    data = message.encode("utf-8")            # str -&gt; bytes
+    client.sendall(data)
+    reply = client.recv(1024)
+
+print(f"[client] sent {len(data)} bytes, got back: {reply.decode('utf-8')}")</code></pre>
+
+<p>The command-line arguments (<code>sys.argv</code>) become the message: run <code>python3 echo_client.py hello</code> and <code>message</code> is <code>"hello"</code>.</p>
+
+<h3>Bytes and Encodings</h3>
+
+<p>What travels over a network is always bytes (<code>bytes</code>). Turn a string into bytes with <code>encode("utf-8")</code> before sending, and turn received bytes back into a string with <code>decode("utf-8")</code>. An English letter is 1 byte, but a Korean character is 3 bytes in UTF-8, so <code>"안녕"</code> ("hi") is 2 characters and 6 bytes. Byte values print with a leading <code>b</code>, as in <code>b'hello'</code>.</p>
+
+<pre><code>text = "안녕"
+data = text.encode("utf-8")
+print(data, len(text), len(data))   # b'\xec\x95\x88\xeb\x85\x95' 2 6
+print(data.decode("utf-8"))         # 안녕</code></pre>
+
+<h3>Server and Client in One Terminal</h3>
+
+<p>A server is a program that never finishes. Run it normally and the terminal is tied up, so you cannot start the client. On a real PC you would simply open two terminal windows; in this lab we use the shell's job control instead.</p>
+
+<table>
+<thead>
+<tr><th>Command</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>python3 echo_server.py &amp;</code></td><td>The trailing <code>&amp;</code>: run in the background and give the prompt back at once</td></tr>
+<tr><td><code>sleep 2</code></td><td>Wait 2 seconds, giving the server time to open its port</td></tr>
+<tr><td><code>jobs</code></td><td>List the background jobs</td></tr>
+<tr><td><code>kill %1</code></td><td>Stop job number 1</td></tr>
+<tr><td><code>netstat -tln</code></td><td>List the TCP ports waiting for connections (LISTEN)</td></tr>
+</tbody>
+</table>
+
+<p>The background server prints to the same screen, so <code>[server]</code> and <code>[client]</code> lines appear mixed together. That is why the example programs mark each line with who printed it.</p>
+
+<pre><code>$ python3 echo_server.py &amp;
+$ sleep 2; python3 echo_client.py hello
+[server] listening on 127.0.0.1:5000
+[server] connection from 127.0.0.1
+[server] received 5 bytes: b'hello'
+[client] sent 5 bytes, got back: hello</code></pre>
+
+<h2>Protocols: HTTP Is an Agreement in Plain Text</h2>
+
+<h3>What Is a Protocol?</h3>
+
+<p>TCP carries bytes faithfully but has no idea what they mean. A protocol is the rule both sides agree on in advance: what to send, in which order and in which format. The echo server's rule was simply "send back what you get". The web's rule is HTTP. HTTP requests and responses are text a person can read, with lines ending in <code>\r\n</code>.</p>
+
+<h3>The Shape of a Request and a Response</h3>
+
+<pre><code>request (client -&gt; server)
+  GET /hello.txt HTTP/1.0          request line: method, path, version
+  Host: 127.0.0.1:8000             headers (name: value), any number
+                                   empty line = end of headers
+
+response (server -&gt; client)
+  HTTP/1.0 200 OK                  status line: version, status code, reason
+  Content-type: text/plain         headers
+  Content-Length: 57
+                                   empty line
+  Hello from the server!           body (57 bytes)
+  안녕하세요, 서버입니다.</code></pre>
+
+<p>Headers describe the body. <code>Content-Type</code> gives its kind (<code>text/plain</code>, <code>text/html</code>, <code>application/json</code>) and <code>Content-Length</code> its size in bytes. A browser looks at <code>Content-Type</code> to decide whether to show text or draw a web page. Header names ignore case, so the <code>Content-type</code> that <code>http.server</code> sends is the same header as <code>Content-Type</code>.</p>
+
+<h3>Status Codes</h3>
+
+<table>
+<thead>
+<tr><th>Code</th><th>Name</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td>200</td><td>OK</td><td>Success</td></tr>
+<tr><td>201</td><td>Created</td><td>Something new was created (a successful POST)</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>The request is malformed</td></tr>
+<tr><td>404</td><td>Not Found</td><td>No such path</td></tr>
+<tr><td>500</td><td>Internal Server Error</td><td>The server program failed</td></tr>
+</tbody>
+</table>
+
+<p>The first digit gives the broad class: 2xx success, 3xx go elsewhere, 4xx the client's fault, 5xx the server's fault. Note that a 404 is still a normal answer sent by the server; it is not the same as failing to connect at all.</p>
+
+<h3>Python's Web Server: http.server</h3>
+
+<p>The standard library includes a simple web server that hands out the files in a folder. <code>-m</code> runs a module as a program.</p>
+
+<pre><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;</code></pre>
+
+<p>It listens on port 8000 and treats the <code>site</code> folder as the root (<code>/</code>) of the site: a request for <code>/hello.txt</code> gets <code>site/hello.txt</code>, a request for <code>/</code> gets <code>site/index.html</code>. Each request leaves an access log line such as <code>127.0.0.1 - - [date] "GET /hello.txt HTTP/1.0" 200 -</code>. It is meant for development and practice, not for running a real service.</p>
+
+<h3>Sending a GET Over a Raw Socket</h3>
+
+<p><code>raw_get.py</code> in <a href="raw_http.html">raw_http</a> does by hand what a browser does: it builds the request text, sends it, receives until the server closes the connection, and splits head from body at the first empty line (<code>\r\n\r\n</code>).</p>
+
+<pre><code>request = f"GET {path} HTTP/1.0\r\nHost: {HOST}:{PORT}\r\n\r\n"
+
+with socket.create_connection((HOST, PORT)) as sock:
+    sock.sendall(request.encode("ascii"))
+    chunks = []
+    while True:                     # read until the server closes the connection
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        chunks.append(chunk)
+
+response = b"".join(chunks)
+head, _, body = response.partition(b"\r\n\r\n")
+lines = head.decode("iso-8859-1").split("\r\n")
+print("status line:", lines[0])</code></pre>
+
+<p><code>socket.create_connection((HOST, PORT))</code> is a shortcut that creates the socket and calls <code>connect</code> in one go. <code>recv</code> may return only part of the data, so the loop keeps collecting until it gets empty bytes (<code>b""</code>), which means the other side closed the connection. With HTTP/1.0 the server closes the connection after sending the whole response.</p>
+
+<p>You can run the same experiment without Python. <code>nc</code> (netcat) sends its input over a socket and prints whatever comes back.</p>
+
+<pre><code>printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000</code></pre>
+
+<h2>urllib.request: the Standard Library's HTTP Client</h2>
+
+<p>Writing requests by hand is great for learning how it works, but in practice there is a lot more to handle: redirects, compression, https encryption. <code>urllib.request.urlopen</code> does all of it given a single URL.</p>
+
+<pre><code>import json
+from urllib.request import urlopen
+
+with urlopen("http://127.0.0.1:8000/data.json", timeout=5) as response:
+    print(response.status, response.reason)        # 200 OK
+    content_type = response.headers.get("Content-Type")
+    body = response.read()                          # bytes
+
+data = json.loads(body)                             # JSON text -&gt; dict
+print(data["city"])                                 # Seoul</code></pre>
+
+<table>
+<thead>
+<tr><th>Response object</th><th>Contents</th></tr>
+</thead>
+<tbody>
+<tr><td><code>response.status</code></td><td>The status code (an int, e.g. 200)</td></tr>
+<tr><td><code>response.reason</code></td><td>The reason phrase (e.g. OK)</td></tr>
+<tr><td><code>response.headers</code></td><td>The headers; read them with <code>.get("Content-Type")</code> or <code>["Content-Type"]</code></td></tr>
+<tr><td><code>response.read()</code></td><td>The whole body (<code>bytes</code>); it can be read only once</td></tr>
+</tbody>
+</table>
+
+<p>A URL such as <code>http://127.0.0.1:8000/data.json</code> consists of a scheme (<code>http</code>), a host (<code>127.0.0.1</code>), a port (<code>8000</code>) and a path (<code>/data.json</code>). Leave out the port and it is 80 for http, 443 for https. In <a href="fetch.html">fetch</a> you fetch text, JSON and HTML in turn. <code>wget -q -O - URL</code> gets the same result: the server does not care who is asking, only whether the agreement is kept.</p>
+
+<p><code>requests</code>, which you often see in tutorials, is an external package that does the same job more conveniently; it has to be installed with <code>pip install requests</code>. This virtual machine has neither pip nor internet, so we stick to the standard library's <code>urllib</code>.</p>
+
+<h2>A Small JSON API Server</h2>
+
+<h3>APIs and Methods</h3>
+
+<p>A web page returns HTML for people to read; an API returns data (usually JSON) for programs to read. The method of a request says what you want to do.</p>
+
+<table>
+<thead>
+<tr><th>Request</th><th>Meaning</th><th>Successful answer</th></tr>
+</thead>
+<tbody>
+<tr><td><code>GET /memos</code></td><td>Give me the list of memos</td><td>200 with a JSON array</td></tr>
+<tr><td><code>GET /memos/2</code></td><td>Give me memo number 2</td><td>200 with a JSON object (404 if there is none)</td></tr>
+<tr><td><code>POST /memos</code></td><td>Create a new memo from the JSON in the body</td><td>201 with the new memo (400 if the body is wrong)</td></tr>
+</tbody>
+</table>
+
+<h3>The Server: BaseHTTPRequestHandler</h3>
+
+<p>Subclass <code>BaseHTTPRequestHandler</code> from <code>http.server</code> and give it <code>do_GET</code> and <code>do_POST</code> methods; the server calls the one matching the request's method. The request path is in <code>self.path</code>, the headers in <code>self.headers</code>, the body is read from <code>self.rfile</code>, and the response is written in the order status line, headers, empty line, body. The shape of the HTTP response you saw earlier becomes the order of the method calls.</p>
+
+<pre><code>def send_json(self, status, data):
+    body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    self.send_response(status)                       # status line
+    self.send_header("Content-Type", "application/json; charset=utf-8")
+    self.send_header("Content-Length", str(len(body)))
+    self.end_headers()                               # empty line
+    self.wfile.write(body)                           # body
+
+def do_POST(self):
+    length = int(self.headers.get("Content-Length", 0))
+    raw = self.rfile.read(length)                    # the request body
+    try:
+        text = json.loads(raw)["text"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        self.send_json(400, {"error": 'send JSON like {"text": "..."}'})
+        return
+    memo = {"id": len(memos) + 1, "text": text}
+    memos.append(memo)
+    self.send_json(201, memo)</code></pre>
+
+<p>The body is read for exactly the number of bytes the <code>Content-Length</code> header announced. Data from a client is checked, not trusted: if it is not JSON or has no <code>text</code> key, the server answers 400 instead of crashing. <code>ensure_ascii=False</code> sends Korean text as the characters themselves instead of escapes like <code>우</code>. The memos live only in a Python list, so they vanish when the server stops; to keep them you would save them to a file or a database.</p>
+
+<h3>The Client: Choosing Method and Body with Request</h3>
+
+<pre><code>def call(method, path, data=None):
+    body = None
+    headers = {}
+    if data is not None:
+        body = json.dumps(data).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    request = Request(BASE + path, data=body, headers=headers, method=method)
+    try:
+        with urlopen(request, timeout=5) as response:
+            return response.status, json.loads(response.read())
+    except HTTPError as error:              # 4xx/5xx: the body still has JSON
+        return error.code, json.loads(error.read())</code></pre>
+
+<p>Give <code>urlopen</code> a <code>Request</code> object instead of a URL string and you choose the method, headers and body. On a 4xx or 5xx answer <code>urlopen</code> raises <code>HTTPError</code>; that exception object also has <code>code</code> and <code>read()</code> like a response, so you can still read the error description the server sent. In <a href="json_api.html">json_api</a> you get 200, 201, 400 and 404 answers.</p>
+
+<pre><code>$ python3 api_client.py 우유 사기
+[server] POST /memos -&gt; 201
+POST /memos (201, {'id': 2, 'text': '우유 사기'})
+[server] GET /memos -&gt; 200
+GET  /memos (200, [{'id': 1, 'text': 'buy milk'}, {'id': 2, 'text': '우유 사기'}])</code></pre>
+
+<p>Splitting on every path with <code>if</code> soon gets tedious. Web frameworks such as Flask take this part over by pairing paths with functions (routes). The Flask examples (flask_hello and the rest) show how to build web apps on top of the HTTP you learned here.</p>
+
+<h2>Handling Network Errors</h2>
+
+<p>A file is usually just there, but a network can fail at any moment: the server may be down, slow, or at the wrong address. Each kind of failure raises a different exception. In <a href="errors.html">errors</a> you trigger them one by one.</p>
+
+<table>
+<thead>
+<tr><th>Situation</th><th>With socket</th><th>With urlopen</th></tr>
+</thead>
+<tbody>
+<tr><td>No server waiting on that port</td><td><code>ConnectionRefusedError</code></td><td><code>URLError</code> (reason: Connection refused)</td></tr>
+<tr><td>The server answered, but with 404, 500, ...</td><td>(you read the status line yourself)</td><td><code>HTTPError</code> (code: 404)</td></tr>
+<tr><td>Connected, but no answer comes</td><td><code>TimeoutError</code> (old name <code>socket.timeout</code>)</td><td><code>TimeoutError</code> or <code>URLError</code></td></tr>
+<tr><td>The name cannot be turned into an IP address</td><td><code>socket.gaierror</code></td><td><code>URLError</code> (reason: [Errno -3] ...)</td></tr>
+</tbody>
+</table>
+
+<pre><code>def fetch_text(url, timeout=3):
+    try:
+        with urlopen(url, timeout=timeout) as response:
+            return response.read().decode("utf-8")
+    except HTTPError as error:          # the server answered with 4xx/5xx
+        print(f"HTTP error {error.code} {error.reason}: {url}")
+    except URLError as error:           # no answer: refused, unknown host, ...
+        print(f"cannot reach {url}: {error.reason}")
+    except TimeoutError:                # connected, but the reply never came
+        print(f"timed out after {timeout} s: {url}")
+    return None</code></pre>
+
+<p>Three things to remember:</p>
+
+<ul>
+<li><strong>The order of except</strong>: <code>HTTPError</code> is a subclass of <code>URLError</code>. If <code>URLError</code> came first it would catch the 404 too, so the more specific <code>HTTPError</code> goes first.</li>
+<li><strong>Always set a timeout</strong>: without <code>timeout</code>, a server that never answers freezes your program forever. <code>silent_server.py</code> accepts connections but never replies, to show why a timeout matters. With sockets, set it with <code>create_connection(addr, timeout=2)</code> or <code>sock.settimeout(2)</code>.</li>
+<li><strong>What the user should see</strong>: instead of a traceback, one line saying what failed and why, and then the program carries on. If it makes sense, try again a little later.</li>
+</ul>
+
+<p>Opening <code>http://example.com/</code> in this virtual machine fails with <code>[Errno -3] Try again</code> because there is no DNS. On a PC with internet access the same code fetches the page.</p>
+
+<h2>UDP: Letters Without a Connection</h2>
+
+<p>UDP does not set up a connection; it throws data one chunk (a datagram) at a time. Change the socket type to <code>SOCK_DGRAM</code> and, with no <code>listen</code>, <code>accept</code> or <code>connect</code>, exchange data with <code>sendto(data, addr)</code> and <code>recvfrom(1024)</code>.</p>
+
+<pre><code># receiver
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("127.0.0.1", 5005))
+data, addr = sock.recvfrom(1024)      # one whole datagram + sender
+
+# sender
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto("하나".encode("utf-8"), ("127.0.0.1", 5005))</code></pre>
+
+<table>
+<thead>
+<tr><th></th><th>TCP</th><th>UDP</th></tr>
+</thead>
+<tbody>
+<tr><td>Connection</td><td>Set up first (connect/accept)</td><td>None</td></tr>
+<tr><td>Delivery</td><td>Complete and in order</td><td>Not guaranteed (data may vanish or arrive out of order)</td></tr>
+<tr><td>Boundaries</td><td>A stream of bytes, no message boundaries</td><td>One datagram is one message</td></tr>
+<tr><td>Nobody receiving</td><td><code>ConnectionRefusedError</code></td><td>Silently lost</td></tr>
+<tr><td>Used for</td><td>The web, file transfer, email</td><td>DNS, video calls, games</td></tr>
+</tbody>
+</table>
+
+<p>In the last step of <a href="udp.html">udp</a> the sender happily reports "sent" even though the receiver has already ended, without any error. Checking that the data arrived is up to your program.</p>
+
+<h2>What Changes on a Real PC</h2>
+
+<ul>
+<li><strong>Real IP addresses</strong>: besides loopback, a real PC has a device with an address like <code>192.168.0.12</code>. Other computers on the same Wi-Fi connect to that address.</li>
+<li><strong>127.0.0.1 versus 0.0.0.0</strong>: a server bound to <code>127.0.0.1</code> accepts connections only from the same computer. To let other computers in, bind to <code>0.0.0.0</code> (every device). That opens it to the outside, so keeping practice servers on <code>127.0.0.1</code> is the safe choice.</li>
+<li><strong>Firewalls</strong>: the operating system's firewall may block incoming connections. On Windows or macOS a window may ask whether to allow a server the first time it starts.</li>
+<li><strong>DNS and https</strong>: with internet access, <code>urlopen("https://www.python.org/")</code> opens named addresses and encrypted https just the same. In this virtual machine it fails because there is no DNS.</li>
+<li><strong>Two terminals</strong>: instead of <code>&amp;</code> and <code>kill %1</code>, run the server in one terminal window and the client in another. Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.</li>
+<li><strong>A browser</strong>: start <code>python3 -m http.server</code> and open <code>http://127.0.0.1:8000/</code> in your browser. The browser's requests show up in the server's access log.</li>
+</ul>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li><strong>Sending a string as is</strong>: <code>sock.sendall("hello")</code> gives <code>TypeError: a bytes-like object is required, not 'str'</code>. Send <code>"hello".encode("utf-8")</code> or <code>b"hello"</code>.</li>
+<li><strong>Starting the client before the server</strong>: you get <code>ConnectionRefusedError</code>. Start the server first and wait a moment until it is ready.</li>
+<li><strong>Starting a server twice on the same port</strong>: <code>OSError: [Errno 98] Address in use</code> (on a typical Linux PC, <code>Address already in use</code>). Find the leftover server with <code>jobs</code> and stop it with <code>kill %1</code>.</li>
+<li><strong>Running a server without &amp;</strong>: the terminal looks frozen. Nothing is broken; the server is waiting. Stop it with <kbd>Ctrl</kbd>+<kbd>C</kbd> and run it again with <code>&amp;</code>.</li>
+<li><strong>Trusting one recv to get everything</strong>: TCP is a stream of bytes, so a message may arrive in several pieces. One recv is enough for the short messages of the echo example, but for longer data either keep receiving until the end, as <code>raw_get.py</code> does, or use a rule that announces the length first (<code>Content-Length</code>).</li>
+<li><strong>Waiting without a timeout</strong>: a server that never answers freezes your program forever. Always set a time limit, as in <code>urlopen(url, timeout=5)</code>.</li>
+<li><strong>Mistaking a 404 for a failed connection</strong>: a 404 is a normal answer from the server. Handle <code>HTTPError</code> and <code>URLError</code> separately.</li>
+</ul>
+
+<h2>Summary</h2>
+
+<ul>
+<li>An address is an <code>(IP, port)</code> pair. <code>127.0.0.1</code> (<code>localhost</code>) is the machine itself.</li>
+<li>A TCP server does <code>bind → listen → accept → recv/sendall</code>, a client <code>connect → sendall → recv</code>. What travels is <code>bytes</code>, so <code>encode</code>/<code>decode</code>.</li>
+<li>A protocol is an agreement on what the bytes mean. HTTP is text made of a request line (or status line), headers, an empty line and a body.</li>
+<li><code>urllib.request.urlopen</code> is an HTTP client and <code>http.server</code> an HTTP server. JSON goes back and forth with <code>json.dumps</code>/<code>json.loads</code>.</li>
+<li>Network code sets a timeout and catches <code>HTTPError</code>, <code>URLError</code>, <code>TimeoutError</code> and <code>ConnectionRefusedError</code>.</li>
+<li>UDP sends datagrams with neither a connection nor guaranteed delivery.</li>
+</ul>

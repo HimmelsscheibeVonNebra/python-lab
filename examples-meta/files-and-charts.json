@@ -1,0 +1,164 @@
+{
+  "class": "files-and-charts",
+  "title": "파일, 클래스, 차트",
+  "summary": "open()과 with로 파일을 읽고 쓰며 CSV 한 줄을 직접 나눠 본다. class Position으로 데이터와 메서드를 묶고, matplotlib으로 선·막대·히스토그램 차트를 PNG 파일로 저장한다. 이 스타터에는 완성본이 없으므로 셸 명령으로 기대 결과를 미리 확인해 둔다.",
+  "examples": [
+    {
+      "name": "journal_by_hand",
+      "source": "data/journal/starter/journal_by_hand.py",
+      "also": [
+        "data/journal/starter/trades.csv"
+      ],
+      "summary": "Practice 1. 옆에 있는 trades.csv를 open()으로 열어 헤더 한 줄을 건너뛰고, 나머지 줄마다 strip()과 split(\",\")으로 필드를 나눠 action(fields[2])이 buy인지 sell인지 센다. pd.read_csv가 하는 일을 손으로 해 보는 연습이다.",
+      "steps": [
+        {
+          "cmd": "head -3 trades.csv; wc -l trades.csv",
+          "note": "첫 줄은 열 이름 date,ticker,action,shares,price이고, 그 아래가 거래 한 건씩이다. 전체 11줄 = 헤더 1줄 + 거래 10건."
+        },
+        {
+          "cmd": "python3 journal_by_hand.py; echo \"exit=$?\"",
+          "note": "스타터는 파일을 열고 헤더만 읽은 뒤 닫는다. 출력이 없고 exit=0이다. with 블록이 끝나면 파일은 자동으로 닫힌다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nf = open(\"trades.csv\")\nprint(repr(f.readline()))\nline = f.readline()\nfields = line.strip().split(\",\")\nprint(fields)\nprint(fields[1], fields[2], int(fields[3]) * int(fields[4]))\nf.close()\nEOF",
+          "note": "readline()이 돌려준 헤더 끝에 \\n이 붙어 있는 것을 repr로 확인한다. strip()으로 떼고 split(\",\")으로 자르면 문자열 다섯 개의 리스트가 된다. 숫자도 '10'처럼 문자열이라 int()로 바꿔야 곱할 수 있다: TEA buy 50000."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nf = open(\"trades.csv\")\nf.readline()\nlast = f.readline().split(\",\")[4]\nprint(repr(last), last == \"5000\")\nf.close()\nEOF",
+          "note": "strip() 없이 자르면 마지막 필드가 '5000\\n'이라 \"5000\"과 같지 않다(False). 줄 끝 개행이 비교를 망치는 함정이다."
+        },
+        {
+          "cmd": "cut -d, -f3 trades.csv | sort | uniq -c",
+          "note": "셸 도구로 세 번째 열(action)을 세어 정답을 미리 본다: buy 6, sell 4(action 1은 헤더). 완성한 프로그램은 buy 6과 sell 4 두 줄을 출력해야 한다."
+        }
+      ],
+      "expect": "TEA buy 50000",
+      "notes": "nano journal_by_hand.py로 TODO 자리에 for line in f: 반복을 쓰고 두 카운터를 늘린 뒤, 마지막에 print(\"buy\", buys)와 print(\"sell\", sells)를 출력한다. 다시 실행해 위 셸 결과와 같은지 비교한다."
+    },
+    {
+      "name": "position_report",
+      "source": "data/journal/starter/position_report.py",
+      "summary": "Practice 2. Position 클래스는 __init__에서 ticker, shares, buy를 self에 저장한다. profit(self, close) 메서드를 추가하고, 다섯 행으로 Position 객체를 만들어 종목별 손익을 화면에 출력하면서 같은 줄을 portfolio_report.txt에도 쓴다.",
+      "steps": [
+        {
+          "cmd": "python3 position_report.py; echo \"exit=$?\"; ls portfolio_report.txt",
+          "note": "스타터는 클래스와 데이터만 정의하므로 출력이 없고, 보고서 파일도 아직 만들어지지 않는다(No such file or directory)."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom position_report import Position\np1 = Position(\"CODE\", 2, 10000)\np2 = Position(\"TEA\", 10, 5000)\nprint(p1.ticker, p2.shares)\nprint(p1.ticker, p1.shares, p1.buy)\nEOF",
+          "note": "한 클래스에서 만든 두 객체가 각자의 속성을 가진다: CODE 10, 그리고 CODE 2 10000. 모듈을 import하면 맨 위 코드가 실행되지만 이 스타터에는 print가 없어 조용하다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom position_report import Position\nprint(hasattr(Position(\"TEA\", 40, 5000), \"profit\"))\nEOF",
+          "note": "아직 profit 메서드가 없으므로 False다. 메서드를 추가하면 True가 되고, Position(\"TEA\", 40, 5000).profit(4800)은 -8000을 돌려줘야 한다."
+        },
+        {
+          "cmd": "printf 'class P:\\n    def profit(close):\\n        return close\\nprint(P().profit(4800))\\n' > no_self.py\npython3 no_self.py\nrm no_self.py",
+          "note": "def에서 self를 빼먹은 메서드를 호출하면 TypeError: P.profit() takes 1 positional argument but 2 were given이 난다. 호출할 때 Python이 객체 자신을 첫 인자로 넘기기 때문이다."
+        }
+      ],
+      "expect": "takes 1 positional argument but 2 were given",
+      "traceback": true,
+      "notes": "마지막 단계의 TypeError는 슬라이드의 TRAP을 재현한 의도된 오류다. 완성한 프로그램은 CODE +8000, TEA -8000, ROBO +25000, MLBK +15000, FIT +24000과 Saved portfolio_report.txt를 출력해야 하고, cat portfolio_report.txt로 같은 다섯 줄이 파일에 저장됐는지 확인한다. 보고서를 내 컴퓨터로 받으려면 cp portfolio_report.txt /mnt/host/ 후 받기 상자에 이름을 넣는다."
+    },
+    {
+      "name": "my_charts",
+      "source": "data/journal/starter/my_charts.py",
+      "summary": "Lab 1. CODE의 한 주 종가를 마커·제목·y축 이름·격자가 있는 선 그래프로 week.png에 저장하고, plt.figure()로 새 그림을 시작해 다섯 종목의 평가액을 막대 그래프로 values.png에 저장한다.",
+      "steps": [
+        {
+          "cmd": "python3 my_charts.py; echo \"exit=$?\"; ls *.png",
+          "note": "스타터는 matplotlib을 불러오고 리스트만 만든다. 출력도 PNG 파일도 없다(ls가 No such file or directory를 알린다). 처음 실행할 때는 Matplotlib is building the font cache라는 안내가 한 번 나올 수 있다. 이 가상 머신에는 화면이 없으므로 plt.show() 대신 plt.savefig()로 파일을 만들어야 한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport matplotlib.pyplot as plt\ndays = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"]\nplt.plot(days, [10000, 10200, 9800, 10500, 10800], marker=\"o\")\nplt.title(\"CODE closing prices\")\nplt.savefig(\"demo_line.png\")\nplt.figure()\nplt.bar([\"win\", \"loss\"], [3, 2])\nplt.savefig(\"demo_bar.png\")\nprint(\"Saved demo_line.png and demo_bar.png\")\nEOF",
+          "note": "슬라이드의 선 그래프와 막대 그래프를 따로 저장해 본다. 두 차트 사이의 plt.figure()가 없으면 막대가 선 위에 겹쳐 한 파일에 그려진다."
+        },
+        {
+          "cmd": "ls -l demo_line.png demo_bar.png\ncp demo_line.png demo_bar.png /mnt/host/",
+          "note": "PNG 두 개가 만들어졌다. /mnt/host/로 복사한 뒤 페이지의 받기 상자에 demo_line.png를 입력하면 내 컴퓨터로 내려받아 열어 볼 수 있다."
+        },
+        {
+          "cmd": "rm demo_line.png demo_bar.png",
+          "note": "연습용 파일을 지운다. 완성한 my_charts.py는 High: 10800, Saved week.png, Saved values.png를 출력해야 한다."
+        }
+      ],
+      "expect": "Saved demo_line.png and demo_bar.png",
+      "slow": true,
+      "notes": "완성 후 확인할 것: week.png는 점 다섯 개를 이은 선 하나에 제목·격자가 있고, values.png는 제목과 won 단위 y축이 있는 막대 다섯 개다. 두 그림이 한 파일에 겹쳐 있지 않아야 한다. y축은 0이 아니라 9800 근처에서 시작한다(matplotlib이 데이터 범위에 맞춘다)."
+    },
+    {
+      "name": "year_report",
+      "source": "data/journal/starter/year_report.py",
+      "also": [
+        "data/journal/starter/prices_2026.csv"
+      ],
+      "summary": "Lab 2. pd.read_csv로 2026년 260거래일의 종가 파일을 읽어 CODE의 1년을 선 그래프(code_year.png)로, 하루 변화량 diff().dropna()를 히스토그램(changes.png)으로 저장하고, 거래일 수와 최고 종가, 그 날짜를 출력한다.",
+      "steps": [
+        {
+          "cmd": "head -3 prices_2026.csv; wc -l prices_2026.csv",
+          "note": "열은 date와 다섯 종목(CODE, TEA, ROBO, MLBK, FIT)이다. 261줄 = 헤더 1줄 + 거래일 260일."
+        },
+        {
+          "cmd": "python3 year_report.py; echo \"exit=$?\"",
+          "note": "스타터는 CSV를 읽고 CODE 열을 꺼내기만 한다. pandas를 불러오는 데 시간이 걸리고 출력은 없다. 파일이 없으면 여기서 FileNotFoundError가 났을 것이다."
+        },
+        {
+          "cmd": "sort -t, -k2 -n prices_2026.csv | tail -n 1",
+          "note": "셸에서 둘째 열(CODE)로 정렬한 마지막 줄이 최고 종가다: 2026-08-06의 12795. 완성한 프로그램이 idxmax()로 찾아야 할 값과 같다."
+        },
+        {
+          "cmd": "grep -E '^2026-03-0[2-6]' prices_2026.csv",
+          "note": "3월 2–6일은 앞의 pandas 이야기에 나온 그 주다. CODE 열이 10000, 10200, 9800, 10500, 10800으로 앞의 pandas 예제 자료와 맞물린다."
+        }
+      ],
+      "expect": "2026-08-06,12795",
+      "slow": true,
+      "notes": "완성한 프로그램은 Days: 260, Best close: 12795, Best date: 2026-08-06, Saved code_year.png, Saved changes.png를 출력해야 한다. 히스토그램의 변화량은 첫날에 전날이 없으므로 하나 적은 259개다. 차트는 cp code_year.png changes.png /mnt/host/ 후 받기 상자로 내려받는다."
+    },
+    {
+      "name": "journal_chart",
+      "source": "data/journal/starter/journal_chart.py",
+      "also": [
+        "data/journal/starter/trades.csv"
+      ],
+      "summary": "Lab 3(과제). pd.read_csv로 매매 일지를 읽어 value_counts로 buy/sell 횟수를 막대 그래프(journal.png)로 그리고, 두 횟수와 총 거래 금액(shares * price의 합)을 출력한다.",
+      "steps": [
+        {
+          "cmd": "python3 journal_chart.py; echo \"exit=$?\"",
+          "note": "스타터는 CSV를 DataFrame으로 읽기만 하고 출력이 없다. Practice 1에서 손으로 하던 strip, split, int()를 read_csv가 줄마다 대신한다."
+        },
+        {
+          "cmd": "awk -F, 'NR > 1 { total += $4 * $5 } END { print \"Traded:\", total }' trades.csv",
+          "note": "셸에서 헤더를 건너뛰고 shares × price를 더하면 Traded: 340000이다. 완성한 프로그램은 buy 6, sell 4, Traded: 340000, Saved journal.png를 출력해야 한다."
+        }
+      ],
+      "expect": "Traded: 340000",
+      "slow": true
+    },
+    {
+      "name": "make_prices_2026",
+      "source": "data/journal/data/make_prices_2026.py",
+      "also": [
+        "data/journal/data/portfolio.csv",
+        "data/journal/data/trades.csv"
+      ],
+      "summary": "prices_2026.csv를 만든 생성 스크립트다. random.seed(2026)로 매번 같은 난수열을 쓰므로 실행할 때마다 바이트까지 같은 파일이 나온다. 3월 2–6일 주는 앞의 pandas 예제 자료의 종가에 고정되어 있다.",
+      "steps": [
+        {
+          "cmd": "python3 make_prices_2026.py",
+          "note": "prices_2026.csv: 260 trading days, 5 tickers. 2026년의 평일(월–금)만 세면 260일이다."
+        },
+        {
+          "cmd": "cmp prices_2026.csv ../starter/prices_2026.csv && echo identical",
+          "note": "새로 만든 파일과 스타터 폴더의 복사본이 한 바이트도 다르지 않다(identical). seed가 같으면 random의 결과도 같다."
+        },
+        {
+          "cmd": "cat portfolio.csv",
+          "note": "같은 폴더의 portfolio.csv는 앞에서 만든 my_portfolio.py의 표를 CSV로 저장한 것이다. 각 종목의 close가 prices_2026.csv의 3월 6일 종가와 같다."
+        }
+      ],
+      "expect": "identical"
+    }
+  ]
+}

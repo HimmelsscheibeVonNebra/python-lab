@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Getting Started with Python · Python Lab" data-title-ko="파이썬 시작하기 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Getting Started with Python · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="basics/starter">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html" aria-current="page"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" aria-current="page" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 01 · 4 examples</span><span lang="ko">01장 · 예제 4개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><span></span><a class="next" href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문">02 <span lang="en">Conditionals</span><span lang="ko">조건문</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></h1>
+    <p class="lead"><span lang="en">Check your Python version and try interactive mode, script mode and venv, then use print(), input() and type conversion to finish a greeting program, a calculator and a BMI program.</span><span lang="ko">Python 버전 확인, 대화형 모드와 스크립트 모드, venv를 체험한 뒤 print()와 input(), 형 변환으로 인사·계산기·BMI 프로그램을 완성한다.</span> <a href="#notes-intro"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="lab1_setup" aria-pressed="true">lab1_setup</button>
+          <button type="button" data-pick="hello" aria-pressed="false">hello</button>
+          <button type="button" data-pick="calc" aria-pressed="false">calc</button>
+          <button type="button" data-pick="bmi" aria-pressed="false">bmi</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="lab1_setup" data-dir="basics/starter">
+        <h2>lab1_setup <span class="muted">~/basics/starter</span></h2>
+        <p><span lang="en">Follow Lab 1 (set up your development environment) in this web lab. Check the Python version, try interactive mode (REPL), type() and type conversion, then create and activate a virtual environment .venv.</span><span lang="ko">실습 1(개발 환경 준비)을 이 웹 실습실에서 따라 한다. Python 버전을 확인하고, 대화형 모드(REPL)와 type()·형 변환을 시험한 뒤 가상 환경 .venv를 만들어 활성화한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 --version" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 --version">▶</button><code>python3 --version</code></div>
+          <p><span lang="en">This lab's Python is 3.14.10. Only the number differs from the 3.12.4 on the slides; what you learn is the same. On a Windows PC the command is usually python or py.</span><span lang="ko">이 실습실의 Python은 3.14.10이다. 슬라이드의 3.12.4와 숫자만 다를 뿐 배우는 내용은 같다. Windows PC에서는 명령이 보통 python 또는 py다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i">▶</button><code>printf '%s\n' '2 + 3' 'print(&quot;hi&quot;)' 'type(3.14)' 'exit()' | python3 -i</code></div>
+          <p><span lang="en">This feeds input into the REPL. After each &gt;&gt;&gt; you see, in order, the value of the expression 5, the print output hi, and &lt;class 'float'&gt;. If you type just python3 yourself, the same &gt;&gt;&gt; prompt appears, and exit() leaves it.</span><span lang="ko">REPL에 입력을 흘려 넣은 모습이다. &gt;&gt;&gt; 뒤에 식의 값 5, print 결과 hi, &lt;class 'float'&gt;가 차례로 나온다. 직접 python3만 입력하면 같은 &gt;&gt;&gt; 프롬프트가 뜨고 exit()로 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'">▶</button><code>python3 -c 'print(type(42), type(3.14), type(&quot;hi&quot;), type(True), type(None))'</code></div>
+          <p><span lang="en">The five basic data types int, float, str, bool and NoneType are printed.</span><span lang="ko">다섯 가지 기본 자료형 int, float, str, bool, NoneType이 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'">▶</button><code>python3 -c 'print(int(&quot;42&quot;), int(3.9), float(&quot;3.5&quot;), float(7), str(42) + &quot;!&quot;, bool(0), bool(&quot;&quot;), bool(None), bool(5))'</code></div>
+          <p><span lang="en">int(3.9) truncates rather than rounds, giving 3, and float(7) gives 7.0. Only 0, the empty string and None are False; 5 is True.</span><span lang="ko">int(3.9)는 반올림이 아니라 버려서 3이 되고, float(7)은 7.0이 된다. 0·빈 문자열·None만 False이고 5는 True다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+print(&quot;3&quot; + &quot;3&quot;)
+print(int(&quot;3&quot;) + 3)
+print(&quot;3&quot; + 3)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+print(&quot;3&quot; + &quot;3&quot;)
+print(int(&quot;3&quot;) + 3)
+print(&quot;3&quot; + 3)
+EOF">▶</button><code>python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+print(&quot;3&quot; + &quot;3&quot;)
+print(int(&quot;3&quot;) + 3)
+print(&quot;3&quot; + 3)
+EOF</code></div>
+          <p><span lang="en">&quot;3&quot; + &quot;3&quot; is the concatenation 33; converted with int it is 6. Adding a string and an integer raises a TypeError, as in the last line (the start of the Traceback is hidden with grep).</span><span lang="ko">&quot;3&quot; + &quot;3&quot;은 이어 붙인 33, int로 바꾸면 6이다. 문자열과 정수를 더하면 마지막 줄처럼 TypeError가 난다(Traceback 앞부분은 grep으로 숨겼다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'print(int(float(&quot;3.5&quot;))); print(int(&quot;3.5&quot;))' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">&quot;3.5&quot; has to go through float to become the integer 3. Calling int(&quot;3.5&quot;) directly raises ValueError: invalid literal for int().</span><span lang="ko">&quot;3.5&quot;는 float을 거쳐야 정수 3이 된다. int(&quot;3.5&quot;)를 바로 하면 ValueError: invalid literal for int()가 난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin" title="Run in the terminal / 터미널에서 실행" aria-label="Run: mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin">▶</button><code>mkdir -p ~/python-week1 &amp;&amp; python3 -m venv --without-pip ~/python-week1/.venv &amp;&amp; ls ~/python-week1/.venv/bin</code></div>
+          <p><span lang="en">The virtual environment folder .venv is created, and activate and python appear inside bin. This lab has no pip, so --without-pip is added. On a real PC, python3 -m venv .venv is enough.</span><span lang="ko">가상 환경 폴더 .venv가 생기고 bin 안에 activate와 python이 보인다. 이 실습실에는 pip이 없어 --without-pip을 붙였다. 실제 PC에서는 python3 -m venv .venv면 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd=". ~/python-week1/.venv/bin/activate
+which python
+python --version
+deactivate
+which python" title="Run in the terminal / 터미널에서 실행" aria-label="Run: . ~/python-week1/.venv/bin/activate
+which python
+python --version
+deactivate
+which python">▶</button><code>. ~/python-week1/.venv/bin/activate
+which python
+python --version
+deactivate
+which python</code></div>
+          <p><span lang="en">After activation, python points to ~/python-week1/.venv/bin/python; after deactivate it is /usr/bin/python again. If you activate it yourself without deactivate, (.venv) appears in front of the prompt.</span><span lang="ko">활성화하면 python이 ~/python-week1/.venv/bin/python을 가리키고, deactivate 뒤에는 다시 /usr/bin/python이 된다. deactivate 없이 직접 활성화해 보면 프롬프트 앞에 (.venv)가 붙는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Installing VS Code and the Python extension, selecting the interpreter and creating a Google Colab notebook are steps you do on a real PC, outside the browser. The terminal in this lab plays the role of VS Code's built-in terminal (Ctrl+` / Cmd+`), and instead of the ▶ Run button you run a file with python3 filename.py. In the BusyBox shell the source command is written as . (a dot).</span><span lang="ko">VS Code 설치, Python 확장 설치, 인터프리터 선택, Google Colab 노트북 만들기는 브라우저 밖 실제 PC에서 하는 단계다. 이 실습실의 터미널은 VS Code의 내장 터미널(Ctrl+` / Cmd+`) 역할을 하고, ▶ Run 버튼 대신 python3 파일이름.py로 실행한다. source 명령은 BusyBox 셸에서 . 으로 쓴다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="hello" data-dir="basics/starter" hidden>
+        <h2>hello <span class="muted">~/basics/starter</span></h2>
+        <p><span lang="en">Lab 2: print Hello, World! and Hello, Python!, store your name, major and date in variables and print them with labels, then pass several values to print() to make Week 1 of 16.</span><span lang="ko">실습 2: Hello, World!와 Hello, Python!을 출력하고, 이름·전공·날짜를 변수에 담아 레이블과 함께 출력한 뒤 print()에 여러 값을 넘겨 Week 1 of 16을 만든다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 hello.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 hello.py; echo &quot;exit=$?&quot;">▶</button><code>python3 hello.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter code is only comments, so it prints nothing and exits normally (exit=0). Your task is to fill in the TODOs.</span><span lang="ko">시작 코드는 주석뿐이라 아무것도 출력하지 않고 정상 종료(exit=0)한다. TODO를 채우는 것이 과제다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/hello.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/hello.py">▶</button><code>python3 ../solutions/hello.py</code></div>
+          <p><span lang="en">Output of the sample solution. Values passed with commas, as in print(&quot;Name:&quot;, name), are separated by one space each, and the last line is Week 1 of 16.</span><span lang="ko">예시 답안의 출력이다. print(&quot;Name:&quot;, name)처럼 쉼표로 넘긴 값 사이에는 공백이 하나씩 들어가고, 마지막 줄은 Week 1 of 16이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+print(&quot;Hello&quot;, &quot;World&quot;)
+print(&quot;A&quot;, &quot;B&quot;, sep=&quot;-&quot;)
+print(&quot;same line&quot;, end=&quot; &quot;)
+print(&quot;continues&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+print(&quot;Hello&quot;, &quot;World&quot;)
+print(&quot;A&quot;, &quot;B&quot;, sep=&quot;-&quot;)
+print(&quot;same line&quot;, end=&quot; &quot;)
+print(&quot;continues&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+print(&quot;Hello&quot;, &quot;World&quot;)
+print(&quot;A&quot;, &quot;B&quot;, sep=&quot;-&quot;)
+print(&quot;same line&quot;, end=&quot; &quot;)
+print(&quot;continues&quot;)
+EOF</code></div>
+          <p><span lang="en">sep=&quot;-&quot; changes the separator to give A-B, and end=&quot; &quot; puts a space instead of a newline, so the next print continues on the same line.</span><span lang="ko">sep=&quot;-&quot;는 구분자를 A-B로 바꾸고, end=&quot; &quot;는 줄바꿈 대신 공백을 넣어 다음 print가 같은 줄에 이어진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+name, score = &quot;Kim&quot;, 95.5
+print(f&quot;{name} scored {score}&quot;)
+print(f&quot;{score:.1f} pts&quot;)
+print(f&quot;{1234567:,}&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+name, score = &quot;Kim&quot;, 95.5
+print(f&quot;{name} scored {score}&quot;)
+print(f&quot;{score:.1f} pts&quot;)
+print(f&quot;{1234567:,}&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+name, score = &quot;Kim&quot;, 95.5
+print(f&quot;{name} scored {score}&quot;)
+print(f&quot;{score:.1f} pts&quot;)
+print(f&quot;{1234567:,}&quot;)
+EOF</code></div>
+          <p><span lang="en">{name} inside the f-string is replaced by its value. :.1f gives one decimal place, and :, adds thousands separators (1,234,567).</span><span lang="ko">f-string 안의 {name}이 값으로 바뀐다. :.1f는 소수 한 자리, :,는 천 단위 쉼표(1,234,567)다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(&quot;Hello, World!)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(&quot;Hello, World!)'">▶</button><code>python3 -c 'print(&quot;Hello, World!)'</code></div>
+          <p><span lang="en">As in the experiment on the slides, leaving out the closing quotation mark gives SyntaxError: unterminated string literal, and the ^ mark points to the problem. Not a single line of the program runs.</span><span lang="ko">슬라이드의 실험처럼 닫는 따옴표를 빼면 SyntaxError: unterminated string literal이 나고 ^ 표시가 문제 위치를 가리킨다. 프로그램은 한 줄도 실행되지 않는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Fill in the TODOs with nano hello.py, press Ctrl+O (save) and Ctrl+X (exit), then run python3 hello.py again. Replace the name, major and date with your own.</span><span lang="ko">nano hello.py로 TODO를 채우고 Ctrl+O(저장), Ctrl+X(종료) 후 python3 hello.py로 다시 실행한다. 이름·전공·날짜는 자기 정보로 바꾼다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="calc" data-dir="basics/starter" hidden>
+        <h2>calc <span class="muted">~/basics/starter</span></h2>
+        <p><span lang="en">Lab 3: read two numbers with input(), convert them to float, and print their sum, difference, product and the quotient to two decimal places with f-strings.</span><span lang="ko">실습 3: 두 수를 input()으로 받아 float로 바꾸고 합·차·곱과 소수 둘째 자리까지의 몫을 f-string으로 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n2\n' | python3 calc.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n2\n' | python3 calc.py; echo">▶</button><code>printf '8\n2\n' | python3 calc.py; echo</code></div>
+          <p><span lang="en">The inputs 8 and 2 are piped in beforehand. The starter code prints only the two prompts and no results. You can also run python3 calc.py yourself and type the numbers on the keyboard.</span><span lang="ko">입력 8과 2를 파이프로 미리 넣었다. 시작 코드는 두 프롬프트만 출력하고 계산 결과는 없다. 직접 python3 calc.py로 실행해 키보드로 입력해도 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n2\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n2\n' | python3 ../solutions/calc.py">▶</button><code>printf '8\n2\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">The input is not shown on screen, so the two prompts run together on one line. Because the values were converted to float, a decimal point appears, as in 8.0 + 2.0 = 10.0.</span><span lang="ko">입력이 화면에 보이지 않아 프롬프트 두 개가 한 줄에 붙어 나온다. float로 바꿨으므로 8.0 + 2.0 = 10.0처럼 소수점이 붙는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '7\n3\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '7\n3\n' | python3 ../solutions/calc.py">▶</button><code>printf '7\n3\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">The quotient is 2.333..., but {a / b:.2f} shows it as 2.33.</span><span lang="ko">몫은 2.333...이지만 {a / b:.2f} 때문에 2.33으로 표시된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf -- '-6\n2\n' | python3 ../solutions/calc.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf -- '-6\n2\n' | python3 ../solutions/calc.py">▶</button><code>printf -- '-6\n2\n' | python3 ../solutions/calc.py</code></div>
+          <p><span lang="en">Negative numbers work as well: -4.0, -8.0, -12.0, -3.00.</span><span lang="ko">음수도 그대로 계산된다: -4.0, -8.0, -12.0, -3.00.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'">▶</button><code>python3 -c 'a, b = 7.0, 2.0; print(a // b, a % b, a ** b)'</code></div>
+          <p><span lang="en">The three operators from the challenge: floor division 3.0, remainder 1.0, exponent 49.0. When both operands are floats, the result is a float too.</span><span lang="ko">도전 과제의 세 연산자: 정수 나눗셈 3.0, 나머지 1.0, 거듭제곱 49.0. float끼리 계산하면 결과도 float다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>printf '8\n0\n' | python3 -u ../solutions/calc.py 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">If the second number is 0, the sum, difference and product are printed, but the division stops with ZeroDivisionError: division by zero. Handling this is covered in the 'Files, Exceptions and JSON' chapter.</span><span lang="ko">두 번째 수가 0이면 합·차·곱은 출력되지만 나눗셈에서 ZeroDivisionError: division by zero로 멈춘다. 이 처리는 '파일·예외·JSON' 장에서 다룬다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="bmi" data-dir="basics/starter" hidden>
+        <h2>bmi <span class="muted">~/basics/starter</span></h2>
+        <p><span lang="en">Lab 4: read height (cm) and weight (kg), convert the height to m, and print BMI = weight ÷ height (m)² to one decimal place.</span><span lang="ko">실습 4: 키(cm)와 몸무게(kg)를 입력받아 키를 m로 바꾸고 BMI = 몸무게 ÷ 키(m)²를 소수 한 자리로 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '175\n70\n' | python3 bmi.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '175\n70\n' | python3 bmi.py; echo">▶</button><code>printf '175\n70\n' | python3 bmi.py; echo</code></div>
+          <p><span lang="en">The starter code only reads the input and prints nothing.</span><span lang="ko">시작 코드는 입력만 받고 아무것도 출력하지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '175\n70\n' | python3 ../solutions/bmi.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '175\n70\n' | python3 ../solutions/bmi.py">▶</button><code>printf '175\n70\n' | python3 ../solutions/bmi.py</code></div>
+          <p><span lang="en">These are the test values from the slides. You should see Height: 1.75 m, Weight: 70.0 kg, Your BMI is 22.9.</span><span lang="ko">슬라이드의 테스트 값이다. Height: 1.75 m, Weight: 70.0 kg, Your BMI is 22.9가 나와야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '160\n64\n' | python3 ../solutions/bmi.py
+printf '180\n81\n' | python3 ../solutions/bmi.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '160\n64\n' | python3 ../solutions/bmi.py
+printf '180\n81\n' | python3 ../solutions/bmi.py">▶</button><code>printf '160\n64\n' | python3 ../solutions/bmi.py
+printf '180\n81\n' | python3 ../solutions/bmi.py</code></div>
+          <p><span lang="en">:.2f keeps the trailing zero, as in 1.60 m. In both cases the BMI is 25.0.</span><span lang="ko">1.60 m처럼 :.2f가 끝자리 0을 유지한다. 두 경우 모두 BMI 25.0이다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The challenge, a BMI category (Underweight, Normal, Overweight, Obese), is built with if / elif / else from the 'Operators, Strings and Conditionals' chapter. Leave three test inputs and their expected results as comments at the bottom of the file.</span><span lang="ko">도전 과제인 BMI 분류(Underweight, Normal, Overweight, Obese)는 '연산자·문자열·조건문' 장의 if / elif / else로 만든다. 테스트 입력 세 가지와 예상 결과를 파일 아래 주석으로 남긴다.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="lab1_setup">
+    <details class="source" open data-path="/home/student/basics/starter/hello.py">
+      <summary>hello.py <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: Print greetings and your own details.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Print Hello, World! and Hello, Python! on separate lines.</span>
+<span class="ln"># TODO: Store your name, major and today's date in string variables.</span>
+<span class="ln"># TODO: Print each value with the labels Name:, Major: and Date:.</span>
+<span class="ln"># TODO: Use print() with multiple arguments to display Week 1 of 16.</span>
+<span class="ln"> </span>
+<span class="ln"># Document your output checks here.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="hello" hidden>
+    <details class="source" open data-path="/home/student/basics/starter/hello.py">
+      <summary>hello.py <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: Print greetings and your own details.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Print Hello, World! and Hello, Python! on separate lines.</span>
+<span class="ln"># TODO: Store your name, major and today's date in string variables.</span>
+<span class="ln"># TODO: Print each value with the labels Name:, Major: and Date:.</span>
+<span class="ln"># TODO: Use print() with multiple arguments to display Week 1 of 16.</span>
+<span class="ln"> </span>
+<span class="ln"># Document your output checks here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/basics/solutions/hello.py">
+      <summary>basics/solutions/hello.py <span class="muted src-lines" data-lines="18"><span lang="en">18 lines</span><span lang="ko">18줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 reference solution: greetings, variables and output.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># These are example details. Use your own details in your submission.</span>
+<span class="ln">name = &quot;Alex Kim&quot;</span>
+<span class="ln">major = &quot;Computer Science&quot;</span>
+<span class="ln">date = &quot;2026-09-10&quot;</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;Hello, World!&quot;)</span>
+<span class="ln">print(&quot;Hello, Python!&quot;)</span>
+<span class="ln">print(&quot;Name:&quot;, name)</span>
+<span class="ln">print(&quot;Major:&quot;, major)</span>
+<span class="ln">print(&quot;Date:&quot;, date)</span>
+<span class="ln">print(&quot;Week&quot;, 1, &quot;of&quot;, 16)</span>
+<span class="ln"> </span>
+<span class="ln"># Checks:</span>
+<span class="ln"># The first two lines are Hello, World! and Hello, Python!.</span>
+<span class="ln"># Name, Major and Date display the corresponding variable values.</span>
+<span class="ln"># The final line is Week 1 of 16.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="calc" hidden>
+    <details class="source" open data-path="/home/student/basics/starter/calc.py">
+      <summary>calc.py <span class="muted src-lines" data-lines="12"><span lang="en">12 lines</span><span lang="ko">12줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: Read two numbers and calculate four arithmetic results.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># For this lab, enter numeric text and a nonzero second number.</span>
+<span class="ln">first_text = input(&quot;First number: &quot;)</span>
+<span class="ln">second_text = input(&quot;Second number: &quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Convert both strings to floats and store them as a and b.</span>
+<span class="ln"># TODO: Print the sum, difference and product with labeled expressions.</span>
+<span class="ln"># TODO: Print the quotient with two decimal places using an f-string.</span>
+<span class="ln"># Use the example output in the README as a guide.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/basics/solutions/calc.py">
+      <summary>basics/solutions/calc.py <span class="muted src-lines" data-lines="19"><span lang="en">19 lines</span><span lang="ko">19줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 reference solution: numeric input and arithmetic output.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume numeric input and a nonzero second number.</span>
+<span class="ln">first_text = input(&quot;First number: &quot;)</span>
+<span class="ln">second_text = input(&quot;Second number: &quot;)</span>
+<span class="ln">a = float(first_text)</span>
+<span class="ln">b = float(second_text)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;{a} + {b} = {a + b}&quot;)</span>
+<span class="ln">print(f&quot;{a} - {b} = {a - b}&quot;)</span>
+<span class="ln">print(f&quot;{a} * {b} = {a * b}&quot;)</span>
+<span class="ln">print(f&quot;{a} / {b} = {a / b:.2f}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests (sum, difference, product, displayed quotient):</span>
+<span class="ln"># 8, 2 -&gt; 10.0, 6.0, 16.0, 4.00</span>
+<span class="ln"># 7, 3 -&gt; 10.0, 4.0, 21.0, 2.33</span>
+<span class="ln"># 2.5, 0.5 -&gt; 3.0, 2.0, 1.25, 5.00</span>
+<span class="ln"># -6, 2 -&gt; -4.0, -8.0, -12.0, -3.00</span>
+<span class="ln"># Zero divisors and nonnumeric text are outside this lab's valid input.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="bmi" hidden>
+    <details class="source" open data-path="/home/student/basics/starter/bmi.py">
+      <summary>bmi.py <span class="muted src-lines" data-lines="13"><span lang="en">13 lines</span><span lang="ko">13줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: Convert units and calculate BMI.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># For this lab, enter positive numeric values.</span>
+<span class="ln">height_cm = float(input(&quot;Height (cm): &quot;))</span>
+<span class="ln">weight_kg = float(input(&quot;Weight (kg): &quot;))</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Convert height_cm to height_m by dividing by 100.</span>
+<span class="ln"># TODO: Calculate bmi = weight_kg / height_m ** 2.</span>
+<span class="ln"># TODO: Print height with two decimal places and the unit m.</span>
+<span class="ln"># TODO: Print weight with one decimal place and the unit kg.</span>
+<span class="ln"># TODO: Print Your BMI is followed by BMI with one decimal place.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/basics/solutions/bmi.py">
+      <summary>basics/solutions/bmi.py <span class="muted src-lines" data-lines="18"><span lang="en">18 lines</span><span lang="ko">18줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 reference solution: height conversion and BMI arithmetic.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume positive numeric measurements. This exercise does not classify health.</span>
+<span class="ln">height_cm = float(input(&quot;Height (cm): &quot;))</span>
+<span class="ln">weight_kg = float(input(&quot;Weight (kg): &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">height_m = height_cm / 100</span>
+<span class="ln">bmi = weight_kg / (height_m ** 2)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;Height: {height_m:.2f} m&quot;)</span>
+<span class="ln">print(f&quot;Weight: {weight_kg:.1f} kg&quot;)</span>
+<span class="ln">print(f&quot;Your BMI is {bmi:.1f}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests (height in cm, weight in kg -&gt; displayed height and BMI):</span>
+<span class="ln"># 175, 70 -&gt; 1.75 m, BMI 22.9</span>
+<span class="ln"># 160, 64 -&gt; 1.60 m, BMI 25.0</span>
+<span class="ln"># 180, 81 -&gt; 1.80 m, BMI 25.0</span>
+<span class="ln"># Zero height and nonnumeric text are outside this lab's valid input.</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-intro">
+      <h2 class="notes-title"><span lang="en">Python Overview &amp; Development Environment</span><span lang="ko">Python 개요와 개발 환경</span></h2>
+<div lang="en">
+<p>In this chapter we look at what kind of language Python, which we will use throughout, is and how it runs, then set up a development environment and write our first programs. The theory part covers a Python overview, the development environment (VS Code, virtual environments with venv, Google Colab), variables and data types, input and output with <code>print()</code> and <code>input()</code>, and type conversion. In the practice part you set up your development environment (<a href="#ex=lab1_setup">lab1_setup</a>) and then complete, in order, a greeting program (<a href="#ex=hello">hello</a>), an input and calculation program (<a href="#ex=calc">calc</a>) and a BMI calculator (<a href="#ex=bmi">bmi</a>). The result is three <code>.py</code> files.</p>
+
+<p>This course first covers the Python core syntax and then builds on it to create a project.</p>
+
+<h2>Python Overview</h2>
+
+<h3>What Is Python?</h3>
+
+<p>Python was created by Guido van Rossum and first released in 1991. Its features are:</p>
+
+<ul>
+<li>It is a <strong>high-level, general-purpose language</strong>. The syntax is clear and readable, and reads almost like English.</li>
+<li>It is an <strong>interpreted language</strong>. Code runs line by line, with no separate compile step.</li>
+<li>It is <strong>dynamically typed</strong>. You do not declare a type when you create a variable.</li>
+<li>Besides a huge standard library, there are more than 500,000 packages on PyPI.</li>
+<li>The current version is Python 3. Python 2 was retired in 2020.</li>
+</ul>
+
+<p>The slides compare the same greeting in Python and Java. Python needs two lines, while Java needs a class and a <code>main</code> method to be declared.</p>
+
+<pre><code># Python reads almost like English
+name = "Python"
+print("Hello,", name)
+
+# Java needs a lot more to say the same
+# public class Main {
+#     public static void main(String[] a) {
+#         System.out.println("Hello, Java");
+#     }
+# }</code></pre>
+
+<h3>Why Learn Python?</h3>
+
+<p>Python is used in many fields. In data and AI, with pandas, NumPy, matplotlib, scikit-learn, PyTorch and TensorFlow, it has become the default language of data science. In web and automation, it is used for web frameworks such as Django, Flask and FastAPI, and for scripts, bots, web scraping and glue code between systems. It is also widely used in education and scientific computing, games, DevOps and cloud tooling, and is consistently #1 in language rankings.</p>
+
+<p>Another important point is that its beginner-friendly syntax lets you focus on problem solving instead of language details. In this course, both the core syntax and the project use Python alone.</p>
+
+<h3>How Python Runs Your Code</h3>
+
+<p>Source code (<code>.py</code>) is first compiled to bytecode, and this bytecode is executed by the Python Virtual Machine. This happens automatically, so to you it feels as if the file runs directly. There are three ways to use Python.</p>
+
+<ul>
+<li><strong>Interactive mode (REPL)</strong>: type <code>python3</code> in a terminal and the <code>&gt;&gt;&gt;</code> prompt appears. Enter statements one at a time and see the results instantly. Leave with <code>exit()</code>.</li>
+<li><strong>Script mode</strong>: save the code in a file and run it with <code>python3 file.py</code>.</li>
+<li><strong>Notebook mode</strong> (Colab, Jupyter): code runs cell by cell, combining both styles.</li>
+</ul>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3              # interactive mode
+&gt;&gt;&gt; 2 + 3
+5
+&gt;&gt;&gt; print("hi")
+hi
+&gt;&gt;&gt; exit()
+$ python3 hello.py     # script mode
+Hello, World!</code></pre>
+
+<p>Check your version with <code>python3 --version</code>. On Windows the command is usually <code>python</code> or <code>py</code>. This web lab's Python is 3.14.10, so only the version number differs; everything you learn in this course works the same. You can try checking the version and using interactive mode yourself in the <a href="#ex=lab1_setup">lab1_setup</a> example.</p>
+
+<h2>Development Environment</h2>
+
+<h3>Three Options</h3>
+
+<table>
+<thead><tr><th>Environment</th><th>Features</th></tr></thead>
+<tbody>
+<tr><td>Local: Python + VS Code</td><td>Full control, and it works offline. Best for real projects and assignments, and our main setup in class.</td></tr>
+<tr><td>Virtual environment (venv)</td><td>One isolated set of packages per project. It avoids version conflicts and is standard practice for every project.</td></tr>
+<tr><td>Google Colab</td><td>Runs in the browser, with nothing to install. A free GPU is available for heavier work; great for quick experiments and data work.</td></tr>
+</tbody>
+</table>
+
+<p>VS Code and venv are recommended for assignments; think of Colab as a backup for when you are away from your laptop. All three are the same Python, so everything you learn works the same everywhere.</p>
+
+<p>This web lab can be seen as a fourth option. A small Linux runs inside the browser, and you use Python in its terminal. Like Colab, there is nothing to install, and like VS Code's built-in terminal, you run programs in the terminal with <code>python3 file.py</code>. Files are edited with the <code>nano</code> editor.</p>
+
+<h3>Setting Up VS Code</h3>
+
+<p>VS Code is an editor you install and use on a real PC. The steps are:</p>
+
+<ol>
+<li>Install Python 3.x from python.org. On Windows, be sure to tick <strong>Add python.exe to PATH</strong>.</li>
+<li>Install VS Code from code.visualstudio.com.</li>
+<li>Add the Python extension by Microsoft from the Extensions view.</li>
+<li>Open your working folder (e.g. <code>python-week1</code>) with <strong>File → Open Folder…</strong>.</li>
+<li>Press <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> and select the interpreter with <strong>Python: Select Interpreter</strong>.</li>
+<li>Create <code>hello.py</code>, then press the ▶ Run button or run it in the terminal.</li>
+</ol>
+
+<p>Open the built-in terminal with <kbd>Ctrl</kbd> + <kbd>`</kbd> on Windows/Linux and <kbd>Cmd</kbd> + <kbd>`</kbd> on macOS. The selected interpreter is shown in the bottom-right status bar.</p>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3 hello.py
+Hello, World!</code></pre>
+
+<h3>Virtual Environments with venv</h3>
+
+<p>A virtual environment gives each project its own Python packages, isolated from the system. For example, even if two projects need different versions of pandas, they do not conflict. venv is built into Python, so there is nothing extra to install. Always activate the virtual environment before <code>pip install</code>; VS Code detects the <code>.venv</code> folder automatically. When you use Git, add <code>.venv/</code> to <code>.gitignore</code> and share a <code>requirements.txt</code> instead.</p>
+
+<pre><code># 1. Create (inside your project folder)
+$ python3 -m venv .venv
+# 2. Activate
+$ source .venv/bin/activate     # macOS/Linux
+&gt; .venv\Scripts\activate        # Windows
+# 3. Install packages
+(.venv) $ pip install requests
+# 4. Leave the environment
+(.venv) $ deactivate</code></pre>
+
+<p>This lab has no network and no pip, so you cannot <code>pip install</code>. You can still go through creating and activating a virtual environment exactly as it is, using <code>python3 -m venv --without-pip</code>. After activation, the <code>python</code> command points to the interpreter inside <code>.venv</code>, and after <code>deactivate</code> it goes back to the original (<a href="#ex=lab1_setup">lab1_setup</a>). In the BusyBox shell, use the equivalent <code>.</code> command instead of <code>source</code>.</p>
+
+<h3>Google Colab</h3>
+
+<p>Colab (colab.research.google.com) is Jupyter notebooks hosted by Google. You need only a browser and a Google account, and a notebook consists of code cells and text (Markdown) cells. Run a cell with <kbd>Shift</kbd> + <kbd>Enter</kbd>. Popular libraries are pre-installed, and a free GPU/TPU is available for heavier work. Notebooks (<code>.ipynb</code>) are saved to Google Drive and shared like a Google Doc. However, the runtime resets after idle time, so save your files to Drive.</p>
+
+<pre><code># In a Colab code cell
+print("Hello from Colab!")
+
+# Shell commands start with !
+!python --version
+!pip install some-package
+
+# Variables persist between cells
+x = 10</code></pre>
+
+<p>Colab is used in a real browser with a Google account. In this lab, run the same code in the terminal instead of a Colab cell. Colab's <code>!</code> commands are the same as shell commands typed in this lab's terminal without the <code>!</code>.</p>
+
+<h2>Variables and Data Types</h2>
+
+<h3>Variables</h3>
+
+<p>A variable is a name that refers to a value stored in memory. It is created by an assignment of the form <code>name = value</code>; there is no declaration keyword. Assigning again changes the value, and can even change the type. You can also assign to several variables at once using commas.</p>
+
+<pre><code>age = 20
+height = 175.5
+name = "Kim"
+is_student = True
+
+age = age + 1          # 21
+age = "twenty-one"     # now a string!
+
+# Multiple assignment
+x, y = 10, 20
+MAX_SCORE = 100        # a constant</code></pre>
+
+<p>Variable names follow these rules:</p>
+
+<ul>
+<li>Only letters, digits and the underscore (<code>_</code>) are allowed, and a name cannot start with a digit.</li>
+<li>Names are case-sensitive. <code>age</code> and <code>Age</code> are different variables.</li>
+<li>Keywords such as <code>if</code>, <code>for</code> and <code>class</code> cannot be used as names.</li>
+<li>By convention, variables use <code>snake_case</code> and constants use <code>UPPER_CASE</code>.</li>
+</ul>
+
+<h3>Basic Data Types</h3>
+
+<table>
+<thead><tr><th>Type</th><th>Examples</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>int</code></td><td><code>42</code>, <code>-7</code>, <code>0</code></td><td>Whole numbers, with unlimited size.</td></tr>
+<tr><td><code>float</code></td><td><code>3.14</code>, <code>2.0</code>, <code>1e-3</code></td><td>Decimal numbers (64-bit floating point)</td></tr>
+<tr><td><code>str</code></td><td><code>"hello"</code>, <code>'a'</code></td><td>Text, in single or double quotes.</td></tr>
+<tr><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>Logical values. Note the capital first letter.</td></tr>
+<tr><td><code>NoneType</code></td><td><code>None</code></td><td>The absence of a value.</td></tr>
+</tbody>
+</table>
+
+<p>Check a value's type with <code>type(x)</code>. For example, <code>type(3.14)</code> gives <code>&lt;class 'float'&gt;</code>. The type decides which operations are allowed. <code>"3" + "3"</code> concatenates the strings into <code>"33"</code>, but <code>"3" + 3</code> tries to add a string and an integer, so it is an error (TypeError). You can check the five types and this error yourself in <a href="#ex=lab1_setup">lab1_setup</a>.</p>
+
+<h2>Input and Output</h2>
+
+<h3>Output with print()</h3>
+
+<p><code>print()</code> writes values to the screen. If you pass several values separated by commas, they are printed separated by one space. <code>sep=</code> changes the separator, and <code>end=</code> changes the line ending (default: newline).</p>
+
+<p>An f-string (<code>f"..."</code>) is the modern way to embed values directly in text. A variable or expression written inside braces is replaced by its value. You can also add a format specifier inside the braces: <code>{x:.2f}</code> gives two decimal places, and <code>{n:,}</code> adds thousands separators.</p>
+
+<pre><code>print("Hello", "World")          # Hello World
+print("A", "B", sep="-")         # A-B
+print("same line", end=" ")
+print("continues")
+
+name, score = "Kim", 95.5
+print(f"{name} scored {score}")  # Kim scored 95.5
+print(f"{score:.1f} pts")        # 95.5 pts
+print(f"{1234567:,}")            # 1,234,567</code></pre>
+
+<p>You can see the output of this code in the <a href="#ex=hello">hello</a> example.</p>
+
+<h3>Input with input()</h3>
+
+<p><code>input(prompt)</code> shows the prompt, waits until the user types something, and returns what they typed. The returned value is <strong>always a string</strong>, even when the user types a number. So to do arithmetic, you must first convert it with <code>int()</code> or <code>float()</code>. <code>"3" + "4"</code> is not 7 but the concatenation <code>"34"</code>.</p>
+
+<pre><code>name = input("Your name: ")
+print(f"Hi, {name}!")
+
+age = input("Your age: ")
+print(type(age))      # &lt;class 'str'&gt;
+print(age + 1)        # TypeError!
+
+age = int(input("Your age: "))
+print(age + 1)        # works now</code></pre>
+
+<p>The typical pattern for reading a number is <code>n = int(input("Number: "))</code>.</p>
+
+<p>The example steps in this lab pipe the input in beforehand, as in <code>printf '8\n2\n' | python3 calc.py</code>. Done this way, the values you enter are not shown on screen, so the prompts run together on one line. If you want to type the input on the keyboard yourself, run just <code>python3 calc.py</code>, type a value and press <kbd>Enter</kbd>.</p>
+
+<h3>Type Conversion (Casting)</h3>
+
+<table>
+<thead><tr><th>Function</th><th>Input → Output</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>int()</code></td><td><code>"42"</code> → <code>42</code>, <code>3.9</code> → <code>3</code></td><td>Truncates the fractional part of a float. <code>int("3.5")</code> is an error.</td></tr>
+<tr><td><code>float()</code></td><td><code>"3.5"</code> → <code>3.5</code>, <code>7</code> → <code>7.0</code></td><td>Accepts integers and numeric strings.</td></tr>
+<tr><td><code>str()</code></td><td><code>42</code> → <code>"42"</code>, <code>3.5</code> → <code>"3.5"</code></td><td>Needed before joining a number with text.</td></tr>
+<tr><td><code>bool()</code></td><td><code>0</code>, <code>""</code>, <code>None</code> → <code>False</code></td><td>Everything else becomes <code>True</code>.</td></tr>
+</tbody>
+</table>
+
+<p>Implicit conversion happens in arithmetic: <code>int + float</code> gives a <code>float</code>. Between strings and numbers, however, conversion is the programmer's job. For example, to turn <code>"3.5"</code> into an integer you go through two steps, as in <code>int(float("3.5"))</code>. In the type conversion steps of <a href="#ex=lab1_setup">lab1_setup</a>, check that <code>int(3.9)</code> becomes 3 and that <code>int("3.5")</code> raises a ValueError.</p>
+
+<h2>Lab 1: Set Up Your Environment</h2>
+
+<p>On a real PC, you do the following:</p>
+
+<ol>
+<li>Install Python 3.x and confirm with <code>python3 --version</code>.</li>
+<li>Install VS Code and the Python extension.</li>
+<li>Create a folder <code>python-week1</code> and open it in VS Code.</li>
+<li>Create a virtual environment <code>.venv</code> and activate it.</li>
+<li>Select the <code>.venv</code> interpreter in the bottom-right status bar of VS Code.</li>
+<li>Create a new notebook in Google Colab as a backup.</li>
+</ol>
+
+<pre><code>$ mkdir python-week1
+$ cd python-week1
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+(.venv) $ python --version
+Python 3.12.4
+(.venv) $ code .
+# Windows: .venv\Scripts\activate</code></pre>
+
+<p>You are done when the terminal prompt starts with <code>(.venv)</code> and VS Code shows the <code>.venv</code> interpreter. The VS Code and Colab steps must be done on a real PC and browser, but creating the folder, creating the virtual environment, activating and deactivating it, and checking the version can all be tried as they are in <a href="#ex=lab1_setup">lab1_setup</a>. <code>code .</code> is the command that opens VS Code, so it is not used in this lab.</p>
+
+<h2>Lab 2: Hello, World!</h2>
+
+<p>Create <code>hello.py</code>, type in the following program and run it. In VS Code, use the ▶ button or <code>python hello.py</code> in the terminal; in Colab, put the same code in a cell and run it with <kbd>Shift</kbd> + <kbd>Enter</kbd>.</p>
+
+<pre><code># hello.py
+print("Hello, World!")
+print("Hello, Python!")
+
+# Your turn
+print("Name:", "Kim Minsu")
+print("Major:", "Computer Science")
+print("Week", 1, "of", 16)</code></pre>
+
+<p>Next, extend it to store your name, your major and today's date in variables and print each on a separate line. The TODOs in the starter code ask for the same thing: the two Hello lines, three string variables holding your name, major and date, the labels <code>Name:</code>, <code>Major:</code> and <code>Date:</code>, and <code>Week 1 of 16</code> made with a <code>print()</code> that takes several arguments.</p>
+
+<p>Finally, remove a quotation mark and read the error message. Without the closing quotation mark you get <code>SyntaxError: unterminated string literal</code>, and the <code>^</code> mark points to the problem. If there is a syntax error, not a single line of the program runs. This is shown in the <a href="#ex=hello">hello</a> example.</p>
+
+<h2>Lab 3: Input &amp; Calculation</h2>
+
+<p>Read two numbers with <code>input()</code> and print their sum, difference, product and quotient. Show the quotient to two decimal places with an f-string.</p>
+
+<pre><code># calc.py
+a = float(input("First number: "))
+b = float(input("Second number: "))
+print(f"{a} + {b} = {a + b}")
+print(f"{a} - {b} = {a - b}")
+print(f"{a} * {b} = {a * b}")
+print(f"{a} / {b} = {a / b:.2f}")</code></pre>
+
+<p>Because the values are converted with <code>float()</code>, entering 8 and 2 gives a decimal point, as in <code>8.0 + 2.0 = 10.0</code>. With 7 and 3, the quotient 2.333... is shown as <code>2.33</code>. The starter code reads the two inputs as plain strings, so start by converting them to <code>float</code>.</p>
+
+<p>There are two challenges. First, also print floor division <code>//</code>, remainder <code>%</code> and exponent <code>**</code>. Second, see what happens when the second number is 0. The sum, difference and product are printed, but the program stops at the division with a <code>ZeroDivisionError</code>. How to handle this error is covered in the 'Files, Exceptions and JSON' chapter. You can run both in the <a href="#ex=calc">calc</a> example.</p>
+
+<h2>Lab 4: BMI Calculator</h2>
+
+<p>BMI is weight (kg) divided by the square of height (m). Read the height in cm and the weight in kg, convert the height to m, and print the BMI to one decimal place.</p>
+
+<pre><code># bmi.py
+height_cm = float(input("Height (cm): "))
+weight = float(input("Weight (kg): "))
+height_m = height_cm / 100
+bmi = weight / (height_m ** 2)
+print(f"Height: {height_m:.2f} m")
+print(f"Weight: {weight:.1f} kg")
+print(f"Your BMI is {bmi:.1f}")</code></pre>
+
+<p>Tested with 175 cm and 70 kg, the BMI should be 22.9 (<a href="#ex=bmi">bmi</a>). As a challenge that previews the 'Operators, Strings and Conditionals' chapter, also print a category based on the BMI. By the Asia-Pacific standard, below 18.5 is Underweight, 18.5–22.9 is Normal, 23–24.9 is Overweight, and 25 or above is Obese.</p>
+
+<h2>Summary and Next Chapter</h2>
+
+<p>In this chapter we learned:</p>
+
+<ul>
+<li>Python is interpreted, dynamically typed and readable.</li>
+<li>The tools are VS Code + venv locally and Colab in the browser.</li>
+<li>Variables and the core types <code>int</code>, <code>float</code>, <code>str</code> and <code>bool</code>.</li>
+<li>Output with <code>print()</code> and f-strings; <code>input()</code> always returns a <code>str</code>.</li>
+<li>Type conversion with <code>int()</code>, <code>float()</code>, <code>str()</code> and <code>bool()</code>.</li>
+</ul>
+
+<p>Once you have finished <code>hello.py</code>, <code>calc.py</code> and <code>bmi.py</code>, as the starter code says, leave test inputs and expected results as comments at the bottom of each file. To bring a file you made in this lab to your own computer, copy it with <code>cp hello.py /mnt/host/</code> and then use the page's Download box.</p>
+
+<p>In the next chapter, 'Operators, Strings and Conditionals', we learn arithmetic, comparison and logical operators, string indexing, slicing and methods, and <code>if</code> / <code>elif</code> / <code>else</code> conditionals, and we write string processing, grade classification, rock-paper-scissors and leap year programs.</p>
+</div><div lang="ko">
+<p>이 장에서는 앞으로 계속 사용할 Python이 어떤 언어이고 어떻게 실행되는지 살펴본 뒤, 개발 환경을 준비하고 첫 프로그램을 만듭니다. 이론 부분에서는 Python 개요, 개발 환경(VS Code, 가상 환경 venv, Google Colab), 변수와 자료형, <code>print()</code>와 <code>input()</code>을 이용한 입출력, 형 변환을 다룹니다. 실습 부분에서는 개발 환경을 준비하고(<a href="#ex=lab1_setup">lab1_setup</a>), 인사 프로그램(<a href="#ex=hello">hello</a>), 입력과 계산 프로그램(<a href="#ex=calc">calc</a>), BMI 계산기(<a href="#ex=bmi">bmi</a>)를 차례로 완성합니다. 결과물은 <code>.py</code> 파일 세 개입니다.</p>
+
+<p>이 강좌는 Python의 핵심 문법을 먼저 익힌 뒤, 그것을 바탕으로 프로젝트를 만들어 봅니다.</p>
+
+<h2>Python 개요</h2>
+
+<h3>Python이란</h3>
+
+<p>Python은 Guido van Rossum이 만들어 1991년에 처음 공개한 언어입니다. 특징은 다음과 같습니다.</p>
+
+<ul>
+<li><strong>고수준 범용 언어</strong>입니다. 문법이 간결하고 읽기 쉬워 거의 영어 문장처럼 읽힙니다.</li>
+<li><strong>인터프리터 언어</strong>입니다. 별도의 컴파일 단계 없이 코드를 한 줄씩 실행합니다.</li>
+<li><strong>동적 타이핑</strong> 언어입니다. 변수를 만들 때 자료형을 선언하지 않습니다.</li>
+<li>방대한 표준 라이브러리에 더해, PyPI에 50만 개가 넘는 패키지가 있습니다.</li>
+<li>현재 버전은 Python 3입니다. Python 2는 2020년에 지원이 끝났습니다.</li>
+</ul>
+
+<p>슬라이드는 같은 인사말을 Python과 Java로 비교합니다. Python은 두 줄이면 되지만, Java는 클래스와 <code>main</code> 메서드를 선언해야 합니다.</p>
+
+<pre><code># Python reads almost like English
+name = "Python"
+print("Hello,", name)
+
+# Java needs a lot more to say the same
+# public class Main {
+#     public static void main(String[] a) {
+#         System.out.println("Hello, Java");
+#     }
+# }</code></pre>
+
+<h3>왜 Python을 배우는가</h3>
+
+<p>Python은 여러 분야에서 쓰입니다. 데이터와 AI 분야에서는 pandas, NumPy, matplotlib, scikit-learn, PyTorch, TensorFlow가 있어 데이터 과학의 기본 언어로 자리 잡았습니다. 웹과 자동화 분야에서는 Django, Flask, FastAPI 같은 웹 프레임워크와 스크립트, 봇, 웹 스크래핑, 시스템 사이를 잇는 접착 코드에 쓰입니다. 그 밖에도 교육과 과학 계산, 게임, DevOps, 클라우드 도구에 널리 쓰이며 언어 순위에서 꾸준히 1위를 차지합니다.</p>
+
+<p>초보자에게 친숙한 문법 덕분에 언어의 세부 규칙보다 문제 해결에 집중할 수 있다는 점도 중요합니다. 이 강좌에서는 핵심 문법과 프로젝트 모두 Python 하나로 진행합니다.</p>
+
+<h3>Python이 코드를 실행하는 방법</h3>
+
+<p>소스 코드(<code>.py</code>)는 먼저 바이트코드로 컴파일되고, 이 바이트코드를 Python 가상 머신이 실행합니다. 이 과정은 자동으로 일어나므로 사용자는 파일을 바로 실행하는 것처럼 느낍니다. Python을 쓰는 방식은 세 가지입니다.</p>
+
+<ul>
+<li><strong>대화형 모드(REPL)</strong>: 터미널에 <code>python3</code>를 입력하면 <code>&gt;&gt;&gt;</code> 프롬프트가 나타납니다. 문장을 하나씩 입력하면 결과가 즉시 나옵니다. <code>exit()</code>로 빠져나옵니다.</li>
+<li><strong>스크립트 모드</strong>: 코드를 파일로 저장하고 <code>python3 file.py</code>로 실행합니다.</li>
+<li><strong>노트북 모드</strong>(Colab, Jupyter): 셀 단위로 코드를 실행하므로 두 방식을 섞은 형태입니다.</li>
+</ul>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3              # interactive mode
+&gt;&gt;&gt; 2 + 3
+5
+&gt;&gt;&gt; print("hi")
+hi
+&gt;&gt;&gt; exit()
+$ python3 hello.py     # script mode
+Hello, World!</code></pre>
+
+<p><code>python3 --version</code>으로 버전을 확인합니다. Windows에서는 명령이 보통 <code>python</code> 또는 <code>py</code>입니다. 이 웹 실습실의 Python은 3.14.10이라 버전 숫자만 다르고, 이 강좌에서 배우는 내용은 똑같이 동작합니다. <a href="#ex=lab1_setup">lab1_setup</a> 예제에서 버전 확인과 대화형 모드를 직접 해 볼 수 있습니다.</p>
+
+<h2>개발 환경</h2>
+
+<h3>세 가지 선택지</h3>
+
+<table>
+<thead><tr><th>환경</th><th>특징</th></tr></thead>
+<tbody>
+<tr><td>로컬: Python + VS Code</td><td>모든 것을 직접 제어하고 오프라인에서도 동작합니다. 실제 프로젝트와 과제에 가장 적합하며 수업의 기본 환경입니다.</td></tr>
+<tr><td>가상 환경(venv)</td><td>프로젝트마다 독립된 패키지 묶음을 둡니다. 버전 충돌을 막아 주며 모든 프로젝트에서 표준으로 쓰는 방법입니다.</td></tr>
+<tr><td>Google Colab</td><td>브라우저에서 실행되어 설치할 것이 없습니다. 무거운 작업에는 무료 GPU를 쓸 수 있고, 빠른 실험과 데이터 작업에 좋습니다.</td></tr>
+</tbody>
+</table>
+
+<p>과제에는 VS Code와 venv를 권장하고, Colab은 노트북 컴퓨터가 없을 때 쓰는 백업으로 생각하면 됩니다. 세 환경 모두 같은 Python이므로 배운 내용은 어디서나 똑같이 동작합니다.</p>
+
+<p>이 웹 실습실은 네 번째 선택지라고 볼 수 있습니다. 브라우저 안에서 작은 Linux가 실행되고, 그 안의 터미널에서 Python을 씁니다. 설치가 필요 없다는 점은 Colab과 같고, 터미널에서 <code>python3 파일.py</code>로 실행한다는 점은 VS Code의 내장 터미널과 같습니다. 파일 편집은 <code>nano</code> 편집기로 합니다.</p>
+
+<h3>VS Code 설정</h3>
+
+<p>VS Code는 실제 PC에 설치해 쓰는 편집기입니다. 순서는 다음과 같습니다.</p>
+
+<ol>
+<li>python.org에서 Python 3.x를 설치합니다. Windows에서는 <strong>Add python.exe to PATH</strong>를 꼭 체크합니다.</li>
+<li>code.visualstudio.com에서 VS Code를 설치합니다.</li>
+<li>확장(Extensions) 보기에서 Microsoft의 Python 확장을 추가합니다.</li>
+<li><strong>File → Open Folder…</strong>로 작업 폴더(예: <code>python-week1</code>)를 엽니다.</li>
+<li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>를 누르고 <strong>Python: Select Interpreter</strong>로 인터프리터를 선택합니다.</li>
+<li><code>hello.py</code>를 만들고 ▶ Run 버튼을 누르거나 터미널에서 실행합니다.</li>
+</ol>
+
+<p>내장 터미널은 Windows/Linux에서 <kbd>Ctrl</kbd> + <kbd>`</kbd>, macOS에서 <kbd>Cmd</kbd> + <kbd>`</kbd>로 엽니다. 선택된 인터프리터는 오른쪽 아래 상태 표시줄에 나타납니다.</p>
+
+<pre><code>$ python3 --version
+Python 3.12.4
+$ python3 hello.py
+Hello, World!</code></pre>
+
+<h3>venv로 만드는 가상 환경</h3>
+
+<p>가상 환경은 프로젝트마다 자기만의 Python 패키지를 시스템과 분리해 두는 방법입니다. 예를 들어 두 프로젝트가 서로 다른 버전의 pandas를 필요로 해도 충돌하지 않습니다. venv는 Python에 내장되어 있어 따로 설치할 것이 없습니다. <code>pip install</code> 전에는 항상 가상 환경을 활성화해야 하며, VS Code는 <code>.venv</code> 폴더를 자동으로 찾아 줍니다. Git을 쓸 때는 <code>.venv/</code>를 <code>.gitignore</code>에 넣고 대신 <code>requirements.txt</code>를 공유합니다.</p>
+
+<pre><code># 1. Create (inside your project folder)
+$ python3 -m venv .venv
+# 2. Activate
+$ source .venv/bin/activate     # macOS/Linux
+&gt; .venv\Scripts\activate        # Windows
+# 3. Install packages
+(.venv) $ pip install requests
+# 4. Leave the environment
+(.venv) $ deactivate</code></pre>
+
+<p>이 실습실에는 네트워크와 pip이 없으므로 <code>pip install</code>은 할 수 없습니다. 하지만 가상 환경을 만들고 활성화하는 과정은 <code>python3 -m venv --without-pip</code>으로 그대로 체험할 수 있습니다. 활성화하면 <code>python</code> 명령이 <code>.venv</code> 안의 인터프리터를 가리키고, <code>deactivate</code>하면 원래대로 돌아옵니다(<a href="#ex=lab1_setup">lab1_setup</a>). BusyBox 셸에서는 <code>source</code> 대신 같은 뜻의 <code>.</code> 명령을 씁니다.</p>
+
+<h3>Google Colab</h3>
+
+<p>Colab(colab.research.google.com)은 Google이 호스팅하는 Jupyter 노트북입니다. 브라우저와 Google 계정만 있으면 되고, 코드 셀과 텍스트(Markdown) 셀로 구성됩니다. 셀은 <kbd>Shift</kbd> + <kbd>Enter</kbd>로 실행합니다. 많이 쓰는 라이브러리가 미리 설치되어 있고 무거운 작업에는 무료 GPU/TPU를 쓸 수 있습니다. 노트북(<code>.ipynb</code>)은 Google Drive에 저장되어 Google 문서처럼 공유됩니다. 다만 한동안 사용하지 않으면 런타임이 초기화되므로 파일은 Drive에 저장해 두어야 합니다.</p>
+
+<pre><code># In a Colab code cell
+print("Hello from Colab!")
+
+# Shell commands start with !
+!python --version
+!pip install some-package
+
+# Variables persist between cells
+x = 10</code></pre>
+
+<p>Colab은 실제 브라우저에서 Google 계정으로 사용합니다. 이 실습실에서는 Colab 셀 대신 터미널에서 같은 코드를 실행하면 됩니다. Colab의 <code>!</code> 명령은 이 실습실의 터미널에서 <code>!</code> 없이 입력하는 셸 명령과 같습니다.</p>
+
+<h2>변수와 자료형</h2>
+
+<h3>변수</h3>
+
+<p>변수는 메모리에 저장된 값을 가리키는 이름입니다. <code>이름 = 값</code> 형태의 대입문으로 만들며, 선언 키워드는 없습니다. 다시 대입하면 값이 바뀌고, 자료형까지 바뀔 수도 있습니다. 쉼표를 써서 여러 변수에 한 번에 대입할 수도 있습니다.</p>
+
+<pre><code>age = 20
+height = 175.5
+name = "Kim"
+is_student = True
+
+age = age + 1          # 21
+age = "twenty-one"     # now a string!
+
+# Multiple assignment
+x, y = 10, 20
+MAX_SCORE = 100        # a constant</code></pre>
+
+<p>변수 이름에는 다음 규칙이 있습니다.</p>
+
+<ul>
+<li>문자, 숫자, 밑줄(<code>_</code>)만 쓸 수 있고 숫자로 시작할 수 없습니다.</li>
+<li>대소문자를 구별합니다. <code>age</code>와 <code>Age</code>는 다른 변수입니다.</li>
+<li><code>if</code>, <code>for</code>, <code>class</code> 같은 키워드는 이름으로 쓸 수 없습니다.</li>
+<li>관례상 변수는 <code>snake_case</code>, 상수는 <code>UPPER_CASE</code>로 씁니다.</li>
+</ul>
+
+<h3>기본 자료형</h3>
+
+<table>
+<thead><tr><th>자료형</th><th>예</th><th>설명</th></tr></thead>
+<tbody>
+<tr><td><code>int</code></td><td><code>42</code>, <code>-7</code>, <code>0</code></td><td>정수. 크기 제한이 없습니다.</td></tr>
+<tr><td><code>float</code></td><td><code>3.14</code>, <code>2.0</code>, <code>1e-3</code></td><td>실수(64비트 부동소수점)</td></tr>
+<tr><td><code>str</code></td><td><code>"hello"</code>, <code>'a'</code></td><td>문자열. 작은따옴표나 큰따옴표로 감쌉니다.</td></tr>
+<tr><td><code>bool</code></td><td><code>True</code>, <code>False</code></td><td>논리값. 첫 글자가 대문자입니다.</td></tr>
+<tr><td><code>NoneType</code></td><td><code>None</code></td><td>값이 없음을 나타냅니다.</td></tr>
+</tbody>
+</table>
+
+<p>값의 자료형은 <code>type(x)</code>로 확인합니다. 예를 들어 <code>type(3.14)</code>는 <code>&lt;class 'float'&gt;</code>입니다. 자료형에 따라 할 수 있는 연산이 정해집니다. <code>"3" + "3"</code>은 문자열을 이어 붙여 <code>"33"</code>이 되지만, <code>"3" + 3</code>은 문자열과 정수를 더하려 하므로 오류(TypeError)입니다. <a href="#ex=lab1_setup">lab1_setup</a>에서 다섯 자료형과 이 오류를 직접 확인할 수 있습니다.</p>
+
+<h2>입력과 출력</h2>
+
+<h3>print()로 출력하기</h3>
+
+<p><code>print()</code>는 값을 화면에 출력합니다. 여러 값을 쉼표로 넘기면 공백 하나로 구분해 출력합니다. <code>sep=</code>는 구분자를, <code>end=</code>는 줄 끝 문자(기본값은 줄바꿈)를 바꿉니다.</p>
+
+<p>f-string(<code>f"..."</code>)은 문자열 안에 값을 직접 넣는 현대적인 방법입니다. 중괄호 안에 변수나 식을 쓰면 그 값으로 바뀝니다. 중괄호 안에 형식 지정자를 붙일 수도 있습니다. <code>{x:.2f}</code>는 소수점 아래 두 자리, <code>{n:,}</code>는 천 단위 쉼표를 붙입니다.</p>
+
+<pre><code>print("Hello", "World")          # Hello World
+print("A", "B", sep="-")         # A-B
+print("same line", end=" ")
+print("continues")
+
+name, score = "Kim", 95.5
+print(f"{name} scored {score}")  # Kim scored 95.5
+print(f"{score:.1f} pts")        # 95.5 pts
+print(f"{1234567:,}")            # 1,234,567</code></pre>
+
+<p>이 코드의 출력은 <a href="#ex=hello">hello</a> 예제에서 확인할 수 있습니다.</p>
+
+<h3>input()으로 입력받기</h3>
+
+<p><code>input(prompt)</code>는 프롬프트를 보여 주고 사용자가 입력할 때까지 기다린 뒤, 입력한 내용을 돌려줍니다. 돌려주는 값은 사용자가 숫자를 입력해도 <strong>항상 문자열</strong>입니다. 그래서 계산하려면 먼저 <code>int()</code>나 <code>float()</code>로 바꿔야 합니다. <code>"3" + "4"</code>는 7이 아니라 이어 붙인 <code>"34"</code>입니다.</p>
+
+<pre><code>name = input("Your name: ")
+print(f"Hi, {name}!")
+
+age = input("Your age: ")
+print(type(age))      # &lt;class 'str'&gt;
+print(age + 1)        # TypeError!
+
+age = int(input("Your age: "))
+print(age + 1)        # works now</code></pre>
+
+<p>숫자를 입력받는 전형적인 형태는 <code>n = int(input("Number: "))</code>입니다.</p>
+
+<p>이 실습실의 예제 단계는 <code>printf '8\n2\n' | python3 calc.py</code>처럼 입력을 미리 파이프로 넣어 실행합니다. 이렇게 하면 입력한 값이 화면에 보이지 않아 프롬프트가 한 줄에 이어 붙어 나옵니다. 키보드로 직접 입력하고 싶으면 <code>python3 calc.py</code>만 실행하고 값을 입력한 뒤 <kbd>Enter</kbd>를 누르면 됩니다.</p>
+
+<h3>형 변환</h3>
+
+<table>
+<thead><tr><th>함수</th><th>입력 → 출력</th><th>참고</th></tr></thead>
+<tbody>
+<tr><td><code>int()</code></td><td><code>"42"</code> → <code>42</code>, <code>3.9</code> → <code>3</code></td><td>실수의 소수 부분은 버립니다. <code>int("3.5")</code>는 오류입니다.</td></tr>
+<tr><td><code>float()</code></td><td><code>"3.5"</code> → <code>3.5</code>, <code>7</code> → <code>7.0</code></td><td>정수와 숫자 문자열을 받습니다.</td></tr>
+<tr><td><code>str()</code></td><td><code>42</code> → <code>"42"</code>, <code>3.5</code> → <code>"3.5"</code></td><td>숫자를 문자열과 이어 붙일 때 필요합니다.</td></tr>
+<tr><td><code>bool()</code></td><td><code>0</code>, <code>""</code>, <code>None</code> → <code>False</code></td><td>그 밖의 값은 모두 <code>True</code>입니다.</td></tr>
+</tbody>
+</table>
+
+<p>산술 연산에서는 암묵적인 변환이 일어납니다. <code>int + float</code>의 결과는 <code>float</code>입니다. 반면 문자열과 숫자 사이의 변환은 프로그래머가 직접 해야 합니다. 예를 들어 <code>"3.5"</code>를 정수로 만들려면 <code>int(float("3.5"))</code>처럼 두 단계를 거칩니다. <a href="#ex=lab1_setup">lab1_setup</a>의 형 변환 단계에서 <code>int(3.9)</code>가 3이 되는 것과 <code>int("3.5")</code>의 ValueError를 확인해 봅니다.</p>
+
+<h2>실습 1: 개발 환경 준비</h2>
+
+<p>실제 PC에서 할 일은 다음과 같습니다.</p>
+
+<ol>
+<li>Python 3.x를 설치하고 <code>python3 --version</code>으로 확인합니다.</li>
+<li>VS Code와 Python 확장을 설치합니다.</li>
+<li><code>python-week1</code> 폴더를 만들고 VS Code에서 엽니다.</li>
+<li>가상 환경 <code>.venv</code>를 만들고 활성화합니다.</li>
+<li>VS Code 오른쪽 아래 상태 표시줄에서 <code>.venv</code> 인터프리터를 선택합니다.</li>
+<li>백업용으로 Google Colab에서 새 노트북을 만듭니다.</li>
+</ol>
+
+<pre><code>$ mkdir python-week1
+$ cd python-week1
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+(.venv) $ python --version
+Python 3.12.4
+(.venv) $ code .
+# Windows: .venv\Scripts\activate</code></pre>
+
+<p>터미널 프롬프트가 <code>(.venv)</code>로 시작하고 VS Code가 <code>.venv</code> 인터프리터를 보여 주면 완료입니다. VS Code와 Colab 단계는 실제 PC와 브라우저에서 해야 하지만, 폴더 만들기, 가상 환경 만들기, 활성화와 해제, 버전 확인은 <a href="#ex=lab1_setup">lab1_setup</a>에서 그대로 해 볼 수 있습니다. <code>code .</code>는 VS Code를 여는 명령이므로 이 실습실에서는 쓰지 않습니다.</p>
+
+<h2>실습 2: Hello, World!</h2>
+
+<p><code>hello.py</code>를 만들어 다음 프로그램을 입력하고 실행합니다. VS Code에서는 ▶ 버튼이나 터미널의 <code>python hello.py</code>로, Colab에서는 같은 코드를 셀에 넣고 <kbd>Shift</kbd> + <kbd>Enter</kbd>로 실행합니다.</p>
+
+<pre><code># hello.py
+print("Hello, World!")
+print("Hello, Python!")
+
+# Your turn
+print("Name:", "Kim Minsu")
+print("Major:", "Computer Science")
+print("Week", 1, "of", 16)</code></pre>
+
+<p>이어서 자기 이름, 전공, 오늘 날짜를 변수에 저장해 각각 다른 줄에 출력하도록 확장합니다. 시작 코드의 TODO도 같은 내용입니다. Hello 두 줄, 이름·전공·날짜를 담은 문자열 변수 세 개, <code>Name:</code>·<code>Major:</code>·<code>Date:</code> 레이블, 그리고 여러 인자를 넘긴 <code>print()</code>로 만든 <code>Week 1 of 16</code>입니다.</p>
+
+<p>마지막으로 따옴표 하나를 지워 보고 오류 메시지를 읽어 봅니다. 닫는 따옴표가 없으면 <code>SyntaxError: unterminated string literal</code>이 나고 <code>^</code> 표시가 문제 위치를 가리킵니다. 문법 오류가 있으면 프로그램은 한 줄도 실행되지 않습니다. 이 과정은 <a href="#ex=hello">hello</a> 예제에 있습니다.</p>
+
+<h2>실습 3: 입력과 계산</h2>
+
+<p><code>input()</code>으로 두 수를 입력받아 합, 차, 곱, 몫을 출력합니다. 몫은 f-string으로 소수 둘째 자리까지 표시합니다.</p>
+
+<pre><code># calc.py
+a = float(input("First number: "))
+b = float(input("Second number: "))
+print(f"{a} + {b} = {a + b}")
+print(f"{a} - {b} = {a - b}")
+print(f"{a} * {b} = {a * b}")
+print(f"{a} / {b} = {a / b:.2f}")</code></pre>
+
+<p><code>float()</code>로 바꿨기 때문에 8과 2를 입력하면 <code>8.0 + 2.0 = 10.0</code>처럼 소수점이 붙습니다. 7과 3이면 몫 2.333...이 <code>2.33</code>으로 표시됩니다. 시작 코드는 두 입력을 문자열 그대로 받아 두었으므로, 이를 <code>float</code>로 바꾸는 것부터 시작합니다.</p>
+
+<p>도전 과제는 두 가지입니다. 첫째, 정수 나눗셈 <code>//</code>, 나머지 <code>%</code>, 거듭제곱 <code>**</code>도 출력해 봅니다. 둘째, 두 번째 수가 0이면 어떻게 되는지 확인합니다. 합·차·곱은 출력되지만 나눗셈에서 <code>ZeroDivisionError</code>로 프로그램이 멈춥니다. 이 오류를 처리하는 방법은 '파일·예외·JSON' 장에서 다룹니다. 두 가지 모두 <a href="#ex=calc">calc</a> 예제에서 실행해 볼 수 있습니다.</p>
+
+<h2>실습 4: BMI 계산기</h2>
+
+<p>BMI는 몸무게(kg)를 키(m)의 제곱으로 나눈 값입니다. 키를 cm로, 몸무게를 kg으로 입력받아 키를 m로 바꾼 뒤 BMI를 소수 한 자리로 출력합니다.</p>
+
+<pre><code># bmi.py
+height_cm = float(input("Height (cm): "))
+weight = float(input("Weight (kg): "))
+height_m = height_cm / 100
+bmi = weight / (height_m ** 2)
+print(f"Height: {height_m:.2f} m")
+print(f"Weight: {weight:.1f} kg")
+print(f"Your BMI is {bmi:.1f}")</code></pre>
+
+<p>175 cm, 70 kg으로 시험하면 BMI는 22.9여야 합니다(<a href="#ex=bmi">bmi</a>). '연산자·문자열·조건문' 장의 내용을 미리 써 보는 도전 과제로, BMI에 따라 분류도 출력해 봅니다. 아시아·태평양 기준으로 18.5 미만은 Underweight, 18.5–22.9는 Normal, 23–24.9는 Overweight, 25 이상은 Obese입니다.</p>
+
+<h2>정리와 다음 장</h2>
+
+<p>이 장에서 배운 내용은 다음과 같습니다.</p>
+
+<ul>
+<li>Python은 인터프리터 언어이고, 동적 타이핑을 하며, 읽기 쉽습니다.</li>
+<li>도구는 로컬의 VS Code + venv와 브라우저의 Colab입니다.</li>
+<li>변수와 핵심 자료형 <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>을 배웠습니다.</li>
+<li><code>print()</code>와 f-string으로 출력하고, <code>input()</code>은 항상 <code>str</code>을 돌려줍니다.</li>
+<li><code>int()</code>, <code>float()</code>, <code>str()</code>, <code>bool()</code>로 형을 변환합니다.</li>
+</ul>
+
+<p><code>hello.py</code>, <code>calc.py</code>, <code>bmi.py</code>를 완성했으면 시작 코드의 안내대로 각 파일 아래쪽에 테스트 입력과 예상 결과를 주석으로 남깁니다. 이 실습실에서 만든 파일을 내 컴퓨터로 가져오려면 <code>cp hello.py /mnt/host/</code>로 복사한 뒤 페이지의 받기 상자를 사용합니다.</p>
+
+<p>다음 장 '연산자·문자열·조건문'에서는 산술·비교·논리 연산자, 문자열의 인덱싱·슬라이싱·메서드, <code>if</code> / <code>elif</code> / <code>else</code> 조건문을 배우고, 문자열 처리, 성적 분류, 가위바위보, 윤년 계산 프로그램을 만듭니다.</p>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

@@ -3,28 +3,32 @@
 웹브라우저에서 32비트 x86 Linux를 부팅해 [2026_BasicProgrammingUsingPython](../2026_BasicProgrammingUsingPython) 강의의 수업 내용과 예제(`Codes/`, `Sample/`의 Flask 예제)를 실행하는 교육용 실습 환경입니다. 모든 페이지는 영어/한국어를 고를 수 있으며 기본은 영어입니다.
 [Linux Lab](../LinuxSystemProgramming_Lab/linux-kernel-lab/)과 같은 구조(v86 에뮬레이터 + xterm.js + 정적 파일)이며, 정적 파일만으로 동작하므로 GitHub Pages에 그대로 배포됩니다. C 컴파일러(gcc)와 커널 모듈 실습은 넣지 않았습니다.
 
-- **주차별 페이지** — `classes/weekNN/index.html` 하나에 그 주의 모든 차시가 들어 있습니다. 페이지를 열면 가상 머신을 한 번 부팅하고, 오른쪽에서 예제를 고르면 재부팅 없이 실행 순서와 소스만 바뀌고 터미널에서 그 예제의 디렉터리로 `cd`합니다 (Flask 앱이 켜져 있으면 `web stop`도). 주소의 `#ex=<예제 이름>`으로 처음 예제를 고를 수 있고, 아래에 차시별 강의 내용(슬라이드를 풀어 쓴 글)이 있습니다. 예전 주소 `classes/<주차-차시>/…`는 새 페이지로 넘겨 줍니다.
-- **찾아가기** — 모든 페이지 맨 위 막대에 주차 번호(1 2 3 5 … 13, Flask)와 자유 실습이 있어 어디서든 한 번에 이동합니다. 주차 페이지 오른쪽 위에는 이전·다음 주차 버튼이 있습니다. 짧은 주소 `w9/`(→ `classes/week09/`), `flask/`(→ `classes/sample/`)도 있으며 `#ex=`를 붙이면 그 예제가 바로 열립니다 (예: `w9/#ex=composition`).
-- **실행 순서** — ▶ 버튼을 누르면 명령이 터미널에 입력됩니다. 짧은 Python 코드는 한 줄짜리 `python3 -c '…; …'` 대신 `python3 - <<'EOF'` … `EOF`처럼 여러 줄로 적어 코드 그대로 읽히게 합니다. 수업 코드 전체가 `/home/student/week01` … 에 들어 있습니다.
-- **Flask 예제** — `classes/sample/`. 강의 저장소 `Sample/`의 sample1·sample2·sample4 (네이버 API를 쓰는 sample3은 제외).
+- **주제별 장** — 내용은 주차가 아니라 주제로 나뉩니다 (`chapters.json`): 파이썬 시작하기, 연산자·문자열·조건문, 반복문, 함수, 모듈과 표준 라이브러리, 파일·예외·JSON, 정규표현식·텍스트 처리, 데이터 분석(pandas·matplotlib), 객체지향, 프로젝트 만들기(요구사항·설계·Git), 디버깅과 테스트, 데이터베이스(SQLite), 네트워크, 웹 앱(Flask), 동시성(스레드·asyncio). 장마다 페이지 하나(`<장 id>/index.html`, 예: `network/`)이고, 한 장은 하나 이상의 부분(`examples-meta/<부분>.json`)으로 되어 있습니다.
+- **한 장 = 가상 머신 하나** — 페이지를 열면 가상 머신을 한 번 부팅하고, 오른쪽에서 예제를 고르면 재부팅 없이 실행 순서와 소스만 바뀌고 터미널에서 그 예제의 디렉터리로 `cd`합니다 (Flask 앱이 켜져 있으면 `web stop`도). 주소의 `#ex=<예제 이름>`으로 처음 예제를 고를 수 있고(예: `oop/#ex=composition`), 아래에 부분별 강의 내용이 있습니다.
+- **찾아가기** — 모든 페이지 맨 위에 장 메뉴(번호와 제목)와, 화면이 넓으면 장 이름 막대가 있어 어디서든 한 번에 이동합니다. 장 페이지 오른쪽 위에는 이전·다음 장 버튼이 있습니다.
+- **실행 순서** — ▶ 버튼을 누르면 명령이 터미널에 입력됩니다. 짧은 Python 코드는 한 줄짜리 `python3 -c '…; …'` 대신 `python3 - <<'EOF'` … `EOF`처럼 여러 줄로 적어 코드 그대로 읽히게 합니다.
+- **살아 있는 소스** — 아래 소스 목록은 터미널에서 파일을 고치면 1–2초 안에 고친 내용으로 바뀌고 "터미널에서 수정됨" 표시가 붙습니다. 게스트의 `lab-srcwatch`(BusyBox 셸 스크립트, inittab에서 시작)가 페이지가 보여 주는 파일(`/mnt/host/.srcwatch`)을 1초마다 살펴, 바뀌면 `/mnt/host/.src/`로 복사하고 페이지(`js/lab.js`)가 그것을 읽어 다시 그립니다. 재부팅하면 원래 소스로 돌아갑니다.
+- **예제 코드의 위치** — 가상 머신의 `/home/student`도 주제별 폴더입니다: `basics`, `conditionals`, `loops`, `functions`, `modules`, `files`, `regex`, `data`, `oop`, `project`, `testing`, `database`, `network`, `web`, `concurrency`. 강의 저장소(주차별 `Codes/weekNN`, `Sample/`)의 코드는 `scripts/sync-course.py`가 `course-layout.json`의 대응표대로 주제 폴더에 옮겨 `course/`에 넣습니다 (예: `Codes/week03/starter/session1` → `loops/starter`, `Sample/sample2` → `web/sample2`). 이 실습에서 더한 코드(파일·예외, 정규식, 네트워크, 동시성, `web/flask_hello`)는 `rootfs/overlay/home/student/`에 있습니다. Flask 예제는 강의 저장소의 sample1·sample2·sample4이며, 네이버 API를 쓰는 sample3은 뺐습니다.
 - **자유 실습** — `playground.html`. REPL, `nano`로 스크립트 작성, 파일 올리기/받기.
 
 ## 구성
 
 ```text
-index.html, playground.html, classes/,  생성된 페이지 (scripts/gen-pages.mjs 출력;
-w1/ … w13/, flask/                     w9/ 등은 주차 페이지로 넘겨 주는 짧은 주소)
+index.html, playground.html,            생성된 페이지 (scripts/gen-pages.mjs 출력)
+basics/ … concurrency/                  장 페이지 (장 id = chapters.json의 id)
 css/, js/lab.js, js/lang.js             스타일과 공용 스크립트 (v86 + xterm.js, 파일 올리기/받기, 언어 선택)
 build/, bios/, vendor/xterm/            v86, SeaBIOS/VGA BIOS, xterm.js   (Linux Lab에서 복사)
 images/bzImage                          Linux 6.12 i686 커널              (Linux Lab에서 복사)
 images/rootfs.cpio.gz, images/9p/       게스트 이미지 (scripts/build-images.sh 출력)
 
-course/                                 강의 저장소 사본 → 게스트의 /home/student
-                                        (Codes/weekNN → weekNN, Sample/sampleN → sample/sampleN)
-examples-meta/                          예제별 설명과 실행 순서 (차시당 JSON 하나, 한국어)
+course/                                 강의 저장소 코드를 주제 폴더로 옮긴 사본 → 게스트의 /home/student
+course-layout.json                      강의 저장소 경로 → 주제 폴더 대응표 (scripts/sync-course.py)
+chapters.json                           목차: 장의 순서·제목과 각 장을 이루는 부분
+examples-meta/                          예제별 설명과 실행 순서 (부분당 JSON 하나, 한국어)
 examples-meta/en/                       같은 내용의 영어 문장 (명령은 한국어 파일 것을 씀)
-class-notes/, class-notes/en/           차시별 강의 내용 (슬라이드를 풀어 쓴 HTML 조각, 한국어/영어)
-rootfs/overlay/                         게스트에 덮어쓰는 파일: /init, inittab, 계정, 프로필, 자유 실습 예제
+class-notes/, class-notes/en/           부분별 강의 내용 (HTML 조각, 한국어/영어)
+rootfs/overlay/                         게스트에 덮어쓰는 파일: /init, inittab, 계정, 프로필, web·lab-srcwatch,
+                                        자유 실습과 새 장(files, regex, network, concurrency)의 예제
 rootfs/site-packages/_lab_flask.py      게스트 Python이 /opt/py/flask.zip에서 Flask를 import하게 하는 훅
 scripts/                                이미지 빌드, 페이지 생성, 강의 코드 동기화
 tests/                                  Node.js 헤드리스 테스트
@@ -90,32 +94,32 @@ web restart            # 직접 다시 시작 (보통은 저장만 하면 저절
 web stop
 ```
 
-Flask 예제 차시는 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/student/flask_hello/app.py`, 강의 저장소가 아니라 이 실습의 파일)로 시작합니다. 생성기는 예제 파일을 `course/`에서 찾고, 없으면 `rootfs/overlay/home/student/`에서 찾습니다. 패키지의 실행 파일은 9p에 넣지 않으므로 `flask` 명령은 `rootfs/overlay/usr/bin/flask`(`python3 -m flask`)로 제공합니다.
+Flask 장은 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/student/web/flask_hello/app.py`, 강의 저장소가 아니라 이 실습의 파일)로 시작합니다. 생성기는 예제 파일을 `course/`에서 찾고, 없으면 `rootfs/overlay/home/student/`에서 찾습니다. 패키지의 실행 파일은 9p에 넣지 않으므로 `flask` 명령은 `rootfs/overlay/usr/bin/flask`(`python3 -m flask`)로 제공합니다.
 
 ## 언어 (영어/한국어)
 
 모든 페이지는 두 언어를 함께 담고(`<span lang="en">`, `<span lang="ko">`), `js/lang.js`가 `<html data-lang>`으로 하나만 보입니다. 기본은 영어이고, 오른쪽 위의 English/한국어 버튼으로 바꾼 선택은 그 브라우저에 저장됩니다. 터미널 상태 표시(`js/lab.js`)도 같은 선택을 따릅니다.
 
-- 한국어 `examples-meta/<차시>.json`이 명령·테스트의 기준이고, `examples-meta/en/<차시>.json`에는 영어 문장(제목·요약·각 단계 설명)만 있습니다. 단계 수가 다르면 생성기가 멈춥니다.
-- 강의 내용은 `class-notes/<차시>.html`과 `class-notes/en/<차시>.html`.
-- 영어 파일이 없는 차시도 생성은 되며(한국어가 두 언어 모두에 표시됨), 생성기가 마지막에 `no English yet:`으로 알려 줍니다. 실행 순서를 고치면 두 파일을 함께 고칩니다.
+- 한국어 `examples-meta/<부분>.json`이 명령·테스트의 기준이고, `examples-meta/en/<부분>.json`에는 영어 문장(제목·요약·각 단계 설명)만 있습니다. 단계 수가 다르면 생성기가 멈춥니다.
+- 강의 내용은 `class-notes/<부분>.html`과 `class-notes/en/<부분>.html`.
+- 영어 파일이 없는 부분도 생성은 되며(한국어가 두 언어 모두에 표시됨), 생성기가 마지막에 `no English yet:`으로 알려 줍니다. 실행 순서를 고치면 두 파일을 함께 고칩니다.
 
 ## 수업 내용·예제 수정
 
 1. 강의 저장소의 코드를 다시 가져오고 이미지를 다시 만듭니다 (`course/`가 이미지에 들어갑니다).
 
    ```bash
-   scripts/sync-course.sh        # ../2026_BasicProgrammingUsingPython의 Codes/, Sample/ → course/
+   scripts/sync-course.py        # ../2026_BasicProgrammingUsingPython의 Codes/, Sample/ → course/ (주제 폴더로)
    scripts/build-images.sh
    ```
 
-2. `examples-meta/<주차-차시>.json`에 예제의 설명과 실행 순서를, `examples-meta/en/<주차-차시>.json`에 영어 설명을 적습니다. 필드 설명은 `scripts/gen-pages.mjs` 맨 위에 있습니다.
+2. `examples-meta/<부분>.json`에 예제의 설명과 실행 순서를, `examples-meta/en/<부분>.json`에 영어 설명을 적고, 그 부분을 `chapters.json`의 장에 넣습니다 (새 장이면 장을 추가). 필드 설명은 `scripts/gen-pages.mjs` 맨 위에 있습니다.
 
    ```json
    {
      "name": "even_sum",
-     "source": "week03/starter/session1/even_sum.py",
-     "also": ["week03/solutions/session1/even_sum.py"],
+     "source": "loops/starter/even_sum.py",
+     "also": ["loops/solutions/even_sum.py"],
      "summary": "예제가 보여 주는 것",
      "steps": [{ "cmd": "python3 even_sum.py", "note": "관찰할 것" }],
      "expect": "출력에 반드시 나와야 하는 문자열 (테스트용, 선택)"
@@ -124,7 +128,7 @@ Flask 예제 차시는 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/stud
 
    `input()`을 쓰는 프로그램은 `printf '70\n1.75\n' | python3 bmi.py`처럼 입력을 넣어 자동 테스트가 가능하게 합니다. 편집기를 열거나 직접 입력해야 하는 예제는 `"manual": true`, 오류(Traceback)가 학습 내용인 예제는 `"traceback": true`, pandas·matplotlib를 쓰는 예제는 `"slow": true`로 표시합니다.
 
-3. `class-notes/<주차-차시>.html`과 `class-notes/en/<주차-차시>.html`을 고칩니다. 생성기가 허용 태그(`h2 h3 p ul ol li pre code table … a kbd`)와 예제 링크를 검사합니다.
+3. `class-notes/<부분>.html`과 `class-notes/en/<부분>.html`을 고칩니다. 생성기가 허용 태그(`h2 h3 p ul ol li pre code table … a kbd`)와 예제 링크를 검사합니다.
 
    긴 코드는 `"cmd"`에 줄바꿈을 넣어 여러 줄로 적습니다 (`cat > file.py <<'EOF'` … `EOF`, `python3 - <<'EOF'` … `EOF`). 테스트는 여러 줄 명령 뒤의 확인 명령을 새 줄에 붙입니다.
 
@@ -132,8 +136,8 @@ Flask 예제 차시는 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/stud
 
    ```bash
    node scripts/gen-pages.mjs
-   node tests/examples-test.mjs              # 모든 차시
-   node tests/examples-test.mjs week03-1     # 한 차시만
+   node tests/examples-test.mjs              # 모든 부분
+   node tests/examples-test.mjs loops        # 한 부분만
    ```
 
 ## 이미지 빌드
@@ -150,6 +154,8 @@ Alpine 컨테이너 안에서 `apk --arch x86`으로 빈 루트에 x86 패키지
 - **9p**: 같은 루트에 `PACKAGES_9P`(기본 `py3-pandas py3-matplotlib py3-flask`)를 더 설치해, 추가된 파일만(Flask 계열은 `flask.zip` 하나로 묶어) `images/9p/`로 변환합니다 (v86의 `fs2json.py`, `copy-to-sha256.py`; `scripts/v86/`. Python 3.14에서 `compression.zstd`가 없으면 `zstandard`를 쓰도록 고쳤습니다).
 - 다른 Alpine 버전: `ALPINE_VERSION=3.23`, initramfs에 패키지 추가: `PACKAGES="..."`, 9p 패키지 바꾸기: `PACKAGES_9P="py3-pandas py3-matplotlib py3-flask"`(기본값), 9p 없이: `PACKAGES_9P=""`.
 
+Docker 없이 예제·강의 코드·`rootfs/overlay`만 바꿨을 때는 `scripts/repack-initramfs.py`로 기존 `images/rootfs.cpio.gz`의 `/home/student`와 overlay 파일만 갈아 끼울 수 있습니다 (패키지·표준 라이브러리·9p는 그대로; 같은 입력이면 같은 결과).
+
 커널은 다시 빌드하지 않고 Linux Lab의 `images/bzImage`를 그대로 씁니다 (설정: Linux Lab의 `buildroot-external/board/kernellab/linux.config`).
 
 ## 테스트
@@ -159,7 +165,7 @@ node tests/python-test.mjs        # 환경: 셸, gcc 없음, 한글 입출력, �
 node tests/examples-test.mjs      # 모든 예제의 실행 순서
 ```
 
-브라우저 없이 v86으로 이미지를 부팅해, 페이지와 같은 직렬 콘솔 셸에 명령을 입력합니다. `VERBOSE=1`을 주면 게스트 콘솔이 보이고, 예제 테스트의 전체 기록은 `tests/out/<차시>.log`에 남습니다.
+브라우저 없이 v86으로 이미지를 부팅해, 페이지와 같은 직렬 콘솔 셸에 명령을 입력합니다. `VERBOSE=1`을 주면 게스트 콘솔이 보이고, 예제 테스트의 전체 기록은 `tests/out/<부분>.log`에 남습니다.
 
 ## GitHub Pages 배포
 

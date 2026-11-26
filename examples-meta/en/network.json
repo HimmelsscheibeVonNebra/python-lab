@@ -1,0 +1,81 @@
+{
+  "title": "Networking",
+  "summary": "Learn what IP addresses, ports and loopback are, and build a TCP echo server and client with socket. Send a GET request over a raw socket to see that HTTP is an agreement written in plain text (a protocol), exchange files with urllib.request and http.server, then build a JSON API server and client, handle network errors and try UDP. This virtual machine has no internet, so every connection stays inside 127.0.0.1 (the machine itself).",
+  "examples": {
+    "echo": {
+      "summary": "The smallest server and client. The server waits for connections on port 5000 of 127.0.0.1 and sends back whatever bytes it receives; the client sends one message and prints the reply. The server runs in the background with &, and kill stops it at the end.",
+      "notes": "If you start the server twice, the second one fails with OSError: [Errno 98] Address in use (a typical Linux PC words it Address already in use), because only one program can hold a port. Find the leftover server with jobs, stop it with kill %1 and start again.",
+      "steps": [
+        "The machine's network devices. Only lo (loopback) with inet 127.0.0.1 is up; there is no network card (a name like eth0). This virtual machine cannot reach the internet and can only talk to itself. On a real PC you would see one more device with an address such as 192.168.0.12.",
+        "The oldest address book there is, pairing names with IP addresses. Both localhost and this machine's name, python-lab, point to 127.0.0.1. That is why writing localhost in a URL is the same as 127.0.0.1.",
+        "The trailing & runs the program in the background. A server never finishes because it keeps waiting for connections; without & the terminal would be stuck with it and you could not type the next command. The server's output will show up later, mixed into this terminal.",
+        "Gives the server 2 seconds to start, then runs the client. Lines starting with [server] come from the background server, the [client] line from the client: two programs printing into one terminal. The server received b'hello', 5 bytes, and sent it straight back.",
+        "Sockets carry bytes, not strings. The two characters of 안녕 are 6 bytes in UTF-8 (b'\\xec\\x95\\x88...'). The client turned the text into bytes with encode, and turned the reply back into text with decode. The server did not stop; it took the next connection.",
+        "The TCP ports currently waiting for connections (LISTEN). 127.0.0.1:5000 is our echo server. Because its address is 127.0.0.1, only programs on this machine can connect.",
+        "str and bytes side by side: len(text), the number of characters, is 2; len(data), the number of bytes, is 6. Encode before sending over the network, decode after receiving. Both sides must use the same encoding (utf-8) or the text comes out garbled.",
+        "%1 is this terminal's background job number 1 (the echo server). Unless you kill it, the server keeps holding port 5000. The jobs command lists the background jobs."
+      ]
+    },
+    "raw_http": {
+      "summary": "HTTP is an agreement in plain text (a protocol). Start the web server that comes with Python (python3 -m http.server), send a GET request line over a socket yourself, and read the response as status line, headers and body. Send the same request with nc to see the raw response.",
+      "notes": "On a real PC, start the same server and type http://127.0.0.1:8000/ into the browser's address bar: index.html opens as a web page. A browser is just a program that sends the same GET request text as this example.",
+      "steps": [
+        "The files the web server will hand out. The server treats this folder as the root (/) of the site, so a request for /hello.txt gets site/hello.txt.",
+        "Runs the standard library module http.server as a program: port 8000, bound to 127.0.0.1 only (--bind), serving the files in site (--directory). A web server without writing a line of code.",
+        "The request: line is everything we sent: the request line GET /hello.txt HTTP/1.0, a Host header, and an empty line (\\r\\n\\r\\n) to finish. The first line of the response, HTTP/1.0 200 OK, is the status line, then come the name = value headers, and after an empty line the 57-byte body. The line 127.0.0.1 - - [...] \"GET /hello.txt HTTP/1.0\" 200 is the server's access log. The Date and Last-Modified values change on every run.",
+        "The same thing without Python. nc (netcat) sends its input over a socket and prints the bytes that come back unchanged, so you can see the empty line between headers and body. Content-type: text/html says the body is HTML; a browser sees this and draws a web page instead of showing text.",
+        "Asking for a file that does not exist still connects, and the server answers normally, only the status line is HTTP/1.0 404 File not found. A status code is the server saying \"I got your request, and here is how it went\". head -n 3 keeps the first three lines.",
+        "Stops the web server. From now on a request to port 8000 is refused outright (the errors example shows this)."
+      ]
+    },
+    "fetch": {
+      "summary": "Open a URL with urllib.request.urlopen and the standard library builds the request and splits the response for you. Take the result apart with status, headers and read(), and when the Content-Type is application/json, turn it into a dictionary with json.loads.",
+      "notes": "On a PC with internet access the same fetch.py opens real web addresses, for example python3 fetch.py https://www.python.org/ — urlopen even handles the encryption of https. This virtual machine has no internet, so such addresses fail as in the errors example.",
+      "steps": [
+        "Starts the same web server as in raw_http.",
+        "From the response object urlopen returned we took status 200, reason OK and the Content-Type header text/plain. read() returns bytes, so the length is 57 bytes; the program decodes them before printing. In the server's log the request line now says HTTP/1.1, because urllib wrote the request.",
+        "Writing localhost reaches the same server (/etc/hosts). The server labelled the .json file Content-Type: application/json, so fetch.py turned the body into a dictionary with json.loads and printed one key and value per line. temperature is the integer 3, not a string.",
+        "Asking for just / makes the server return the folder's index.html (200 text/html). A web page is only text, so a string method finds the <h1>It works!</h1> line.",
+        "The command-line downloader wget fetches the same JSON. -O - means print to the screen instead of saving a file. The server does not care who is asking, as long as they keep to the agreement (HTTP).",
+        "Stops the web server."
+      ]
+    },
+    "json_api": {
+      "summary": "A small JSON API built on http.server's BaseHTTPRequestHandler. GET /memos lists the memos, GET /memos/<id> returns one, POST /memos adds a new one. It answers with a fitting status code (200, 201, 400, 404) and a JSON body, and api_client.py sends and receives JSON with urllib.request.Request.",
+      "notes": "In Flask the same API is much shorter: one function per route (see flask_hello in the Flask examples). Underneath, the same HTTP requests and responses you saw here go back and forth.",
+      "steps": [
+        "Starts the memo API server on port 8080 in the background. The memos live only in the Python list memos, so they are gone when the server stops.",
+        "do_GET answered GET /memos. The body is the JSON array [{\"id\": 1, \"text\": \"buy milk\"}]. [server] GET /memos -> 200 is the one-line log from our own log_request. The final echo adds a newline, since the body has none and the prompt would stick to it.",
+        "The client's call(\"GET\", \"/memos\") returns a tuple (status code, decoded JSON): (200, [{'id': 1, 'text': 'buy milk'}]). A JSON array becomes a Python list, a JSON object a dictionary.",
+        "With arguments, the client first sends POST /memos with {\"text\": \"우유 사기\"} (\"buy milk\" in Korean) in the body. The server creates the memo and returns 201 (Created) with {'id': 2, ...}. The GET that follows shows two memos: the state lasts as long as the server runs.",
+        "Imports api_client as a module and sends several requests. An existing memo gives 200, the missing memo 99 gives 404 with {'error': 'no memo 99'}, a body without the text key gives 400 (Bad Request), an unknown path 404. urlopen raises HTTPError for 4xx answers, but call catches it and still reads the JSON in the error body.",
+        "Stops the API server. Start it again and the memos are back to the single buy milk."
+      ]
+    },
+    "errors": {
+      "summary": "Networks fail all the time. Trigger each failure in turn: no server (ConnectionRefusedError), a 404 answer (urllib.error.HTTPError), no answer at all (TimeoutError, formerly socket.timeout) and a name that cannot be found (URLError). safe_get.py catches each one with try/except and turns it into a readable message.",
+      "notes": "The ConnectionRefusedError traceback in the first step is on purpose. In real programs, network code always sets a timeout and wraps the lines that can fail in try/except.",
+      "steps": [
+        "Runs the client without starting the echo server. Nothing is waiting on port 5000, so the operating system refuses the connection: ConnectionRefusedError: [Errno 111] Connection refused. The traceback points at the connect line.",
+        "With urlopen the same situation arrives as a URLError. safe_get.py catches it, reports cannot reach ...: [Errno 111] Connection refused and exits normally.",
+        "This time start the web server, serving the site folder of the http example.",
+        "The first URL works and prints OK 37 characters: the 57-byte body is 37 characters once decoded. For the second URL the server does answer, but with 404, so urlopen raises HTTPError and except HTTPError turns it into HTTP error 404 File not found. HTTPError is a subclass of URLError, so it must come first in the except order.",
+        "Stops the web server.",
+        "A server on port 8001 that listens but never accepts or replies. The operating system still accepts the connection, so the client connects fine and then waits for an answer that never comes.",
+        "Thanks to urlopen(url, timeout=3) the client gives up after 3 seconds and prints timed out after 3 s. Without a timeout this program would wait until the server hangs up, which may be never.",
+        "The same at the socket level. The timeout=2 of create_connection also applies to recv, so after 2 seconds TimeoutError: timed out. The first line, True, confirms that the old name socket.timeout is now the same as the built-in exception TimeoutError.",
+        "Stops the silent server (it would end by itself after 60 seconds).",
+        "This virtual machine has neither internet nor DNS (the service that turns names into IP addresses). The address of example.com cannot be found, and after a few seconds you get cannot reach ...: [Errno -3] Try again. On a PC with internet access this URL prints OK with the Example Domain page."
+      ]
+    },
+    "udp": {
+      "summary": "UDP sends one self-contained chunk (a datagram) at a time, like a letter, with no connection. The receiver ends by itself after three datagrams on port 5005; the sender sends each command-line word as one datagram. Even when nobody is receiving, the sender finishes without an error.",
+      "steps": [
+        "A SOCK_DGRAM socket binds to port 5005 and waits in recvfrom. Unlike the TCP server there is no listen and no accept.",
+        "127.0.0.1:5005 shows up in the UDP port list. UDP has no connections, so the State column is empty (TCP said LISTEN).",
+        "One word is one datagram. Each recvfrom gets exactly one chunk; the receiver prints #1, #2, #3 and ends with [receiver] done. The two programs run at the same time, so the order of the [sender] and [receiver] lines can differ a little from run to run.",
+        "The receiver has already ended, yet sent 9 bytes is printed with no error. UDP does not check whether anyone received it; the datagrams simply vanished. With TCP, connect would have raised ConnectionRefusedError."
+      ]
+    }
+  }
+}

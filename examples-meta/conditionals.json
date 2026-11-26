@@ -1,0 +1,138 @@
+{
+  "class": "conditionals",
+  "title": "연산자, 문자열, 조건문 (실습)",
+  "summary": "문자열 처리, 성적 분류, 가위바위보, 윤년 계산 네 프로그램을 완성하고 경계값과 잘못된 입력으로 테스트한다.",
+  "examples": [
+    {
+      "name": "strings",
+      "source": "conditionals/starter/strings.py",
+      "also": [
+        "conditionals/solutions/strings.py"
+      ],
+      "summary": "실습 1: 입력의 앞뒤 공백을 제거하고 Length, Upper, Reverse를 출력한다. 비어 있지 않으면 First로 첫 글자를, 비어 있으면 No text entered를 출력한다.",
+      "steps": [
+        {
+          "cmd": "printf '  Python  \\n' | python3 strings.py; echo",
+          "note": "시작 코드는 Text: 프롬프트만 출력한다. 입력을 파이프로 넣었으며, python3 strings.py로 실행해 직접 입력해도 된다."
+        },
+        {
+          "cmd": "printf '  Python  \\n' | python3 ../solutions/strings.py",
+          "note": "공백이 제거돼 Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P가 나온다."
+        },
+        {
+          "cmd": "printf '   \\n' | python3 ../solutions/strings.py",
+          "note": "공백만 입력하면 strip 뒤 빈 문자열이 된다. Length: 0, Upper:와 Reverse:는 비어 있고 No text entered가 나온다. 빈 문자열에서도 앞의 세 줄은 출력돼야 한다."
+        },
+        {
+          "cmd": "printf ' A \\n' | python3 ../solutions/strings.py",
+          "note": "한 글자는 Length: 1이고 Upper, Reverse, First가 모두 A다."
+        },
+        {
+          "cmd": "python3 -u -c 'text = \"   \".strip(); print(text[0])' 2>&1 | grep -v -e '^Traceback' -e '^ '",
+          "note": "검사 없이 인덱싱하면 생기는 결함이다. 빈 문자열에서 IndexError가 나므로 if text:로 막아야 한다."
+        },
+        {
+          "cmd": "python3 -c 'word = \"Level\".lower(); print(word == word[::-1])'",
+          "note": "선택 확장 과제: 소문자로 바꾼 뒤 역순과 비교하면 회문 Level은 True다."
+        }
+      ],
+      "expect": "Reverse: nohtyP",
+      "notes": "nano strings.py로 TODO를 채운 뒤 같은 세 입력(일반 단어, 공백만, 한 글자)으로 실행해 답안 출력과 비교한다. 테스트 입력과 예상 결과를 파일 아래 주석으로 기록한다."
+    },
+    {
+      "name": "grades",
+      "source": "conditionals/starter/grades.py",
+      "also": [
+        "conditionals/solutions/grades.py"
+      ],
+      "summary": "실습 2: 0~100 정수 점수를 A(90~100), B(80~89), C(70~79), D(60~69), F(0~59)로 분류하고, 범위 밖이면 Invalid score를 출력한다.",
+      "steps": [
+        {
+          "cmd": "echo 85 | python3 grades.py; echo",
+          "note": "시작 코드는 Score: 프롬프트만 출력하고 등급은 없다."
+        },
+        {
+          "cmd": "for s in -1 0 59 60 69 70 79 80 89 90 100 101; do printf '%4s -> ' $s; echo $s | python3 ../solutions/grades.py | sed 's/^Score: //'; done",
+          "note": "경계값 테스트 표다. 각 기준의 바로 아래 값과 기준 값, 두 끝값 0과 100, 범위 밖 -1과 101을 넣었다. 59는 F, 60은 D, 89는 B, 90은 A, 101은 Invalid score여야 한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nscore = 95\nif score >= 60:\n    print(\"D\")\nelif score >= 90:\n    print(\"A\")\nEOF",
+          "note": "낮은 기준을 먼저 검사한 잘못된 사슬이다. 95가 D로 나온다. 높은 기준부터 검사해야 하는 이유다."
+        },
+        {
+          "cmd": "for s in 59 60 101; do\npython3 - <<EOF\nscore = $s\nif not 0 <= score <= 100:\n    print(score, \"Invalid score\")\nelse:\n    if score >= 60:\n        print(score, \"Pass\")\n    else:\n        print(score, \"Fail\")\nEOF\ndone",
+          "note": "선택 과제 Pass/Fail: 판정을 유효 점수 분기 안에 넣었기 때문에 101에는 Pass/Fail이 붙지 않는다."
+        }
+      ],
+      "expect": "101 -> Invalid score",
+      "notes": "자기 grades.py도 같은 for 반복문으로 시험할 수 있다. ../solutions/grades.py 자리를 grades.py로 바꿔 실행하고 두 표를 비교한다."
+    },
+    {
+      "name": "rps",
+      "source": "conditionals/starter/rps.py",
+      "also": [
+        "conditionals/solutions/rps.py"
+      ],
+      "summary": "실습 3: 입력을 strip().lower()로 정리해 rock, paper, scissors인지 검사하고, random.choice로 고른 컴퓨터 선택과 비교해 Tie, You win, You lose를 출력한다.",
+      "steps": [
+        {
+          "cmd": "echo rock | python3 rps.py; echo",
+          "note": "시작 코드는 프롬프트만 출력한다. 컴퓨터 선택은 이미 만들어지지만 비교 코드가 없다."
+        },
+        {
+          "cmd": "for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done",
+          "note": "같은 rock을 세 번 넣어도 random.choice 때문에 컴퓨터 선택과 결과가 매번 달라질 수 있다. 그래서 이대로는 테스트를 반복할 수 없다."
+        },
+        {
+          "cmd": "sed 's/random.choice(options)/\"scissors\"/' ../solutions/rps.py > /tmp/rps_fixed.py\ngrep -n 'computer =' /tmp/rps_fixed.py",
+          "note": "슬라이드의 재현 가능한 테스트: 컴퓨터 선택을 \"scissors\"로 고정한 사본을 /tmp에 만들었다. 원본 파일은 바꾸지 않는다."
+        },
+        {
+          "cmd": "for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' \"$p\"; echo \"$p\" | python3 /tmp/rps_fixed.py; done",
+          "note": "컴퓨터가 scissors일 때: 공백과 대문자가 섞인 ROCK은 정리돼 You win, paper는 You lose, scissors는 Tie, lizard와 빈 입력은 Invalid choice다."
+        },
+        {
+          "cmd": "for c in rock paper scissors; do sed \"s/random.choice(options)/\\\"$c\\\"/\" ../solutions/rps.py > /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done",
+          "note": "가능한 9가지 조합 전체를 표로 출력한다. 슬라이드의 표와 같이 Tie 3번, You win 3번, You lose 3번이어야 한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\noptions = [\"rock\", \"paper\", \"scissors\"]\nprint(\"ROCK\" in options, \"ROCK\".strip().lower() in options)\nEOF",
+          "note": "lower()를 빠뜨리면 ROCK이 잘못된 입력(False)으로 처리된다. 정규화한 뒤에는 True다."
+        }
+      ],
+      "expect": "You win",
+      "notes": "자기 rps.py를 테스트할 때는 슬라이드처럼 computer = \"scissors\"로 잠시 고정해 보고, 제출 전에 random.choice(options)로 되돌린다. 위의 sed 명령에서 ../solutions/rps.py를 rps.py로 바꾸면 파일을 고치지 않고 같은 시험을 할 수 있다."
+    },
+    {
+      "name": "leap_year",
+      "source": "conditionals/starter/leap_year.py",
+      "also": [
+        "conditionals/solutions/leap_year.py"
+      ],
+      "summary": "실습 4: 양의 정수 연도를 입력받아 400의 배수이거나, 4의 배수이면서 100의 배수가 아니면 윤년으로 판정한다. 0 이하이면 Enter a positive year를 출력한다.",
+      "steps": [
+        {
+          "cmd": "echo 2024 | python3 leap_year.py; echo",
+          "note": "시작 코드는 Year: 프롬프트만 출력한다."
+        },
+        {
+          "cmd": "for y in 1900 2000 2024 2023; do\npython3 - <<EOF\nyear = $y\nby4 = year % 4 == 0\nby100 = year % 100 == 0\nby400 = year % 400 == 0\nprint(year, by4, by100, by400, by400 or (by4 and not by100))\nEOF\ndone",
+          "note": "나눗셈 검사 세 개를 먼저 계산해 본다. 1900은 True True False라 윤년이 아니고(False), 2000은 400의 배수라 윤년이다. 2024는 True, 2023은 False."
+        },
+        {
+          "cmd": "for y in 2024 2000 2023 1900 0 -4; do echo $y | python3 ../solutions/leap_year.py; done",
+          "note": "답안 실행: 2024와 2000은 Leap year, 2023과 1900은 Not a leap year, 0과 -4는 Enter a positive year다."
+        },
+        {
+          "cmd": "for y in 1900 2000; do\npython3 - <<EOF\nyear = $y\nif year <= 0:\n    print(\"Enter a positive year\")\nelif year % 400 == 0:\n    print(f\"{year}: Leap year\")\nelif year % 100 == 0:\n    print(f\"{year}: Not a leap year\")\nelif year % 4 == 0:\n    print(f\"{year}: Leap year\")\nelse:\n    print(f\"{year}: Not a leap year\")\nEOF\ndone",
+          "note": "도전 과제의 if/elif 풀이다. 400 → 100 → 4 순서로 검사하면 불리언 식 풀이와 같은 결과가 나온다."
+        },
+        {
+          "cmd": "python3 -c 'year = 1900; print(year % 4 == 0)'",
+          "note": "4의 배수만 검사하는 흔한 결함: 1900이 True로 나와 윤년으로 잘못 판정된다. 1900이 이 결함을 드러내는 테스트다."
+        }
+      ],
+      "expect": "1900: Not a leap year"
+    }
+  ]
+}

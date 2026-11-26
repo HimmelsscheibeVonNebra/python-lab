@@ -15,22 +15,43 @@
   <div class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
-      <nav class="weeknav" aria-label="Weeks / 주차">
-        <span class="weeknav-label"><span lang="en">Week</span><span lang="ko">주차</span></span>
-        <a href="classes/week01/index.html" title="Week 1 / 1주차 — Python Overview &amp; Development Environment">1</a>
-        <a href="classes/week02/index.html" title="Week 2 / 2주차 — Operators, Strings &amp; Conditionals (Theory) · Operators, Strings &amp; Conditionals (Practice)">2</a>
-        <a href="classes/week03/index.html" title="Week 3 / 3주차 — Loops · Functions">3</a>
-        <a href="classes/week05/index.html" title="Week 5 / 5주차 — Modules and the Standard Library · pandas: Series and DataFrame">5</a>
-        <a href="classes/week06/index.html" title="Week 6 / 6주차 — Files, Classes, Charts">6</a>
-        <a href="classes/week07/index.html" title="Week 7 / 7주차 — Object-Oriented Programming">7</a>
-        <a href="classes/week09/index.html" title="Week 9 / 9주차 — Objects That Work Together: State Validation, References, Composition and Inheritance · From Exercises to a Solo Project: Topic Selection and Requirements Analysis">9</a>
-        <a href="classes/week10/index.html" title="Week 10 / 10주차 — From Proposal to Design: Decomposition, Contracts, Modules · Your Project Has a History: Commits, Branches, Pull Requests">10</a>
-        <a href="classes/week11/index.html" title="Week 11 / 11주차 — Writing the Project Documents: Requirement, Feature, Function, UML · Korean Stock Market Analysis: From Scenario to a Web Report MVP">11</a>
-        <a href="classes/week12/index.html" title="Week 12 / 12주차 — Debugging and Regression Tests · Validation, Feature Tests and Code Review">12</a>
-        <a href="classes/week13/index.html" title="Week 13 / 13주차 — SQLite: Your First Database · From CSV to SQLite: Swapping the Storage Layer · Introduction to Database Systems">13</a>
-        <a href="classes/sample/index.html" title="Flask samples / Flask 예제 — Extending the project into a Flask web app">Flask</a>
-        <span class="weeknav-sep" aria-hidden="true"></span>
-        <a href="playground.html" aria-current="page"><span lang="en">Playground</span><span lang="ko">자유 실습</span></a>
+      <details class="toc">
+        <summary><span lang="en">Chapters</span><span lang="ko">목차</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="playground.html" aria-current="page"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
       </nav>
       <div class="lang-switch" role="group" aria-label="Language / 언어">
         <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
@@ -67,7 +88,7 @@
         </form>
         <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
       </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student</code>. The course code is in <code>week01</code> … and <code>sample</code>. Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>student</code> 사용자로 <code>/home/student</code>에서 시작합니다. 주차별 수업 코드는 <code>week01</code> …, <code>sample</code> 디렉터리에 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student</code>, where all the example code is (<code>ls</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>student</code> 사용자로 <code>/home/student</code>에서 시작합니다. 예제 코드가 모두 여기에 있습니다 (<code>ls</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
     </section>
     <aside class="guide">
       <details open>
@@ -102,7 +123,7 @@
         <ol class="steps">
         <li>
           <div class="cmd"><button type="button" data-cmd="ls" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls">▶</button><code>ls</code></div>
-          <p><span lang="en">hello.py, grades.py and the course code directories week01 …</span><span lang="ko">hello.py, grades.py와 주차별 수업 코드 디렉터리 week01 …</span></p>
+          <p><span lang="en">hello.py, grades.py and the directories of the example code</span><span lang="ko">hello.py, grades.py와 예제 코드 디렉터리들</span></p>
         </li>
         <li>
           <div class="cmd"><button type="button" data-cmd="python3 hello.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 hello.py">▶</button><code>python3 hello.py</code></div>
@@ -159,8 +180,8 @@
   </main>
   <section class="sources">
     <h2><span lang="en">Example source</span><span lang="ko">예제 소스</span></h2>
-    <details class="source" open>
-      <summary>hello.py <span class="muted"><span lang="en">9 lines</span><span lang="ko">9줄</span></span></summary>
+    <details class="source" open data-path="/home/student/hello.py">
+      <summary>hello.py <span class="muted src-lines" data-lines="9"><span lang="en">9 lines</span><span lang="ko">9줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
       <pre class="code"><code><span class="ln"># 첫 파이썬 프로그램: python3 hello.py</span>
 <span class="ln">import platform</span>
 <span class="ln"> </span>
@@ -171,8 +192,8 @@
 <span class="ln">print(f&quot;반갑습니다, {name}님!&quot;)</span>
 <span class="ln">print(&quot;1부터 10까지의 합:&quot;, sum(range(1, 11)))</span></code></pre>
     </details>
-    <details class="source">
-      <summary>grades.py <span class="muted"><span lang="en">24 lines</span><span lang="ko">24줄</span></span></summary>
+    <details class="source" data-path="/home/student/grades.py">
+      <summary>grades.py <span class="muted src-lines" data-lines="24"><span lang="en">24 lines</span><span lang="ko">24줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
       <pre class="code"><code><span class="ln"># 리스트, 딕셔너리, 함수, 파일 입출력 예제: python3 grades.py</span>
 <span class="ln">import csv</span>
 <span class="ln">from statistics import mean</span>

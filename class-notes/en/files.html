@@ -1,0 +1,512 @@
+<p>Data that must outlive the program goes into files. This chapter covers three tools for working with files, together with the error handling you always need alongside them. First we build paths and look around folders with <code>pathlib</code>, and compare the modes for opening and closing files with <code>open()</code> and <code>with</code>. Then we use <code>try</code>/<code>except</code> to keep a program running when a file is missing or its contents are wrong, and learn to signal errors with <code>raise</code> and exception classes of our own. Finally we build a game save file with <code>json</code>, and a robust importer that skips bad lines with the <code>csv</code> module. The examples are <a href="paths.html">paths</a>, <a href="file_modes.html">file_modes</a>, <a href="exceptions.html">exceptions</a>, <a href="custom_errors.html">custom_errors</a>, <a href="json_save.html">json_save</a> and <a href="csv_import.html">csv_import</a>.</p>
+
+<h2>Paths and pathlib</h2>
+
+<h3>Path Objects</h3>
+
+<p>A file's location is written as a path such as <code>notes/todo.txt</code>. You can handle paths as plain strings, but with the standard library's <code>pathlib.Path</code>, joining, splitting and checking a path each take a single method. Paths are joined with the division sign <code>/</code>. Gluing <code>"/"</code> onto strings by hand easily drops a slash or doubles one; the <code>/</code> operator rules that out.</p>
+
+<pre><code>from pathlib import Path
+
+p = Path("notes") / "archive" / "old.txt"
+print(p)              # notes/archive/old.txt
+print(p.name)         # old.txt
+print(p.stem)         # old
+print(p.suffix)       # .txt
+print(p.parent)       # notes/archive
+print(p.with_suffix(".bak"))   # notes/archive/old.bak</code></pre>
+
+<table>
+<thead>
+<tr><th>Attribute / method</th><th>Meaning</th><th>For <code>notes/archive/old.txt</code></th></tr>
+</thead>
+<tbody>
+<tr><td><code>p.name</code></td><td>last piece (the file name)</td><td><code>old.txt</code></td></tr>
+<tr><td><code>p.stem</code></td><td>name without the extension</td><td><code>old</code></td></tr>
+<tr><td><code>p.suffix</code></td><td>the extension</td><td><code>.txt</code></td></tr>
+<tr><td><code>p.parent</code></td><td>the folder it is in</td><td><code>notes/archive</code></td></tr>
+<tr><td><code>p.exists()</code></td><td>is there anything at that path?</td><td><code>True</code></td></tr>
+<tr><td><code>p.is_file()</code>, <code>p.is_dir()</code></td><td>is it a file? a folder?</td><td><code>True</code>, <code>False</code></td></tr>
+<tr><td><code>p.resolve()</code></td><td>the absolute path</td><td><code>/home/student/files/paths/notes/archive/old.txt</code></td></tr>
+</tbody>
+</table>
+
+<p>Methods that change a name, such as <code>with_suffix</code>, only build a new <code>Path</code>; they do not touch the file on disk. A <code>Path</code> is a value that says "where". What actually creates or deletes files are methods such as <code>write_text</code>, <code>mkdir</code> and <code>unlink</code>.</p>
+
+<h3>Relative Paths and the Current Folder</h3>
+
+<p>A path that does not start with <code>/</code> is relative: it is interpreted from the folder the program was started in (<code>Path.cwd()</code>). If you <code>cd</code> to another folder in the shell and run the same program, <code>Path("notes")</code> points somewhere else. The example pages here <code>cd</code> into each example's folder before running commands, so relative paths work as intended. The home folder is <code>Path.home()</code> (<code>/home/student</code> in this virtual machine).</p>
+
+<h3>Looking Around a Folder: iterdir, glob, rglob</h3>
+
+<p><code>iterdir()</code> returns everything directly inside a folder; <code>glob(pattern)</code> returns only the names that match a pattern. <code>*</code> means "any characters, any number of them", so <code>"*.txt"</code> is any name ending in .txt. <code>rglob</code> searches every subfolder as well. The order is not fixed, so sort with <code>sorted()</code> before showing the results.</p>
+
+<pre><code>folder = Path("notes")
+for p in sorted(folder.iterdir()):
+    kind = "dir " if p.is_dir() else "file"
+    print(kind, p.name)
+
+for p in sorted(folder.glob("*.txt")):     # .txt directly in notes
+    print(p.name)
+
+for p in sorted(folder.rglob("*.txt")):    # subfolders too
+    print(p)                               # notes/archive/old.txt ...</code></pre>
+
+<h3>read_text and write_text</h3>
+
+<p>Read a short text file all at once with <code>read_text()</code> and write one all at once with <code>write_text()</code>. <code>write_text</code> creates the file if it does not exist and otherwise erases it and writes it anew. To split the text into lines, use <code>splitlines()</code>: you get a list without the <code>\n</code> at the end of each line.</p>
+
+<pre><code>out = Path("notes/hello.txt")
+out.write_text("안녕하세요\nHello\n", encoding="utf-8")   # 12 (characters)
+text = out.read_text(encoding="utf-8")
+print(text.splitlines())                  # ['안녕하세요', 'Hello']
+print(len(out.read_bytes()))              # 22 (bytes)</code></pre>
+
+<h3>Why Always encoding="utf-8"</h3>
+
+<p>A disk stores bytes, not characters. The rule that turns characters into bytes is an encoding, and today's standard is UTF-8. In UTF-8 an English letter takes 1 byte and a Korean character 3 bytes, so the 12 characters above become 22 bytes. If you leave out <code>encoding</code>, Python uses the operating system's default, which differs from computer to computer (older Korean Windows uses cp949). That is why a Korean file that reads fine on your computer can raise <code>UnicodeDecodeError</code> or show garbled characters on another. Make a habit of writing <code>encoding="utf-8"</code> every time you open a text file.</p>
+
+<h3>Check and Create: exists and mkdir</h3>
+
+<p>Checking with <code>exists()</code> first keeps the program from stopping while reading a missing file. Folders are created with <code>mkdir()</code>: <code>parents=True</code> creates the in-between folders as well, and <code>exist_ok=True</code> means no error if the folder already exists. With both options it is safe to run any number of times.</p>
+
+<pre><code>p = Path("notes/nope.txt")
+if p.exists():
+    print(p.read_text(encoding="utf-8"))
+else:
+    print(p, "does not exist, skipping")
+
+Path("notes/out/2026").mkdir(parents=True, exist_ok=True)</code></pre>
+
+<p>In the <a href="paths.html">paths</a> example, look around the notes folder with <code>explore.py</code>, then take paths apart and write a Korean file step by step.</p>
+
+<h2>open() and with</h2>
+
+<h3>File Objects and Modes</h3>
+
+<p><code>read_text</code>/<code>write_text</code> handle a whole file at once. To read a little at a time, add to the end of an existing file, or process a large file line by line, get a file object with <code>open()</code>. The second argument, the mode, decides how the file is opened.</p>
+
+<table>
+<thead>
+<tr><th>Mode</th><th>Meaning</th><th>If the file is missing</th><th>If the file exists</th></tr>
+</thead>
+<tbody>
+<tr><td><code>"r"</code> (default)</td><td>read</td><td><code>FileNotFoundError</code></td><td>reads from the start</td></tr>
+<tr><td><code>"w"</code></td><td>write</td><td>creates it</td><td><strong>erases everything</strong>, then writes</td></tr>
+<tr><td><code>"a"</code></td><td>append</td><td>creates it</td><td>writes after the end</td></tr>
+<tr><td><code>"x"</code></td><td>create a new file (exclusive)</td><td>creates it</td><td><code>FileExistsError</code></td></tr>
+</tbody>
+</table>
+
+<p>Adding <code>b</code> to the mode (<code>"rb"</code>, <code>"wb"</code>) gives binary mode, which reads and writes bytes instead of characters; no <code>encoding</code> is used then. It is for files that are not text, such as images or archives.</p>
+
+<p>The mode to be most careful with is <code>"w"</code>. The moment the file is opened, its old contents are gone, even before you write anything. For a file that collects records, use <code>"a"</code>; for a file that must never be overwritten, use <code>"x"</code>.</p>
+
+<h3>with Closes the File</h3>
+
+<p>A file you opened must be closed when you are done. Until it is closed, what you wrote may not be fully on disk yet, and there is a limit on how many files one program can have open. You can call <code>f.close()</code> yourself, but if an error happens in between, the program never reaches the <code>close()</code> line. The <code>with</code> statement closes the file the moment the block ends, whether it ends normally or because of an error.</p>
+
+<pre><code># closing by hand: an error in the middle skips close()
+f = open("diary.txt", encoding="utf-8")
+text = f.read()
+f.close()
+
+# with: always closed when the block ends
+with open("diary.txt", encoding="utf-8") as f:
+    text = f.read()
+print(f.closed)     # True</code></pre>
+
+<p>Trying to read a closed file gives <code>ValueError: I/O operation on closed file.</code> Finish the file work inside the <code>with</code> block, and outside it use the value you read (<code>text</code>).</p>
+
+<h3>Ways to Read</h3>
+
+<table>
+<thead>
+<tr><th>Code</th><th>Result</th><th>When</th></tr>
+</thead>
+<tbody>
+<tr><td><code>f.read()</code></td><td>all of the rest (one string)</td><td>small files</td></tr>
+<tr><td><code>f.readline()</code></td><td>one line (with its <code>\n</code>), <code>""</code> at the end</td><td>reading just the header first</td></tr>
+<tr><td><code>f.readlines()</code></td><td>a list of the remaining lines</td><td>when you need the lines several times</td></tr>
+<tr><td><code>for line in f:</code></td><td>one line at a time</td><td>large files, and most cases</td></tr>
+</tbody>
+</table>
+
+<p>A file object remembers how far it has read: <code>readlines()</code> after a <code>readline()</code> no longer has the first line. <code>for line in f</code> reads one line at a time without loading the whole file into memory, so it works even for very large files. Each line ends in <code>\n</code>, so remove it with <code>strip()</code> or <code>rstrip()</code> before comparing or printing.</p>
+
+<h3>Ways to Write</h3>
+
+<p><code>f.write(s)</code> writes exactly the string you give it and adds no newline. <code>print(..., file=f)</code> writes to the file with the same rules as printing to the screen (separated by spaces, a newline at the end). <code>f.writelines(list)</code> writes the strings of a list one after another; there too, the newlines are up to you.</p>
+
+<pre><code>with open("log.txt", "w", encoding="utf-8") as f:
+    f.write("a")
+    f.write("b\n")                      # 'ab\n'  (a and b on one line)
+    print("c", "d", sep=",", file=f)    # 'c,d\n'
+    f.writelines(["e\n", "f\n"])</code></pre>
+
+<h3>Code Walk-through: diary.py</h3>
+
+<p><code>diary.py</code> in the <a href="file_modes.html">file_modes</a> example appends one line from the command-line arguments to a diary and shows the whole diary with line numbers. It opens the same file twice: first with <code>"a"</code> to write, then, after the block has ended and the file is closed, again for reading.</p>
+
+<pre><code>entry = " ".join(sys.argv[1:]) or "(empty)"
+
+with open("diary.txt", "a", encoding="utf-8") as f:
+    f.write(entry + "\n")
+
+with open("diary.txt", encoding="utf-8") as f:
+    for number, line in enumerate(f, start=1):
+        print(f"{number}: {line.rstrip()}")</code></pre>
+
+<p><code>sys.argv</code> is the list of words on the command line. For <code>python3 diary.py 두 번째 줄</code> it is <code>["diary.py", "두", "번째", "줄"]</code>, so the program drops the first item and joins the rest with spaces. Check that each run adds one line, and in the following steps watch <code>"w"</code> wipe that record in one go.</p>
+
+<h2>Exceptions: Dealing with Errors</h2>
+
+<h3>Exceptions and Tracebacks</h3>
+
+<p>When a program hits a situation in which it cannot go on, Python raises an exception. <code>int("ten")</code> raises <code>ValueError</code>, opening a missing file raises <code>FileNotFoundError</code>, and dividing by zero raises <code>ZeroDivisionError</code>. If nobody handles the exception, the program stops right there and prints a traceback.</p>
+
+<pre><code>Mina: 84.0
+Traceback (most recent call last):
+  File "/home/student/files/exceptions/report.py", line 13, in &lt;module&gt;
+    report("Joon", [])
+    ~~~~~~^^^^^^^^^^^^
+  File "/home/student/files/exceptions/report.py", line 9, in report
+    print(f"{name}: {average(scores):.1f}")
+                     ~~~~~~~^^^^^^^^
+  File "/home/student/files/exceptions/report.py", line 5, in average
+    return sum(scores) / len(scores)
+           ~~~~~~~~~~~~^~~~~~~~~~~~~
+ZeroDivisionError: division by zero</code></pre>
+
+<p>Read a traceback from the bottom up.</p>
+
+<ol>
+<li><strong>The last line</strong>: the kind of exception and its message. It tells you what went wrong (<code>ZeroDivisionError: division by zero</code>).</li>
+<li><strong>The File line just above</strong>: where the exception actually happened (line 5 of <code>average</code>, where <code>len(scores)</code> is 0).</li>
+<li><strong>The lines above that</strong>: the chain of calls that led there. <code>report("Joon", [])</code> on line 13 called <code>average</code> by way of line 9. Line 13, which passes an empty list, may well be the place to fix.</li>
+</ol>
+
+<p>Recent versions of Python point at the failing part of each line with <code>~~~^^^</code> marks (since 3.11) and use colours in the terminal (since 3.13). Anything printed before the traceback (here <code>Mina: 84.0</code>) stays on screen, and code after the exception (Sora's report) never runs.</p>
+
+<h3>try and except</h3>
+
+<p>Put the code that may raise an exception in a <code>try</code> block, and what to do when that exception happens in an <code>except</code> block. If an exception is raised inside <code>try</code>, the rest of the block is skipped and control jumps to the matching <code>except</code>; after that, execution continues after the whole <code>try</code> statement.</p>
+
+<pre><code>text = "ten"
+try:
+    n = int(text)
+    print("got", n)          # skipped when an exception is raised
+except ValueError as e:
+    print("not a number:", e)
+print("program goes on")</code></pre>
+
+<p><code>as e</code> puts the exception object in a variable. Printing it shows the message, and depending on the kind it carries more information, such as <code>e.filename</code> on a <code>FileNotFoundError</code> or the missing key on a <code>KeyError</code>.</p>
+
+<h3>Common Exceptions</h3>
+
+<table>
+<thead>
+<tr><th>Exception</th><th>When it happens</th><th>Example</th></tr>
+</thead>
+<tbody>
+<tr><td><code>ValueError</code></td><td>right type, wrong value</td><td><code>int("ten")</code>, <code>a, b = "9".split()</code></td></tr>
+<tr><td><code>TypeError</code></td><td>wrong type</td><td><code>"3" + 4</code>, <code>json.dumps({1, 2})</code></td></tr>
+<tr><td><code>KeyError</code></td><td>key not in the dict</td><td><code>prices["mango"]</code></td></tr>
+<tr><td><code>IndexError</code></td><td>position outside the list</td><td><code>[1, 2][5]</code></td></tr>
+<tr><td><code>ZeroDivisionError</code></td><td>division by zero</td><td><code>7 / 0</code></td></tr>
+<tr><td><code>FileNotFoundError</code></td><td>opening a missing file</td><td><code>open("nope.txt")</code></td></tr>
+<tr><td><code>FileExistsError</code></td><td>opening an existing file with <code>"x"</code></td><td><code>open("diary.txt", "x")</code></td></tr>
+<tr><td><code>json.JSONDecodeError</code></td><td>invalid JSON</td><td><code>json.loads("{'a': 1}")</code></td></tr>
+</tbody>
+</table>
+
+<h3>Catch Only What You Expect</h3>
+
+<p>One <code>try</code> can have several <code>except</code> blocks; only the first one that matches, from the top, runs. Exceptions that get the same treatment can be grouped in a tuple: <code>except (ValueError, ZeroDivisionError):</code>. A bare <code>except:</code> or <code>except Exception:</code> swallows every error, quietly hiding even a <code>NameError</code> from a typo. The rule is: catch the exceptions you expect by name, and let unexpected errors show up as tracebacks.</p>
+
+<h3>else and finally</h3>
+
+<p>The <code>else</code> block runs only when the <code>try</code> raised no exception. Moving the success code out of <code>try</code> into <code>else</code> leaves only the lines that can really fail in <code>try</code>, which makes it clear which line's error you mean to catch. The <code>finally</code> block always runs last, on success or failure, even while a <code>return</code> is leaving the function. It is the place for clean-up work.</p>
+
+<pre><code>def to_int(text):
+    try:
+        n = int(text)
+    except ValueError:
+        print("except")
+        return None
+    else:
+        print("else")
+        return n
+    finally:
+        print("finally")
+
+to_int("42")    # else, finally
+to_int("abc")   # except, finally</code></pre>
+
+<table>
+<thead>
+<tr><th>Situation</th><th>Order</th></tr>
+</thead>
+<tbody>
+<tr><td>no exception</td><td>all of <code>try</code> → <code>else</code> → <code>finally</code></td></tr>
+<tr><td>caught exception</td><td><code>try</code> (up to the error) → matching <code>except</code> → <code>finally</code></td></tr>
+<tr><td>uncaught exception</td><td><code>try</code> (up to the error) → <code>finally</code> → passed outward (traceback)</td></tr>
+</tbody>
+</table>
+
+<p><code>with open(...)</code> closing the file works on the same principle as this <code>finally</code>.</p>
+
+<h3>Code Walk-through: calc.py</h3>
+
+<p><code>calc.py</code> in the <a href="exceptions.html">exceptions</a> example divides two numbers for each input line. Input is read line by line with <code>for line in sys.stdin</code>, just like a file. The key point is that the <code>try</code> sits <em>inside</em> the loop: when one line fails, only that line is skipped and the loop moves on. With the <code>try</code> outside the loop, the first failure would end the whole loop.</p>
+
+<pre><code>for number, line in enumerate(sys.stdin, start=1):
+    try:
+        a_text, b_text = line.split()   # ValueError: not two pieces
+        a = int(a_text)                 # ValueError: not a whole number
+        b = int(b_text)
+        result = a / b                  # ZeroDivisionError
+    except ValueError as e:
+        print(f"line {number}: skipped, {e}")
+    except ZeroDivisionError:
+        print(f"line {number}: skipped, cannot divide by zero")
+    else:
+        print(f"line {number}: {a} / {b} = {result:g}")</code></pre>
+
+<p>Feeding in <code>printf '10 4\n7 0\nten 2\n9\n8 2\n'</code> gives two successful lines and three skipped ones. <code>9</code>, a single number, fails while unpacking with <code>ValueError: not enough values to unpack</code>; it is the same kind as <code>int("ten")</code>, so the same <code>except</code> handles it.</p>
+
+<h3>Check First, or Try First</h3>
+
+<p>There are two ways to prepare for a missing file: check first with <code>if p.exists():</code> (Look Before You Leap), or just call <code>open()</code> and catch <code>FileNotFoundError</code> (Easier to Ask Forgiveness than Permission). Python code usually takes the second route: another program could delete the file between the check and the use, and failures that are hard to check in advance, such as a missing permission or broken contents, are handled the same way. For dicts, a method with a default such as <code>prices.get("mango", 0)</code> is often simpler still.</p>
+
+<h2>Raising Exceptions: raise and Your Own Exceptions</h2>
+
+<h3>raise</h3>
+
+<p>When a function you wrote receives a value it cannot handle, do not return some odd value; raise an exception with <code>raise</code>. Then the caller cannot carry on as if nothing happened, and it is the caller who decides whether to handle it. For a bad value, <code>ValueError</code> is the usual choice.</p>
+
+<pre><code>def withdraw(self, amount):
+    if amount &lt;= 0:
+        raise ValueError(f"amount must be positive, got {amount}")
+    ...</code></pre>
+
+<p>A bare <code>raise</code> inside an <code>except</code> block re-raises the exception you just caught, unchanged. Use it when you only want to log something and leave the handling to the code further up.</p>
+
+<h3>Exception Classes of Your Own</h3>
+
+<p>Exceptions are classes too; inherit from <code>Exception</code> to make a new one. Give each module one parent exception (<code>BankError</code>) and put the specific ones under it: the caller can then catch narrowly with <code>except InsufficientFunds</code>, or catch all of the module's errors at once with <code>except BankError</code>. Storing values as attributes in <code>__init__</code> lets the code that catches the exception use the information without picking apart the message string.</p>
+
+<pre><code>class BankError(Exception):
+    """Base class for every error this module raises."""
+
+class InsufficientFunds(BankError):
+    def __init__(self, balance, amount):
+        super().__init__(f"balance {balance}, tried to withdraw {amount}")
+        self.balance = balance
+        self.amount = amount</code></pre>
+
+<pre><code>try:
+    left = account.withdraw(20000)
+except InsufficientFunds as e:
+    print("short by", e.amount - e.balance)    # 13000</code></pre>
+
+<p>Exceptions form a hierarchy, and <code>except</code> catches the class it names plus all of its subclasses. <code>FileNotFoundError</code> and <code>FileExistsError</code> are subclasses of <code>OSError</code>, and <code>json.JSONDecodeError</code> is a subclass of <code>ValueError</code>. So with several <code>except</code> blocks, put the specific ones on top and the broad ones below: a broad one on top would catch everything before the lines below get a chance.</p>
+
+<h3>Exception Chaining: raise ... from</h3>
+
+<p><code>config.py</code> in the <a href="custom_errors.html">custom_errors</a> example reads a port number from a settings file. It can fail for several reasons (no file: <code>FileNotFoundError</code>; not a number: <code>ValueError</code>; out of range), but the caller does not need to know all of them. So the low-level exceptions are caught and re-raised as a single <code>ConfigError</code>. Adding <code>from e</code> links the original exception to the new one's <code>__cause__</code>.</p>
+
+<pre><code>def read_port(path):
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read().strip()
+        port = int(text)
+    except FileNotFoundError as e:
+        raise ConfigError(f"{path}: file not found") from e
+    except ValueError as e:
+        raise ConfigError(f"{path}: port must be a number, got {text!r}") from e
+    if not 1 &lt;= port &lt;= 65535:
+        raise ConfigError(f"{path}: port {port} is outside 1-65535")
+    return port</code></pre>
+
+<p>If nobody catches this <code>ConfigError</code>, you get two tracebacks: the cause (<code>ValueError</code>) on top, then <code>The above exception was the direct cause of the following exception:</code>, and the final error (<code>ConfigError</code>) at the bottom. The cause is not hidden, so while debugging you can see what went wrong in the first place. When there is no need to show the cause, cut the link with <code>raise ... from None</code> (<code>BadRow</code> in <code>csv_import</code> does this).</p>
+
+<h2>JSON: Storing Data as Text</h2>
+
+<h3>What Is JSON?</h3>
+
+<p>JSON (JavaScript Object Notation) is a format for writing structures such as dicts and lists as text. People can read it, and almost every language and web service can exchange it, so it is everywhere: settings files, save files, web API responses. It looks like a Python dict, but the rules are stricter: strings must use double quotes, object keys must be strings, and no comma may follow the last item.</p>
+
+<table>
+<thead>
+<tr><th>Python</th><th>JSON</th><th>Read back as</th></tr>
+</thead>
+<tbody>
+<tr><td><code>dict</code></td><td>object <code>{"k": v}</code></td><td><code>dict</code> (keys always <code>str</code>)</td></tr>
+<tr><td><code>list</code>, <code>tuple</code></td><td>array <code>[ ]</code></td><td><code>list</code></td></tr>
+<tr><td><code>str</code></td><td>string <code>"..."</code></td><td><code>str</code></td></tr>
+<tr><td><code>int</code>, <code>float</code></td><td>number</td><td><code>int</code>, <code>float</code></td></tr>
+<tr><td><code>True</code>, <code>False</code></td><td><code>true</code>, <code>false</code></td><td><code>True</code>, <code>False</code></td></tr>
+<tr><td><code>None</code></td><td><code>null</code></td><td><code>None</code></td></tr>
+<tr><td><code>set</code>, <code>date</code>, objects</td><td>not allowed (<code>TypeError</code>)</td><td>convert to a list or string first</td></tr>
+</tbody>
+</table>
+
+<p>A tuple becomes a list and the number key <code>1</code> becomes the string <code>"1"</code>, so a value saved and read back may not equal the original. Save a date as a string such as <code>"2026-03-02"</code> with <code>date.isoformat()</code>, and turn it back with <code>date.fromisoformat()</code> when reading.</p>
+
+<h3>dump, dumps, load, loads</h3>
+
+<table>
+<thead>
+<tr><th>Function</th><th>Direction</th><th>Works with</th></tr>
+</thead>
+<tbody>
+<tr><td><code>json.dumps(value)</code></td><td>Python value → JSON</td><td>returns a string</td></tr>
+<tr><td><code>json.loads(string)</code></td><td>JSON → Python value</td><td>reads from a string</td></tr>
+<tr><td><code>json.dump(value, f)</code></td><td>Python value → JSON</td><td>writes to an open file</td></tr>
+<tr><td><code>json.load(f)</code></td><td>JSON → Python value</td><td>reads from an open file</td></tr>
+</tbody>
+</table>
+
+<p>The <code>s</code> at the end stands for string; the versions without it take a file object. Remember two options for writing. <code>ensure_ascii=False</code> stores Korean as it is (without it, Korean is escaped as <code>"민지"</code>: not wrong, but hard for people to read). <code>indent=2</code> breaks lines and indents them so people can read the result easily.</p>
+
+<pre><code>import json
+data = {"name": "민지", "tags": ("a", "b"), "pet": None, "ok": True}
+print(json.dumps(data, ensure_ascii=False))
+# {"name": "민지", "tags": ["a", "b"], "pet": null, "ok": true}</code></pre>
+
+<h3>Code Walk-through: save.py</h3>
+
+<p><code>save.py</code> in the <a href="json_save.html">json_save</a> example keeps a game record in <code>save.json</code>: each run reads it, changes it and writes it back. The heart of it is that the load function handles both ways reading can fail. On the very first run there is no file (<code>FileNotFoundError</code>), and if the power goes off while saving, the file may be only half written (<code>JSONDecodeError</code>). Either way, the game starts fresh.</p>
+
+<pre><code>def load():
+    try:
+        with open(SAVE, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print("no save file yet: new game")
+    except json.JSONDecodeError as e:
+        print(f"{SAVE} is broken ({e.msg}, line {e.lineno} column {e.colno}): new game")
+    return new_game()
+
+def save(data):
+    with open(SAVE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)</code></pre>
+
+<p>The defaults come from a function, <code>new_game()</code>, that builds a fresh dict each time, rather than from a constant dict. Returning the constant itself would make several places share its <code>history</code> list, so a score added in one place could show up in another. <code>JSONDecodeError</code> says where the file is broken with <code>lineno</code> and <code>colno</code>; showing that to the user helps when fixing the file by hand.</p>
+
+<p>The saved <code>save.json</code> looks like this. Being able to open and fix it in a text editor is the advantage of a JSON save file.</p>
+
+<pre><code>{
+  "player": "민지",
+  "plays": 3,
+  "best": 150,
+  "history": [
+    120,
+    80,
+    150
+  ],
+  "sound": true
+}</code></pre>
+
+<h2>CSV: A Robust Importer</h2>
+
+<h3>The csv Module Instead of split(",")</h3>
+
+<p>You can split a CSV line yourself with <code>strip().split(",")</code>, but it breaks as soon as a value contains a comma. CSV wraps such values in double quotes, as in <code>"Kim, Jiwoo"</code>, and <code>split</code> knows nothing about quotes. The standard library's <code>csv</code> module knows the quoting and line-break rules.</p>
+
+<pre><code>'"Kim, Jiwoo",math,88'.split(",")
+# ['"Kim', ' Jiwoo"', 'math', '88']     broken into four pieces</code></pre>
+
+<h3>DictReader and DictWriter</h3>
+
+<p><code>csv.DictReader</code> uses the first line (the header) as keys and gives one dict for each of the other lines. You read <code>row["score"]</code> instead of <code>row[2]</code>, so the code still works if the columns are reordered. All values are strings, so numbers need <code>int()</code>. When a line's field count differs from the header, this is what you get:</p>
+
+<ul>
+<li>Too few fields: the missing key's value is <code>None</code> (<code>{'name': '지우', 'subject': 'math', 'score': None}</code>).</li>
+<li>Too many fields: the extra values go into a list under the key <code>None</code> (<code>{..., None: ['extra']}</code>).</li>
+<li>A field that is present but empty: the empty string <code>''</code>.</li>
+</ul>
+
+<p><code>csv.DictWriter</code> goes the other way and writes dicts as lines. Set the column order with <code>fieldnames</code>, then write the header with <code>writeheader()</code> and the rows with <code>writerows()</code>. Values containing commas are quoted automatically. Open CSV files with <code>newline=""</code>, both for reading and writing: it leaves line-break handling to the csv module. Without it, depending on the operating system, blank lines can appear between rows or line breaks inside quotes can break.</p>
+
+<h3>Code Walk-through: importer.py</h3>
+
+<p>Real data nearly always has bad lines mixed in. One bad line should not make you give up the whole import, and it should not be dropped silently either. <code>importer.py</code> in the <a href="csv_import.html">csv_import</a> example collects the good lines and reports the bad ones with their line numbers and reasons. The work is split in two: <code>parse(row)</code> checks one line and either returns a clean dict or raises <code>BadRow</code>, and <code>main</code> calls <code>parse</code> for every line and catches <code>BadRow</code>.</p>
+
+<pre><code>class BadRow(Exception):
+    """A row we cannot use; the message says why."""
+
+def parse(row):
+    if None in row:
+        raise BadRow(f"extra fields {row[None]}")
+    if row["score"] is None:
+        raise BadRow("missing score column")
+    name = row["name"].strip()
+    if not name:
+        raise BadRow("empty name")
+    try:
+        score = int(row["score"])
+    except ValueError:
+        raise BadRow(f"score is not a whole number: {row['score']!r}") from None
+    if not 0 &lt;= score &lt;= 100:
+        raise BadRow(f"score {score} is outside 0-100")
+    return {"name": name, "subject": row["subject"], "score": score}</code></pre>
+
+<p>Whatever the reason, <code>parse</code> reports it as one kind of exception, <code>BadRow</code>, so <code>main</code> needs only one <code>except</code>. The <code>ValueError</code> from <code>int()</code> is also re-raised as <code>BadRow</code>; since the message already says everything about the cause, <code>from None</code> cuts the link.</p>
+
+<pre><code>try:
+    with open(path, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                good.append(parse(row))
+            except BadRow as e:
+                bad += 1
+                print(f"line {reader.line_num}: skipped, {e}")
+except FileNotFoundError:
+    print(f"error: {path} not found")
+    return 1</code></pre>
+
+<p>There are two layers of <code>try</code>. The inner one sits inside the loop and handles one line's failure; the outer one handles the file itself being missing. <code>reader.line_num</code> is the file's line number read so far (the header is 1), so it matches the numbers from <code>cat -n scores.csv</code>. If the file is missing, <code>main</code> returns 1 and <code>sys.exit(main(...))</code> uses it as the exit code, keeping the shell's convention that 0 means success and anything else means failure.</p>
+
+<pre><code>line 5: skipped, score is not a whole number: ''
+line 6: skipped, score is not a whole number: 'eighty'
+line 7: skipped, score 105 is outside 0-100
+line 8: skipped, missing score column
+line 9: skipped, empty name
+line 10: skipped, extra fields ['extra']
+4 rows saved to clean.csv, 6 skipped
+average of the good rows: 82.2</code></pre>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li><strong>Opening an existing file with <code>"w"</code>.</strong> Its contents vanish the moment it opens. To add, use <code>"a"</code>; if it must not be overwritten, use <code>"x"</code>.</li>
+<li><strong>Leaving out <code>encoding</code>.</strong> A Korean file that works on your computer turns into garbage on another. Always write <code>encoding="utf-8"</code> for text files.</li>
+<li><strong>Forgetting the <code>\n</code> at the end of a line.</strong> In <code>for line in f</code>, <code>line</code> ends in <code>\n</code>, so <code>line == "5000"</code> is false; <code>strip()</code> before comparing. In the other direction, <code>write()</code> adds no <code>\n</code>.</li>
+<li><strong>Reading a file outside its <code>with</code> block.</strong> It is already closed: <code>ValueError: I/O operation on closed file.</code></li>
+<li><strong>Catching everything with <code>except:</code>.</strong> It swallows typos (<code>NameError</code>) and even Ctrl+C, so bugs hide. Catch the exceptions you expect, by name.</li>
+<li><strong>Putting too much code in <code>try</code>.</strong> It blurs which line's error you mean to catch, and it also catches the same kind of error from lines you did not expect. Move the success code into <code>else</code>.</li>
+<li><strong>Catching an exception and doing nothing (<code>except ValueError: pass</code>).</strong> Data disappears silently. If you skip something, say what and why.</li>
+<li><strong>Single quotes or a trailing comma in JSON.</strong> <code>{'a': 1}</code> and <code>[1, 2,]</code> are not JSON. Do not write it by hand; produce it with <code>json.dump</code>.</li>
+<li><strong>Forgetting that CSV values are strings.</strong> <code>row["score"] &gt; 90</code> is a <code>TypeError</code>. Convert with <code>int()</code>, and handle the case where the conversion fails.</li>
+</ul>
+
+<h2>Check Quiz</h2>
+
+<ol>
+<li><strong>What are the <code>suffix</code> and <code>parent</code> of <code>Path("data") / "2026" / "a.csv"</code>?</strong> <code>.csv</code> and <code>data/2026</code>.</li>
+<li><strong>Which mode adds one line to the end of an existing log file?</strong> <code>"a"</code>.</li>
+<li><strong>What happens to the file if an exception is raised inside a <code>with</code> block?</strong> It is closed as the block is left.</li>
+<li><strong>When does the <code>else</code> block run?</strong> Only when the <code>try</code> raised no exception.</li>
+<li><strong>Does <code>finally</code> run even when there is a <code>return</code>?</strong> Yes, just before the function ends.</li>
+<li><strong>Does <code>except BankError</code> catch <code>InsufficientFunds</code>?</strong> Yes, because it is a subclass.</li>
+<li><strong>In <code>raise ConfigError(...) from e</code>, where does <code>e</code> end up?</strong> In the new exception's <code>__cause__</code>; it is also shown in the traceback.</li>
+<li><strong>What does <code>loads</code> give back for <code>json.dumps((1, 2))</code>?</strong> Not a tuple but the list <code>[1, 2]</code>.</li>
+<li><strong>In DictReader, what is the missing value of a line with too few fields?</strong> <code>None</code>.</li>
+</ol>
+
+<h2>Summary</h2>
+
+<p>Build paths with <code>Path</code> and join them with <code>/</code>. Open files with <code>with open(..., encoding="utf-8")</code>, finish the work inside the block, and pick the mode (<code>r</code>, <code>w</code>, <code>a</code>, <code>x</code>) that fits the job. Put work that can fail in <code>try</code>, catch only the exceptions you expect by name, and report values your function cannot handle with <code>raise</code>. Store structured data with <code>json</code> and tables with <code>csv</code>, and when reading, always consider that the file may be missing or broken. Run the steps on each example page, then deliberately break the input and see how the program reacts.</p>

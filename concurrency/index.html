@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Concurrency: Threads and asyncio · Python Lab" data-title-ko="동시성: 스레드와 asyncio · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Concurrency: Threads and asyncio · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="concurrency/threads">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html" aria-current="page"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" aria-current="page" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 15 · 6 examples</span><span lang="ko">15장 · 예제 6개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask">← 14 <span lang="en">Web</span><span lang="ko">웹</span></a><span></span></nav>
+    </div>
+    <h1><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></h1>
+    <p class="lead"><span lang="en">Make programs faster by overlapping the time they spend waiting (I/O). Practice threading.Thread with start and join, race conditions on shared values and Lock, producer/consumer with queue.Queue, ThreadPoolExecutor's map, submit and as_completed, asyncio's async/await and gather, and an asyncio echo server on 127.0.0.1. Also see why pure computation does not get faster on this one-core virtual machine.</span><span lang="ko">기다리는 일(I/O)을 겹쳐서 프로그램을 빠르게 만든다. threading.Thread의 start와 join, 공유 값의 경쟁 조건과 Lock, queue.Queue로 만드는 생산자-소비자, ThreadPoolExecutor의 map·submit·as_completed, asyncio의 async/await와 gather, 그리고 127.0.0.1의 asyncio 에코 서버를 실습한다. 코어가 하나인 가상 머신에서 계산만 하는 일은 왜 빨라지지 않는지도 확인한다.</span> <a href="#notes-concurrency"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="threads" aria-pressed="true">threads</button>
+          <button type="button" data-pick="race_lock" aria-pressed="false">race_lock</button>
+          <button type="button" data-pick="producer_consumer" aria-pressed="false">producer_consumer</button>
+          <button type="button" data-pick="thread_pool" aria-pressed="false">thread_pool</button>
+          <button type="button" data-pick="asyncio_basics" aria-pressed="false">asyncio_basics</button>
+          <button type="button" data-pick="echo_server" aria-pressed="false">echo_server</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="threads" data-dir="concurrency/threads">
+        <h2>threads <span class="muted">~/concurrency/threads</span></h2>
+        <p><span lang="en">Run three pretend downloads (each waits 1 second) one at a time, then in three threads, and compare the time taken. threading.Thread(target=..., args=...) creates a thread, start() sets it going and join() waits for it to finish. Time is measured with time.perf_counter().</span><span lang="ko">가짜 다운로드 세 개(각 1초 대기)를 한 번에 하나씩, 그리고 스레드 세 개로 실행해 걸린 시간을 비교한다. threading.Thread(target=..., args=...)로 스레드를 만들고 start()로 출발시키며 join()으로 끝나기를 기다린다. 시간은 time.perf_counter()로 잰다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 download_sim.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 download_sim.py">▶</button><code>python3 download_sim.py</code></div>
+          <p><span lang="en">sequential alternates start and done and takes about 3 s; threaded prints the three start lines first, then the three done lines, and takes about 1 s. While waiting, the CPU is idle, so the three waits overlap. The order of the lines in the threaded run can change from run to run.</span><span lang="ko">sequential은 start와 done이 번갈아 나오고 about 3 s, threaded는 start 세 줄이 먼저 나온 뒤 done 세 줄이 나오고 about 1 s다. 기다리는 동안 CPU는 놀고 있으므로 세 번의 기다림이 겹친다. 스레드 쪽의 줄 순서는 실행마다 달라질 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds
+
+jobs = [(&quot;x&quot;, 0.6), (&quot;y&quot;, 0.2), (&quot;z&quot;, 0.4)]
+threads = [threading.Thread(target=work, args=job) for job in jobs]
+for t in threads:
+    t.start()
+print(&quot;right after start:&quot;, results)
+for t in threads:
+    t.join()
+print(&quot;after join:&quot;, dict(sorted(results.items())))
+print(&quot;finish order:&quot;, list(results))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds
+
+jobs = [(&quot;x&quot;, 0.6), (&quot;y&quot;, 0.2), (&quot;z&quot;, 0.4)]
+threads = [threading.Thread(target=work, args=job) for job in jobs]
+for t in threads:
+    t.start()
+print(&quot;right after start:&quot;, results)
+for t in threads:
+    t.join()
+print(&quot;after join:&quot;, dict(sorted(results.items())))
+print(&quot;finish order:&quot;, list(results))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds
+
+jobs = [(&quot;x&quot;, 0.6), (&quot;y&quot;, 0.2), (&quot;z&quot;, 0.4)]
+threads = [threading.Thread(target=work, args=job) for job in jobs]
+for t in threads:
+    t.start()
+print(&quot;right after start:&quot;, results)
+for t in threads:
+    t.join()
+print(&quot;after join:&quot;, dict(sorted(results.items())))
+print(&quot;finish order:&quot;, list(results))
+EOF</code></div>
+          <p><span lang="en">A thread function's return value is thrown away, so the results go into a shared dictionary. Right after start() nobody has finished yet, so it is {}; only after every join() are all three results there. They finished in order of the shortest wait: y, z, x.</span><span lang="ko">스레드 함수의 return 값은 버려지므로 결과는 공유 딕셔너리에 담는다. start() 직후에는 아직 아무도 끝나지 않아 {}이고, join()을 모두 마친 뒤에야 세 결과가 다 있다. 끝난 순서는 짧게 기다린 순서 y, z, x다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+def work():
+    time.sleep(1)
+    print(&quot;worker: done&quot;)
+
+t = threading.Thread(target=work)
+t.start()
+print(&quot;main: worker alive?&quot;, t.is_alive())
+print(&quot;main: last line of the program&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+def work():
+    time.sleep(1)
+    print(&quot;worker: done&quot;)
+
+t = threading.Thread(target=work)
+t.start()
+print(&quot;main: worker alive?&quot;, t.is_alive())
+print(&quot;main: last line of the program&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import threading
+import time
+
+def work():
+    time.sleep(1)
+    print(&quot;worker: done&quot;)
+
+t = threading.Thread(target=work)
+t.start()
+print(&quot;main: worker alive?&quot;, t.is_alive())
+print(&quot;main: last line of the program&quot;)
+EOF</code></div>
+          <p><span lang="en">Without join(), the main thread does not wait and goes straight on. The two main lines come first and worker: done appears a second later. Python does not end the process until every non-daemon thread has finished, but wherever you need the results, wait with join() first.</span><span lang="ko">join()이 없으면 메인 스레드는 기다리지 않고 바로 다음 줄로 간다. main 두 줄이 먼저 나오고 1초 뒤에 worker: done이 나온다. 파이썬은 데몬이 아닌 스레드가 모두 끝날 때까지 프로세스를 끝내지 않는다. 결과를 써야 하는 지점 앞에서는 join()으로 기다려야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import threading
+import time
+from download_sim import download, FILES
+
+start = time.perf_counter()
+threads = [threading.Thread(target=download(name)) for name in FILES]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(f&quot;about {round(time.perf_counter() - start)} s&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import threading
+import time
+from download_sim import download, FILES
+
+start = time.perf_counter()
+threads = [threading.Thread(target=download(name)) for name in FILES]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(f&quot;about {round(time.perf_counter() - start)} s&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import threading
+import time
+from download_sim import download, FILES
+
+start = time.perf_counter()
+threads = [threading.Thread(target=download(name)) for name in FILES]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(f&quot;about {round(time.perf_counter() - start)} s&quot;)
+EOF</code></div>
+          <p><span lang="en">A common mistake: target=download(name) calls the function right there and passes its return value, None, as the target. The downloads run one by one before any thread is created, so it takes about 3 s. Pass the function as target=download and its arguments separately as args=(name,).</span><span lang="ko">흔한 실수: target=download(name)은 함수를 지금 이 자리에서 호출하고 그 반환값 None을 target으로 넘긴다. 다운로드가 스레드를 만들기 전에 하나씩 실행되어 about 3 s가 걸린다. 함수는 target=download, 인자는 args=(name,)으로 따로 넘긴다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="race_lock" data-dir="concurrency/race" hidden>
+        <h2>race_lock <span class="muted">~/concurrency/race</span></h2>
+        <p><span lang="en">Four threads each deposit 1 into a single balance 1000 times. When another thread slips in between a read and a write, deposits disappear (a race condition). Holding a threading.Lock with a with statement lets only one thread read and write at a time, so the result is always right.</span><span lang="ko">스레드 네 개가 하나의 잔액(balance)에 1000번씩 입금한다. 읽기와 쓰기 사이에 다른 스레드가 끼어들면 입금이 사라진다(경쟁 조건). threading.Lock을 with 문으로 잡으면 한 번에 한 스레드만 읽고 쓰므로 결과가 항상 맞다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 counter_race.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 counter_race.py">▶</button><code>python3 counter_race.py</code></div>
+          <p><span lang="en">expected 4000, but got is far smaller (around 1000 on this virtual machine, and it can vary a little between runs). time.sleep(0) hands the turn to another thread between the read and the write, so all four threads read the same value and all write that value + 1: three deposits out of four vanish. There is no error message, which is exactly what makes race conditions dangerous.</span><span lang="ko">expected 4000인데 got은 훨씬 작다(이 가상 머신에서는 1000 근처이고 실행마다 조금 다를 수 있다). time.sleep(0)이 읽기와 쓰기 사이에서 다른 스레드에 차례를 넘기므로, 네 스레드가 같은 값을 읽고 똑같이 그 값+1을 써서 네 번의 입금 중 세 번이 사라진다. 오류 메시지는 없다. 이것이 경쟁 조건이 위험한 이유다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 counter_race.py lock" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 counter_race.py lock">▶</button><code>python3 counter_race.py lock</code></div>
+          <p><span lang="en">Inside with lock:, other threads wait until one thread has finished its read and write. expected 4000, got 4000, correct, however many times you run it.</span><span lang="ko">with lock: 안에서는 한 스레드가 읽기-쓰기를 끝낼 때까지 다른 스레드가 기다린다. expected 4000, got 4000, correct. 몇 번을 실행해도 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import dis
+
+counter = 0
+
+def add():
+    global counter
+    counter += 1
+
+dis.dis(add)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import dis
+
+counter = 0
+
+def add():
+    global counter
+    counter += 1
+
+dis.dis(add)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import dis
+
+counter = 0
+
+def add():
+    global counter
+    counter += 1
+
+dis.dis(add)
+EOF</code></div>
+          <p><span lang="en">counter += 1 is one line but not one action. In bytecode it splits into LOAD_GLOBAL (read), BINARY_OP += (add) and STORE_GLOBAL (write). A thread switch can happen anywhere in between.</span><span lang="ko">counter += 1은 한 줄이지만 한 동작이 아니다. 바이트코드로 보면 LOAD_GLOBAL(읽기), BINARY_OP +=(더하기), STORE_GLOBAL(쓰기)로 나뉜다. 스레드 전환은 이 사이 어디에서나 일어날 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import threading
+
+counter = 0
+
+def work():
+    global counter
+    for _ in range(100_000):
+        counter += 1
+
+threads = [threading.Thread(target=work) for _ in range(4)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(&quot;expected 400000, got&quot;, counter)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import threading
+
+counter = 0
+
+def work():
+    global counter
+    for _ in range(100_000):
+        counter += 1
+
+threads = [threading.Thread(target=work) for _ in range(4)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(&quot;expected 400000, got&quot;, counter)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import threading
+
+counter = 0
+
+def work():
+    global counter
+    for _ in range(100_000):
+        counter += 1
+
+threads = [threading.Thread(target=work) for _ in range(4)]
+for t in threads:
+    t.start()
+for t in threads:
+    t.join()
+print(&quot;expected 400000, got&quot;, counter)
+EOF</code></div>
+          <p><span lang="en">With plain counter += 1 and no sleep, you will usually get the right 400000 here, because Python with a GIL rarely switches threads at that point. But the language does not promise it: another version, a free-threaded build or several cores can get it wrong. A correct result does not make the code safe. Wrap code that changes a shared value in a Lock.</span><span lang="ko">sleep 없이 counter += 1만 하면 여기서는 대개 400000이 맞게 나온다. GIL이 있는 파이썬이 스레드를 바꾸는 시점이 드물기 때문이다. 하지만 언어가 보장하는 것이 아니다. 다른 버전, GIL이 없는 빌드, 여러 코어에서는 틀릴 수 있다. 결과가 맞게 나왔다고 안전한 코드가 아니다. 공유 값을 바꾸는 코드는 Lock으로 감싼다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import threading
+
+lock = threading.Lock()
+with lock:
+    print(&quot;got the lock once&quot;)
+    print(&quot;again?&quot;, lock.acquire(timeout=1))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import threading
+
+lock = threading.Lock()
+with lock:
+    print(&quot;got the lock once&quot;)
+    print(&quot;again?&quot;, lock.acquire(timeout=1))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import threading
+
+lock = threading.Lock()
+with lock:
+    print(&quot;got the lock once&quot;)
+    print(&quot;again?&quot;, lock.acquire(timeout=1))
+EOF</code></div>
+          <p><span lang="en">A Lock cannot be taken again even by the thread that already holds it. With timeout=1 you get again? False after one second; without a timeout it would wait forever (a deadlock). If the same thread needs to take it several times, use threading.RLock.</span><span lang="ko">Lock은 이미 잡은 스레드도 다시 잡을 수 없다. timeout=1을 주었으므로 1초 뒤 again? False가 나온다. timeout이 없으면 영원히 기다린다(교착 상태, deadlock). 같은 스레드가 여러 번 잡아야 한다면 threading.RLock을 쓴다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="producer_consumer" data-dir="concurrency/queue" hidden>
+        <h2>producer_consumer <span class="muted">~/concurrency/queue</span></h2>
+        <p><span lang="en">The producer/consumer pattern. A waiter thread (the producer) puts six orders into a queue.Queue and two cook threads (the consumers) take them out one at a time and cook each for 0.5 s. The queue handles the locking, so the threads never share a list directly. None is the &quot;no more orders&quot; signal.</span><span lang="ko">생산자-소비자 패턴. 웨이터 스레드(생산자)가 주문 여섯 개를 queue.Queue에 넣고, 요리사 스레드 두 개(소비자)가 하나씩 꺼내 0.5초씩 요리한다. 큐가 잠금을 대신 처리하므로 스레드끼리 리스트를 직접 나눠 쓰지 않는다. None은 &quot;주문 끝&quot; 신호다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 kitchen.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 kitchen.py">▶</button><code>python3 kitchen.py</code></div>
+          <p><span lang="en">The waiter pauses after placing five orders: once the two cooks have taken one each, the counter (a queue with maxsize=3) holds three, and put() waits until there is room. The cooks finish dishes in turn, and at the end you get the sorted list of dishes and 2 cooks: about 1.5 s (one cook would need 3.0 s). Which cook gets which dish can change from run to run.</span><span lang="ko">웨이터가 주문 다섯 개를 넣은 뒤 잠시 멈춘다. 요리사 둘이 하나씩 가져가고 나면 카운터(maxsize=3인 큐)에 셋이 차서 put()이 자리가 날 때까지 기다리기 때문이다. 요리사 둘이 번갈아 요리를 끝내고, 마지막에 정렬한 요리 목록과 2 cooks: about 1.5 s (one cook would need 3.0 s)가 나온다. 어느 요리사가 어느 요리를 맡는지는 실행마다 달라질 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import kitchen
+
+kitchen.COOKS = 3
+kitchen.main()
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import kitchen
+
+kitchen.COOKS = 3
+kitchen.main()
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import kitchen
+
+kitchen.COOKS = 3
+kitchen.main()
+EOF</code></div>
+          <p><span lang="en">With three cooks it takes about 1.0 s. Only the side that takes the work grew; the waiter's code is unchanged. It also puts COOKS stop signals (None), so all three cooks finish.</span><span lang="ko">요리사를 셋으로 늘리면 about 1.0 s다. 일을 나눠 받는 쪽만 늘렸고 웨이터 코드는 그대로다. 정지 신호 None도 COOKS개만큼 넣으므로 세 요리사가 모두 끝난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import queue
+
+q = queue.Queue(maxsize=2)
+q.put(&quot;first&quot;)
+q.put(&quot;second&quot;)
+try:
+    q.put_nowait(&quot;third&quot;)
+except queue.Full:
+    print(&quot;full:&quot;, q.qsize(), &quot;items&quot;)
+print(q.get(), q.get())
+try:
+    q.get(timeout=1)
+except queue.Empty:
+    print(&quot;empty: nothing came within 1 s&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import queue
+
+q = queue.Queue(maxsize=2)
+q.put(&quot;first&quot;)
+q.put(&quot;second&quot;)
+try:
+    q.put_nowait(&quot;third&quot;)
+except queue.Full:
+    print(&quot;full:&quot;, q.qsize(), &quot;items&quot;)
+print(q.get(), q.get())
+try:
+    q.get(timeout=1)
+except queue.Empty:
+    print(&quot;empty: nothing came within 1 s&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import queue
+
+q = queue.Queue(maxsize=2)
+q.put(&quot;first&quot;)
+q.put(&quot;second&quot;)
+try:
+    q.put_nowait(&quot;third&quot;)
+except queue.Full:
+    print(&quot;full:&quot;, q.qsize(), &quot;items&quot;)
+print(q.get(), q.get())
+try:
+    q.get(timeout=1)
+except queue.Empty:
+    print(&quot;empty: nothing came within 1 s&quot;)
+EOF</code></div>
+          <p><span lang="en">A queue hands items out in the order they went in (FIFO): first second. put_nowait() on a full queue raises queue.Full, and get() on an empty queue raises queue.Empty once the timeout passes. A get() without a timeout waits forever for something to arrive, which is why a program never ends if you forget to send the consumers a stop signal.</span><span lang="ko">큐는 넣은 순서대로 꺼낸다(FIFO): first second. 가득 찬 큐에 put_nowait()하면 queue.Full, 빈 큐에서 timeout이 지나면 queue.Empty가 난다. timeout 없는 get()은 무엇이 들어올 때까지 영원히 기다린다. 소비자에게 정지 신호를 보내지 않으면 프로그램이 끝나지 않는 이유다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="thread_pool" data-dir="concurrency/pool" hidden>
+        <h2>thread_pool <span class="muted">~/concurrency/pool</span></h2>
+        <p><span lang="en">concurrent.futures.ThreadPoolExecutor creates and joins the threads for you. map gives results in input order; submit with as_completed gives them in the order they finish. cpu_pool.py splits pure computation across a thread pool and a process pool (ProcessPoolExecutor) and shows that on this one-core virtual machine it does not get faster.</span><span lang="ko">concurrent.futures.ThreadPoolExecutor는 스레드를 직접 만들고 join하는 일을 대신해 준다. map은 입력 순서대로, submit과 as_completed는 끝난 순서대로 결과를 준다. cpu_pool.py는 계산만 하는 일을 스레드 풀과 프로세스 풀(ProcessPoolExecutor)로 나눠 보고, 코어가 하나인 이 가상 머신에서는 빨라지지 않는다는 것을 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 pool_demo.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 pool_demo.py">▶</button><code>python3 pool_demo.py</code></div>
+          <p><span lang="en">The three pages wait 1.5, 0.5 and 1.0 s. map returns them in input order (home, news, about); as_completed returns them in the order they finished (news, about, home). Both together take about 3 s; one by one it would be 6 s.</span><span lang="ko">페이지 세 개는 각각 1.5, 0.5, 1.0초를 기다린다. map은 입력 순서(home, news, about)대로 돌려주고, as_completed는 먼저 끝난 순서(news, about, home)대로 돌려준다. 두 번 합쳐 about 3 s다. 하나씩 했다면 6초다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pool_demo import fetch, PAGES
+
+for workers in (1, 2, 3):
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        list(pool.map(fetch, PAGES))
+    print(f&quot;{workers} workers: about {round((time.perf_counter() - start) * 2) / 2} s&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pool_demo import fetch, PAGES
+
+for workers in (1, 2, 3):
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        list(pool.map(fetch, PAGES))
+    print(f&quot;{workers} workers: about {round((time.perf_counter() - start) * 2) / 2} s&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pool_demo import fetch, PAGES
+
+for workers in (1, 2, 3):
+    start = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        list(pool.map(fetch, PAGES))
+    print(f&quot;{workers} workers: about {round((time.perf_counter() - start) * 2) / 2} s&quot;)
+EOF</code></div>
+          <p><span lang="en">max_workers is how many threads work at once. With 1 it takes 3.0 s, the same as one by one; with 2 or 3 it takes 1.5 s. Even with two workers, the one that finishes the short news page picks up about, so everything is done within the longest wait, home's 1.5 s. Leaving the with block waits for all the work and cleans up the threads.</span><span lang="ko">max_workers는 동시에 일하는 스레드 수다. 1이면 하나씩과 같은 3.0 s, 2와 3이면 1.5 s다. 일꾼이 둘일 때도 짧은 news가 끝난 자리에서 about을 이어 받으므로 가장 긴 home 1.5초 안에 다 끝난다. with 블록을 나갈 때 풀이 모든 일을 기다리고 스레드를 정리한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from concurrent.futures import ThreadPoolExecutor
+
+def check(n):
+    if n == 3:
+        raise ValueError(f&quot;bad input {n}&quot;)
+    return n * n
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    futures = [pool.submit(check, n) for n in range(1, 5)]
+    for n, future in zip(range(1, 5), futures):
+        try:
+            print(n, &quot;-&gt;&quot;, future.result())
+        except ValueError as error:
+            print(n, &quot;-&gt; error:&quot;, error)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from concurrent.futures import ThreadPoolExecutor
+
+def check(n):
+    if n == 3:
+        raise ValueError(f&quot;bad input {n}&quot;)
+    return n * n
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    futures = [pool.submit(check, n) for n in range(1, 5)]
+    for n, future in zip(range(1, 5), futures):
+        try:
+            print(n, &quot;-&gt;&quot;, future.result())
+        except ValueError as error:
+            print(n, &quot;-&gt; error:&quot;, error)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from concurrent.futures import ThreadPoolExecutor
+
+def check(n):
+    if n == 3:
+        raise ValueError(f&quot;bad input {n}&quot;)
+    return n * n
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    futures = [pool.submit(check, n) for n in range(1, 5)]
+    for n, future in zip(range(1, 5), futures):
+        try:
+            print(n, &quot;-&gt;&quot;, future.result())
+        except ValueError as error:
+            print(n, &quot;-&gt; error:&quot;, error)
+EOF</code></div>
+          <p><span lang="en">submit() immediately returns a Future (a receipt for a result that comes later). An exception raised inside a job is not shown where it happens; it is raised again when you call future.result(). That is why the result() call is wrapped in try: 1 -&gt; 1, 2 -&gt; 4, 3 -&gt; error: bad input 3, 4 -&gt; 16.</span><span lang="ko">submit()은 바로 Future(나중에 나올 결과의 영수증)를 돌려준다. 작업 안에서 난 예외는 그 자리에서 보이지 않고 future.result()를 부를 때 다시 발생한다. 그래서 result() 호출을 try로 감싼다: 1 -&gt; 1, 2 -&gt; 4, 3 -&gt; error: bad input 3, 4 -&gt; 16.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 cpu_pool.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 cpu_pool.py">▶</button><code>python3 cpu_pool.py</code></div>
+          <p><span lang="en">CPU cores: 1. Counting primes is pure computation with no waiting, so splitting it across threads takes about the same time (about the same as). The process pool is even slower (slower than) because starting processes and passing data between them costs time. The seconds vary a little between runs. On a PC with several cores and a big enough job, the processes would come out ahead.</span><span lang="ko">CPU cores: 1이다. 소수 세기는 기다림 없이 계산만 하므로 스레드로 나눠도 걸리는 시간이 비슷하다(about the same as). 프로세스 풀은 프로세스를 띄우고 데이터를 주고받는 비용 때문에 오히려 느리다(slower than). 초 단위 숫자는 실행마다 조금씩 다르다. 코어가 여러 개인 PC에서 일이 충분히 크면 프로세스 쪽이 빨라진다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">cpu_pool.py takes about 10 seconds. A file that uses ProcessPoolExecutor must have the if __name__ == &quot;__main__&quot;: guard, because the worker processes import the file to find count_primes. For the same reason a process pool does not work in code fed through standard input with python3 -.</span><span lang="ko">cpu_pool.py는 약 10초 걸린다. ProcessPoolExecutor를 쓰는 파일에는 if __name__ == &quot;__main__&quot;: 가드가 꼭 있어야 한다. 일꾼 프로세스가 이 파일을 import해서 count_primes를 찾기 때문이다. 같은 이유로 python3 - 로 표준 입력에 넣은 코드에서는 프로세스 풀이 동작하지 않는다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="asyncio_basics" data-dir="concurrency/asyncio" hidden>
+        <h2>asyncio_basics <span class="muted">~/concurrency/asyncio</span></h2>
+        <p><span lang="en">asyncio overlaps many waits on a single thread. A coroutine defined with async def pauses at each await while the event loop runs other coroutines. Awaiting one at a time takes 3 seconds; waiting for all of them together with asyncio.gather takes 1. Also see what happens when you forget await and when time.sleep blocks the loop.</span><span lang="ko">asyncio는 스레드 하나에서 여러 기다림을 겹친다. async def로 만든 코루틴은 await에서 멈추고, 그동안 이벤트 루프가 다른 코루틴을 돌린다. await를 하나씩 하면 3초, asyncio.gather로 한꺼번에 기다리면 1초다. await를 잊었을 때와 time.sleep으로 루프를 막았을 때도 본다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 async_basics.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 async_basics.py">▶</button><code>python3 async_basics.py</code></div>
+          <p><span lang="en">one after another awaits in turn and takes about 3 s; gather waits for the three coroutines together, printing three start lines then three done lines, in about 1 s. gather's result list is in the order you passed the coroutines, not the order they finished. There is only one thread.</span><span lang="ko">one after another는 await를 차례로 해서 about 3 s, gather는 세 코루틴을 함께 기다려 start 세 줄 뒤에 done 세 줄이 나오고 about 1 s다. gather의 결과 리스트는 끝난 순서가 아니라 넘긴 순서다. 스레드는 하나뿐이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def hello():
+    await asyncio.sleep(0.1)
+    return &quot;hello&quot;
+
+async def main():
+    result = hello()
+    print(&quot;without await:&quot;, type(result).__name__)
+    print(&quot;with await:&quot;, await hello())
+
+asyncio.run(main())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def hello():
+    await asyncio.sleep(0.1)
+    return &quot;hello&quot;
+
+async def main():
+    result = hello()
+    print(&quot;without await:&quot;, type(result).__name__)
+    print(&quot;with await:&quot;, await hello())
+
+asyncio.run(main())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def hello():
+    await asyncio.sleep(0.1)
+    return &quot;hello&quot;
+
+async def main():
+    result = hello()
+    print(&quot;without await:&quot;, type(result).__name__)
+    print(&quot;with await:&quot;, await hello())
+
+asyncio.run(main())
+EOF</code></div>
+          <p><span lang="en">Just calling an async function does not run its body; it only creates a coroutine object. without await: coroutine, with await: hello. A coroutine that is never awaited shows up when the program ends as the warning RuntimeWarning: coroutine 'hello' was never awaited.</span><span lang="ko">async 함수를 부르기만 하면 몸체는 실행되지 않고 coroutine 객체만 생긴다. without await: coroutine, with await: hello. 한 번도 await되지 않은 코루틴은 프로그램이 끝날 때 RuntimeWarning: coroutine 'hello' was never awaited 경고로 드러난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import asyncio
+import time
+
+async def bad(name):
+    time.sleep(1)
+    return name
+
+async def good(name):
+    await asyncio.sleep(1)
+    return name
+
+async def main():
+    for func in (bad, good):
+        start = time.perf_counter()
+        await asyncio.gather(func(&quot;a&quot;), func(&quot;b&quot;), func(&quot;c&quot;))
+        print(func.__name__, f&quot;about {round(time.perf_counter() - start)} s&quot;)
+
+asyncio.run(main())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import asyncio
+import time
+
+async def bad(name):
+    time.sleep(1)
+    return name
+
+async def good(name):
+    await asyncio.sleep(1)
+    return name
+
+async def main():
+    for func in (bad, good):
+        start = time.perf_counter()
+        await asyncio.gather(func(&quot;a&quot;), func(&quot;b&quot;), func(&quot;c&quot;))
+        print(func.__name__, f&quot;about {round(time.perf_counter() - start)} s&quot;)
+
+asyncio.run(main())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import asyncio
+import time
+
+async def bad(name):
+    time.sleep(1)
+    return name
+
+async def good(name):
+    await asyncio.sleep(1)
+    return name
+
+async def main():
+    for func in (bad, good):
+        start = time.perf_counter()
+        await asyncio.gather(func(&quot;a&quot;), func(&quot;b&quot;), func(&quot;c&quot;))
+        print(func.__name__, f&quot;about {round(time.perf_counter() - start)} s&quot;)
+
+asyncio.run(main())
+EOF</code></div>
+          <p><span lang="en">A common mistake: time.sleep(1) inside a coroutine has no await, so the whole event loop stops. Even under gather, bad takes about 3 s, while good, which uses asyncio.sleep, takes about 1 s. Inside a coroutine, use an awaitable function for every wait.</span><span lang="ko">흔한 실수: 코루틴 안에서 time.sleep(1)을 쓰면 await가 없어 이벤트 루프 전체가 멈춘다. gather로 묶어도 bad about 3 s, asyncio.sleep을 쓴 good은 about 1 s다. 코루틴 안에서는 기다리는 일마다 await할 수 있는 함수를 쓴다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def slow():
+    await asyncio.sleep(2)
+    return &quot;finally&quot;
+
+async def main():
+    task = asyncio.create_task(slow())
+    print(&quot;task started, main goes on&quot;)
+    try:
+        async with asyncio.timeout(0.5):
+            await task
+    except TimeoutError:
+        print(&quot;gave up after 0.5 s, task cancelled:&quot;, task.cancelled())
+
+asyncio.run(main())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def slow():
+    await asyncio.sleep(2)
+    return &quot;finally&quot;
+
+async def main():
+    task = asyncio.create_task(slow())
+    print(&quot;task started, main goes on&quot;)
+    try:
+        async with asyncio.timeout(0.5):
+            await task
+    except TimeoutError:
+        print(&quot;gave up after 0.5 s, task cancelled:&quot;, task.cancelled())
+
+asyncio.run(main())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import asyncio
+
+async def slow():
+    await asyncio.sleep(2)
+    return &quot;finally&quot;
+
+async def main():
+    task = asyncio.create_task(slow())
+    print(&quot;task started, main goes on&quot;)
+    try:
+        async with asyncio.timeout(0.5):
+            await task
+    except TimeoutError:
+        print(&quot;gave up after 0.5 s, task cancelled:&quot;, task.cancelled())
+
+asyncio.run(main())
+EOF</code></div>
+          <p><span lang="en">create_task() puts the coroutine on the event loop right away and main carries on. If it does not finish within asyncio.timeout(0.5), the awaited task is cancelled and TimeoutError is raised: gave up after 0.5 s, task cancelled: True. Put a time limit on waits that might never get an answer, such as network calls.</span><span lang="ko">create_task()는 코루틴을 바로 이벤트 루프에 올리고 main은 계속 진행한다. asyncio.timeout(0.5) 안에서 끝나지 않으면 기다리던 작업이 취소되고 TimeoutError가 난다: gave up after 0.5 s, task cancelled: True. 네트워크처럼 응답이 안 올 수 있는 기다림에는 시간 제한을 둔다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="echo_server" data-dir="concurrency/asyncio" hidden>
+        <h2>echo_server <span class="muted">~/concurrency/asyncio</span></h2>
+        <p><span lang="en">asyncio.start_server opens a TCP echo server on 127.0.0.1 that sends each line back in capitals. First the server and three clients run together under gather in one script; then the server runs as a background process and echo_client.py connects to it separately. The server stops by itself after two clients or 30 seconds.</span><span lang="ko">asyncio.start_server로 127.0.0.1에서 TCP 에코 서버를 열고, 받은 줄을 대문자로 돌려준다. 한 스크립트 안에서 서버와 클라이언트 셋을 gather로 함께 돌린 뒤, 서버를 백그라운드 프로세스로 띄우고 echo_client.py로 따로 접속해 본다. 서버는 클라이언트 두 명 또는 30초 뒤에 스스로 끝난다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_server.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_server.py">▶</button><code>python3 echo_server.py</code></div>
+          <p><span lang="en">Three clients connect almost at once (three connected lines), each sends two messages half a second apart and leaves. While one client is quiet, the server answers the others, all on one thread. The last three lines are the capitalized replies each client received. The port numbers are chosen by the operating system and change on every run.</span><span lang="ko">클라이언트 셋이 거의 동시에 접속하고(connected 세 줄), 각자 메시지 두 개를 0.5초 간격으로 보낸 뒤 떠난다. 한 클라이언트가 쉬는 동안 서버는 다른 클라이언트에 답한다. 스레드는 하나다. 마지막 세 줄은 각 클라이언트가 받은 대문자 답이다. port 숫자는 운영체제가 정하므로 실행마다 다르다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_server.py serve &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_server.py serve &amp;">▶</button><code>python3 echo_server.py serve &amp;</code></div>
+          <p><span lang="en">This time only the server runs, in the background (&amp;) on port 8765. server: listening on 127.0.0.1:8765 appears shortly. The prompt comes back at once and the server's output is mixed in with it.</span><span lang="ko">이번에는 서버만 8765번 포트에서 백그라운드로 띄운다(&amp;). 곧 server: listening on 127.0.0.1:8765가 나온다. 프롬프트는 바로 돌아오고 서버 출력은 그 사이에 섞여 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_client.py hello world" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_client.py hello world">▶</button><code>python3 echo_client.py hello world</code></div>
+          <p><span lang="en">Connect from another process: client got: HELLO, client got: WORLD. If the server is still starting, the client retries a few times half a second apart.</span><span lang="ko">다른 프로세스에서 접속한다. client got: HELLO, client got: WORLD. 서버가 아직 준비 중이면 클라이언트가 0.5초 간격으로 몇 번 다시 시도한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_client.py 'how are you'; wait" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_client.py 'how are you'; wait">▶</button><code>python3 echo_client.py 'how are you'; wait</code></div>
+          <p><span lang="en">After the second client gets HOW ARE YOU, the server prints server: served 2 clients, bye and ends by itself. wait waits for the background server to finish.</span><span lang="ko">두 번째 클라이언트가 HOW ARE YOU를 받고 나면 서버는 server: served 2 clients, bye를 출력하고 스스로 끝난다. wait는 백그라운드 서버가 끝날 때까지 기다린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_client.py hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_client.py hello">▶</button><code>python3 echo_client.py hello</code></div>
+          <p><span lang="en">The server is gone, so the connection is refused (ConnectionRefusedError). After a few retries the client prints client: no server on 127.0.0.1:8765.</span><span lang="ko">서버가 끝났으므로 연결이 거절된다(ConnectionRefusedError). 클라이언트는 몇 번 다시 시도한 뒤 client: no server on 127.0.0.1:8765를 출력한다.</span></p>
+        </li>
+      </ol>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="threads">
+    <details class="source" open data-path="/home/student/concurrency/threads/download_sim.py">
+      <summary>download_sim.py <span class="muted src-lines" data-lines="42"><span lang="en">42 lines</span><span lang="ko">42줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Three pretend downloads, first one after another, then in three threads.</span>
+<span class="ln"> </span>
+<span class="ln">Each download only waits (time.sleep stands in for the network), so while</span>
+<span class="ln">one thread waits the others can run: the waits overlap.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import threading</span>
+<span class="ln">import time</span>
+<span class="ln"> </span>
+<span class="ln">FILES = [&quot;a.txt&quot;, &quot;b.txt&quot;, &quot;c.txt&quot;]</span>
+<span class="ln">WAIT = 1.0   # seconds each download waits for the &quot;network&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def download(name):</span>
+<span class="ln">    print(f&quot;  start {name}&quot;)</span>
+<span class="ln">    time.sleep(WAIT)             # waiting: this thread sleeps, the CPU is free</span>
+<span class="ln">    print(f&quot;  done  {name}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def one_after_another():</span>
+<span class="ln">    for name in FILES:</span>
+<span class="ln">        download(name)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def in_threads():</span>
+<span class="ln">    threads = [threading.Thread(target=download, args=(name,)) for name in FILES]</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.start()                # starts running download(name) in the background</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.join()                 # waits until that thread has finished</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def timed(label, func):</span>
+<span class="ln">    print(label)</span>
+<span class="ln">    start = time.perf_counter()</span>
+<span class="ln">    func()</span>
+<span class="ln">    elapsed = time.perf_counter() - start</span>
+<span class="ln">    print(f&quot;{label}: about {round(elapsed)} s&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    timed(&quot;sequential&quot;, one_after_another)</span>
+<span class="ln">    timed(&quot;threaded&quot;, in_threads)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="race_lock" hidden>
+    <details class="source" open data-path="/home/student/concurrency/race/counter_race.py">
+      <summary>counter_race.py <span class="muted src-lines" data-lines="50"><span lang="en">50 lines</span><span lang="ko">50줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Four threads add to one shared balance.  Run: python3 counter_race.py [lock]</span>
+<span class="ln"> </span>
+<span class="ln">Without the lock, a thread can read the balance, get paused, and write back</span>
+<span class="ln">an old value: other threads' deposits are lost.  With the lock, only one</span>
+<span class="ln">thread at a time runs the read-and-write part.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import sys</span>
+<span class="ln">import threading</span>
+<span class="ln">import time</span>
+<span class="ln"> </span>
+<span class="ln">THREADS = 4</span>
+<span class="ln">DEPOSITS = 1000              # per thread</span>
+<span class="ln"> </span>
+<span class="ln">balance = 0</span>
+<span class="ln">lock = threading.Lock()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def deposit(times, use_lock):</span>
+<span class="ln">    global balance</span>
+<span class="ln">    for _ in range(times):</span>
+<span class="ln">        if use_lock:</span>
+<span class="ln">            with lock:                   # acquire ... release, even on errors</span>
+<span class="ln">                current = balance</span>
+<span class="ln">                time.sleep(0)</span>
+<span class="ln">                balance = current + 1</span>
+<span class="ln">        else:</span>
+<span class="ln">            current = balance            # 1. read</span>
+<span class="ln">            time.sleep(0)                # 2. pause: another thread may run now</span>
+<span class="ln">            balance = current + 1        # 3. write back (maybe a stale value)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    use_lock = sys.argv[1:] == [&quot;lock&quot;]</span>
+<span class="ln">    threads = [threading.Thread(target=deposit, args=(DEPOSITS, use_lock))</span>
+<span class="ln">               for _ in range(THREADS)]</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.start()</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.join()</span>
+<span class="ln"> </span>
+<span class="ln">    expected = THREADS * DEPOSITS</span>
+<span class="ln">    print(&quot;with lock:&quot; if use_lock else &quot;without lock:&quot;, f&quot;expected {expected}, got {balance}&quot;)</span>
+<span class="ln">    if balance == expected:</span>
+<span class="ln">        print(&quot;correct&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(f&quot;lost updates: {expected - balance}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="producer_consumer" hidden>
+    <details class="source" open data-path="/home/student/concurrency/queue/kitchen.py">
+      <summary>kitchen.py <span class="muted src-lines" data-lines="54"><span lang="en">54 lines</span><span lang="ko">54줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Producer/consumer: one waiter takes orders, two cooks cook them.</span>
+<span class="ln"> </span>
+<span class="ln">The waiter (producer) puts orders into a queue.Queue; each cook (consumer)</span>
+<span class="ln">takes the next order out.  queue.Queue does its own locking, so the threads</span>
+<span class="ln">never touch a shared list directly.  None is the &quot;no more orders&quot; signal.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import queue</span>
+<span class="ln">import threading</span>
+<span class="ln">import time</span>
+<span class="ln"> </span>
+<span class="ln">ORDERS = [&quot;ramen&quot;, &quot;bibimbap&quot;, &quot;tteokbokki&quot;, &quot;kimbap&quot;, &quot;mandu&quot;, &quot;japchae&quot;]</span>
+<span class="ln">COOKS = 2</span>
+<span class="ln">COOK_TIME = 0.5              # seconds per dish</span>
+<span class="ln"> </span>
+<span class="ln">orders = queue.Queue(maxsize=3)   # the counter holds at most 3 tickets</span>
+<span class="ln">served = queue.Queue()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def waiter():</span>
+<span class="ln">    for dish in ORDERS:</span>
+<span class="ln">        orders.put(dish)              # blocks while the counter is full</span>
+<span class="ln">        print(f&quot;waiter: order {dish}&quot;)</span>
+<span class="ln">    for _ in range(COOKS):</span>
+<span class="ln">        orders.put(None)              # one stop signal per cook</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def cook(name):</span>
+<span class="ln">    while True:</span>
+<span class="ln">        dish = orders.get()           # blocks until there is an order</span>
+<span class="ln">        if dish is None:</span>
+<span class="ln">            break</span>
+<span class="ln">        time.sleep(COOK_TIME)</span>
+<span class="ln">        print(f&quot;{name}: {dish} ready&quot;)</span>
+<span class="ln">        served.put((dish, name))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    start = time.perf_counter()</span>
+<span class="ln">    threads = [threading.Thread(target=waiter)]</span>
+<span class="ln">    threads += [threading.Thread(target=cook, args=(f&quot;cook{i}&quot;,)) for i in range(1, COOKS + 1)]</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.start()</span>
+<span class="ln">    for t in threads:</span>
+<span class="ln">        t.join()</span>
+<span class="ln">    elapsed = time.perf_counter() - start</span>
+<span class="ln"> </span>
+<span class="ln">    dishes = sorted(served.get()[0] for _ in range(served.qsize()))</span>
+<span class="ln">    print(f&quot;served {len(dishes)} dishes:&quot;, &quot;, &quot;.join(dishes))</span>
+<span class="ln">    alone = len(ORDERS) * COOK_TIME</span>
+<span class="ln">    print(f&quot;{COOKS} cooks: about {round(elapsed * 2) / 2} s (one cook would need {alone} s)&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="thread_pool" hidden>
+    <details class="source" open data-path="/home/student/concurrency/pool/pool_demo.py">
+      <summary>pool_demo.py <span class="muted src-lines" data-lines="35"><span lang="en">35 lines</span><span lang="ko">35줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;concurrent.futures.ThreadPoolExecutor: a pool of worker threads.</span>
+<span class="ln"> </span>
+<span class="ln">fetch() pretends to download a page: it waits, then returns a file name.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import time</span>
+<span class="ln">from concurrent.futures import ThreadPoolExecutor, as_completed</span>
+<span class="ln"> </span>
+<span class="ln">PAGES = {&quot;home&quot;: 1.5, &quot;news&quot;: 0.5, &quot;about&quot;: 1.0}   # page -&gt; seconds to wait</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def fetch(page):</span>
+<span class="ln">    time.sleep(PAGES[page])</span>
+<span class="ln">    return f&quot;{page}.html&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def with_map():</span>
+<span class="ln">    print(&quot;map: results in the order of the inputs&quot;)</span>
+<span class="ln">    with ThreadPoolExecutor(max_workers=3) as pool:</span>
+<span class="ln">        for result in pool.map(fetch, PAGES):</span>
+<span class="ln">            print(&quot;  got&quot;, result)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def with_as_completed():</span>
+<span class="ln">    print(&quot;submit + as_completed: results in the order they finish&quot;)</span>
+<span class="ln">    with ThreadPoolExecutor(max_workers=3) as pool:</span>
+<span class="ln">        futures = [pool.submit(fetch, page) for page in PAGES]</span>
+<span class="ln">        for future in as_completed(futures):</span>
+<span class="ln">            print(&quot;  got&quot;, future.result())</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    start = time.perf_counter()</span>
+<span class="ln">    with_map()</span>
+<span class="ln">    with_as_completed()</span>
+<span class="ln">    print(f&quot;total: about {round(time.perf_counter() - start)} s (one by one: 6 s)&quot;)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/concurrency/pool/cpu_pool.py">
+      <summary>cpu_pool.py <span class="muted src-lines" data-lines="50"><span lang="en">50 lines</span><span lang="ko">50줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CPU work: one by one, in a thread pool, and in a process pool.</span>
+<span class="ln"> </span>
+<span class="ln">count_primes() only computes, it never waits.  Threads share one interpreter</span>
+<span class="ln">(and, in the usual build, one GIL), so they cannot compute in parallel.</span>
+<span class="ln">Processes can -- but only if the machine has more than one CPU core.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import os</span>
+<span class="ln">import time</span>
+<span class="ln">from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor</span>
+<span class="ln"> </span>
+<span class="ln">CHUNKS = [(2, 4000), (4000, 8000), (8000, 12000), (12000, 16000)]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def count_primes(bounds):</span>
+<span class="ln">    low, high = bounds</span>
+<span class="ln">    count = 0</span>
+<span class="ln">    for n in range(low, high):</span>
+<span class="ln">        if all(n % d for d in range(2, int(n ** 0.5) + 1)):</span>
+<span class="ln">            count += 1</span>
+<span class="ln">    return count</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def measure(label, run):</span>
+<span class="ln">    start = time.perf_counter()</span>
+<span class="ln">    total = sum(run())</span>
+<span class="ln">    elapsed = time.perf_counter() - start</span>
+<span class="ln">    print(f&quot;{label:&lt;10} {total} primes  {elapsed:.1f} s&quot;)</span>
+<span class="ln">    return elapsed</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    print(&quot;CPU cores:&quot;, os.cpu_count())</span>
+<span class="ln">    count_primes(CHUNKS[0])          # warm-up: the first run of any code is slower</span>
+<span class="ln">    base = measure(&quot;one by one&quot;, lambda: map(count_primes, CHUNKS))</span>
+<span class="ln">    with ThreadPoolExecutor(max_workers=4) as pool:</span>
+<span class="ln">        threads = measure(&quot;threads&quot;, lambda: pool.map(count_primes, CHUNKS))</span>
+<span class="ln">    with ProcessPoolExecutor(max_workers=4) as pool:</span>
+<span class="ln">        processes = measure(&quot;processes&quot;, lambda: pool.map(count_primes, CHUNKS))</span>
+<span class="ln">    for label, seconds in ((&quot;threads&quot;, threads), (&quot;processes&quot;, processes)):</span>
+<span class="ln">        if seconds &lt; 0.6 * base:</span>
+<span class="ln">            verdict = &quot;faster than&quot;</span>
+<span class="ln">        elif seconds &gt; 1.5 * base:</span>
+<span class="ln">            verdict = &quot;slower than&quot;</span>
+<span class="ln">        else:</span>
+<span class="ln">            verdict = &quot;about the same as&quot;</span>
+<span class="ln">        print(f&quot;{label}: {verdict} one by one&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:   # required: worker processes import this file</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="asyncio_basics" hidden>
+    <details class="source" open data-path="/home/student/concurrency/asyncio/async_basics.py">
+      <summary>async_basics.py <span class="muted src-lines" data-lines="34"><span lang="en">34 lines</span><span lang="ko">34줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;asyncio: many waits on one thread.</span>
+<span class="ln"> </span>
+<span class="ln">A coroutine (async def) pauses at each await and lets the event loop run</span>
+<span class="ln">another coroutine until its wait is over.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import asyncio</span>
+<span class="ln">import time</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def brew(drink, seconds):</span>
+<span class="ln">    print(f&quot;  start {drink}&quot;)</span>
+<span class="ln">    await asyncio.sleep(seconds)     # pause here; other coroutines run meanwhile</span>
+<span class="ln">    print(f&quot;  done  {drink}&quot;)</span>
+<span class="ln">    return f&quot;{drink} ({seconds} s)&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def one_after_another():</span>
+<span class="ln">    return [await brew(&quot;coffee&quot;, 1), await brew(&quot;tea&quot;, 1), await brew(&quot;cocoa&quot;, 1)]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def together():</span>
+<span class="ln">    return await asyncio.gather(brew(&quot;coffee&quot;, 1), brew(&quot;tea&quot;, 1), brew(&quot;cocoa&quot;, 1))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def main():</span>
+<span class="ln">    for label, func in ((&quot;one after another&quot;, one_after_another), (&quot;gather&quot;, together)):</span>
+<span class="ln">        print(label)</span>
+<span class="ln">        start = time.perf_counter()</span>
+<span class="ln">        results = await func()</span>
+<span class="ln">        print(f&quot;{label}: {results} in about {round(time.perf_counter() - start)} s&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    asyncio.run(main())              # start the event loop and run main() to the end</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="echo_server" hidden>
+    <details class="source" open data-path="/home/student/concurrency/asyncio/echo_server.py">
+      <summary>echo_server.py <span class="muted src-lines" data-lines="80"><span lang="en">80 lines</span><span lang="ko">80줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;An asyncio TCP echo server on 127.0.0.1.</span>
+<span class="ln"> </span>
+<span class="ln">  python3 echo_server.py          server + 3 clients in this one script</span>
+<span class="ln">  python3 echo_server.py serve    only the server, on port 8765; it stops</span>
+<span class="ln">                                  after 2 clients or 30 seconds</span>
+<span class="ln"> </span>
+<span class="ln">One thread, one event loop: while one client is quiet, the server answers</span>
+<span class="ln">the others.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import asyncio</span>
+<span class="ln">import sys</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 8765</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def handle(reader, writer):</span>
+<span class="ln">    &quot;&quot;&quot;Called once per connection; echoes each line back in capitals.&quot;&quot;&quot;</span>
+<span class="ln">    peer = writer.get_extra_info(&quot;peername&quot;)[1]</span>
+<span class="ln">    print(f&quot;server: client from port {peer} connected&quot;)</span>
+<span class="ln">    while True:</span>
+<span class="ln">        line = await reader.readline()        # b&quot;&quot; when the client hangs up</span>
+<span class="ln">        if not line:</span>
+<span class="ln">            break</span>
+<span class="ln">        writer.write(line.upper())</span>
+<span class="ln">        await writer.drain()</span>
+<span class="ln">    print(f&quot;server: client from port {peer} left&quot;)</span>
+<span class="ln">    writer.close()</span>
+<span class="ln">    await writer.wait_closed()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def client(name, messages, port):</span>
+<span class="ln">    reader, writer = await asyncio.open_connection(HOST, port)</span>
+<span class="ln">    replies = []</span>
+<span class="ln">    for text in messages:</span>
+<span class="ln">        writer.write(f&quot;{name}: {text}\n&quot;.encode())</span>
+<span class="ln">        await writer.drain()</span>
+<span class="ln">        replies.append((await reader.readline()).decode().strip())</span>
+<span class="ln">        await asyncio.sleep(0.5)              # a slow client; others go on</span>
+<span class="ln">    writer.close()</span>
+<span class="ln">    await writer.wait_closed()</span>
+<span class="ln">    return replies</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def demo():</span>
+<span class="ln">    server = await asyncio.start_server(handle, HOST, 0)   # port 0: any free port</span>
+<span class="ln">    port = server.sockets[0].getsockname()[1]</span>
+<span class="ln">    async with server:</span>
+<span class="ln">        results = await asyncio.gather(</span>
+<span class="ln">            client(&quot;mina&quot;, [&quot;hi&quot;, &quot;bye&quot;], port),</span>
+<span class="ln">            client(&quot;jun&quot;, [&quot;hello&quot;, &quot;see you&quot;], port),</span>
+<span class="ln">            client(&quot;sora&quot;, [&quot;hey&quot;, &quot;later&quot;], port),</span>
+<span class="ln">        )</span>
+<span class="ln">    for replies in results:</span>
+<span class="ln">        print(&quot;client got:&quot;, replies)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def serve(clients=2, seconds=30):</span>
+<span class="ln">    done = asyncio.Event()</span>
+<span class="ln">    count = 0</span>
+<span class="ln"> </span>
+<span class="ln">    async def handle_and_count(reader, writer):</span>
+<span class="ln">        nonlocal count</span>
+<span class="ln">        await handle(reader, writer)</span>
+<span class="ln">        count += 1</span>
+<span class="ln">        if count == clients:</span>
+<span class="ln">            done.set()</span>
+<span class="ln"> </span>
+<span class="ln">    server = await asyncio.start_server(handle_and_count, HOST, PORT)</span>
+<span class="ln">    print(f&quot;server: listening on {HOST}:{PORT}&quot;)</span>
+<span class="ln">    async with server:</span>
+<span class="ln">        try:</span>
+<span class="ln">            await asyncio.wait_for(done.wait(), seconds)</span>
+<span class="ln">        except TimeoutError:</span>
+<span class="ln">            print(&quot;server: time is up&quot;)</span>
+<span class="ln">    print(f&quot;server: served {count} clients, bye&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    asyncio.run(serve() if sys.argv[1:] == [&quot;serve&quot;] else demo())</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/concurrency/asyncio/echo_client.py">
+      <summary>echo_client.py <span class="muted src-lines" data-lines="39"><span lang="en">39 lines</span><span lang="ko">39줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Sends each argument as a line to the echo server and prints the replies.</span>
+<span class="ln"> </span>
+<span class="ln">  python3 echo_client.py hello world</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import asyncio</span>
+<span class="ln">import sys</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 8765</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def connect(tries=6):</span>
+<span class="ln">    &quot;&quot;&quot;The server may still be starting: try a few times, half a second apart.&quot;&quot;&quot;</span>
+<span class="ln">    for _ in range(tries - 1):</span>
+<span class="ln">        try:</span>
+<span class="ln">            return await asyncio.open_connection(HOST, PORT)</span>
+<span class="ln">        except ConnectionRefusedError:</span>
+<span class="ln">            await asyncio.sleep(0.5)</span>
+<span class="ln">    return await asyncio.open_connection(HOST, PORT)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">async def main(messages):</span>
+<span class="ln">    try:</span>
+<span class="ln">        reader, writer = await connect()</span>
+<span class="ln">    except ConnectionRefusedError:</span>
+<span class="ln">        print(f&quot;client: no server on {HOST}:{PORT}&quot;)</span>
+<span class="ln">        return 1</span>
+<span class="ln">    for text in messages:</span>
+<span class="ln">        writer.write(text.encode() + b&quot;\n&quot;)</span>
+<span class="ln">        await writer.drain()</span>
+<span class="ln">        reply = await reader.readline()</span>
+<span class="ln">        print(&quot;client got:&quot;, reply.decode().strip())</span>
+<span class="ln">    writer.close()</span>
+<span class="ln">    await writer.wait_closed()</span>
+<span class="ln">    return 0</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    sys.exit(asyncio.run(main(sys.argv[1:] or [&quot;hello&quot;])))</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-concurrency">
+      <h2 class="notes-title"><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></h2>
+<div lang="en">
+<p>This topic is concurrency. Much of what programs do is not computing but waiting: for a web page to arrive, for a file to be read, for the user to type. If a program does something else while it waits, the same work can finish in far less time. First we use <code>threading</code> to create threads and overlap waits, and look at the race conditions that appear when several threads change the same value, and at <code>Lock</code>. Then we cover the producer/consumer pattern with <code>queue.Queue</code>, <code>concurrent.futures</code>, which manages threads for you, and <code>asyncio</code>, which handles many waits on a single thread. Finally we build an asyncio TCP echo server. The practice pages are <a href="#ex=threads">threads</a>, <a href="#ex=race_lock">race_lock</a>, <a href="#ex=producer_consumer">producer_consumer</a>, <a href="#ex=thread_pool">thread_pool</a>, <a href="#ex=asyncio_basics">asyncio_basics</a> and <a href="#ex=echo_server">echo_server</a>.</p>
+
+<h2>What concurrency is: overlapping waits</h2>
+
+<h3>The barista</h3>
+
+<p>Say a barista takes an order for three coffees. If they stand by the machine for the minute it takes to brew one cup and only then start the next, it takes three minutes. If they put the first cup on, then the second and third right away, it takes about one minute. There is still one barista with two hands. The only change is that the waiting times overlap. That is concurrency.</p>
+
+<p>With three baristas, three people really move their hands at the same time. That is parallelism. Concurrency means <em>dealing with several tasks at once by taking turns</em>; parallelism means <em>actually running several tasks at the same instant</em>. Running in parallel needs several CPU cores.</p>
+
+<h3>I/O-bound and CPU-bound work</h3>
+
+<p>Whether a task can get faster depends on what it spends its time on.</p>
+
+<table>
+<thead>
+<tr><th>Kind</th><th>Time goes into</th><th>Examples</th><th>With threads or asyncio</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O-bound</td><td>waiting for the outside world: network, disk, the user</td><td>downloads, database queries, a server answering clients</td><td>the waits overlap, so it gets faster</td></tr>
+<tr><td>CPU-bound</td><td>computing</td><td>counting primes, image processing, big matrix products</td><td>no faster on one core</td></tr>
+</tbody>
+</table>
+
+<p>In this lab, <code>time.sleep</code> stands in for a real network wait. A sleeping thread does not use the CPU, so it behaves just like a real I/O wait.</p>
+
+<h3>About this virtual machine</h3>
+
+<p>The virtual machine in your browser has <strong>one</strong> CPU core, and because it is emulated it is much slower than a real PC. <code>os.cpu_count()</code> returns 1. Examples that overlap waits therefore speed up exactly as they would on a PC, but pure computation does not get faster whether you split it into threads or processes. The section on CPU-bound work below explains what changes on a PC with several cores.</p>
+
+<h2>threading: creating threads</h2>
+
+<h3>What a thread is</h3>
+
+<p>A thread is a separate flow of execution inside one program (process). A program starts with a single main thread. New threads see the same memory (the same variables, the same objects) while each runs its own function. While one thread waits in <code>time.sleep</code> or a network read, other threads run.</p>
+
+<h3>Thread, start, join</h3>
+
+<p><code>threading.Thread(target=function, args=(argument,))</code> creates a thread object, <code>start()</code> sets it going and <code>join()</code> waits for it to finish. Here is the heart of the <a href="#ex=threads">threads</a> example.</p>
+
+<pre><code>import threading
+import time
+
+def download(name):
+    print(f"  start {name}")
+    time.sleep(1.0)             # waiting: this thread sleeps, the CPU is free
+    print(f"  done  {name}")
+
+threads = [threading.Thread(target=download, args=(name,)) for name in FILES]
+for t in threads:
+    t.start()                   # starts running download(name) in the background
+for t in threads:
+    t.join()                    # waits until that thread has finished</code></pre>
+
+<p>Splitting the starting and the waiting into two loops matters. If you call <code>join()</code> right after <code>start()</code> in the same loop, the second thread does not start until the first has finished, which is the same as running them one by one. Start them all, then wait for them all.</p>
+
+<h3>Measuring time: time.perf_counter</h3>
+
+<p>Measure elapsed time with <code>time.perf_counter()</code>. Its value by itself means nothing; the difference between two calls is the number of seconds in between. It is not affected by changes to the clock, which makes it right for measurements. Measurements vary a little from run to run, so the examples round them with <code>round()</code> and print things like "about 1 s".</p>
+
+<pre><code>start = time.perf_counter()
+func()
+elapsed = time.perf_counter() - start
+print(f"about {round(elapsed)} s")</code></pre>
+
+<pre><code>sequential: about 3 s
+threaded: about 1 s</code></pre>
+
+<p>In the threaded run the three start lines come first, followed by the three done lines. Which thread prints first is up to the operating system, so the order can change between runs. Never write code that depends on the order in which threads print.</p>
+
+<h3>Getting results out of a thread</h3>
+
+<p>The <code>return</code> value of a thread's function is thrown away. If you need results, put them in a dictionary or list that all threads can see, and read it after <code>join()</code> has confirmed they are all done. Right after <code>start()</code> it is still empty. <code>concurrent.futures</code>, below, is the more convenient way to get results back.</p>
+
+<pre><code>results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds      # each thread writes its own key
+
+# ... start all, then join all ...
+print(results)</code></pre>
+
+<h3>Without join</h3>
+
+<p>Without <code>join()</code>, the main thread does not wait for the threads and moves straight on. The program still does not vanish before the work is done, because Python ends the process only when every non-daemon thread has finished. A daemon thread, created with <code>Thread(..., daemon=True)</code>, is stopped when the main thread ends. Wherever you need the results, always <code>join()</code> first.</p>
+
+<h2>Shared state and race conditions</h2>
+
+<h3>Disappearing deposits</h3>
+
+<p>Threads share memory, which is convenient, and that is exactly what makes them dangerous. In the <a href="#ex=race_lock">race_lock</a> example, four threads each add 1 to a single <code>balance</code> 1000 times. The result should be 4000.</p>
+
+<pre><code>def deposit(times):
+    global balance
+    for _ in range(times):
+        current = balance          # 1. read
+        time.sleep(0)              # 2. pause: another thread may run now
+        balance = current + 1      # 3. write back (maybe a stale value)</code></pre>
+
+<pre><code>without lock: expected 4000, got 1001
+lost updates: 2999</code></pre>
+
+<p>When two threads A and B take turns, this happens:</p>
+
+<table>
+<thead>
+<tr><th>Step</th><th>Thread A</th><th>Thread B</th><th>balance</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><code>current = balance</code> (10)</td><td></td><td>10</td></tr>
+<tr><td>2</td><td></td><td><code>current = balance</code> (10)</td><td>10</td></tr>
+<tr><td>3</td><td><code>balance = 11</code></td><td></td><td>11</td></tr>
+<tr><td>4</td><td></td><td><code>balance = 11</code></td><td>11</td></tr>
+</tbody>
+</table>
+
+<p>Two deposits were made but the value went up by only 1, because B read the old value before A wrote. When the result depends on the order in which threads happen to run, that is a race condition. There is no error message, and some runs happen to come out right, which makes these bugs hard to find. The <code>time.sleep(0)</code> in the example deliberately hands over the turn between the read and the write so that the problem shows up every time.</p>
+
+<h3>One line is not safe either</h3>
+
+<p><code>counter += 1</code> is one line but not one action. Looking at the bytecode with <code>dis.dis</code> shows it split into a read, an add and a write.</p>
+
+<pre><code>LOAD_GLOBAL              0 (counter)
+LOAD_SMALL_INT           1
+BINARY_OP               13 (+=)
+STORE_GLOBAL             0 (counter)</code></pre>
+
+<p>On the lab machine, doing plain <code>counter += 1</code> 400,000 times with no sleep usually gives exactly 400000, because today's CPython rarely switches threads in the middle of such short code. But that is an accident of the implementation, not a promise of the language. A different version, slightly longer code, or a build without the GIL running on several cores can give a wrong value. A correct result is not proof that the code is safe.</p>
+
+<h3>threading.Lock</h3>
+
+<p>A <code>Lock</code> is a key that only one thread can hold at a time. Entering a <code>with lock:</code> block takes the key (acquire) and leaving it gives the key back (release). If another thread holds the key, you wait until it is returned. Even if an exception happens inside the block, <code>with</code> gives the key back, so it is safer than calling <code>acquire()</code> and <code>release()</code> yourself.</p>
+
+<pre><code>lock = threading.Lock()
+
+def deposit(times):
+    global balance
+    for _ in range(times):
+        with lock:                 # only one thread at a time in here
+            current = balance
+            time.sleep(0)
+            balance = current + 1</code></pre>
+
+<pre><code>with lock: expected 4000, got 4000
+correct</code></pre>
+
+<p>Keep the part inside the lock (the critical section) down to the minimum that reads and changes the shared value. If you wait for a long time inside the lock, every other thread stops too and the threads gain you nothing.</p>
+
+<h3>Deadlock</h3>
+
+<p>A <code>Lock</code> cannot be taken again even by the thread that already holds it. If a thread inside <code>with lock:</code> tries to take <code>lock</code> again, it waits for itself forever. The same happens when two threads each wait for the other's lock. This is called a deadlock. The example uses <code>lock.acquire(timeout=1)</code> to wait for just one second and see <code>False</code>. When the same thread needs to take a lock several times, use <code>threading.RLock</code>. If you use several locks, make every thread take them in the same order.</p>
+
+<h2>queue.Queue: producers and consumers</h2>
+
+<h3>The safest way to share work</h3>
+
+<p>Instead of guarding shared variables with locks, have threads pass messages to each other; there is less room for mistakes. A <code>queue.Queue</code> is a first-in, first-out line that many threads can use at the same time safely. The side that creates work (the producer) puts items in with <code>put()</code>, and the side that handles it (the consumer) takes them out with <code>get()</code>. The queue does the locking itself.</p>
+
+<table>
+<thead>
+<tr><th>Method</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>q.put(item)</code></td><td>adds an item; if <code>maxsize</code> is reached, waits until there is room</td></tr>
+<tr><td><code>q.get()</code></td><td>takes out the oldest item; if the queue is empty, waits until one arrives</td></tr>
+<tr><td><code>q.get(timeout=1)</code></td><td>waits at most 1 second, then raises <code>queue.Empty</code></td></tr>
+<tr><td><code>q.put_nowait(item)</code></td><td>does not wait; raises <code>queue.Full</code> if the queue is full</td></tr>
+<tr><td><code>q.qsize()</code></td><td>how many items are in it right now (other threads may change that at any moment)</td></tr>
+</tbody>
+</table>
+
+<h3>The waiter and the cooks</h3>
+
+<p>In <code>kitchen.py</code> from <a href="#ex=producer_consumer">producer_consumer</a>, a waiter thread puts orders into a queue, and two cook threads take them out one at a time and cook each for 0.5 seconds.</p>
+
+<pre><code>orders = queue.Queue(maxsize=3)   # the counter holds at most 3 tickets
+
+def waiter():
+    for dish in ORDERS:
+        orders.put(dish)              # blocks while the counter is full
+    for _ in range(COOKS):
+        orders.put(None)              # one stop signal per cook
+
+def cook(name):
+    while True:
+        dish = orders.get()           # blocks until there is an order
+        if dish is None:
+            break
+        time.sleep(COOK_TIME)
+        served.put((dish, name))</code></pre>
+
+<p>The cooks keep taking orders in a <code>while True</code> loop, so they need some way to learn that the work is over. Here the waiter puts one <code>None</code> per cook, and a cook who takes out <code>None</code> leaves the loop. A special value like this is called a sentinel. With only one sentinel, only one cook would stop; the other would wait in <code>get()</code> forever and the program would never end.</p>
+
+<p><code>maxsize=3</code> limits the size of the queue. When the producer is faster than the consumers, it pauses the producer so that work does not pile up in memory without end (backpressure). When you run it, you can see the waiter stop after five orders until a dish is finished.</p>
+
+<pre><code>served 6 dishes: bibimbap, japchae, kimbap, mandu, ramen, tteokbokki
+2 cooks: about 1.5 s (one cook would need 3.0 s)</code></pre>
+
+<p>With three cooks it takes about 1.0 s. Only the number of consumers changes; the producer code stays the same. The list of results is printed with <code>sorted()</code> because which dish finishes first can change from run to run. Queues also offer <code>task_done()</code> and <code>join()</code> for "wait until everything that was put in has been handled".</p>
+
+<h2>concurrent.futures: thread pools</h2>
+
+<h3>ThreadPoolExecutor and map</h3>
+
+<p>Creating threads, starting them, waiting for them and collecting results looks much the same every time. <code>concurrent.futures.ThreadPoolExecutor</code> keeps a few worker threads ready (a pool), shares out the jobs you give it and hands back the results. Leaving the <code>with</code> block waits for all jobs to finish and cleans up the threads.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    for result in pool.map(fetch, PAGES):
+        print("  got", result)</code></pre>
+
+<p><code>pool.map(function, inputs)</code> is used like the built-in <code>map</code> but runs in several threads. Results come out <strong>in the order of the inputs</strong>. If home, which takes 1.5 seconds, is the first input, then news, done after 0.5 seconds, still waits for home and comes out second. You get the function's return value directly, so no shared dictionary is needed.</p>
+
+<h3>submit, Future, as_completed</h3>
+
+<p><code>pool.submit(function, argument)</code> hands over one job and immediately returns a <code>Future</code>, a receipt for a result that will come later. <code>future.result()</code> waits for the result and returns it. <code>as_completed(futures)</code> yields the futures one by one <strong>in the order they finish</strong>. Use it when you want to handle whichever result is ready first.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    futures = [pool.submit(fetch, page) for page in PAGES]
+    for future in as_completed(futures):
+        print("  got", future.result())</code></pre>
+
+<pre><code>map: results in the order of the inputs
+  got home.html
+  got news.html
+  got about.html
+submit + as_completed: results in the order they finish
+  got news.html
+  got about.html
+  got home.html
+total: about 3 s (one by one: 6 s)</code></pre>
+
+<h3>Exceptions inside jobs</h3>
+
+<p>When a worker thread raises an exception, nothing shows at that moment. The exception is stored in the Future and raised again when you call <code>future.result()</code>, which is why that call is wrapped in <code>try</code>. If you never call <code>result()</code>, the exception disappears silently, so watch out.</p>
+
+<pre><code>for n, future in zip(range(1, 5), futures):
+    try:
+        print(n, "->", future.result())
+    except ValueError as error:
+        print(n, "-> error:", error)</code></pre>
+
+<h3>max_workers</h3>
+
+<p><code>max_workers</code> is the number of threads working at once. With 1 it is the same as one by one, and more workers than jobs does not help. For work that is mostly waiting, even dozens of workers are fine, but it is polite to keep the number reasonable so you do not hit someone else's server with too many requests at once.</p>
+
+<h2>CPU-bound work, the GIL and processes</h2>
+
+<h3>Why computation does not get faster</h3>
+
+<p><code>cpu_pool.py</code> splits a pure computation, counting primes, into four chunks and runs them one by one, in a thread pool and in a process pool. Here is the result on this virtual machine (the seconds change from run to run).</p>
+
+<pre><code>CPU cores: 1
+one by one 1862 primes  0.7 s
+threads    1862 primes  0.7 s
+processes  1862 primes  3.3 s
+threads: about the same as one by one
+processes: slower than one by one</code></pre>
+
+<p>With one core, only one computation can run at a time. Threads and processes just take turns, and the total amount of computing stays the same. The processes are even slower, because starting new Python processes and passing data to and from them adds its own cost.</p>
+
+<h3>The GIL</h3>
+
+<p>Even on a PC with several cores, splitting computation across threads does not speed it up in standard CPython. A lock called the GIL (Global Interpreter Lock) means that only one thread in a process runs Python code at any moment. Threads do release the GIL while they wait, in <code>time.sleep</code>, file reads or socket reads, which is why I/O-bound work overlaps well in threads. Since Python 3.13 there is also a separate free-threaded build without the GIL, in which threads can compute together on several cores, but the default install is still the build with the GIL. The Python in this virtual machine has the GIL enabled too.</p>
+
+<h3>ProcessPoolExecutor</h3>
+
+<p>The standard way to spread computation over several cores is processes. Each process has its own interpreter and its own GIL, so as many can compute at once as there are cores. <code>ProcessPoolExecutor</code> is used just like <code>ThreadPoolExecutor</code>.</p>
+
+<pre><code>from concurrent.futures import ProcessPoolExecutor
+
+def main():
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        total = sum(pool.map(count_primes, CHUNKS))
+
+if __name__ == "__main__":   # required: worker processes import this file
+    main()</code></pre>
+
+<p>There are some differences. The worker processes import this file to find <code>count_primes</code>, so the <code>if __name__ == "__main__":</code> guard is required and the code has to live in a file (code fed through standard input with <code>python3 -</code> cannot be imported, so it fails). Arguments and results are copied between processes, so they must be values that pickle can convert, and big ones are slow to send. Processes do not share memory, so changing a global variable in one is invisible to the others. On a PC with several cores and a big enough job (at least tens of milliseconds per chunk), a process pool runs faster than one by one by a factor close to the number of cores. If the job is too small, starting the processes costs more than it saves, even on a PC.</p>
+
+<table>
+<thead>
+<tr><th></th><th>One core (this virtual machine)</th><th>PC with several cores</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O-bound + threads/asyncio</td><td>faster</td><td>faster</td></tr>
+<tr><td>CPU-bound + threads</td><td>no change</td><td>no change (GIL); can be faster on a free-threaded build</td></tr>
+<tr><td>CPU-bound + processes</td><td>even slower</td><td>faster if the job is big enough</td></tr>
+</tbody>
+</table>
+
+<h2>asyncio: overlapping waits on one thread</h2>
+
+<h3>Coroutines and the event loop</h3>
+
+<p>The operating system can switch threads at any moment, so with threads you always have to watch for race conditions. <code>asyncio</code> works differently. There is one thread, and it moves on to other work only at the points where a function itself says "I am waiting here" (<code>await</code>). A function defined with <code>async def</code> is a coroutine function, and the manager that runs coroutines in turn is the event loop. <code>asyncio.run(main())</code> starts the event loop and runs it until <code>main()</code> finishes.</p>
+
+<pre><code>import asyncio
+
+async def brew(drink, seconds):
+    print(f"  start {drink}")
+    await asyncio.sleep(seconds)     # pause here; other coroutines run meanwhile
+    print(f"  done  {drink}")
+    return f"{drink} ({seconds} s)"
+
+async def together():
+    return await asyncio.gather(brew("coffee", 1), brew("tea", 1), brew("cocoa", 1))
+
+asyncio.run(together())</code></pre>
+
+<h3>Awaiting one at a time vs gather</h3>
+
+<p>Writing <code>await brew(...)</code> three times in a row starts each one only after the previous one has finished, so it takes 3 seconds. Passing several coroutines to <code>asyncio.gather(...)</code> runs them all together, and when they are all done it returns their results as a list <strong>in the order you passed them</strong>. Here is the output of <a href="#ex=asyncio_basics">asyncio_basics</a>.</p>
+
+<pre><code>one after another: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 3 s
+gather: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 1 s</code></pre>
+
+<h3>create_task and time limits</h3>
+
+<p><code>asyncio.create_task(coroutine)</code> puts the coroutine on the event loop right away and returns a Task. The caller carries on without waiting and later gets the result with <code>await task</code> when it needs it. Give waits that might never get an answer a time limit with <code>async with asyncio.timeout(seconds):</code>. When the time is up, the awaited work is cancelled and <code>TimeoutError</code> is raised.</p>
+
+<pre><code>task = asyncio.create_task(slow())
+try:
+    async with asyncio.timeout(0.5):
+        await task
+except TimeoutError:
+    print("gave up after 0.5 s, task cancelled:", task.cancelled())</code></pre>
+
+<h3>Two asyncio traps</h3>
+
+<p>First, if you forget <code>await</code>, nothing happens. Just calling a coroutine function does not run its body; it only creates a coroutine object. Such a coroutine shows up later as the warning <code>RuntimeWarning: coroutine 'hello' was never awaited</code>.</p>
+
+<p>Second, calling an ordinary function that waits, such as <code>time.sleep()</code>, inside a coroutine stops the whole event loop. There is no <code>await</code> point, so there is no chance to switch to another coroutine. In the example, even under <code>gather</code>, <code>bad</code> takes about 3 s while <code>good</code>, which uses <code>asyncio.sleep</code>, takes about 1 s. Inside coroutines, use awaitable functions such as <code>asyncio.sleep</code> and <code>asyncio.open_connection</code>. If you really must call an ordinary function that waits, run it in a separate thread with <code>await asyncio.to_thread(function, argument)</code>.</p>
+
+<h2>An asyncio TCP echo server</h2>
+
+<h3>The server: start_server</h3>
+
+<p>asyncio shines brightest in network servers that handle many connections at once. Most clients are quiet most of the time, so one thread can move from connection to connection, handling only the data that has arrived. <code>echo_server.py</code> in <a href="#ex=echo_server">echo_server</a> is a server that sends each line it receives back in capitals.</p>
+
+<pre><code>async def handle(reader, writer):
+    """Called once per connection; echoes each line back in capitals."""
+    while True:
+        line = await reader.readline()        # b"" when the client hangs up
+        if not line:
+            break
+        writer.write(line.upper())
+        await writer.drain()
+    writer.close()
+    await writer.wait_closed()
+
+server = await asyncio.start_server(handle, "127.0.0.1", 8765)</code></pre>
+
+<p><code>asyncio.start_server</code> starts a new <code>handle</code> coroutine for every connection that comes in and passes it a <code>reader</code> for reading and a <code>writer</code> for writing. <code>reader.readline()</code> waits until a line arrives, and returns the empty bytes <code>b""</code> when the other side hangs up. <code>writer.write()</code> only puts the data in a buffer; <code>await writer.drain()</code> waits until it can actually be sent. What travels over a socket is bytes, not strings, so convert with <code>encode()</code> and <code>decode()</code>.</p>
+
+<h3>The client: open_connection</h3>
+
+<pre><code>reader, writer = await asyncio.open_connection("127.0.0.1", port)
+writer.write(b"hi\n")
+await writer.drain()
+reply = await reader.readline()</code></pre>
+
+<p>Run without arguments, the example opens the server and runs three clients together with <code>gather</code>, all in one script. Port <code>0</code> lets the operating system pick a free port, so it cannot clash with other programs. Each client rests half a second between messages, and meanwhile the server answers the other clients: one thread handling three connections together.</p>
+
+<pre><code>client got: ['MINA: HI', 'MINA: BYE']
+client got: ['JUN: HELLO', 'JUN: SEE YOU']
+client got: ['SORA: HEY', 'SORA: LATER']</code></pre>
+
+<h3>A server in its own process</h3>
+
+<p><code>python3 echo_server.py serve &amp;</code> runs only the server, in the background on port 8765, and <code>echo_client.py</code>, a separate process, connects to it. <code>127.0.0.1</code> is the address that means "this machine" (loopback), so only programs on the same computer can connect. This server stops by itself after two clients or 30 seconds. Giving a practice server a way to end means a forgotten process never sits on the port. Connecting after the server has ended raises <code>ConnectionRefusedError</code>; the client catches it and prints <code>client: no server on 127.0.0.1:8765</code>.</p>
+
+<h2>Which one to choose</h2>
+
+<table>
+<thead>
+<tr><th>Tool</th><th>Good for</th><th>Watch out for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>threading.Thread</code></td><td>overlapping a few tasks that wait</td><td>guard shared values with a Lock; getting results back is clumsy</td></tr>
+<tr><td><code>queue.Queue</code></td><td>a flow split into a producing side and a handling side</td><td>send the consumers a stop signal</td></tr>
+<tr><td><code>ThreadPoolExecutor</code></td><td>I/O-bound work running one function on many inputs</td><td>exceptions come out of <code>result()</code></td></tr>
+<tr><td><code>asyncio</code></td><td>network programs with very many connections</td><td>every wait must be an await</td></tr>
+<tr><td><code>ProcessPoolExecutor</code></td><td>big computations on several cores</td><td>the <code>__main__</code> guard, copying costs, no gain on one core</td></tr>
+</tbody>
+</table>
+
+<p>Most of the time a <code>ThreadPoolExecutor</code> is simpler and safer than handling <code>Thread</code> yourself. If you already use libraries built on asyncio (web frameworks, network clients), go with asyncio. If a computation is slow, first improve the algorithm and data structures, and only then think about processes.</p>
+
+<h2>Common mistakes</h2>
+
+<ul>
+<li><strong><code>target=f(x)</code></strong>: calls the function right there. Write <code>target=f, args=(x,)</code>. With a single argument, <code>args=(x)</code> is not a tuple; add the comma: <code>(x,)</code>.</li>
+<li><strong><code>join()</code> right after <code>start()</code> in the loop</strong>: the same as running one by one. Start them all, then wait for them all.</li>
+<li><strong>Reading results before <code>join()</code></strong>: they are still empty or incomplete.</li>
+<li><strong>"It was right when I tested it"</strong>: race conditions show up only sometimes. Guard values that several threads change with a Lock, or pass them through a Queue.</li>
+<li><strong>Waiting a long time inside a lock, taking the same Lock twice</strong>: things slow down or deadlock.</li>
+<li><strong>Not sending the consumers a stop signal</strong>: <code>get()</code> waits forever and the program never ends.</li>
+<li><strong>Never calling <code>future.result()</code></strong>: exceptions inside jobs vanish silently.</li>
+<li><strong>Forgetting await, <code>time.sleep</code> inside a coroutine</strong>: the code does not run, or the whole event loop stops.</li>
+<li><strong>Trying to speed up computation with threads</strong>: the GIL prevents it. With several cores, use processes.</li>
+<li><strong>Relying on output order or exact timings</strong>: they change from run to run. Sort results or collect them in the order you submitted them, and treat times as approximate.</li>
+</ul>
+
+<h2>Summary</h2>
+
+<ul>
+<li>Concurrency is overlapping waits; parallelism is actually running at the same time on several cores.</li>
+<li>Overlapping I/O waits with <code>Thread(target=..., args=...)</code>, <code>start()</code> and <code>join()</code> turns a 3-second job into a 1-second one.</li>
+<li>Code that reads, changes and writes a shared value creates race conditions. <code>with lock:</code> lets only one thread run it at a time.</li>
+<li><code>queue.Queue</code> is a safe channel for passing work between threads; a sentinel signals the end.</li>
+<li><code>ThreadPoolExecutor</code>'s <code>map</code> gives results in input order, <code>as_completed</code> in the order they finish.</li>
+<li><code>asyncio</code> overlaps waits on one thread by switching coroutines at every <code>await</code>; <code>gather</code> waits for them together.</li>
+<li>Pure computation does not get faster on this one-core virtual machine. On a multi-core PC, split it across processes.</li>
+</ul>
+</div><div lang="ko">
+<p>이번 주제는 동시성(concurrency)입니다. 프로그램이 하는 일의 상당 부분은 계산이 아니라 기다림입니다. 웹 페이지가 내려오기를, 파일이 읽히기를, 사용자가 입력하기를 기다립니다. 기다리는 동안 다른 일을 하게 만들면 같은 일을 훨씬 짧은 시간에 끝낼 수 있습니다. 먼저 <code>threading</code>으로 스레드를 만들어 기다림을 겹치고, 여러 스레드가 같은 값을 바꿀 때 생기는 경쟁 조건과 <code>Lock</code>을 봅니다. 이어서 <code>queue.Queue</code>로 일을 나누는 생산자-소비자 패턴, 스레드 관리를 대신해 주는 <code>concurrent.futures</code>, 스레드 하나로 여러 기다림을 다루는 <code>asyncio</code>를 차례로 익히고, 마지막으로 asyncio TCP 에코 서버를 만듭니다. 실습 페이지는 <a href="#ex=threads">threads</a>, <a href="#ex=race_lock">race_lock</a>, <a href="#ex=producer_consumer">producer_consumer</a>, <a href="#ex=thread_pool">thread_pool</a>, <a href="#ex=asyncio_basics">asyncio_basics</a>, <a href="#ex=echo_server">echo_server</a>입니다.</p>
+
+<h2>동시성이란: 기다림을 겹치기</h2>
+
+<h3>카페의 바리스타</h3>
+
+<p>바리스타 한 명이 커피 세 잔을 주문받았다고 해 봅시다. 커피 머신이 한 잔을 내리는 1분 동안 옆에 서서 기다렸다가 다음 잔을 시작하면 3분이 걸립니다. 첫 잔을 머신에 올려 두고 두 번째, 세 번째 잔도 바로 올려 두면 약 1분이면 됩니다. 바리스타는 여전히 한 명이고 손도 두 개뿐입니다. 달라진 것은 기다리는 시간을 겹쳤다는 것뿐입니다. 이것이 동시성입니다.</p>
+
+<p>바리스타가 세 명이면 세 사람이 정말로 동시에 손을 움직입니다. 이것은 병렬성(parallelism)입니다. 동시성은 여러 일을 <em>번갈아 진행하며 함께 다루는 것</em>이고, 병렬성은 여러 일을 <em>같은 순간에 실제로 실행하는 것</em>입니다. 병렬로 실행하려면 CPU 코어가 여러 개 있어야 합니다.</p>
+
+<h3>I/O 작업과 CPU 작업</h3>
+
+<p>어떤 일이 빨라질 수 있는지는 그 일이 무엇을 하며 시간을 보내는지에 달려 있습니다.</p>
+
+<table>
+<thead>
+<tr><th>종류</th><th>시간을 쓰는 곳</th><th>예</th><th>스레드·asyncio로</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O 작업(I/O-bound)</td><td>네트워크, 디스크, 사용자 등 바깥을 기다림</td><td>다운로드, 데이터베이스 질의, 서버의 클라이언트 응답</td><td>기다림이 겹쳐서 빨라진다</td></tr>
+<tr><td>CPU 작업(CPU-bound)</td><td>계산</td><td>소수 세기, 이미지 처리, 큰 행렬 곱</td><td>코어가 하나면 빨라지지 않는다</td></tr>
+</tbody>
+</table>
+
+<p>이 실습에서는 진짜 네트워크 대신 <code>time.sleep</code>으로 기다림을 흉내 냅니다. 잠든 스레드는 CPU를 쓰지 않으므로 실제 I/O 대기와 같은 성질을 가집니다.</p>
+
+<h3>이 가상 머신에 대해</h3>
+
+<p>브라우저 안의 가상 머신에는 CPU 코어가 <strong>하나</strong>뿐이고, 에뮬레이션이라 실제 PC보다 훨씬 느립니다. <code>os.cpu_count()</code>가 1을 돌려줍니다. 그래서 기다림을 겹치는 예제는 PC와 똑같이 빨라지지만, 계산만 하는 일은 스레드로 나누든 프로세스로 나누든 빨라지지 않습니다. 코어가 여러 개인 PC에서 무엇이 달라지는지는 아래 CPU 작업 절에서 설명합니다.</p>
+
+<h2>threading: 스레드 만들기</h2>
+
+<h3>스레드란</h3>
+
+<p>스레드는 한 프로그램(프로세스) 안에서 따로 진행되는 실행 흐름입니다. 프로그램은 메인 스레드 하나로 시작합니다. 새 스레드를 만들면 같은 메모리(같은 변수, 같은 객체)를 함께 보면서 각자 자기 함수를 실행합니다. 한 스레드가 <code>time.sleep</code>이나 네트워크 읽기로 기다리는 동안 다른 스레드가 실행됩니다.</p>
+
+<h3>Thread, start, join</h3>
+
+<p><code>threading.Thread(target=함수, args=(인자,))</code>로 스레드 객체를 만들고, <code>start()</code>로 출발시키며, <code>join()</code>으로 끝나기를 기다립니다. <a href="#ex=threads">threads</a> 예제의 핵심 부분입니다.</p>
+
+<pre><code>import threading
+import time
+
+def download(name):
+    print(f"  start {name}")
+    time.sleep(1.0)             # waiting: this thread sleeps, the CPU is free
+    print(f"  done  {name}")
+
+threads = [threading.Thread(target=download, args=(name,)) for name in FILES]
+for t in threads:
+    t.start()                   # starts running download(name) in the background
+for t in threads:
+    t.join()                    # waits until that thread has finished</code></pre>
+
+<p>시작과 기다림을 두 개의 반복문으로 나눈 것이 중요합니다. 한 반복문 안에서 <code>start()</code> 바로 뒤에 <code>join()</code>을 하면 첫 스레드가 끝날 때까지 두 번째 스레드를 시작하지 않으므로 결국 하나씩 실행하는 것과 같아집니다. 모두 출발시킨 다음에 모두 기다립니다.</p>
+
+<h3>시간 재기: time.perf_counter</h3>
+
+<p>경과 시간은 <code>time.perf_counter()</code>로 잽니다. 이 함수의 값 자체에는 의미가 없고, 두 번 부른 값의 차가 그 사이에 흐른 초입니다. 시계를 바꿔도 영향을 받지 않아 측정용으로 알맞습니다. 측정값은 실행마다 조금씩 다르므로 예제에서는 <code>round()</code>로 반올림해 "about 1 s"처럼 출력합니다.</p>
+
+<pre><code>start = time.perf_counter()
+func()
+elapsed = time.perf_counter() - start
+print(f"about {round(elapsed)} s")</code></pre>
+
+<pre><code>sequential: about 3 s
+threaded: about 1 s</code></pre>
+
+<p>스레드 쪽에서는 start 세 줄이 먼저 나오고 done 세 줄이 뒤따릅니다. 어느 스레드가 먼저 출력하는지는 운영체제가 정하므로 순서가 실행마다 달라질 수 있습니다. 여러 스레드의 출력 순서에 기대는 코드를 쓰면 안 됩니다.</p>
+
+<h3>스레드에서 결과 받기</h3>
+
+<p>스레드가 실행한 함수의 <code>return</code> 값은 버려집니다. 결과가 필요하면 모든 스레드가 볼 수 있는 딕셔너리나 리스트에 넣고, <code>join()</code>으로 모두 끝난 뒤에 읽습니다. <code>start()</code> 직후에 읽으면 아직 비어 있습니다. 결과를 돌려받는 더 편한 방법은 아래 <code>concurrent.futures</code>입니다.</p>
+
+<pre><code>results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds      # each thread writes its own key
+
+# ... start all, then join all ...
+print(results)</code></pre>
+
+<h3>join을 하지 않으면</h3>
+
+<p><code>join()</code>이 없으면 메인 스레드는 스레드가 끝나기를 기다리지 않고 바로 다음 줄로 갑니다. 그래도 프로그램이 일을 끝내기 전에 사라지지는 않습니다. 파이썬은 데몬이 아닌 스레드가 모두 끝나야 프로세스를 끝내기 때문입니다. <code>Thread(..., daemon=True)</code>로 만든 데몬 스레드는 메인 스레드가 끝나면 함께 중단됩니다. 결과를 써야 하는 지점에서는 반드시 <code>join()</code>합니다.</p>
+
+<h2>공유 상태와 경쟁 조건</h2>
+
+<h3>사라지는 입금</h3>
+
+<p>스레드는 메모리를 함께 쓰기 때문에 편리하지만, 바로 그 점이 위험합니다. <a href="#ex=race_lock">race_lock</a> 예제에서 스레드 네 개가 하나의 <code>balance</code>에 1000번씩 1을 더합니다. 결과는 4000이어야 합니다.</p>
+
+<pre><code>def deposit(times):
+    global balance
+    for _ in range(times):
+        current = balance          # 1. read
+        time.sleep(0)              # 2. pause: another thread may run now
+        balance = current + 1      # 3. write back (maybe a stale value)</code></pre>
+
+<pre><code>without lock: expected 4000, got 1001
+lost updates: 2999</code></pre>
+
+<p>두 스레드 A와 B가 번갈아 실행되면 이런 일이 생깁니다.</p>
+
+<table>
+<thead>
+<tr><th>순서</th><th>스레드 A</th><th>스레드 B</th><th>balance</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><code>current = balance</code> (10)</td><td></td><td>10</td></tr>
+<tr><td>2</td><td></td><td><code>current = balance</code> (10)</td><td>10</td></tr>
+<tr><td>3</td><td><code>balance = 11</code></td><td></td><td>11</td></tr>
+<tr><td>4</td><td></td><td><code>balance = 11</code></td><td>11</td></tr>
+</tbody>
+</table>
+
+<p>입금은 두 번 했는데 값은 1만 늘었습니다. B는 A가 쓰기 전의 낡은 값을 읽었기 때문입니다. 결과가 스레드의 실행 순서에 따라 달라지는 상황을 경쟁 조건(race condition)이라고 합니다. 오류 메시지가 없고, 어떤 실행에서는 우연히 맞기도 해서 찾기 어려운 버그입니다. 예제의 <code>time.sleep(0)</code>은 읽기와 쓰기 사이에서 일부러 차례를 넘겨 이 문제를 매번 드러나게 합니다.</p>
+
+<h3>한 줄이어도 안전하지 않다</h3>
+
+<p><code>counter += 1</code>은 한 줄이지만 한 동작이 아닙니다. <code>dis.dis</code>로 바이트코드를 보면 읽기, 더하기, 쓰기로 나뉘어 있습니다.</p>
+
+<pre><code>LOAD_GLOBAL              0 (counter)
+LOAD_SMALL_INT           1
+BINARY_OP               13 (+=)
+STORE_GLOBAL             0 (counter)</code></pre>
+
+<p>실습 가상 머신에서 sleep 없이 <code>counter += 1</code>만 40만 번 하면 대개 400000이 정확히 나옵니다. 지금의 CPython이 이런 짧은 코드 중간에서 스레드를 바꾸는 일이 드물기 때문입니다. 하지만 이것은 구현의 우연이지 언어의 약속이 아닙니다. 버전이 바뀌거나, 코드가 조금 길어지거나, GIL이 없는 빌드에서 여러 코어로 실행하면 틀린 값이 나올 수 있습니다. 결과가 맞게 나왔다는 것은 안전하다는 증거가 아닙니다.</p>
+
+<h3>threading.Lock</h3>
+
+<p><code>Lock</code>(잠금)은 한 번에 한 스레드만 가질 수 있는 열쇠입니다. <code>with lock:</code> 블록에 들어갈 때 열쇠를 얻고(acquire) 나올 때 돌려줍니다(release). 다른 스레드가 열쇠를 갖고 있으면 돌려받을 때까지 기다립니다. 블록 안에서 예외가 나도 <code>with</code>가 열쇠를 돌려주므로 <code>acquire()</code>와 <code>release()</code>를 직접 부르는 것보다 안전합니다.</p>
+
+<pre><code>lock = threading.Lock()
+
+def deposit(times):
+    global balance
+    for _ in range(times):
+        with lock:                 # only one thread at a time in here
+            current = balance
+            time.sleep(0)
+            balance = current + 1</code></pre>
+
+<pre><code>with lock: expected 4000, got 4000
+correct</code></pre>
+
+<p>잠금으로 감싸는 부분(임계 구역)은 공유 값을 읽고 바꾸는 최소한으로 합니다. 잠금 안에서 오래 기다리면 다른 스레드가 모두 멈춰 스레드를 쓴 의미가 없어집니다.</p>
+
+<h3>교착 상태</h3>
+
+<p><code>Lock</code>은 이미 열쇠를 가진 스레드도 다시 얻을 수 없습니다. 같은 스레드가 <code>with lock:</code> 안에서 다시 <code>lock</code>을 얻으려 하면 자기 자신을 영원히 기다립니다. 두 스레드가 서로 상대의 잠금을 기다리는 경우도 마찬가지입니다. 이를 교착 상태(deadlock)라고 합니다. 예제에서는 <code>lock.acquire(timeout=1)</code>로 1초만 기다려 <code>False</code>를 확인합니다. 같은 스레드가 여러 번 얻어야 하는 경우에는 <code>threading.RLock</code>을 씁니다. 잠금을 여러 개 쓴다면 모든 스레드가 같은 순서로 얻도록 합니다.</p>
+
+<h2>queue.Queue: 생산자와 소비자</h2>
+
+<h3>일을 나누는 가장 안전한 방법</h3>
+
+<p>공유 변수를 잠금으로 지키는 대신, 스레드끼리 메시지를 주고받게 하면 실수할 여지가 줄어듭니다. <code>queue.Queue</code>는 여러 스레드가 동시에 써도 안전한 줄(FIFO)입니다. 일을 만드는 쪽(생산자)은 <code>put()</code>으로 넣고, 일을 처리하는 쪽(소비자)은 <code>get()</code>으로 꺼냅니다. 큐 안에서 잠금을 알아서 처리합니다.</p>
+
+<table>
+<thead>
+<tr><th>메서드</th><th>하는 일</th></tr>
+</thead>
+<tbody>
+<tr><td><code>q.put(item)</code></td><td>넣는다. <code>maxsize</code>가 차 있으면 자리가 날 때까지 기다린다</td></tr>
+<tr><td><code>q.get()</code></td><td>가장 먼저 넣은 것을 꺼낸다. 비어 있으면 들어올 때까지 기다린다</td></tr>
+<tr><td><code>q.get(timeout=1)</code></td><td>1초까지만 기다리고, 그래도 없으면 <code>queue.Empty</code></td></tr>
+<tr><td><code>q.put_nowait(item)</code></td><td>기다리지 않는다. 가득 차 있으면 <code>queue.Full</code></td></tr>
+<tr><td><code>q.qsize()</code></td><td>지금 들어 있는 개수(다른 스레드 때문에 곧 바뀔 수 있다)</td></tr>
+</tbody>
+</table>
+
+<h3>웨이터와 요리사</h3>
+
+<p><a href="#ex=producer_consumer">producer_consumer</a>의 <code>kitchen.py</code>에서는 웨이터 스레드가 주문을 큐에 넣고, 요리사 스레드 두 개가 하나씩 꺼내 0.5초씩 요리합니다.</p>
+
+<pre><code>orders = queue.Queue(maxsize=3)   # the counter holds at most 3 tickets
+
+def waiter():
+    for dish in ORDERS:
+        orders.put(dish)              # blocks while the counter is full
+    for _ in range(COOKS):
+        orders.put(None)              # one stop signal per cook
+
+def cook(name):
+    while True:
+        dish = orders.get()           # blocks until there is an order
+        if dish is None:
+            break
+        time.sleep(COOK_TIME)
+        served.put((dish, name))</code></pre>
+
+<p>요리사는 <code>while True</code>로 계속 주문을 꺼내므로, 일이 끝났다는 것을 알려 줄 방법이 필요합니다. 여기서는 요리사 수만큼 <code>None</code>을 넣고, <code>None</code>을 꺼낸 요리사는 반복을 끝냅니다. 이런 특별한 값을 센티널(sentinel)이라고 합니다. 센티널을 하나만 넣으면 요리사 하나만 끝나고 나머지는 <code>get()</code>에서 영원히 기다려 프로그램이 끝나지 않습니다.</p>
+
+<p><code>maxsize=3</code>은 큐의 크기를 제한합니다. 생산자가 소비자보다 빠를 때 메모리에 일이 끝없이 쌓이지 않도록 생산자를 잠시 세우는 역할(배압, backpressure)을 합니다. 실행해 보면 웨이터가 주문 다섯 개를 넣은 뒤 요리가 하나 끝날 때까지 멈추는 것을 볼 수 있습니다.</p>
+
+<pre><code>served 6 dishes: bibimbap, japchae, kimbap, mandu, ramen, tteokbokki
+2 cooks: about 1.5 s (one cook would need 3.0 s)</code></pre>
+
+<p>요리사를 셋으로 늘리면 about 1.0 s입니다. 소비자 수만 바꾸면 되고 생산자 코드는 그대로입니다. 결과 목록을 <code>sorted()</code>로 정렬해 출력하는 이유는 어느 요리가 먼저 끝나는지가 실행마다 다를 수 있기 때문입니다. 큐에는 <code>task_done()</code>과 <code>join()</code>으로 "넣은 일이 모두 처리될 때까지 기다리기"를 하는 방법도 있습니다.</p>
+
+<h2>concurrent.futures: 스레드 풀</h2>
+
+<h3>ThreadPoolExecutor와 map</h3>
+
+<p>스레드를 만들고, 출발시키고, 기다리고, 결과를 모으는 일은 매번 비슷합니다. <code>concurrent.futures.ThreadPoolExecutor</code>는 일꾼 스레드 몇 개를 미리 만들어 두고(풀), 맡긴 일을 나눠 처리한 뒤 결과를 돌려줍니다. <code>with</code> 블록을 나갈 때 모든 일이 끝나기를 기다리고 스레드를 정리합니다.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    for result in pool.map(fetch, PAGES):
+        print("  got", result)</code></pre>
+
+<p><code>pool.map(함수, 입력들)</code>은 내장 <code>map</code>처럼 쓰지만 여러 스레드에서 실행합니다. 결과는 <strong>입력 순서대로</strong> 나옵니다. 1.5초 걸리는 home이 첫 입력이면, 0.5초 만에 끝난 news도 home이 끝날 때까지 기다렸다가 두 번째로 나옵니다. 함수의 return 값을 그대로 받을 수 있으니 공유 딕셔너리가 필요 없습니다.</p>
+
+<h3>submit, Future, as_completed</h3>
+
+<p><code>pool.submit(함수, 인자)</code>는 일 하나를 맡기고 곧바로 <code>Future</code>를 돌려줍니다. Future는 나중에 나올 결과의 영수증입니다. <code>future.result()</code>는 결과가 나올 때까지 기다렸다가 돌려줍니다. <code>as_completed(futures)</code>는 Future들을 <strong>끝난 순서대로</strong> 하나씩 내줍니다. 먼저 끝난 결과부터 처리하고 싶을 때 씁니다.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    futures = [pool.submit(fetch, page) for page in PAGES]
+    for future in as_completed(futures):
+        print("  got", future.result())</code></pre>
+
+<pre><code>map: results in the order of the inputs
+  got home.html
+  got news.html
+  got about.html
+submit + as_completed: results in the order they finish
+  got news.html
+  got about.html
+  got home.html
+total: about 3 s (one by one: 6 s)</code></pre>
+
+<h3>작업 안의 예외</h3>
+
+<p>일꾼 스레드에서 예외가 나도 그 자리에서는 아무것도 보이지 않습니다. 예외는 Future 안에 보관되었다가 <code>future.result()</code>를 부를 때 다시 발생합니다. 그래서 <code>result()</code> 호출을 <code>try</code>로 감쌉니다. <code>result()</code>를 한 번도 부르지 않으면 예외가 조용히 사라지므로 주의합니다.</p>
+
+<pre><code>for n, future in zip(range(1, 5), futures):
+    try:
+        print(n, "->", future.result())
+    except ValueError as error:
+        print(n, "-> error:", error)</code></pre>
+
+<h3>max_workers</h3>
+
+<p><code>max_workers</code>는 동시에 일하는 스레드 수입니다. 1이면 하나씩 하는 것과 같고, 일의 개수보다 많아도 더 빨라지지 않습니다. 기다림이 대부분인 일이라면 수십 개까지 늘려도 괜찮지만, 상대 서버에 너무 많은 요청을 한꺼번에 보내지 않도록 적당히 제한하는 것이 예의입니다.</p>
+
+<h2>CPU 작업, GIL, 프로세스</h2>
+
+<h3>계산은 왜 빨라지지 않는가</h3>
+
+<p><code>cpu_pool.py</code>는 소수를 세는 계산만 하는 일을 네 조각으로 나눠 하나씩, 스레드 풀로, 프로세스 풀로 각각 실행합니다. 이 가상 머신에서의 결과입니다(초 단위 숫자는 실행마다 다릅니다).</p>
+
+<pre><code>CPU cores: 1
+one by one 1862 primes  0.7 s
+threads    1862 primes  0.7 s
+processes  1862 primes  3.3 s
+threads: about the same as one by one
+processes: slower than one by one</code></pre>
+
+<p>코어가 하나이면 계산은 한 번에 하나만 할 수 있습니다. 스레드든 프로세스든 번갈아 실행할 뿐 전체 계산량은 그대로입니다. 프로세스 쪽은 새 파이썬 프로세스를 띄우고 데이터를 주고받는 비용까지 더해져 오히려 느립니다.</p>
+
+<h3>GIL</h3>
+
+<p>코어가 여러 개인 PC에서도 보통의 CPython에서는 스레드로 계산을 나눠도 빨라지지 않습니다. GIL(Global Interpreter Lock)이라는 잠금 때문에 한 프로세스 안에서 파이썬 코드를 실행하는 스레드는 한순간에 하나뿐이기 때문입니다. 대신 스레드가 <code>time.sleep</code>, 파일 읽기, 소켓 읽기처럼 기다리는 동안에는 GIL을 내려놓으므로 I/O 작업은 스레드로 잘 겹쳐집니다. 파이썬 3.13부터는 GIL이 없는 별도 빌드(free-threaded build)도 있어 스레드가 여러 코어에서 함께 계산할 수 있지만, 아직 기본 설치는 GIL이 있는 빌드입니다. 이 가상 머신의 파이썬도 GIL이 켜져 있습니다.</p>
+
+<h3>ProcessPoolExecutor</h3>
+
+<p>여러 코어로 계산을 나누는 표준적인 방법은 프로세스입니다. 프로세스마다 자기 인터프리터와 자기 GIL을 가지므로 코어 수만큼 동시에 계산할 수 있습니다. <code>ProcessPoolExecutor</code>는 <code>ThreadPoolExecutor</code>와 사용법이 같습니다.</p>
+
+<pre><code>from concurrent.futures import ProcessPoolExecutor
+
+def main():
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        total = sum(pool.map(count_primes, CHUNKS))
+
+if __name__ == "__main__":   # required: worker processes import this file
+    main()</code></pre>
+
+<p>몇 가지 차이가 있습니다. 일꾼 프로세스는 이 파일을 import해서 <code>count_primes</code>를 찾으므로 <code>if __name__ == "__main__":</code> 가드가 반드시 필요하고, 코드가 파일에 있어야 합니다(<code>python3 -</code>로 표준 입력에 넣은 코드는 import할 수 없어 오류가 납니다). 인자와 결과는 프로세스 사이를 복사되어 오가므로 pickle로 바꿀 수 있는 값이어야 하고, 크면 그만큼 느립니다. 프로세스끼리는 메모리를 공유하지 않으므로 전역 변수를 바꿔도 다른 프로세스에는 보이지 않습니다. 코어가 여러 개인 PC에서 일이 충분히 크면(조각마다 적어도 수십 밀리초 이상) 프로세스 풀이 하나씩보다 코어 수에 가까운 배수만큼 빨라집니다. 일이 너무 작으면 PC에서도 프로세스를 띄우는 비용이 더 큽니다.</p>
+
+<table>
+<thead>
+<tr><th></th><th>1코어(이 가상 머신)</th><th>여러 코어 PC</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O 작업 + 스레드/asyncio</td><td>빨라진다</td><td>빨라진다</td></tr>
+<tr><td>CPU 작업 + 스레드</td><td>그대로</td><td>그대로(GIL). free-threaded 빌드에서는 빨라질 수 있다</td></tr>
+<tr><td>CPU 작업 + 프로세스</td><td>오히려 느려진다</td><td>일이 크면 빨라진다</td></tr>
+</tbody>
+</table>
+
+<h2>asyncio: 스레드 하나로 기다림 겹치기</h2>
+
+<h3>코루틴과 이벤트 루프</h3>
+
+<p>스레드는 운영체제가 언제든 바꿔 실행하므로 경쟁 조건을 늘 조심해야 합니다. <code>asyncio</code>는 다른 방식을 씁니다. 스레드는 하나이고, 함수가 스스로 "여기서 기다린다"고 밝힌 지점(<code>await</code>)에서만 다른 일로 넘어갑니다. <code>async def</code>로 정의한 함수를 코루틴 함수라고 하고, 코루틴들을 번갈아 실행하는 관리자를 이벤트 루프라고 합니다. <code>asyncio.run(main())</code>이 이벤트 루프를 시작하고 <code>main()</code>이 끝날 때까지 돌립니다.</p>
+
+<pre><code>import asyncio
+
+async def brew(drink, seconds):
+    print(f"  start {drink}")
+    await asyncio.sleep(seconds)     # pause here; other coroutines run meanwhile
+    print(f"  done  {drink}")
+    return f"{drink} ({seconds} s)"
+
+async def together():
+    return await asyncio.gather(brew("coffee", 1), brew("tea", 1), brew("cocoa", 1))
+
+asyncio.run(together())</code></pre>
+
+<h3>await를 하나씩 vs gather</h3>
+
+<p><code>await brew(...)</code>를 세 번 차례로 쓰면 하나가 끝나야 다음을 시작하므로 3초가 걸립니다. <code>asyncio.gather(...)</code>에 코루틴 여러 개를 넘기면 모두 함께 진행하고, 모두 끝나면 결과를 <strong>넘긴 순서대로</strong> 리스트로 돌려줍니다. <a href="#ex=asyncio_basics">asyncio_basics</a>의 출력입니다.</p>
+
+<pre><code>one after another: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 3 s
+gather: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 1 s</code></pre>
+
+<h3>create_task와 시간 제한</h3>
+
+<p><code>asyncio.create_task(코루틴)</code>은 코루틴을 이벤트 루프에 바로 올리고 Task를 돌려줍니다. 만든 쪽은 기다리지 않고 계속 진행하다가, 필요할 때 <code>await task</code>로 결과를 받습니다. 응답이 오지 않을 수 있는 기다림에는 <code>async with asyncio.timeout(초):</code>로 시간 제한을 둡니다. 제한 시간이 지나면 기다리던 작업이 취소되고 <code>TimeoutError</code>가 납니다.</p>
+
+<pre><code>task = asyncio.create_task(slow())
+try:
+    async with asyncio.timeout(0.5):
+        await task
+except TimeoutError:
+    print("gave up after 0.5 s, task cancelled:", task.cancelled())</code></pre>
+
+<h3>asyncio의 두 가지 함정</h3>
+
+<p>첫째, <code>await</code>를 잊으면 아무 일도 일어나지 않습니다. 코루틴 함수를 부르기만 하면 몸체는 실행되지 않고 coroutine 객체만 생깁니다. 이런 코루틴은 나중에 <code>RuntimeWarning: coroutine 'hello' was never awaited</code> 경고로 드러납니다.</p>
+
+<p>둘째, 코루틴 안에서 <code>time.sleep()</code>처럼 기다리는 일반 함수를 부르면 이벤트 루프 전체가 멈춥니다. <code>await</code> 지점이 없으니 다른 코루틴으로 넘어갈 기회가 없습니다. 예제에서 <code>gather</code>로 묶어도 <code>bad</code>는 about 3 s, <code>asyncio.sleep</code>을 쓴 <code>good</code>은 about 1 s입니다. 코루틴 안에서는 <code>asyncio.sleep</code>, <code>asyncio.open_connection</code>처럼 await할 수 있는 함수를 씁니다. 어쩔 수 없이 기다리는 일반 함수를 불러야 한다면 <code>await asyncio.to_thread(함수, 인자)</code>로 별도 스레드에서 실행합니다.</p>
+
+<h2>asyncio TCP 에코 서버</h2>
+
+<h3>서버: start_server</h3>
+
+<p>asyncio가 가장 빛나는 곳은 많은 연결을 동시에 다루는 네트워크 서버입니다. 클라이언트 대부분은 대부분의 시간 동안 조용하므로, 스레드 하나가 이 연결 저 연결을 오가며 도착한 데이터만 처리하면 됩니다. <a href="#ex=echo_server">echo_server</a>의 <code>echo_server.py</code>는 받은 줄을 대문자로 돌려주는 서버입니다.</p>
+
+<pre><code>async def handle(reader, writer):
+    """Called once per connection; echoes each line back in capitals."""
+    while True:
+        line = await reader.readline()        # b"" when the client hangs up
+        if not line:
+            break
+        writer.write(line.upper())
+        await writer.drain()
+    writer.close()
+    await writer.wait_closed()
+
+server = await asyncio.start_server(handle, "127.0.0.1", 8765)</code></pre>
+
+<p><code>asyncio.start_server</code>는 연결이 하나 들어올 때마다 <code>handle</code> 코루틴을 새로 시작하고, 읽기용 <code>reader</code>와 쓰기용 <code>writer</code>를 넘깁니다. <code>reader.readline()</code>은 줄 하나가 올 때까지 기다리며, 상대가 연결을 끊으면 빈 바이트열 <code>b""</code>을 돌려줍니다. <code>writer.write()</code>는 보낼 데이터를 버퍼에 넣기만 하고, <code>await writer.drain()</code>이 실제로 보낼 수 있을 때까지 기다립니다. 소켓으로 오가는 것은 문자열이 아니라 바이트이므로 <code>encode()</code>와 <code>decode()</code>로 바꿉니다.</p>
+
+<h3>클라이언트: open_connection</h3>
+
+<pre><code>reader, writer = await asyncio.open_connection("127.0.0.1", port)
+writer.write(b"hi\n")
+await writer.drain()
+reply = await reader.readline()</code></pre>
+
+<p>예제를 인자 없이 실행하면 한 스크립트 안에서 서버를 열고 클라이언트 세 개를 <code>gather</code>로 함께 돌립니다. 포트로 <code>0</code>을 주면 운영체제가 빈 포트를 골라 주므로 다른 프로그램과 부딪히지 않습니다. 각 클라이언트는 메시지 사이에 0.5초씩 쉬지만, 그동안 서버는 다른 클라이언트에 답합니다. 스레드 하나로 세 연결을 함께 처리하는 것입니다.</p>
+
+<pre><code>client got: ['MINA: HI', 'MINA: BYE']
+client got: ['JUN: HELLO', 'JUN: SEE YOU']
+client got: ['SORA: HEY', 'SORA: LATER']</code></pre>
+
+<h3>따로 띄운 서버</h3>
+
+<p><code>python3 echo_server.py serve &amp;</code>는 서버만 8765번 포트에서 백그라운드로 실행하고, 다른 프로세스인 <code>echo_client.py</code>가 접속합니다. <code>127.0.0.1</code>은 자기 자신을 가리키는 주소(루프백)라 같은 컴퓨터 안에서만 연결됩니다. 이 서버는 클라이언트 두 명을 받거나 30초가 지나면 스스로 끝납니다. 연습용 서버에 종료 조건을 넣어 두면 잊고 켜 둔 프로세스가 포트를 차지하는 일이 없습니다. 서버가 끝난 뒤 접속하면 <code>ConnectionRefusedError</code>가 나는데, 클라이언트는 이를 잡아 <code>client: no server on 127.0.0.1:8765</code>를 출력합니다.</p>
+
+<h2>무엇을 고를까</h2>
+
+<table>
+<thead>
+<tr><th>도구</th><th>알맞은 일</th><th>주의할 점</th></tr>
+</thead>
+<tbody>
+<tr><td><code>threading.Thread</code></td><td>기다림이 있는 일 몇 개를 겹치기</td><td>공유 값은 Lock으로. 결과 받기가 번거롭다</td></tr>
+<tr><td><code>queue.Queue</code></td><td>만드는 쪽과 처리하는 쪽이 나뉜 흐름</td><td>소비자에게 정지 신호를 보낸다</td></tr>
+<tr><td><code>ThreadPoolExecutor</code></td><td>같은 함수를 여러 입력에 실행하는 I/O 작업</td><td>예외는 <code>result()</code>에서 나온다</td></tr>
+<tr><td><code>asyncio</code></td><td>연결이 아주 많은 네트워크 프로그램</td><td>모든 기다림이 await여야 한다</td></tr>
+<tr><td><code>ProcessPoolExecutor</code></td><td>여러 코어에서 큰 계산</td><td><code>__main__</code> 가드, 복사 비용, 코어가 하나면 이득 없음</td></tr>
+</tbody>
+</table>
+
+<p>대부분의 경우 직접 <code>Thread</code>를 다루기보다 <code>ThreadPoolExecutor</code>가 간단하고 안전합니다. 이미 asyncio로 된 라이브러리(웹 프레임워크, 네트워크 클라이언트)를 쓴다면 asyncio를 따릅니다. 계산이 느리다면 먼저 알고리즘과 자료 구조를 개선하고, 그다음에 프로세스를 생각합니다.</p>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li><strong><code>target=f(x)</code></strong>: 함수를 그 자리에서 호출해 버립니다. <code>target=f, args=(x,)</code>로 씁니다. 인자가 하나일 때 <code>args=(x)</code>는 튜플이 아니므로 쉼표를 붙여 <code>(x,)</code>로 씁니다.</li>
+<li><strong>반복문 안에서 <code>start()</code> 직후 <code>join()</code></strong>: 하나씩 실행하는 것과 같아집니다. 모두 시작한 뒤 모두 기다립니다.</li>
+<li><strong><code>join()</code> 전에 결과 읽기</strong>: 아직 비어 있거나 일부만 있습니다.</li>
+<li><strong>"테스트할 때는 맞았다"</strong>: 경쟁 조건은 가끔만 나타납니다. 여러 스레드가 바꾸는 값은 Lock으로 지키거나 Queue로 주고받습니다.</li>
+<li><strong>잠금 안에서 오래 기다리기, 같은 Lock을 두 번 얻기</strong>: 느려지거나 교착 상태가 됩니다.</li>
+<li><strong>소비자에게 정지 신호를 보내지 않기</strong>: <code>get()</code>이 영원히 기다려 프로그램이 끝나지 않습니다.</li>
+<li><strong><code>future.result()</code>를 부르지 않기</strong>: 작업 안의 예외가 조용히 사라집니다.</li>
+<li><strong>await 잊기, 코루틴 안의 <code>time.sleep</code></strong>: 실행되지 않거나 이벤트 루프 전체가 멈춥니다.</li>
+<li><strong>계산을 스레드로 빠르게 하려 하기</strong>: GIL 때문에 빨라지지 않습니다. 코어가 여러 개라면 프로세스를 씁니다.</li>
+<li><strong>출력 순서나 정확한 시간에 기대기</strong>: 실행마다 달라집니다. 결과는 정렬하거나 넘긴 순서로 모으고, 시간은 대략으로 봅니다.</li>
+</ul>
+
+<h2>정리</h2>
+
+<ul>
+<li>동시성은 기다림을 겹치는 것이고, 병렬성은 여러 코어에서 실제로 동시에 실행하는 것입니다.</li>
+<li><code>Thread(target=..., args=...)</code>, <code>start()</code>, <code>join()</code>으로 I/O 대기를 겹치면 3초 걸리던 일이 1초가 됩니다.</li>
+<li>공유 값을 읽고-바꾸고-쓰는 코드는 경쟁 조건을 만듭니다. <code>with lock:</code>으로 한 번에 한 스레드만 실행하게 합니다.</li>
+<li><code>queue.Queue</code>는 스레드끼리 일을 안전하게 주고받는 통로입니다. 센티널로 끝을 알립니다.</li>
+<li><code>ThreadPoolExecutor</code>의 <code>map</code>은 입력 순서, <code>as_completed</code>는 끝난 순서로 결과를 줍니다.</li>
+<li><code>asyncio</code>는 스레드 하나에서 <code>await</code> 지점마다 코루틴을 바꿔 가며 기다림을 겹칩니다. <code>gather</code>로 함께 기다립니다.</li>
+<li>계산만 하는 일은 코어가 하나인 이 가상 머신에서 빨라지지 않습니다. 여러 코어 PC에서는 프로세스로 나눕니다.</li>
+</ul>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

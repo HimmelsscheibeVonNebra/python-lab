@@ -2,28 +2,30 @@
 // sources in course/.  Every page carries both languages; js/lang.js shows one
 // (English by default, the reader's choice is remembered).
 //
-//   index.html                           hub: every week + the playground
+//   index.html                           hub: every chapter + the playground
 //   playground.html                      free practice (hello.py, grades.py)
-//   classes/weekNN/index.html            one week: one machine for all its
-//                                        examples (#ex=<name> picks one),
-//                                        steps, source, lecture notes
-//   classes/<class>/...                  old addresses, redirect to the above
+//   <chapter>/index.html                 one chapter (chapters.json): one machine
+//                                        for all its examples (#ex=<name> picks
+//                                        one), steps, source, lecture notes
 //
 //   node scripts/gen-pages.mjs
 //
+// Table of contents: chapters.json
+//   [{ "id": "loops", "nav": {en, ko}, "title": {en, ko}, "classes": ["..."] }]
+//   A chapter is made of one or more classes (parts), in order.  Every class
+//   file must belong to a chapter.
+//
 // Korean (the source of truth for commands and tests):
-//   examples-meta/<class>.json   class = weekNN-S (e.g. week03-1); any other id
-//                                (e.g. "sample") needs a "label" and is
-//                                listed after the weeks
+//   examples-meta/<class>.json
 //   {
-//     "class": "week03-1", "title": "...", "summary": "...",
+//     "class": "loops", "title": "...", "summary": "...",
 //     "examples": [{
 //       "name": "even_sum",                       page name (also the file slug)
-//       "source": "week03/starter/session1/even_sum.py",   under course/ (or
+//       "source": "loops/starter/even_sum.py",   under course/ (or
 //                                                 rootfs/overlay/home/student/)
-//       "dir": "week03/starter/session1",         start directory (default:
+//       "dir": "loops/starter",                   start directory (default:
 //                                                 the source's directory)
-//       "also": ["week03/solutions/session1/even_sum.py"],  more files to show
+//       "also": ["loops/solutions/even_sum.py"],  more files to show
 //       "summary": "...",
 //       "steps": [{ "cmd": "python3 even_sum.py", "note": "..." }],
 //       "manual": false,       true: needs typing; the test does not run it
@@ -38,7 +40,7 @@
 // English (text only; commands come from the Korean file):
 //   examples-meta/en/<class>.json
 //   {
-//     "title": "...", "summary": "...", "label": "...",   (label: non-week only)
+//     "title": "...", "summary": "...",
 //     "examples": {
 //       "even_sum": { "summary": "...", "notes": "...",
 //                     "steps": ["note of step 1", "note of step 2", ...] }
@@ -80,47 +82,38 @@ function both(t, tag = "span") {
 const bothText = (en, ko, tag) => both({ en: esc(en ?? ko), ko: esc(ko) }, tag);
 
 // Example files: course/<path>, or the lab's own files in the student's home
-// (rootfs/overlay/home/student/<path>, e.g. flask_hello/app.py).
+// (rootfs/overlay/home/student/<path>, e.g. web/flask_hello/app.py).
 const homeFile = (rel) =>
   exists(path.join("course", rel)) ? path.join("course", rel) : path.join("rootfs/overlay/home/student", rel);
 
 const slugOf = (ex) => ex.name.replace(/[^A-Za-z0-9_.-]+/g, "-");
 const dirOf = (ex) => ex.dir || path.posix.dirname(ex.source);
 
-// week03-1 -> "Week 3 · Session 1" / "3주차 1차시"; others use their "label"
-function classLabel(cls) {
-  const m = cls.class.match(/^week(\d+)-(\d+)$/);
-  if (!m) return { en: cls.en.label || cls.label || cls.class, ko: cls.label || cls.class };
-  return { en: `Week ${Number(m[1])} · Session ${Number(m[2])}`, ko: `${Number(m[1])}주차 ${Number(m[2])}차시` };
-}
-// Weekly classes first, in order; then the others (Flask samples).
-const classOrder = (c) => (/^week\d/.test(c.class) ? "0" : "1") + c.class;
-
 // ---------------------------------------------------------------- templates
 
-// Short address of a week page: w9/ -> classes/week09/, flask/ -> classes/sample/
-const shortOf = (week) => (week.n ? `w${week.n}` : week.key === "sample" ? "flask" : week.key);
-
-// The bar at the top of every page: home, every week (one click away from
-// anywhere), the playground and the language switch.
-// current: a week key, "playground" or "home".
+// The bar at the top of every page: home, the table of contents (a menu of
+// every chapter, one click away from anywhere), the playground and the
+// language switch.  current: a chapter id, "playground" or "home".
 function topbar(root, current) {
-  const link = (href, text, here, title) =>
-    `<a href="${href}"${here ? ' aria-current="page"' : ""}${title ? ` title="${esc(title)}"` : ""}>${text}</a>`;
+  const here = chapters.find((c) => c.id === current);
   return `  <div class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="${root}index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>${SITE}</span></a>
-      <nav class="weeknav" aria-label="Weeks / 주차">
-        <span class="weeknav-label">${bothText("Week", "주차")}</span>
-${weeks
-  .map((w) => {
-    const l = weekLabel(w);
-    const titles = w.classes.map((c) => c.en.title ?? c.title).join(" · ");
-    return `        ${link(`${root}classes/${w.key}/index.html`, w.n ? String(w.n) : "Flask", w.key === current, `${l.en} / ${l.ko} — ${titles}`)}`;
-  })
+      <details class="toc">
+        <summary>${here
+          ? `<span class="toc-num">${here.num}</span>${bothText(here.title.en, here.title.ko)}`
+          : bothText("Chapters", "목차")}<span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+${chapters
+  .map((c) => `          <li><a href="${root}${c.id}/index.html"${c.id === current ? ' aria-current="page"' : ""}><span class="toc-num">${c.num}</span>${bothText(c.title.en, c.title.ko)}</a></li>`)
   .join("\n")}
-        <span class="weeknav-sep" aria-hidden="true"></span>
-        ${link(`${root}playground.html`, bothText("Playground", "자유 실습"), current === "playground")}
+          <li class="toc-extra"><a href="${root}playground.html"${current === "playground" ? ' aria-current="page"' : ""}><span class="toc-num">&gt;_</span>${bothText("Playground", "자유 실습")}</a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+${chapters
+  .map((c) => `        <a href="${root}${c.id}/index.html"${c.id === current ? ' aria-current="page"' : ""} title="${esc(c.title.en)} / ${esc(c.title.ko)}">${bothText(c.nav.en, c.nav.ko)}</a>`)
+  .join("\n")}
       </nav>
       <div class="lang-switch" role="group" aria-label="Language / 언어">
         <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
@@ -206,10 +199,12 @@ ${s.note ? `          <p>${bothText(s.note.en, s.note.ko)}</p>\n` : ""}        <
       </ol>`;
 }
 
-function sourceHtml(name, text, open) {
+// path: the file in the guest (/home/student/...).  js/lab.js redraws the
+// listing when the file is edited there (lab-srcwatch in the guest).
+function sourceHtml(name, text, open, path) {
   const lines = text.replace(/\n$/, "").split("\n");
-  return `    <details class="source"${open ? " open" : ""}>
-      <summary>${esc(name)} <span class="muted">${bothText(`${lines.length} lines`, `${lines.length}줄`)}</span></summary>
+  return `    <details class="source"${open ? " open" : ""}${path ? ` data-path="${esc(path)}"` : ""}>
+      <summary>${esc(name)} <span class="muted src-lines" data-lines="${lines.length}">${bothText(`${lines.length} lines`, `${lines.length}줄`)}</span><span class="src-edited" hidden>${bothText("edited in the terminal", "터미널에서 수정됨")}</span></summary>
       <pre class="code"><code>${lines.map((l) => `<span class="ln">${esc(l) || " "}</span>`).join("\n")}</code></pre>
     </details>`;
 }
@@ -302,12 +297,25 @@ function loadEnglish(cls) {
   if (missing.length) untranslated.push(`${cls.class} (${missing.join(", ")})`);
 }
 
-const classes = fs
-  .readdirSync(path.join(ROOT, "examples-meta"))
-  .filter((f) => f.endsWith(".json"))
-  .map((f) => JSON.parse(read(path.join("examples-meta", f))))
-  .filter((c) => c.examples.length > 0)
-  .sort((a, b) => classOrder(a).localeCompare(classOrder(b), "en", { numeric: true }));
+// Chapters (chapters.json) and their classes (examples-meta/<class>.json)
+const allClasses = new Map(
+  fs
+    .readdirSync(path.join(ROOT, "examples-meta"))
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(read(path.join("examples-meta", f))))
+    .map((c) => [c.class, c])
+);
+const chapterDefs = JSON.parse(read("chapters.json"));
+const listed = new Set(chapterDefs.flatMap((c) => c.classes));
+for (const id of allClasses.keys()) {
+  if (!listed.has(id)) throw new Error(`examples-meta/${id}.json belongs to no chapter in chapters.json`);
+}
+// A chapter whose classes are not written yet is left out.
+const chapters = chapterDefs
+  .map((c) => ({ ...c, classes: c.classes.map((id) => allClasses.get(id)).filter((cls) => cls && cls.examples.length > 0) }))
+  .filter((c) => c.classes.length > 0);
+chapters.forEach((c, i) => { c.num = String(i + 1).padStart(2, "0"); });
+const classes = chapters.flatMap((c) => c.classes);
 classes.forEach(loadEnglish);
 
 const txt = (enText, koText) => ({ en: enText ?? koText, ko: koText });
@@ -315,55 +323,15 @@ const txt = (enText, koText) => ({ en: enText ?? koText, ko: koText });
 let pageCount = 0;
 let notesCount = 0;
 
-// One page per week: one virtual machine for all of that week's examples.
-// Choosing an example swaps the steps and the source and runs cd in the
-// same machine.  weekNN-S classes share the page classes/weekNN/; any other
-// class (e.g. "sample") has its own.
-const weekOf = (cls) => {
-  const m = cls.class.match(/^week(\d+)-(\d+)$/);
-  return m ? { key: `week${m[1]}`, n: Number(m[1]), session: Number(m[2]) } : { key: cls.class };
-};
-const weeks = [];
-for (const cls of classes) {
-  const w = weekOf(cls);
-  let week = weeks.find((x) => x.key === w.key);
-  if (!week) {
-    week = { key: w.key, n: w.n, classes: [] };
-    weeks.push(week);
-  }
-  week.classes.push(cls);
-}
-const weekLabel = (week) =>
-  week.n ? { en: `Week ${week.n}`, ko: `${week.n}주차` } : classLabel(week.classes[0]);
-const sessionLabel = (cls) => {
-  const w = weekOf(cls);
-  return w.session ? { en: `Session ${w.session}`, ko: `${w.session}차시` } : classLabel(cls);
-};
-
-// Example ids within a week page (#ex=<id>): the slug, or class-slug when
+// Example ids within a chapter page (#ex=<id>): the slug, or class-slug when
 // two sessions use the same name.
-function exampleIds(week) {
-  const all = week.classes.flatMap((cls) => cls.examples.map((ex) => ({ cls, ex, slug: slugOf(ex) })));
+function exampleIds(chapter) {
+  const all = chapter.classes.flatMap((cls) => cls.examples.map((ex) => ({ cls, ex, slug: slugOf(ex) })));
   const count = {};
   all.forEach((e) => { count[e.slug] = (count[e.slug] || 0) + 1; });
   all.forEach((e) => { e.id = count[e.slug] > 1 ? `${e.cls.class}-${e.slug}` : e.slug; });
   return all;
 }
-
-// A page left at an old address (classes/<class>/<example>.html) sends the
-// reader to the example on its week page.
-const redirect = (to) => `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=${esc(to)}">
-  <link rel="icon" href="data:,">
-  <title>${SITE}</title>
-  <script>location.replace(${JSON.stringify(to)} + (${JSON.stringify(to.includes("#"))} ? "" : location.hash));</script>
-</head>
-<body><p><a href="${esc(to)}">${esc(to)}</a></p></body>
-</html>
-`;
 
 function examplePanel({ cls, ex, id }, first) {
   const dir = dirOf(ex);
@@ -390,24 +358,28 @@ ${ex.manual ? callout({
   ko: "pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.",
 }) : ""}${ex.notes ? `      <p class="callout">${bothText(ex.en.notes, ex.notes)}</p>\n` : ""}      </section>`;
   const sources = `    <div class="ex-sources" data-ex="${esc(id)}"${first ? "" : " hidden"}>
-${files.map((f, k) => sourceHtml(shownName(f, dir), read(homeFile(f)), k === 0)).join("\n")}
+${files.map((f, k) => sourceHtml(shownName(f, dir), read(homeFile(f)), k === 0, `/home/student/${f}`)).join("\n")}
     </div>`;
   return { panel, sources };
 }
 
-for (const week of weeks) {
-  const label = weekLabel(week);
-  const entries = exampleIds(week);
-  const single = week.classes.length === 1;
+for (const chapter of chapters) {
+  const entries = exampleIds(chapter);
+  const single = chapter.classes.length === 1;
   const titleOf = (cls) => txt(cls.en.title, cls.title);
   const built = entries.map((e, i) => ({ ...e, ...examplePanel(e, i === 0) }));
+  // Links between examples in the notes (<a href="name.html">) pick the example.
+  const linkExamples = (html, cls) =>
+    html.replace(/href="([A-Za-z0-9_.-]+)\.html"/g, (m, slug) => {
+      const e = entries.find((x) => x.slug === slug && x.cls === cls) || entries.find((x) => x.slug === slug);
+      return e ? `href="#ex=${e.id}"` : m;
+    });
 
-  const picker = week.classes
+  const picker = chapter.classes
     .map((cls) => {
-      const sl = sessionLabel(cls);
       const t = titleOf(cls);
       return `      <div class="ex-group">
-${single ? "" : `        <h3>${bothText(`${sl.en} · ${t.en}`, `${sl.ko} · ${t.ko}`)}</h3>\n`}        <div class="ex-buttons">
+${single ? "" : `        <h3>${bothText(t.en, t.ko)}</h3>\n`}        <div class="ex-buttons">
 ${entries
   .filter((e) => e.cls === cls)
   .map((e) => `          <button type="button" data-pick="${esc(e.id)}" aria-pressed="${e === entries[0]}">${esc(e.ex.name)}</button>`)
@@ -417,70 +389,66 @@ ${entries
     })
     .join("\n");
 
-  const notes = week.classes
+  const notes = chapter.classes
     .map((cls) => {
       const ko = loadNotes(`class-notes/${cls.class}.html`, cls);
       const en = loadNotes(`class-notes/en/${cls.class}.html`, cls) || ko;
       if (!ko) return "";
       notesCount++;
-      const sl = sessionLabel(cls);
       const t = titleOf(cls);
       return `    <article class="notes" id="notes-${esc(cls.class)}">
-      <h2 class="notes-title">${single ? bothText(t.en, t.ko) : bothText(`${sl.en} — ${t.en}`, `${sl.ko} — ${t.ko}`)}</h2>
-${both({ en: `\n${en}\n`, ko: `\n${ko}\n` }, "div")}
+      <h2 class="notes-title">${bothText(t.en, t.ko)}</h2>
+${both({ en: `\n${linkExamples(en, cls)}\n`, ko: `\n${linkExamples(ko, cls)}\n` }, "div")}
     </article>`;
     })
     .filter(Boolean)
     .join("\n");
 
-  const at = weeks.indexOf(week);
-  const prev = weeks[at - 1];
-  const next = weeks[at + 1];
-  const pagerLink = (w, dir) => {
-    if (!w) return "<span></span>";
-    const l = weekLabel(w);
-    return `<a class="${dir}" href="../${w.key}/index.html">${dir === "prev" ? "← " : ""}${bothText(l.en, l.ko)}${dir === "next" ? " →" : ""}</a>`;
-  };
+  const at = chapters.indexOf(chapter);
+  const prev = chapters[at - 1];
+  const next = chapters[at + 1];
+  const pagerLink = (c, dir) =>
+    c
+      ? `<a class="${dir}" href="../${c.id}/index.html" title="${esc(c.title.en)} / ${esc(c.title.ko)}">${dir === "prev" ? "← " : ""}${c.num} ${bothText(c.nav.en, c.nav.ko)}${dir === "next" ? " →" : ""}</a>`
+      : "<span></span>";
   const counts = {
-    en: `${week.classes.length > 1 ? `${week.classes.length} sessions · ` : ""}${entries.length} example${entries.length === 1 ? "" : "s"}`,
-    ko: `${week.classes.length > 1 ? `${week.classes.length}차시 · ` : ""}예제 ${entries.length}개`,
+    en: `${single ? "" : `${chapter.classes.length} parts · `}${entries.length} example${entries.length === 1 ? "" : "s"}`,
+    ko: `${single ? "" : `${chapter.classes.length}부분 · `}예제 ${entries.length}개`,
   };
-  const h1 = single
-    ? { en: `${label.en} — ${titleOf(week.classes[0]).en}`, ko: `${label.ko} — ${titleOf(week.classes[0]).ko}` }
-    : label;
   const intro = single
-    ? `<p class="lead">${bothText(txt(week.classes[0].en.summary, week.classes[0].summary).en, week.classes[0].summary)} <a href="#notes-${esc(week.classes[0].class)}">${bothText("Lecture notes ↓", "강의 내용 ↓")}</a></p>`
+    ? `<p class="lead">${bothText(txt(chapter.classes[0].en.summary, chapter.classes[0].summary).en, chapter.classes[0].summary)}${
+        exists(`class-notes/${chapter.classes[0].class}.html`) ? ` <a href="#notes-${esc(chapter.classes[0].class)}">${bothText("Lecture notes ↓", "강의 내용 ↓")}</a>` : ""
+      }</p>`
     : `<ul class="sessions">
-${week.classes
+${chapter.classes
   .map((cls) => {
-    const sl = sessionLabel(cls);
     const t = titleOf(cls);
     const sm = txt(cls.en.summary, cls.summary);
-    return `      <li><a href="#notes-${esc(cls.class)}"><span class="sess-label">${bothText(sl.en, sl.ko)}</span><strong>${bothText(t.en, t.ko)}</strong><span class="sess-sum">${bothText(sm.en, sm.ko)}</span><span class="sess-more">${bothText("Lecture notes ↓", "강의 내용 ↓")}</span></a></li>`;
+    return `      <li><a href="#notes-${esc(cls.class)}"><strong>${bothText(t.en, t.ko)}</strong><span class="sess-sum">${bothText(sm.en, sm.ko)}</span><span class="sess-more">${bothText("Lecture notes ↓", "강의 내용 ↓")}</span></a></li>`;
   })
   .join("\n")}
     </ul>`;
 
   write(
-    `classes/${week.key}/index.html`,
+    `${chapter.id}/index.html`,
     layout({
-      title: h1,
-      root: "../../",
+      title: chapter.title,
+      root: "../",
       labDir: dirOf(entries[0].ex),
       withLab: true,
-      current: week.key,
+      current: chapter.id,
       body: `  <header class="page-head">
     <div class="page-head-top">
-      <span class="eyebrow">${week.n ? bothText(`${label.en} · ${counts.en}`, `${label.ko} · ${counts.ko}`) : bothText(counts.en, counts.ko)}</span>
-      <nav class="weekpager" aria-label="Previous and next week / 이전·다음 주차">${pagerLink(prev, "prev")}${pagerLink(next, "next")}</nav>
+      <span class="eyebrow">${bothText(`Chapter ${chapter.num} · ${counts.en}`, `${chapter.num}장 · ${counts.ko}`)}</span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장">${pagerLink(prev, "prev")}${pagerLink(next, "next")}</nav>
     </div>
-    <h1>${bothText(h1.en, h1.ko)}</h1>
+    <h1>${bothText(chapter.title.en, chapter.title.ko)}</h1>
     ${intro}
   </header>
   <main>
 ${machine({
-  en: `One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). ${COMMON_HINT.en}`,
-  ko: `이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 수업 코드는 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 있습니다. ${COMMON_HINT.ko}`,
+  en: `One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). ${COMMON_HINT.en}`,
+  ko: `이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). ${COMMON_HINT.ko}`,
 })}
     <aside class="guide">
       <nav class="ex-picker" aria-label="Examples / 예제">
@@ -498,18 +466,6 @@ ${notes}`,
     })
   );
   pageCount++;
-
-  // Short address: w9/ (#ex= is kept)
-  write(`${shortOf(week)}/index.html`, redirect(`../classes/${week.key}/index.html`));
-
-  // Old addresses: classes/<class>/index.html and classes/<class>/<example>.html
-  for (const cls of week.classes) {
-    const base = cls.class === week.key ? "index.html" : `../${week.key}/index.html`;
-    if (cls.class !== week.key) write(`classes/${cls.class}/index.html`, redirect(base));
-    for (const e of entries.filter((x) => x.cls === cls)) {
-      write(`classes/${cls.class}/${slugOf(e.ex)}.html`, redirect(`${base}#ex=${e.id}`));
-    }
-  }
 }
 
 // ---------------------------------------------------------------- playground
@@ -530,7 +486,7 @@ const playground = [
     title: txt("02 · Running a script", "02 · 스크립트 실행"),
     summary: txt("Run the example files in the home directory. Their source is below.", "홈 디렉터리의 예제 파일을 실행합니다. 소스는 아래에 있습니다."),
     steps: [
-      { cmd: "ls", note: txt("hello.py, grades.py and the course code directories week01 …", "hello.py, grades.py와 주차별 수업 코드 디렉터리 week01 …") },
+      { cmd: "ls", note: txt("hello.py, grades.py and the directories of the example code", "hello.py, grades.py와 예제 코드 디렉터리들") },
       { cmd: "python3 hello.py", note: txt("When input() asks for your name, type it in the terminal and press Enter", "input()이 이름을 물으면 터미널에 입력하고 Enter") },
       { cmd: "python3 grades.py", note: txt("Builds a grades file with a dictionary, a function and the csv module", "딕셔너리·함수·csv 모듈로 성적 파일을 만듭니다") },
       { cmd: "cat grades.csv", note: txt("The file the program wrote", "프로그램이 쓴 파일의 내용") },
@@ -572,8 +528,8 @@ write(
   </header>
   <main>
 ${machine({
-  en: `Starts as user <code>student</code> in <code>/home/student</code>. The course code is in <code>week01</code> … and <code>sample</code>. ${COMMON_HINT.en}`,
-  ko: `<code>student</code> 사용자로 <code>/home/student</code>에서 시작합니다. 주차별 수업 코드는 <code>week01</code> …, <code>sample</code> 디렉터리에 있습니다. ${COMMON_HINT.ko}`,
+  en: `Starts as user <code>student</code> in <code>/home/student</code>, where all the example code is (<code>ls</code>). ${COMMON_HINT.en}`,
+  ko: `<code>student</code> 사용자로 <code>/home/student</code>에서 시작합니다. 예제 코드가 모두 여기에 있습니다 (<code>ls</code>). ${COMMON_HINT.ko}`,
 })}
     <aside class="guide">
 ${playground
@@ -592,7 +548,7 @@ ${callout({
   </main>
   <section class="sources">
     <h2>${bothText("Example source", "예제 소스")}</h2>
-${["hello.py", "grades.py"].map((f, i) => sourceHtml(f, read(`rootfs/overlay/home/student/${f}`), i === 0)).join("\n")}
+${["hello.py", "grades.py"].map((f, i) => sourceHtml(f, read(`rootfs/overlay/home/student/${f}`), i === 0, `/home/student/${f}`)).join("\n")}
   </section>`,
   })
 );
@@ -605,7 +561,17 @@ function pythonVersion() {
   return exists(f) ? read(f).trim() : "3";
 }
 
-const exampleCount = weeks.reduce((n, w) => n + exampleIds(w).length, 0);
+// The one-line summary of a single-part chapter, shortened for a card.
+function cls0Summary(chapter) {
+  const cls = chapter.classes[0];
+  const cut = (t) => {
+    const first = t.split(/(?<=[.!?。])\s|(?<=다\.)\s/)[0];
+    return first.length > 160 ? first.slice(0, 157) + "…" : first;
+  };
+  return { en: cut(cls.en.summary ?? cls.summary), ko: cut(cls.summary) };
+}
+
+const exampleCount = chapters.reduce((n, c) => n + exampleIds(c).length, 0);
 
 write(
   "index.html",
@@ -615,19 +581,19 @@ write(
     current: "home",
     body: `  <header class="hero">
     <div class="hero-text">
-      <p class="eyebrow">${bothText("Basic Programming Using Python · 2026", "파이썬 기초 프로그래밍 · 2026")}</p>
-      <h1>${bothText("Run every class example in your browser", "수업 예제를 브라우저에서 바로 실행")}</h1>
+      <p class="eyebrow">${bothText("Basic Programming Using Python", "파이썬 기초 프로그래밍")}</p>
+      <h1>${bothText("Learn Python by running it, right in your browser", "브라우저에서 바로 실행하며 배우는 파이썬")}</h1>
       <p class="lead">${bothText(
-        `Nothing to install. Each week's page boots a small Linux with Python ${pythonVersion()} right in your browser — pick an example and press ▶ to type its commands into the terminal.`,
-        `설치할 것이 없습니다. 주차 페이지를 열면 브라우저 안에서 Python ${pythonVersion()}가 든 작은 Linux가 부팅되고, 예제를 고른 뒤 ▶를 누르면 명령이 터미널에 입력됩니다.`
+        `Nothing to install. Each chapter's page boots a small Linux with Python ${pythonVersion()} right in your browser — pick an example and press ▶ to type its commands into the terminal.`,
+        `설치할 것이 없습니다. 장 페이지를 열면 브라우저 안에서 Python ${pythonVersion()}가 든 작은 Linux가 부팅되고, 예제를 고른 뒤 ▶를 누르면 명령이 터미널에 입력됩니다.`
       )}</p>
       <div class="hero-actions">
-        <a class="btn primary" href="#weeks">${bothText("Browse the weeks", "주차 둘러보기")}</a>
+        <a class="btn primary" href="#chapters">${bothText("Browse the chapters", "목차 보기")}</a>
         <a class="btn" href="playground.html">${bothText("Open the playground", "자유 실습 열기")}</a>
       </div>
       <p class="hero-stats">${bothText(
-        `${weeks.filter((w) => w.n).length} weeks · ${classes.length} sessions · ${exampleCount} examples · Flask apps`,
-        `${weeks.filter((w) => w.n).length}개 주차 · ${classes.length}개 차시 · 예제 ${exampleCount}개 · Flask 앱`
+        `${chapters.length} chapters · ${exampleCount} examples`,
+        `${chapters.length}개 장 · 예제 ${exampleCount}개`
       )}</p>
     </div>
     <div class="hero-term" aria-hidden="true">
@@ -643,60 +609,58 @@ Hello, Mina!
 
   <section class="howto" aria-label="How to use / 사용법">
     <ol>
-      <li><span class="n">1</span><div><strong>${bothText("Pick a week", "주차 고르기")}</strong><p>${bothText(
-        "Use the week numbers in the bar at the top of every page, or the cards below.",
-        "모든 페이지 맨 위의 주차 번호나 아래 카드를 누릅니다."
+      <li><span class="n">1</span><div><strong>${bothText("Pick a chapter", "장 고르기")}</strong><p>${bothText(
+        "Use the chapter menu at the top of every page, or the cards below.",
+        "모든 페이지 맨 위의 장 메뉴나 아래 카드를 누릅니다."
       )}</p></div></li>
       <li><span class="n">2</span><div><strong>${bothText("Choose an example", "예제 고르기")}</strong><p>${bothText(
-        "All of the week's examples share one machine; switching just changes directory.",
-        "그 주의 예제는 한 머신을 같이 씁니다. 바꾸면 디렉터리만 옮겨 갑니다."
+        "All of the chapter's examples share one machine; switching just changes directory.",
+        "그 장의 예제는 한 머신을 같이 씁니다. 바꾸면 디렉터리만 옮겨 갑니다."
       )}</p></div></li>
       <li><span class="n">3</span><div><strong>${bothText("Press ▶", "▶ 누르기")}</strong><p>${both({
-        en: "Each step's command is typed into the terminal. Edit with <code>nano</code> and run it again.",
-        ko: "단계마다 명령이 터미널에 입력됩니다. <code>nano</code>로 고쳐 다시 실행해 보세요.",
+        en: "Each step's command is typed into the terminal. Edit with <code>nano</code> and run it again — the source below follows your edits.",
+        ko: "단계마다 명령이 터미널에 입력됩니다. <code>nano</code>로 고쳐 다시 실행해 보세요 — 아래 소스도 고친 대로 바뀝니다.",
       })}</p></div></li>
     </ol>
     <p class="tip">${both({
-      en: `Short addresses: add <code>w9/</code> to the site address for Week 9 (<code>w1/</code> … <code>w13/</code>, <code>flask/</code>), and <code>#ex=</code> plus an example name to open it directly, e.g. <a href="w9/#ex=composition"><code>w9/#ex=composition</code></a>.`,
-      ko: `짧은 주소: 사이트 주소 뒤에 <code>w9/</code>를 붙이면 9주차입니다 (<code>w1/</code> … <code>w13/</code>, <code>flask/</code>). <code>#ex=</code>와 예제 이름을 더하면 그 예제가 바로 열립니다. 예: <a href="w9/#ex=composition"><code>w9/#ex=composition</code></a>`,
+      en: `Short addresses: add a chapter name to the site address, e.g. <a href="network/"><code>network/</code></a> or <a href="oop/"><code>oop/</code></a>, and <code>#ex=</code> plus an example name to open it directly, e.g. <a href="oop/#ex=composition"><code>oop/#ex=composition</code></a>.`,
+      ko: `짧은 주소: 사이트 주소 뒤에 장 이름을 붙이면 됩니다. 예: <a href="network/"><code>network/</code></a>, <a href="oop/"><code>oop/</code></a>. <code>#ex=</code>와 예제 이름을 더하면 그 예제가 바로 열립니다. 예: <a href="oop/#ex=composition"><code>oop/#ex=composition</code></a>`,
     })}</p>
   </section>
 
-  <main class="list" id="weeks">
-    <div class="week-grid">
-${weeks
-  .map((week) => {
-    const label = weekLabel(week);
-    const entries = exampleIds(week);
-    const href = `classes/${week.key}/index.html`;
-    return `      <article class="week-card${week.n ? "" : " special"}">
-        <a class="week-card-head" href="${href}">
-          <span class="wk-num">${week.n ? week.n : "F"}</span>
-          <span class="wk-name">${bothText(label.en, label.ko)}<small>${bothText(
-            `${week.classes.length > 1 ? `${week.classes.length} sessions · ` : ""}${entries.length} examples`,
-            `${week.classes.length > 1 ? `${week.classes.length}차시 · ` : ""}예제 ${entries.length}개`
+  <main class="list" id="chapters">
+    <div class="chapter-grid">
+${chapters
+  .map((chapter) => {
+    const entries = exampleIds(chapter);
+    const href = `${chapter.id}/index.html`;
+    return `      <article class="chapter-card">
+        <a class="chapter-card-head" href="${href}">
+          <span class="ch-num">${chapter.num}</span>
+          <span class="ch-name">${bothText(chapter.title.en, chapter.title.ko)}<small>${bothText(
+            `${entries.length} example${entries.length === 1 ? "" : "s"}`,
+            `예제 ${entries.length}개`
           )}</small></span>
-          <span class="wk-go" aria-hidden="true">→</span>
+          <span class="ch-go" aria-hidden="true">→</span>
         </a>
-        <ul class="wk-sessions">
-${week.classes.map((cls) => `          <li>${bothText(cls.en.title ?? cls.title, cls.title)}</li>`).join("\n")}
+${chapter.classes.length > 1 ? `        <ul class="ch-parts">
+${chapter.classes.map((cls) => `          <li>${bothText(cls.en.title ?? cls.title, cls.title)}</li>`).join("\n")}
         </ul>
-        <ul class="chips">
+` : `        <p class="ch-sum">${bothText(cls0Summary(chapter).en, cls0Summary(chapter).ko)}</p>
+`}        <ul class="chips">
 ${entries.map((e) => `          <li><a href="${href}#ex=${e.id}">${esc(e.ex.name)}</a></li>`).join("\n")}
         </ul>
-        <p class="wk-short"><code>${shortOf(week)}/</code></p>
+        <p class="ch-short"><code>${chapter.id}/</code></p>
       </article>`;
   })
   .join("\n")}
-      <article class="week-card special">
-        <a class="week-card-head" href="playground.html">
-          <span class="wk-num">&gt;_</span>
-          <span class="wk-name">${bothText("Playground", "자유 실습")}<small>python3 · nano · ${bothText("file exchange", "파일 주고받기")}</small></span>
-          <span class="wk-go" aria-hidden="true">→</span>
+      <article class="chapter-card special">
+        <a class="chapter-card-head" href="playground.html">
+          <span class="ch-num">&gt;_</span>
+          <span class="ch-name">${bothText("Playground", "자유 실습")}<small>python3 · nano · ${bothText("file exchange", "파일 주고받기")}</small></span>
+          <span class="ch-go" aria-hidden="true">→</span>
         </a>
-        <ul class="wk-sessions">
-          <li>${bothText("The REPL, writing and running scripts, uploading your files and downloading results.", "REPL, 스크립트 작성과 실행, 내 컴퓨터의 파일 올리기와 결과 받기.")}</li>
-        </ul>
+        <p class="ch-sum">${bothText("The REPL, writing and running scripts, uploading your files and downloading results.", "REPL, 스크립트 작성과 실행, 내 컴퓨터의 파일 올리기와 결과 받기.")}</p>
       </article>
     </div>
   </main>`,
@@ -704,6 +668,6 @@ ${entries.map((e) => `          <li><a href="${href}#ex=${e.id}">${esc(e.ex.name
 );
 
 console.log(
-  `generated ${pageCount} week pages for ${classes.length} classes (${notesCount} with lecture notes), plus index.html and playground.html`
+  `generated ${pageCount} chapter pages from ${classes.length} classes (${notesCount} with lecture notes), plus index.html and playground.html`
 );
 if (untranslated.length) console.log(`no English yet: ${untranslated.join("; ")}`);

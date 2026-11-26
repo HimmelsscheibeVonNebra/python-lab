@@ -1,0 +1,148 @@
+{
+  "class": "functions",
+  "title": "함수",
+  "summary": "def로 함수를 정의하고 호출하며, 매개변수와 인자, return과 print의 차이, 기본값과 키워드 인자, 지역 변수를 익힌 뒤 is_even, power, sum_to, calculate 네 함수를 완성한다.",
+  "examples": [
+    {
+      "name": "is_even",
+      "source": "functions/starter/is_even.py",
+      "also": [
+        "functions/solutions/is_even.py"
+      ],
+      "summary": "연습 1: 정수가 짝수인지 True/False로 돌려주는 is_even을 완성한다. 그 전에 정의와 호출, print와 return의 차이를 슬라이드 예제로 확인한다.",
+      "steps": [
+        {
+          "cmd": "python3 - <<'EOF'\ndef greet():\n    print(\"Hello!\")\nprint(\"Before\")\ngreet()\ngreet()\nprint(\"After\")\nEOF",
+          "note": "def만으로는 아무것도 출력되지 않는다. 호출할 때마다 본문이 실행돼 Before, Hello!, Hello!, After 순서가 된다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef cafe():\n    print(\"Americano\")\ndrink = cafe()\nprint(drink)\nEOF",
+          "note": "카페 문제: Americano는 함수 안의 print가 화면에 보여 준 것이고, drink에는 None이 들어 있다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef cafe():\n    return \"Americano\"\ndrink = cafe()\nprint(drink)\nEOF",
+          "note": "print를 return으로 바꾸면 값이 호출한 쪽으로 돌아와 drink에 Americano가 담기고, 출력은 한 번만 된다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef show_double(number):\n    print(number * 2)\ndef double(number):\n    return number * 2\nshown = show_double(4)\nsaved = double(4)\nprint(shown)\nprint(saved + 1)\nEOF",
+          "note": "show_double(4)는 8을 보여 주지만 None을 돌려준다. double(4)는 아무것도 출력하지 않지만 8을 돌려줘 saved + 1이 9가 된다."
+        },
+        {
+          "cmd": "python3 is_even.py",
+          "note": "시작 코드의 함수는 pass뿐이라 네 번 모두 None이 출력된다."
+        },
+        {
+          "cmd": "python3 ../solutions/is_even.py",
+          "note": "number % 2 == 0을 return하면 4, 7, 0, -2에 대해 True, False, True, True다. 음수와 0도 짝수 판정이 맞다."
+        }
+      ],
+      "expect": "False"
+    },
+    {
+      "name": "power",
+      "source": "functions/starter/power.py",
+      "also": [
+        "functions/solutions/power.py"
+      ],
+      "summary": "연습 2: 기본값 exponent=2를 가진 power(base, exponent=2)를 완성한다. 위치 인자와 키워드 인자, 인자 개수 오류도 확인한다.",
+      "steps": [
+        {
+          "cmd": "python3 - <<'EOF'\ndef total_price(price, quantity):\n    return price * quantity\nprint(total_price(20, 3))\nprint(total_price(price=20, quantity=3))\nprint(total_price(quantity=3, price=20))\nprint(total_price(20, quantity=3))\nEOF",
+          "note": "위치 인자는 순서대로, 키워드 인자는 이름으로 짝지어진다. 네 호출 모두 60이다."
+        },
+        {
+          "cmd": "python3 power.py",
+          "note": "시작 코드는 None을 세 번 출력한다."
+        },
+        {
+          "cmd": "python3 ../solutions/power.py",
+          "note": "power(3)은 기본값 2를 써서 9, power(2, 3)은 8, power(5, exponent=0)은 1이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef power(base, exponent=2):\n    return base ** exponent\nprint(power(-2, 3))\nEOF",
+          "note": "슬라이드 표의 마지막 줄: 음수 밑 power(-2, 3)은 -8이다."
+        },
+        {
+          "cmd": "python3 -u - <<'EOF' 2>&1 | grep -v -e '^Traceback' -e '^ '\ndef total_price(price, quantity):\n    return price * quantity\nprint(total_price)\nprint(total_price(20))\nEOF",
+          "note": "흔한 실수 두 가지: 괄호 없이 이름만 쓰면 호출되지 않고 <function total_price at ...>만 보인다. 인자를 하나 빠뜨리면 TypeError: ... missing 1 required positional argument: 'quantity'다."
+        }
+      ],
+      "expect": "missing 1 required positional argument"
+    },
+    {
+      "name": "sum_to",
+      "source": "functions/starter/sum_to.py",
+      "also": [
+        "functions/solutions/sum_to.py"
+      ],
+      "summary": "실습 3: 반복문으로 1부터 n까지 더해 돌려주는 sum_to(n)을 완성한다. 음수면 None을 돌려준다. 지역 변수와, 반복문 안의 return이 함수를 일찍 끝내는 문제를 먼저 확인한다.",
+      "steps": [
+        {
+          "cmd": "python3 -u - <<'EOF' 2>&1 | grep -v -e '^Traceback' -e '^ '\nnumber = 10\ndef add_one(number):\n    result = number + 1\n    return result\nprint(add_one(3))\nprint(number)\nprint(result)\nEOF",
+          "note": "지역 변수: add_one(3)은 4, 바깥 number는 그대로 10이다. 함수 안의 result는 밖에서 쓸 수 없어 NameError: name 'result' is not defined다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef serve():\n    for number in range(1, 4):\n        return f\"Coffee for {number}\"\nprint(serve())\nEOF",
+          "note": "일찍 퇴근하는 바리스타: 손님은 셋이지만 첫 반복의 return이 함수를 끝내 Coffee for 1 하나만 나온다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef too_early(n):\n    total = 0\n    for value in range(1, n + 1):\n        total += value\n        return total\nprint(too_early(5))\nprint(too_early(0))\nEOF",
+          "note": "return을 반복문 안에 들여 쓰면 too_early(5)가 15가 아니라 1이다. n = 0이면 반복이 한 번도 돌지 않아 return에 닿지 못하고 None이다."
+        },
+        {
+          "cmd": "python3 sum_to.py",
+          "note": "시작 코드의 sum_to는 None을 돌려주므로 호출한 쪽이 Invalid input을 출력한다."
+        },
+        {
+          "cmd": "python3 ../solutions/sum_to.py",
+          "note": "답안은 Total: 15를 출력한다."
+        },
+        {
+          "cmd": "python3 -B - <<'EOF'\nfrom sum_to import sum_to\nprint(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))\nEOF",
+          "note": "현재 폴더의 내 sum_to.py를 불러와 여러 번 호출한다(import는 다음 장 '모듈과 표준 라이브러리'의 내용이다. 불러올 때 파일 아래쪽이 한 번 실행돼 그 출력이 먼저 나온다). 시작 코드에서는 모두 None이다. 함수를 완성한 뒤 다시 실행해 아래 답안 결과와 비교한다."
+        },
+        {
+          "cmd": "(cd ../solutions && python3 -B -c 'from sum_to import sum_to; print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))')",
+          "note": "같은 호출을 답안 폴더에서 실행했다. Total: 15 다음에 1 15 0 None 6 15: 0과 None은 다르고, 두 번째 sum_to(5)도 새 total로 시작해 다시 15다."
+        }
+      ],
+      "expect": "1 15 0 None 6 15"
+    },
+    {
+      "name": "calculator",
+      "source": "functions/starter/calculator.py",
+      "also": [
+        "functions/solutions/calculator.py"
+      ],
+      "summary": "실습 4: calculate(a, b, operator)가 +, -, *, /의 결과를 돌려주고, 0으로 나누기나 지원하지 않는 연산자에는 None을 돌려주게 완성한다. 함수 안에서는 입력도 출력도 하지 않는다.",
+      "steps": [
+        {
+          "cmd": "python3 - <<'EOF'\ndef total_price(price, quantity):\n    return price * quantity\ndef add_fee(amount, fee=5):\n    return amount + fee\nsubtotal = total_price(20, 3)\nfinal = add_fee(subtotal)\nprint(final)\nEOF",
+          "note": "작은 함수 조합: total_price의 반환값 60이 add_fee의 인자가 되어 기본 수수료 5를 더한 65가 나온다."
+        },
+        {
+          "cmd": "python3 calculator.py",
+          "note": "시작 코드의 calculate는 None을 돌려주므로 Invalid operation이 출력된다."
+        },
+        {
+          "cmd": "python3 ../solutions/calculator.py",
+          "note": "답안은 Result: 10을 출력한다."
+        },
+        {
+          "cmd": "python3 -B - <<'EOF'\nfrom calculator import calculate as c\nprint(c(8, 2, \"+\"), c(8, 2, \"-\"), c(8, 2, \"*\"), c(8, 2, \"/\"), c(8, 0, \"/\"), c(8, 2, \"%\"))\nprint(c(2, 2, \"-\"), c(-3, 2, \"*\"), c(0, 5, \"/\"))\nEOF",
+          "note": "현재 폴더의 내 calculator.py로 슬라이드의 확인 표 전체를 호출한다(import는 다음 장 '모듈과 표준 라이브러리'의 내용이며, 불러올 때 파일 아래쪽 출력이 먼저 한 번 나온다). 시작 코드에서는 모두 None이다."
+        },
+        {
+          "cmd": "(cd ../solutions && python3 -B -c 'from calculator import calculate as c; print(c(8, 2, \"+\"), c(8, 2, \"-\"), c(8, 2, \"*\"), c(8, 2, \"/\"), c(8, 0, \"/\"), c(8, 2, \"%\")); print(c(2, 2, \"-\"), c(-3, 2, \"*\"), c(0, 5, \"/\"))')",
+          "note": "답안 폴더에서 같은 호출: Result: 10 다음에 10 6 16 4.0 None None, 그리고 0 -6 0.0. 나눗셈 결과는 float이고, 0으로 나누기와 %는 None이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nresult = 2 - 2\nprint(\"not result:\", not result)\nprint(\"result is None:\", result is None)\nEOF",
+          "note": "올바른 결과 0에 not result를 쓰면 True가 되어 오류로 착각한다. result is None은 False라 0을 정상 결과로 처리한다."
+        }
+      ],
+      "expect": "10 6 16 4.0 None None",
+      "notes": "선택 과제: 호출하는 쪽에서 input()으로 a, b, 연산자를 받아 calculate()에 넘겨 본다. 함수 이름과 매개변수 이름은 바꾸지 않는다."
+    }
+  ]
+}

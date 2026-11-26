@@ -1,0 +1,51 @@
+{
+  "title": "Functions",
+  "summary": "Define and call functions with def, and learn parameters and arguments, the difference between return and print, default values and keyword arguments, and local variables, then complete four functions: is_even, power, sum_to and calculate.",
+  "examples": {
+    "is_even": {
+      "summary": "Practice 1: complete is_even, which returns True/False depending on whether an integer is even. Before that, check definition and calling, and the difference between print and return, with the examples from the slides.",
+      "steps": [
+        "def on its own prints nothing. The body runs each time the function is called, giving the order Before, Hello!, Hello!, After.",
+        "The cafe challenge: Americano is what the print inside the function displayed on screen, and drink holds None.",
+        "Replacing print with return sends the value back to the caller, so drink holds Americano, and it is printed only once.",
+        "show_double(4) displays 8 but returns None. double(4) prints nothing but returns 8, so saved + 1 is 9.",
+        "The function in the starter code is only pass, so None is printed all four times.",
+        "Returning number % 2 == 0 gives True, False, True, True for 4, 7, 0, -2. The even test is correct for negative numbers and 0 too."
+      ]
+    },
+    "power": {
+      "summary": "Practice 2: complete power(base, exponent=2), which has the default value exponent=2. Also check positional and keyword arguments, and the error for a wrong number of arguments.",
+      "steps": [
+        "Positional arguments bind in order, and keyword arguments bind by name. All four calls give 60.",
+        "The starter code prints None three times.",
+        "power(3) uses the default 2 and gives 9, power(2, 3) gives 8, and power(5, exponent=0) gives 1.",
+        "The last row of the table on the slides: with a negative base, power(-2, 3) is -8.",
+        "Two common mistakes: writing just the name without parentheses does not call the function and shows only <function total_price at ...>. Leaving out one argument gives TypeError: ... missing 1 required positional argument: 'quantity'."
+      ]
+    },
+    "sum_to": {
+      "summary": "Lab 3: complete sum_to(n), which adds 1 through n with a loop and returns the result. For a negative number it returns None. First check local variables, and the problem of a return inside a loop ending the function early.",
+      "steps": [
+        "Local variables: add_one(3) is 4, and the outer number stays 10. result inside the function cannot be used outside, giving NameError: name 'result' is not defined.",
+        "The barista who leaves early: there are three customers, but the return in the first iteration ends the function, so only Coffee for 1 appears.",
+        "If return is indented inside the loop, too_early(5) is 1, not 15. With n = 0 the loop never runs and never reaches the return, so the result is None.",
+        "sum_to in the starter code returns None, so the caller prints Invalid input.",
+        "The solution prints Total: 15.",
+        "Imports your own sum_to.py from the current folder and calls it several times (import is the topic of the next chapter, 'Modules and the Standard Library'; when the file is imported, its bottom part runs once and its output appears first). With the starter code, all results are None. After completing the function, run it again and compare with the solution's results below.",
+        "The same calls run in the solutions folder. After Total: 15 comes 1 15 0 None 6 15: 0 and None are different, and the second sum_to(5) also starts with a new total and gives 15 again."
+      ]
+    },
+    "calculator": {
+      "summary": "Lab 4: complete calculate(a, b, operator) so that it returns the result of +, -, * or /, and returns None for division by zero or an unsupported operator. The function itself does no input or output.",
+      "notes": "Optional task: on the caller's side, read a, b and the operator with input() and pass them to calculate(). Do not change the function name or the parameter names.",
+      "steps": [
+        "Combining small functions: the return value of total_price, 60, becomes the argument of add_fee, which adds the default fee of 5 to give 65.",
+        "calculate in the starter code returns None, so Invalid operation is printed.",
+        "The solution prints Result: 10.",
+        "Calls the whole check table from the slides using your own calculator.py in the current folder (import is the topic of the next chapter, 'Modules and the Standard Library'; when the file is imported, the output of its bottom part appears once first). With the starter code, all results are None.",
+        "The same calls in the solutions folder: after Result: 10 comes 10 6 16 4.0 None None, and then 0 -6 0.0. The division result is a float, and division by zero and % give None.",
+        "Using not result on the correct result 0 gives True, so it would be mistaken for an error. result is None is False, so 0 is handled as a normal result."
+      ]
+    }
+  }
+}

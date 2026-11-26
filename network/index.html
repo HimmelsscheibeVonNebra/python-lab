@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Networking · Python Lab" data-title-ko="네트워크 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Networking · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="network/echo">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html" aria-current="page"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" aria-current="page" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 13 · 6 examples</span><span lang="ko">13장 · 예제 6개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite">← 12 <span lang="en">Database</span><span lang="ko">DB</span></a><a class="next" href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask">14 <span lang="en">Web</span><span lang="ko">웹</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Networking</span><span lang="ko">네트워크</span></h1>
+    <p class="lead"><span lang="en">Learn what IP addresses, ports and loopback are, and build a TCP echo server and client with socket. Send a GET request over a raw socket to see that HTTP is an agreement written in plain text (a protocol), exchange files with urllib.request and http.server, then build a JSON API server and client, handle network errors and try UDP. This virtual machine has no internet, so every connection stays inside 127.0.0.1 (the machine itself).</span><span lang="ko">IP 주소·포트·루프백을 이해하고 socket으로 TCP 에코 서버와 클라이언트를 만든다. 소켓 위로 GET 요청을 직접 보내 HTTP가 글자로 된 약속(프로토콜)임을 확인하고, urllib.request와 http.server로 파일을 주고받은 뒤, JSON API 서버와 클라이언트, 네트워크 오류 처리, UDP까지 실습한다. 이 가상 머신에는 인터넷이 없어서 모든 통신은 127.0.0.1(자기 자신) 안에서 이루어진다.</span> <a href="#notes-network"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="echo" aria-pressed="true">echo</button>
+          <button type="button" data-pick="raw_http" aria-pressed="false">raw_http</button>
+          <button type="button" data-pick="fetch" aria-pressed="false">fetch</button>
+          <button type="button" data-pick="json_api" aria-pressed="false">json_api</button>
+          <button type="button" data-pick="errors" aria-pressed="false">errors</button>
+          <button type="button" data-pick="udp" aria-pressed="false">udp</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="echo" data-dir="network/echo">
+        <h2>echo <span class="muted">~/network/echo</span></h2>
+        <p><span lang="en">The smallest server and client. The server waits for connections on port 5000 of 127.0.0.1 and sends back whatever bytes it receives; the client sends one message and prints the reply. The server runs in the background with &amp;, and kill stops it at the end.</span><span lang="ko">가장 작은 서버와 클라이언트. 서버는 127.0.0.1의 5000번 포트에서 접속을 기다리다가 받은 바이트를 그대로 돌려주고, 클라이언트는 메시지 하나를 보내고 답을 출력한다. 서버는 &amp;로 백그라운드에서 띄우고 마지막에 kill로 멈춘다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ip addr" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ip addr">▶</button><code>ip addr</code></div>
+          <p><span lang="en">The machine's network devices. Only lo (loopback) with inet 127.0.0.1 is up; there is no network card (a name like eth0). This virtual machine cannot reach the internet and can only talk to itself. On a real PC you would see one more device with an address such as 192.168.0.12.</span><span lang="ko">이 컴퓨터의 네트워크 장치 목록이다. lo(루프백)의 inet 127.0.0.1만 살아 있고 랜카드(eth0 같은 이름)는 없다. 이 가상 머신은 인터넷에 나갈 수 없고, 자기 자신하고만 통신할 수 있다는 뜻이다. 실제 PC라면 192.168.0.12 같은 주소를 가진 장치가 하나 더 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat /etc/hosts" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat /etc/hosts">▶</button><code>cat /etc/hosts</code></div>
+          <p><span lang="en">The oldest address book there is, pairing names with IP addresses. Both localhost and this machine's name, python-lab, point to 127.0.0.1. That is why writing localhost in a URL is the same as 127.0.0.1.</span><span lang="ko">이름과 IP 주소를 짝지은 가장 오래된 주소록이다. localhost와 이 컴퓨터의 이름 python-lab이 모두 127.0.0.1을 가리킨다. 그래서 주소 칸에 localhost라고 써도 127.0.0.1과 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_server.py &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_server.py &amp;">▶</button><code>python3 echo_server.py &amp;</code></div>
+          <p><span lang="en">The trailing &amp; runs the program in the background. A server never finishes because it keeps waiting for connections; without &amp; the terminal would be stuck with it and you could not type the next command. The server's output will show up later, mixed into this terminal.</span><span lang="ko">끝의 &amp;는 프로그램을 백그라운드에서 실행한다. 서버는 접속을 기다리느라 끝나지 않는 프로그램이라서, &amp;가 없으면 터미널이 서버에 묶여 다음 명령을 칠 수 없다. 서버의 출력은 나중에 이 터미널에 섞여 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 2; python3 echo_client.py hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 2; python3 echo_client.py hello">▶</button><code>sleep 2; python3 echo_client.py hello</code></div>
+          <p><span lang="en">Gives the server 2 seconds to start, then runs the client. Lines starting with [server] come from the background server, the [client] line from the client: two programs printing into one terminal. The server received b'hello', 5 bytes, and sent it straight back.</span><span lang="ko">서버가 켜질 시간을 2초 준 뒤 클라이언트를 실행한다. [server]로 시작하는 줄은 백그라운드 서버가, [client] 줄은 클라이언트가 찍었다. 한 터미널에 두 프로그램의 출력이 섞여 보이는 것이다. 서버는 5 bytes인 b'hello'를 받아 그대로 돌려주었다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 echo_client.py 안녕" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 echo_client.py 안녕">▶</button><code>python3 echo_client.py 안녕</code></div>
+          <p><span lang="en">Sockets carry bytes, not strings. The two characters of 안녕 are 6 bytes in UTF-8 (b'\xec\x95\x88...'). The client turned the text into bytes with encode, and turned the reply back into text with decode. The server did not stop; it took the next connection.</span><span lang="ko">소켓은 문자열이 아니라 바이트를 주고받는다. 글자 두 개인 안녕이 UTF-8로는 6 bytes(b'\xec\x95\x88...')다. 클라이언트가 encode로 바꿔 보내고, 받은 바이트를 decode로 다시 글자로 만들었다. 서버는 꺼지지 않고 다음 접속을 받았다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="netstat -tln" title="Run in the terminal / 터미널에서 실행" aria-label="Run: netstat -tln">▶</button><code>netstat -tln</code></div>
+          <p><span lang="en">The TCP ports currently waiting for connections (LISTEN). 127.0.0.1:5000 is our echo server. Because its address is 127.0.0.1, only programs on this machine can connect.</span><span lang="ko">지금 접속을 기다리는(LISTEN) TCP 포트 목록이다. 127.0.0.1:5000이 우리 에코 서버다. 주소가 127.0.0.1이므로 이 컴퓨터 안에서만 접속할 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+text = &quot;안녕&quot;
+data = text.encode(&quot;utf-8&quot;)
+print(data, len(text), len(data))
+print(data.decode(&quot;utf-8&quot;))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+text = &quot;안녕&quot;
+data = text.encode(&quot;utf-8&quot;)
+print(data, len(text), len(data))
+print(data.decode(&quot;utf-8&quot;))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+text = &quot;안녕&quot;
+data = text.encode(&quot;utf-8&quot;)
+print(data, len(text), len(data))
+print(data.decode(&quot;utf-8&quot;))
+EOF</code></div>
+          <p><span lang="en">str and bytes side by side: len(text), the number of characters, is 2; len(data), the number of bytes, is 6. Encode before sending over the network, decode after receiving. Both sides must use the same encoding (utf-8) or the text comes out garbled.</span><span lang="ko">str과 bytes를 따로 확인한다. 글자 수 len(text)는 2, 바이트 수 len(data)는 6이다. 네트워크로 보내기 전에는 encode, 받은 뒤에는 decode한다. 양쪽이 같은 인코딩(utf-8)을 써야 글자가 깨지지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">%1 is this terminal's background job number 1 (the echo server). Unless you kill it, the server keeps holding port 5000. The jobs command lists the background jobs.</span><span lang="ko">%1은 이 터미널의 1번 백그라운드 작업(에코 서버)이다. kill로 멈추지 않으면 서버는 계속 5000번 포트를 차지한다. jobs 명령으로 백그라운드 작업 목록을 볼 수 있다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">If you start the server twice, the second one fails with OSError: [Errno 98] Address in use (a typical Linux PC words it Address already in use), because only one program can hold a port. Find the leftover server with jobs, stop it with kill %1 and start again.</span><span lang="ko">서버를 두 번 띄우면 두 번째 서버는 OSError: [Errno 98] Address in use로 실패한다(일반 리눅스 PC에서는 Address already in use라고 나온다). 한 포트는 한 프로그램만 차지할 수 있기 때문이다. 이때는 jobs로 남은 서버를 찾아 kill %1로 멈춘 뒤 다시 실행한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="raw_http" data-dir="network/http" hidden>
+        <h2>raw_http <span class="muted">~/network/http</span></h2>
+        <p><span lang="en">HTTP is an agreement in plain text (a protocol). Start the web server that comes with Python (python3 -m http.server), send a GET request line over a socket yourself, and read the response as status line, headers and body. Send the same request with nc to see the raw response.</span><span lang="ko">HTTP는 글자로 된 약속(프로토콜)이다. 파이썬에 들어 있는 웹 서버(python3 -m http.server)를 띄우고, 소켓 위로 GET 요청 줄을 직접 보내 돌아온 응답을 상태 줄·헤더·본문으로 나누어 읽는다. nc로 같은 요청을 보내 응답 원문도 본다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls site" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls site">▶</button><code>ls site</code></div>
+          <p><span lang="en">The files the web server will hand out. The server treats this folder as the root (/) of the site, so a request for /hello.txt gets site/hello.txt.</span><span lang="ko">웹 서버가 내보낼 파일들이다. 서버는 이 폴더를 웹사이트의 뿌리(/)로 삼아 /hello.txt 요청에 site/hello.txt를 돌려준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;">▶</button><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;</code></div>
+          <p><span lang="en">Runs the standard library module http.server as a program: port 8000, bound to 127.0.0.1 only (--bind), serving the files in site (--directory). A web server without writing a line of code.</span><span lang="ko">표준 라이브러리의 http.server 모듈을 프로그램처럼 실행한다. 8000번 포트, 127.0.0.1에만 묶고(--bind), site 폴더의 파일을 내보낸다(--directory). 코드 한 줄 없이 웹 서버가 생긴다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 3; python3 raw_get.py /hello.txt" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 3; python3 raw_get.py /hello.txt">▶</button><code>sleep 3; python3 raw_get.py /hello.txt</code></div>
+          <p><span lang="en">The request: line is everything we sent: the request line GET /hello.txt HTTP/1.0, a Host header, and an empty line (\r\n\r\n) to finish. The first line of the response, HTTP/1.0 200 OK, is the status line, then come the name = value headers, and after an empty line the 57-byte body. The line 127.0.0.1 - - [...] &quot;GET /hello.txt HTTP/1.0&quot; 200 is the server's access log. The Date and Last-Modified values change on every run.</span><span lang="ko">request: 줄이 우리가 보낸 전부다. GET /hello.txt HTTP/1.0 요청 줄, Host 헤더, 그리고 빈 줄(\r\n\r\n)로 끝난다. 응답의 첫 줄 HTTP/1.0 200 OK가 상태 줄이고, 이어서 이름 = 값 헤더들, 빈 줄 뒤에 본문 57바이트가 온다. 127.0.0.1 - - [...] &quot;GET /hello.txt HTTP/1.0&quot; 200 줄은 서버가 남긴 접속 기록이다. Date와 Last-Modified 값은 실행할 때마다 다르다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000">▶</button><code>printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000</code></div>
+          <p><span lang="en">The same thing without Python. nc (netcat) sends its input over a socket and prints the bytes that come back unchanged, so you can see the empty line between headers and body. Content-type: text/html says the body is HTML; a browser sees this and draws a web page instead of showing text.</span><span lang="ko">파이썬 없이 같은 일을 해 본다. nc(netcat)는 받은 글자를 소켓으로 보내고 돌아온 바이트를 그대로 화면에 찍는다. 헤더와 본문 사이의 빈 줄이 보인다. Content-type: text/html은 본문이 HTML이라는 표시이고, 브라우저는 이것을 보고 글자 대신 웹 페이지로 그린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 raw_get.py /nothing.txt | head -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 raw_get.py /nothing.txt | head -n 3">▶</button><code>python3 raw_get.py /nothing.txt | head -n 3</code></div>
+          <p><span lang="en">Asking for a file that does not exist still connects, and the server answers normally, only the status line is HTTP/1.0 404 File not found. A status code is the server saying &quot;I got your request, and here is how it went&quot;. head -n 3 keeps the first three lines.</span><span lang="ko">없는 파일을 요청해도 연결은 성공하고 서버는 정상적으로 답한다. 다만 상태 줄이 HTTP/1.0 404 File not found다. 상태 코드는 '요청은 받았지만 결과가 이렇다'는 서버의 대답이다. head -n 3으로 앞 세 줄만 본다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stops the web server. From now on a request to port 8000 is refused outright (the errors example shows this).</span><span lang="ko">웹 서버를 멈춘다. 이제 8000번 포트에 요청하면 연결 자체가 거절된다(errors 예제에서 확인한다).</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">On a real PC, start the same server and type http://127.0.0.1:8000/ into the browser's address bar: index.html opens as a web page. A browser is just a program that sends the same GET request text as this example.</span><span lang="ko">실제 PC에서는 같은 서버를 띄운 뒤 브라우저 주소 칸에 http://127.0.0.1:8000/ 을 넣어 보면 index.html이 웹 페이지로 열린다. 브라우저도 결국 이 예제와 똑같은 GET 요청 글자를 보내는 프로그램이다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="fetch" data-dir="network/http" hidden>
+        <h2>fetch <span class="muted">~/network/http</span></h2>
+        <p><span lang="en">Open a URL with urllib.request.urlopen and the standard library builds the request and splits the response for you. Take the result apart with status, headers and read(), and when the Content-Type is application/json, turn it into a dictionary with json.loads.</span><span lang="ko">urllib.request.urlopen으로 URL 하나를 열면 요청 만들기, 응답 나누기를 표준 라이브러리가 대신 해 준다. status, headers, read()로 결과를 꺼내고, Content-Type이 application/json이면 json.loads로 딕셔너리로 바꾼다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;">▶</button><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;</code></div>
+          <p><span lang="en">Starts the same web server as in raw_http.</span><span lang="ko">raw_http와 같은 웹 서버를 다시 띄운다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 3; python3 fetch.py http://127.0.0.1:8000/hello.txt" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 3; python3 fetch.py http://127.0.0.1:8000/hello.txt">▶</button><code>sleep 3; python3 fetch.py http://127.0.0.1:8000/hello.txt</code></div>
+          <p><span lang="en">From the response object urlopen returned we took status 200, reason OK and the Content-Type header text/plain. read() returns bytes, so the length is 57 bytes; the program decodes them before printing. In the server's log the request line now says HTTP/1.1, because urllib wrote the request.</span><span lang="ko">urlopen이 돌려준 응답 객체에서 status 200, reason OK, Content-Type 헤더 text/plain을 꺼냈다. read()는 bytes를 돌려주므로 길이는 57 bytes이고, decode한 뒤 출력했다. 서버 기록의 요청 줄이 이번에는 HTTP/1.1이다. urllib이 만든 요청이기 때문이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 fetch.py http://localhost:8000/data.json" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 fetch.py http://localhost:8000/data.json">▶</button><code>python3 fetch.py http://localhost:8000/data.json</code></div>
+          <p><span lang="en">Writing localhost reaches the same server (/etc/hosts). The server labelled the .json file Content-Type: application/json, so fetch.py turned the body into a dictionary with json.loads and printed one key and value per line. temperature is the integer 3, not a string.</span><span lang="ko">주소를 localhost로 써도 같은 서버에 닿는다(/etc/hosts). 서버가 .json 파일에 Content-Type: application/json을 붙였으므로 fetch.py는 json.loads로 본문을 딕셔너리로 바꾸고 키와 값을 한 줄씩 찍었다. temperature는 문자열이 아니라 정수 3이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from urllib.request import urlopen
+with urlopen(&quot;http://127.0.0.1:8000/&quot;) as response:
+    print(response.status, response.headers[&quot;Content-Type&quot;])
+    html = response.read().decode(&quot;utf-8&quot;)
+for line in html.splitlines():
+    if &quot;&lt;h1&gt;&quot; in line:
+        print(line)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from urllib.request import urlopen
+with urlopen(&quot;http://127.0.0.1:8000/&quot;) as response:
+    print(response.status, response.headers[&quot;Content-Type&quot;])
+    html = response.read().decode(&quot;utf-8&quot;)
+for line in html.splitlines():
+    if &quot;&lt;h1&gt;&quot; in line:
+        print(line)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from urllib.request import urlopen
+with urlopen(&quot;http://127.0.0.1:8000/&quot;) as response:
+    print(response.status, response.headers[&quot;Content-Type&quot;])
+    html = response.read().decode(&quot;utf-8&quot;)
+for line in html.splitlines():
+    if &quot;&lt;h1&gt;&quot; in line:
+        print(line)
+EOF</code></div>
+          <p><span lang="en">Asking for just / makes the server return the folder's index.html (200 text/html). A web page is only text, so a string method finds the &lt;h1&gt;It works!&lt;/h1&gt; line.</span><span lang="ko">경로 /만 요청하면 서버는 폴더 안의 index.html을 돌려준다(200 text/html). 웹 페이지도 그저 글자이므로 문자열 메서드로 &lt;h1&gt;It works!&lt;/h1&gt; 줄을 찾아낼 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="wget -q -O - http://127.0.0.1:8000/data.json" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wget -q -O - http://127.0.0.1:8000/data.json">▶</button><code>wget -q -O - http://127.0.0.1:8000/data.json</code></div>
+          <p><span lang="en">The command-line downloader wget fetches the same JSON. -O - means print to the screen instead of saving a file. The server does not care who is asking, as long as they keep to the agreement (HTTP).</span><span lang="ko">명령줄 다운로드 도구 wget으로도 같은 JSON을 받는다. -O -는 파일로 저장하지 않고 화면에 출력하라는 뜻이다. 서버는 누가 요청했는지 신경 쓰지 않는다. 약속(HTTP)만 지키면 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stops the web server.</span><span lang="ko">웹 서버를 멈춘다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">On a PC with internet access the same fetch.py opens real web addresses, for example python3 fetch.py https://www.python.org/ — urlopen even handles the encryption of https. This virtual machine has no internet, so such addresses fail as in the errors example.</span><span lang="ko">인터넷이 되는 PC에서는 같은 fetch.py로 진짜 웹 주소를 열 수 있다. 예를 들어 python3 fetch.py https://www.python.org/ 처럼 https 주소도 urlopen이 암호화까지 처리해 준다. 이 가상 머신에는 인터넷이 없어서 이런 주소는 errors 예제처럼 실패한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="json_api" data-dir="network/api" hidden>
+        <h2>json_api <span class="muted">~/network/api</span></h2>
+        <p><span lang="en">A small JSON API built on http.server's BaseHTTPRequestHandler. GET /memos lists the memos, GET /memos/&lt;id&gt; returns one, POST /memos adds a new one. It answers with a fitting status code (200, 201, 400, 404) and a JSON body, and api_client.py sends and receives JSON with urllib.request.Request.</span><span lang="ko">http.server의 BaseHTTPRequestHandler로 만드는 작은 JSON API. GET /memos는 메모 목록, GET /memos/&lt;id&gt;는 메모 하나, POST /memos는 새 메모를 추가한다. 상황에 맞는 상태 코드(200, 201, 400, 404)와 JSON 본문으로 답하고, api_client.py는 urllib.request.Request로 JSON을 보내고 받는다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 api_server.py &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 api_server.py &amp;">▶</button><code>python3 api_server.py &amp;</code></div>
+          <p><span lang="en">Starts the memo API server on port 8080 in the background. The memos live only in the Python list memos, so they are gone when the server stops.</span><span lang="ko">메모 API 서버를 8080번 포트에서 백그라운드로 띄운다. 메모는 파이썬 리스트 memos에만 들어 있으므로 서버를 끄면 사라진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 3; wget -q -O - http://127.0.0.1:8080/memos; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 3; wget -q -O - http://127.0.0.1:8080/memos; echo">▶</button><code>sleep 3; wget -q -O - http://127.0.0.1:8080/memos; echo</code></div>
+          <p><span lang="en">do_GET answered GET /memos. The body is the JSON array [{&quot;id&quot;: 1, &quot;text&quot;: &quot;buy milk&quot;}]. [server] GET /memos -&gt; 200 is the one-line log from our own log_request. The final echo adds a newline, since the body has none and the prompt would stick to it.</span><span lang="ko">GET /memos에 do_GET이 응답했다. 본문은 JSON 배열 [{&quot;id&quot;: 1, &quot;text&quot;: &quot;buy milk&quot;}]이다. [server] GET /memos -&gt; 200은 log_request를 고쳐 쓴 한 줄 기록이다. 끝의 echo는 본문 끝에 줄바꿈이 없어서 프롬프트가 붙지 않도록 넣었다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 api_client.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 api_client.py">▶</button><code>python3 api_client.py</code></div>
+          <p><span lang="en">The client's call(&quot;GET&quot;, &quot;/memos&quot;) returns a tuple (status code, decoded JSON): (200, [{'id': 1, 'text': 'buy milk'}]). A JSON array becomes a Python list, a JSON object a dictionary.</span><span lang="ko">클라이언트의 call(&quot;GET&quot;, &quot;/memos&quot;)은 (상태 코드, 해석한 JSON) 튜플을 돌려준다: (200, [{'id': 1, 'text': 'buy milk'}]). JSON 배열은 파이썬 리스트, JSON 객체는 딕셔너리가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 api_client.py 우유 사기" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 api_client.py 우유 사기">▶</button><code>python3 api_client.py 우유 사기</code></div>
+          <p><span lang="en">With arguments, the client first sends POST /memos with {&quot;text&quot;: &quot;우유 사기&quot;} (&quot;buy milk&quot; in Korean) in the body. The server creates the memo and returns 201 (Created) with {'id': 2, ...}. The GET that follows shows two memos: the state lasts as long as the server runs.</span><span lang="ko">인자가 있으면 먼저 POST /memos로 {&quot;text&quot;: &quot;우유 사기&quot;}를 본문에 담아 보낸다. 서버는 새 메모를 만들고 201(Created)과 함께 {'id': 2, ...}를 돌려준다. 이어진 GET에는 메모가 두 개다. 서버가 켜져 있는 동안 상태가 유지된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from api_client import call
+print(call(&quot;GET&quot;, &quot;/memos/2&quot;))
+print(call(&quot;GET&quot;, &quot;/memos/99&quot;))
+print(call(&quot;POST&quot;, &quot;/memos&quot;, {&quot;title&quot;: &quot;no text key&quot;}))
+print(call(&quot;GET&quot;, &quot;/users&quot;))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from api_client import call
+print(call(&quot;GET&quot;, &quot;/memos/2&quot;))
+print(call(&quot;GET&quot;, &quot;/memos/99&quot;))
+print(call(&quot;POST&quot;, &quot;/memos&quot;, {&quot;title&quot;: &quot;no text key&quot;}))
+print(call(&quot;GET&quot;, &quot;/users&quot;))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from api_client import call
+print(call(&quot;GET&quot;, &quot;/memos/2&quot;))
+print(call(&quot;GET&quot;, &quot;/memos/99&quot;))
+print(call(&quot;POST&quot;, &quot;/memos&quot;, {&quot;title&quot;: &quot;no text key&quot;}))
+print(call(&quot;GET&quot;, &quot;/users&quot;))
+EOF</code></div>
+          <p><span lang="en">Imports api_client as a module and sends several requests. An existing memo gives 200, the missing memo 99 gives 404 with {'error': 'no memo 99'}, a body without the text key gives 400 (Bad Request), an unknown path 404. urlopen raises HTTPError for 4xx answers, but call catches it and still reads the JSON in the error body.</span><span lang="ko">api_client를 모듈로 import해 여러 요청을 보낸다. 있는 메모는 200, 없는 메모 99는 404와 {'error': 'no memo 99'}, text 키가 없는 본문은 400(Bad Request), 없는 주소는 404다. urlopen은 4xx 응답에 HTTPError를 일으키지만 call이 그것을 잡아 오류 본문의 JSON까지 읽어 돌려준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stops the API server. Start it again and the memos are back to the single buy milk.</span><span lang="ko">API 서버를 멈춘다. 다시 띄우면 메모는 처음의 buy milk 하나로 돌아간다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">In Flask the same API is much shorter: one function per route (see flask_hello in the Flask examples). Underneath, the same HTTP requests and responses you saw here go back and forth.</span><span lang="ko">같은 일을 Flask로 하면 라우트마다 함수 하나를 붙이는 방식으로 훨씬 짧게 쓸 수 있다(Flask 예제의 flask_hello). 그 아래에서 오가는 것은 여기서 본 것과 같은 HTTP 요청과 응답이다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="errors" data-dir="network/errors" hidden>
+        <h2>errors <span class="muted">~/network/errors</span></h2>
+        <p><span lang="en">Networks fail all the time. Trigger each failure in turn: no server (ConnectionRefusedError), a 404 answer (urllib.error.HTTPError), no answer at all (TimeoutError, formerly socket.timeout) and a name that cannot be found (URLError). safe_get.py catches each one with try/except and turns it into a readable message.</span><span lang="ko">네트워크는 언제든 실패한다. 서버가 없을 때(ConnectionRefusedError), 서버가 404로 답할 때(urllib.error.HTTPError), 답이 오지 않을 때(TimeoutError, 옛 이름 socket.timeout), 주소를 찾지 못할 때(URLError)를 차례로 일으키고, safe_get.py가 각각을 try/except로 잡아 알아보기 쉬운 메시지로 바꾼다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../echo/echo_client.py hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../echo/echo_client.py hello">▶</button><code>python3 ../echo/echo_client.py hello</code></div>
+          <p><span lang="en">Runs the client without starting the echo server. Nothing is waiting on port 5000, so the operating system refuses the connection: ConnectionRefusedError: [Errno 111] Connection refused. The traceback points at the connect line.</span><span lang="ko">에코 서버를 띄우지 않고 클라이언트만 실행했다. 5000번 포트에서 기다리는 프로그램이 없으므로 운영체제가 연결을 거절한다: ConnectionRefusedError: [Errno 111] Connection refused. Traceback은 connect 줄을 가리킨다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 safe_get.py http://127.0.0.1:8000/hello.txt" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 safe_get.py http://127.0.0.1:8000/hello.txt">▶</button><code>python3 safe_get.py http://127.0.0.1:8000/hello.txt</code></div>
+          <p><span lang="en">With urlopen the same situation arrives as a URLError. safe_get.py catches it, reports cannot reach ...: [Errno 111] Connection refused and exits normally.</span><span lang="ko">같은 상황을 urlopen에서는 URLError로 받는다. safe_get.py는 이것을 잡아 cannot reach ...: [Errno 111] Connection refused로 알려 주고 정상 종료한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -m http.server 8000 --bind 127.0.0.1 --directory ../http/site &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -m http.server 8000 --bind 127.0.0.1 --directory ../http/site &amp;">▶</button><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory ../http/site &amp;</code></div>
+          <p><span lang="en">This time start the web server, serving the site folder of the http example.</span><span lang="ko">이번에는 웹 서버를 띄운다. 파일은 http 예제의 site 폴더에서 가져온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 3; python3 safe_get.py http://127.0.0.1:8000/hello.txt http://127.0.0.1:8000/nothing.txt" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 3; python3 safe_get.py http://127.0.0.1:8000/hello.txt http://127.0.0.1:8000/nothing.txt">▶</button><code>sleep 3; python3 safe_get.py http://127.0.0.1:8000/hello.txt http://127.0.0.1:8000/nothing.txt</code></div>
+          <p><span lang="en">The first URL works and prints OK 37 characters: the 57-byte body is 37 characters once decoded. For the second URL the server does answer, but with 404, so urlopen raises HTTPError and except HTTPError turns it into HTTP error 404 File not found. HTTPError is a subclass of URLError, so it must come first in the except order.</span><span lang="ko">첫 주소는 성공해 OK 37 characters를 찍는다. 57바이트였던 본문이 decode 후에는 37글자다. 둘째 주소는 서버가 답은 했지만 404라서 HTTPError가 나고, except HTTPError가 HTTP error 404 File not found로 바꿨다. HTTPError는 URLError의 자식이므로 except 순서에서 먼저 와야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stops the web server.</span><span lang="ko">웹 서버를 멈춘다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 silent_server.py &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 silent_server.py &amp;">▶</button><code>python3 silent_server.py &amp;</code></div>
+          <p><span lang="en">A server on port 8001 that listens but never accepts or replies. The operating system still accepts the connection, so the client connects fine and then waits for an answer that never comes.</span><span lang="ko">8001번 포트에서 듣기만 하고 accept도 답장도 하지 않는 서버다. 연결은 운영체제가 받아 주므로 클라이언트는 연결에 성공한 뒤 답을 하염없이 기다리게 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 2; python3 safe_get.py http://127.0.0.1:8001/" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 2; python3 safe_get.py http://127.0.0.1:8001/">▶</button><code>sleep 2; python3 safe_get.py http://127.0.0.1:8001/</code></div>
+          <p><span lang="en">Thanks to urlopen(url, timeout=3) the client gives up after 3 seconds and prints timed out after 3 s. Without a timeout this program would wait until the server hangs up, which may be never.</span><span lang="ko">urlopen(url, timeout=3) 덕분에 3초 뒤 포기하고 timed out after 3 s를 찍는다. timeout을 주지 않으면 이 프로그램은 서버가 끊을 때까지 영원히 기다린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import socket
+print(socket.timeout is TimeoutError)
+sock = socket.create_connection((&quot;127.0.0.1&quot;, 8001), timeout=2)
+sock.sendall(b&quot;GET / HTTP/1.0\r\n\r\n&quot;)
+try:
+    sock.recv(1024)
+except TimeoutError as error:
+    print(&quot;TimeoutError:&quot;, error)
+sock.close()
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import socket
+print(socket.timeout is TimeoutError)
+sock = socket.create_connection((&quot;127.0.0.1&quot;, 8001), timeout=2)
+sock.sendall(b&quot;GET / HTTP/1.0\r\n\r\n&quot;)
+try:
+    sock.recv(1024)
+except TimeoutError as error:
+    print(&quot;TimeoutError:&quot;, error)
+sock.close()
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import socket
+print(socket.timeout is TimeoutError)
+sock = socket.create_connection((&quot;127.0.0.1&quot;, 8001), timeout=2)
+sock.sendall(b&quot;GET / HTTP/1.0\r\n\r\n&quot;)
+try:
+    sock.recv(1024)
+except TimeoutError as error:
+    print(&quot;TimeoutError:&quot;, error)
+sock.close()
+EOF</code></div>
+          <p><span lang="en">The same at the socket level. The timeout=2 of create_connection also applies to recv, so after 2 seconds TimeoutError: timed out. The first line, True, confirms that the old name socket.timeout is now the same as the built-in exception TimeoutError.</span><span lang="ko">소켓 수준에서도 같다. create_connection의 timeout=2가 recv에도 적용되어 2초 뒤 TimeoutError: timed out이 난다. 첫 줄 True는 옛 이름 socket.timeout이 지금은 내장 예외 TimeoutError와 같은 것이라는 확인이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="kill %1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: kill %1">▶</button><code>kill %1</code></div>
+          <p><span lang="en">Stops the silent server (it would end by itself after 60 seconds).</span><span lang="ko">말 없는 서버를 멈춘다(멈추지 않아도 60초 뒤 스스로 끝난다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 safe_get.py http://example.com/" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 safe_get.py http://example.com/">▶</button><code>python3 safe_get.py http://example.com/</code></div>
+          <p><span lang="en">This virtual machine has neither internet nor DNS (the service that turns names into IP addresses). The address of example.com cannot be found, and after a few seconds you get cannot reach ...: [Errno -3] Try again. On a PC with internet access this URL prints OK with the Example Domain page.</span><span lang="ko">이 가상 머신에는 인터넷도 DNS(이름을 IP 주소로 바꿔 주는 서비스)도 없다. example.com의 주소를 찾지 못해 몇 초 뒤 cannot reach ...: [Errno -3] Try again이 나온다. 인터넷이 되는 PC에서는 이 주소가 OK와 함께 Example Domain 페이지를 돌려준다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The ConnectionRefusedError traceback in the first step is on purpose. In real programs, network code always sets a timeout and wraps the lines that can fail in try/except.</span><span lang="ko">첫 단계의 ConnectionRefusedError Traceback은 일부러 낸 오류다. 실제 프로그램에서 네트워크 코드는 항상 timeout을 주고, 실패할 수 있는 줄을 try/except로 감싼다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="udp" data-dir="network/udp" hidden>
+        <h2>udp <span class="muted">~/network/udp</span></h2>
+        <p><span lang="en">UDP sends one self-contained chunk (a datagram) at a time, like a letter, with no connection. The receiver ends by itself after three datagrams on port 5005; the sender sends each command-line word as one datagram. Even when nobody is receiving, the sender finishes without an error.</span><span lang="ko">연결 없이 편지처럼 한 덩어리(데이터그램)씩 보내는 UDP. 수신기는 5005번 포트에서 데이터그램 세 개를 받으면 스스로 끝나고, 송신기는 명령줄 단어 하나를 데이터그램 하나로 보낸다. 받는 쪽이 없어도 보내는 쪽은 오류 없이 끝난다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 udp_receiver.py &amp;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 udp_receiver.py &amp;">▶</button><code>python3 udp_receiver.py &amp;</code></div>
+          <p><span lang="en">A SOCK_DGRAM socket binds to port 5005 and waits in recvfrom. Unlike the TCP server there is no listen and no accept.</span><span lang="ko">SOCK_DGRAM 소켓으로 5005번 포트에 bind하고 recvfrom으로 기다린다. TCP 서버와 달리 listen도 accept도 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sleep 2; netstat -uln" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sleep 2; netstat -uln">▶</button><code>sleep 2; netstat -uln</code></div>
+          <p><span lang="en">127.0.0.1:5005 shows up in the UDP port list. UDP has no connections, so the State column is empty (TCP said LISTEN).</span><span lang="ko">UDP 포트 목록에 127.0.0.1:5005가 보인다. UDP에는 연결이 없으므로 State 칸이 비어 있다(TCP는 LISTEN이었다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 udp_sender.py 하나 둘 셋" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 udp_sender.py 하나 둘 셋">▶</button><code>python3 udp_sender.py 하나 둘 셋</code></div>
+          <p><span lang="en">One word is one datagram. Each recvfrom gets exactly one chunk; the receiver prints #1, #2, #3 and ends with [receiver] done. The two programs run at the same time, so the order of the [sender] and [receiver] lines can differ a little from run to run.</span><span lang="ko">단어 하나가 데이터그램 하나다. 수신기는 recvfrom 한 번에 정확히 한 덩어리씩 받아 #1, #2, #3으로 찍고 [receiver] done으로 끝난다. 두 프로그램이 동시에 돌기 때문에 [sender]와 [receiver] 줄의 순서는 실행마다 조금 다를 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 udp_sender.py 아무도 없나요" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 udp_sender.py 아무도 없나요">▶</button><code>python3 udp_sender.py 아무도 없나요</code></div>
+          <p><span lang="en">The receiver has already ended, yet sent 9 bytes is printed with no error. UDP does not check whether anyone received it; the datagrams simply vanished. With TCP, connect would have raised ConnectionRefusedError.</span><span lang="ko">수신기가 이미 끝났는데도 sent 9 bytes가 찍히고 오류가 없다. UDP는 상대가 받았는지 확인하지 않는다. 데이터그램은 그냥 사라졌다. TCP였다면 connect에서 ConnectionRefusedError가 났을 것이다.</span></p>
+        </li>
+      </ol>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="echo">
+    <details class="source" open data-path="/home/student/network/echo/echo_server.py">
+      <summary>echo_server.py <span class="muted src-lines" data-lines="20"><span lang="en">20 lines</span><span lang="ko">20줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;TCP echo server: sends every message straight back to the client.&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;   # loopback: only programs on this computer can connect</span>
+<span class="ln">PORT = 5000          # the &quot;door number&quot; clients knock on</span>
+<span class="ln"> </span>
+<span class="ln">with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:</span>
+<span class="ln">    # allow restarting the server right away on the same port</span>
+<span class="ln">    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)</span>
+<span class="ln">    server.bind((HOST, PORT))</span>
+<span class="ln">    server.listen()</span>
+<span class="ln">    print(f&quot;[server] listening on {HOST}:{PORT}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">    while True:</span>
+<span class="ln">        conn, addr = server.accept()          # waits for the next client</span>
+<span class="ln">        with conn:</span>
+<span class="ln">            print(f&quot;[server] connection from {addr[0]}&quot;)</span>
+<span class="ln">            data = conn.recv(1024)            # bytes, at most 1024 of them</span>
+<span class="ln">            print(f&quot;[server] received {len(data)} bytes: {data!r}&quot;)</span>
+<span class="ln">            conn.sendall(data)                # echo the same bytes back</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/echo/echo_client.py">
+      <summary>echo_client.py <span class="muted src-lines" data-lines="16"><span lang="en">16 lines</span><span lang="ko">16줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;TCP echo client: sends one message and prints the reply.&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln">import sys</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 5000</span>
+<span class="ln"> </span>
+<span class="ln">message = &quot; &quot;.join(sys.argv[1:]) or &quot;hello&quot;</span>
+<span class="ln"> </span>
+<span class="ln">with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:</span>
+<span class="ln">    client.connect((HOST, PORT))              # ConnectionRefusedError if no server</span>
+<span class="ln">    data = message.encode(&quot;utf-8&quot;)            # str -&gt; bytes</span>
+<span class="ln">    client.sendall(data)</span>
+<span class="ln">    reply = client.recv(1024)</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;[client] sent {len(data)} bytes, got back: {reply.decode('utf-8')}&quot;)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="raw_http" hidden>
+    <details class="source" open data-path="/home/student/network/http/raw_get.py">
+      <summary>raw_get.py <span class="muted src-lines" data-lines="32"><span lang="en">32 lines</span><span lang="ko">32줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Speak HTTP by hand: a GET request over a plain TCP socket.&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln">import sys</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 8000</span>
+<span class="ln"> </span>
+<span class="ln">path = sys.argv[1] if len(sys.argv) &gt; 1 else &quot;/hello.txt&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># An HTTP request is just text: a request line, headers, an empty line.</span>
+<span class="ln">request = f&quot;GET {path} HTTP/1.0\r\nHost: {HOST}:{PORT}\r\n\r\n&quot;</span>
+<span class="ln">print(&quot;request:&quot;, repr(request))</span>
+<span class="ln"> </span>
+<span class="ln">with socket.create_connection((HOST, PORT)) as sock:</span>
+<span class="ln">    sock.sendall(request.encode(&quot;ascii&quot;))</span>
+<span class="ln">    chunks = []</span>
+<span class="ln">    while True:                     # read until the server closes the connection</span>
+<span class="ln">        chunk = sock.recv(4096)</span>
+<span class="ln">        if not chunk:</span>
+<span class="ln">            break</span>
+<span class="ln">        chunks.append(chunk)</span>
+<span class="ln"> </span>
+<span class="ln">response = b&quot;&quot;.join(chunks)</span>
+<span class="ln">head, _, body = response.partition(b&quot;\r\n\r\n&quot;)   # headers end at an empty line</span>
+<span class="ln">lines = head.decode(&quot;iso-8859-1&quot;).split(&quot;\r\n&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;status line:&quot;, lines[0])</span>
+<span class="ln">for line in lines[1:]:</span>
+<span class="ln">    name, _, value = line.partition(&quot;: &quot;)</span>
+<span class="ln">    print(f&quot;  header {name} = {value}&quot;)</span>
+<span class="ln">print(f&quot;body ({len(body)} bytes):&quot;)</span>
+<span class="ln">print(body.decode(&quot;utf-8&quot;))</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/http/site/hello.txt">
+      <summary>site/hello.txt <span class="muted src-lines" data-lines="2"><span lang="en">2 lines</span><span lang="ko">2줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">Hello from the server!</span>
+<span class="ln">안녕하세요, 서버입니다.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/http/site/index.html">
+      <summary>site/index.html <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&lt;!DOCTYPE html&gt;</span>
+<span class="ln">&lt;html&gt;</span>
+<span class="ln">&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;Python Lab&lt;/title&gt;&lt;/head&gt;</span>
+<span class="ln">&lt;body&gt;</span>
+<span class="ln">&lt;h1&gt;It works!&lt;/h1&gt;</span>
+<span class="ln">&lt;p&gt;This page was served by python3 -m http.server.&lt;/p&gt;</span>
+<span class="ln">&lt;/body&gt;</span>
+<span class="ln">&lt;/html&gt;</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="fetch" hidden>
+    <details class="source" open data-path="/home/student/network/http/fetch.py">
+      <summary>fetch.py <span class="muted src-lines" data-lines="20"><span lang="en">20 lines</span><span lang="ko">20줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;HTTP client with urllib.request: the standard library does the protocol.&quot;&quot;&quot;</span>
+<span class="ln">import json</span>
+<span class="ln">import sys</span>
+<span class="ln">from urllib.request import urlopen</span>
+<span class="ln"> </span>
+<span class="ln">url = sys.argv[1] if len(sys.argv) &gt; 1 else &quot;http://127.0.0.1:8000/hello.txt&quot;</span>
+<span class="ln"> </span>
+<span class="ln">with urlopen(url, timeout=5) as response:</span>
+<span class="ln">    print(&quot;status:&quot;, response.status, response.reason)</span>
+<span class="ln">    content_type = response.headers.get(&quot;Content-Type&quot;)</span>
+<span class="ln">    print(&quot;type:&quot;, content_type)</span>
+<span class="ln">    body = response.read()                 # bytes</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;length:&quot;, len(body), &quot;bytes&quot;)</span>
+<span class="ln">if content_type == &quot;application/json&quot;:</span>
+<span class="ln">    data = json.loads(body)                # JSON text -&gt; dict</span>
+<span class="ln">    for key, value in data.items():</span>
+<span class="ln">        print(f&quot;  {key}: {value}&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(body.decode(&quot;utf-8&quot;), end=&quot;&quot;)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/http/site/data.json">
+      <summary>site/data.json <span class="muted src-lines" data-lines="1"><span lang="en">1 lines</span><span lang="ko">1줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">{&quot;city&quot;: &quot;Seoul&quot;, &quot;temperature&quot;: 3, &quot;unit&quot;: &quot;C&quot;, &quot;sky&quot;: &quot;clear&quot;}</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="json_api" hidden>
+    <details class="source" open data-path="/home/student/network/api/api_server.py">
+      <summary>api_server.py <span class="muted src-lines" data-lines="59"><span lang="en">59 lines</span><span lang="ko">59줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;A tiny JSON API: a memo board kept in memory.</span>
+<span class="ln"> </span>
+<span class="ln">GET  /memos        -&gt; 200, every memo</span>
+<span class="ln">GET  /memos/&lt;id&gt;   -&gt; 200, one memo (404 if there is none)</span>
+<span class="ln">POST /memos        -&gt; 201, add {&quot;text&quot;: &quot;...&quot;} (400 if the body is wrong)</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import json</span>
+<span class="ln">from http.server import BaseHTTPRequestHandler, HTTPServer</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 8080</span>
+<span class="ln"> </span>
+<span class="ln">memos = [{&quot;id&quot;: 1, &quot;text&quot;: &quot;buy milk&quot;}]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class MemoHandler(BaseHTTPRequestHandler):</span>
+<span class="ln">    def send_json(self, status, data):</span>
+<span class="ln">        body = json.dumps(data, ensure_ascii=False).encode(&quot;utf-8&quot;)</span>
+<span class="ln">        self.send_response(status)                       # status line</span>
+<span class="ln">        self.send_header(&quot;Content-Type&quot;, &quot;application/json; charset=utf-8&quot;)</span>
+<span class="ln">        self.send_header(&quot;Content-Length&quot;, str(len(body)))</span>
+<span class="ln">        self.end_headers()                               # empty line</span>
+<span class="ln">        self.wfile.write(body)                           # body</span>
+<span class="ln"> </span>
+<span class="ln">    def do_GET(self):</span>
+<span class="ln">        if self.path == &quot;/memos&quot;:</span>
+<span class="ln">            self.send_json(200, memos)</span>
+<span class="ln">        elif self.path.startswith(&quot;/memos/&quot;):</span>
+<span class="ln">            memo_id = self.path.removeprefix(&quot;/memos/&quot;)</span>
+<span class="ln">            for memo in memos:</span>
+<span class="ln">                if str(memo[&quot;id&quot;]) == memo_id:</span>
+<span class="ln">                    self.send_json(200, memo)</span>
+<span class="ln">                    return</span>
+<span class="ln">            self.send_json(404, {&quot;error&quot;: f&quot;no memo {memo_id}&quot;})</span>
+<span class="ln">        else:</span>
+<span class="ln">            self.send_json(404, {&quot;error&quot;: &quot;not found&quot;})</span>
+<span class="ln"> </span>
+<span class="ln">    def do_POST(self):</span>
+<span class="ln">        if self.path != &quot;/memos&quot;:</span>
+<span class="ln">            self.send_json(404, {&quot;error&quot;: &quot;not found&quot;})</span>
+<span class="ln">            return</span>
+<span class="ln">        length = int(self.headers.get(&quot;Content-Length&quot;, 0))</span>
+<span class="ln">        raw = self.rfile.read(length)                    # the request body</span>
+<span class="ln">        try:</span>
+<span class="ln">            text = json.loads(raw)[&quot;text&quot;]</span>
+<span class="ln">        except (json.JSONDecodeError, KeyError, TypeError):</span>
+<span class="ln">            self.send_json(400, {&quot;error&quot;: 'send JSON like {&quot;text&quot;: &quot;...&quot;}'})</span>
+<span class="ln">            return</span>
+<span class="ln">        memo = {&quot;id&quot;: len(memos) + 1, &quot;text&quot;: text}</span>
+<span class="ln">        memos.append(memo)</span>
+<span class="ln">        self.send_json(201, memo)</span>
+<span class="ln"> </span>
+<span class="ln">    def log_request(self, code=&quot;-&quot;, size=&quot;-&quot;):</span>
+<span class="ln">        # one short line per request instead of the default access log</span>
+<span class="ln">        print(f&quot;[server] {self.command} {self.path} -&gt; {code}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;[server] memo API on http://{HOST}:{PORT}&quot;)</span>
+<span class="ln">HTTPServer((HOST, PORT), MemoHandler).serve_forever()</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/api/api_client.py">
+      <summary>api_client.py <span class="muted src-lines" data-lines="29"><span lang="en">29 lines</span><span lang="ko">29줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Client for api_server.py: sends JSON, reads JSON back.&quot;&quot;&quot;</span>
+<span class="ln">import json</span>
+<span class="ln">import sys</span>
+<span class="ln">from urllib.error import HTTPError</span>
+<span class="ln">from urllib.request import Request, urlopen</span>
+<span class="ln"> </span>
+<span class="ln">BASE = &quot;http://127.0.0.1:8080&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def call(method, path, data=None):</span>
+<span class="ln">    &quot;&quot;&quot;Sends one request; returns (status code, decoded JSON).&quot;&quot;&quot;</span>
+<span class="ln">    body = None</span>
+<span class="ln">    headers = {}</span>
+<span class="ln">    if data is not None:</span>
+<span class="ln">        body = json.dumps(data).encode(&quot;utf-8&quot;)</span>
+<span class="ln">        headers[&quot;Content-Type&quot;] = &quot;application/json&quot;</span>
+<span class="ln">    request = Request(BASE + path, data=body, headers=headers, method=method)</span>
+<span class="ln">    try:</span>
+<span class="ln">        with urlopen(request, timeout=5) as response:</span>
+<span class="ln">            return response.status, json.loads(response.read())</span>
+<span class="ln">    except HTTPError as error:              # 4xx/5xx: the body still has JSON</span>
+<span class="ln">        return error.code, json.loads(error.read())</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    if len(sys.argv) &gt; 1:</span>
+<span class="ln">        text = &quot; &quot;.join(sys.argv[1:])</span>
+<span class="ln">        print(&quot;POST /memos&quot;, call(&quot;POST&quot;, &quot;/memos&quot;, {&quot;text&quot;: text}))</span>
+<span class="ln">    print(&quot;GET  /memos&quot;, call(&quot;GET&quot;, &quot;/memos&quot;))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="errors" hidden>
+    <details class="source" open data-path="/home/student/network/errors/safe_get.py">
+      <summary>safe_get.py <span class="muted src-lines" data-lines="25"><span lang="en">25 lines</span><span lang="ko">25줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Fetch URLs without crashing: each kind of failure gets its own message.&quot;&quot;&quot;</span>
+<span class="ln">import sys</span>
+<span class="ln">from urllib.error import HTTPError, URLError</span>
+<span class="ln">from urllib.request import urlopen</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def fetch_text(url, timeout=3):</span>
+<span class="ln">    &quot;&quot;&quot;Returns the body as text, or None after printing what went wrong.&quot;&quot;&quot;</span>
+<span class="ln">    try:</span>
+<span class="ln">        with urlopen(url, timeout=timeout) as response:</span>
+<span class="ln">            return response.read().decode(&quot;utf-8&quot;)</span>
+<span class="ln">    except HTTPError as error:          # the server answered with 4xx/5xx</span>
+<span class="ln">        print(f&quot;HTTP error {error.code} {error.reason}: {url}&quot;)</span>
+<span class="ln">    except URLError as error:           # no answer: refused, unknown host, ...</span>
+<span class="ln">        print(f&quot;cannot reach {url}: {error.reason}&quot;)</span>
+<span class="ln">    except TimeoutError:                # connected, but the reply never came</span>
+<span class="ln">        print(f&quot;timed out after {timeout} s: {url}&quot;)</span>
+<span class="ln">    return None</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">for url in sys.argv[1:]:</span>
+<span class="ln">    text = fetch_text(url)</span>
+<span class="ln">    if text is not None:</span>
+<span class="ln">        first_line = text.splitlines()[0] if text else &quot;&quot;</span>
+<span class="ln">        print(f&quot;OK {len(text)} characters: {first_line}&quot;)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/errors/silent_server.py">
+      <summary>silent_server.py <span class="muted src-lines" data-lines="14"><span lang="en">14 lines</span><span lang="ko">14줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;A server that never answers: it listens but never accepts.</span>
+<span class="ln"> </span>
+<span class="ln">The operating system still completes the TCP handshake, so clients</span>
+<span class="ln">connect fine -- and then wait for a reply that never comes.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln">import time</span>
+<span class="ln"> </span>
+<span class="ln">with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:</span>
+<span class="ln">    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)</span>
+<span class="ln">    server.bind((&quot;127.0.0.1&quot;, 8001))</span>
+<span class="ln">    server.listen()</span>
+<span class="ln">    print(&quot;[silent] listening on 127.0.0.1:8001, will never reply&quot;)</span>
+<span class="ln">    time.sleep(60)          # then exit on its own</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="udp" hidden>
+    <details class="source" open data-path="/home/student/network/udp/udp_receiver.py">
+      <summary>udp_receiver.py <span class="muted src-lines" data-lines="15"><span lang="en">15 lines</span><span lang="ko">15줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;UDP receiver: no connection, just datagrams arriving at a port.&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 5005</span>
+<span class="ln">COUNT = 3</span>
+<span class="ln"> </span>
+<span class="ln">with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:</span>
+<span class="ln">    sock.bind((HOST, PORT))</span>
+<span class="ln">    sock.settimeout(30)                       # give up if nothing arrives</span>
+<span class="ln">    print(f&quot;[receiver] waiting for {COUNT} datagrams on {HOST}:{PORT}&quot;)</span>
+<span class="ln">    for number in range(1, COUNT + 1):</span>
+<span class="ln">        data, addr = sock.recvfrom(1024)      # one whole datagram + sender</span>
+<span class="ln">        print(f&quot;[receiver] #{number} from {addr[0]}: {data.decode('utf-8')}&quot;)</span>
+<span class="ln">print(&quot;[receiver] done&quot;)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/network/udp/udp_sender.py">
+      <summary>udp_sender.py <span class="muted src-lines" data-lines="11"><span lang="en">11 lines</span><span lang="ko">11줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;UDP sender: each command-line word becomes one datagram.&quot;&quot;&quot;</span>
+<span class="ln">import socket</span>
+<span class="ln">import sys</span>
+<span class="ln"> </span>
+<span class="ln">HOST = &quot;127.0.0.1&quot;</span>
+<span class="ln">PORT = 5005</span>
+<span class="ln"> </span>
+<span class="ln">with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:</span>
+<span class="ln">    for word in sys.argv[1:]:</span>
+<span class="ln">        sent = sock.sendto(word.encode(&quot;utf-8&quot;), (HOST, PORT))</span>
+<span class="ln">        print(f&quot;[sender] sent {sent} bytes: {word}&quot;)</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-network">
+      <h2 class="notes-title"><span lang="en">Networking</span><span lang="ko">네트워킹</span></h2>
+<div lang="en">
+<p>This topic is networking. For two programs to exchange data they have to agree on where the other one is (an IP address and a port), which channel to use (TCP or UDP), and how to interpret the bytes that arrive (a protocol such as HTTP). We start by building the smallest possible server and client with the <code>socket</code> module, and on top of that we write an HTTP request by hand to see that HTTP is really an agreement written in plain text. Then we do the same in a few lines with the standard library's <code>urllib.request</code> and <code>http.server</code>, build a small API server that exchanges JSON, and finally look at handling network errors and at UDP. The practice programs are <a href="#ex=echo">echo</a>, <a href="#ex=raw_http">raw_http</a>, <a href="#ex=fetch">fetch</a>, <a href="#ex=json_api">json_api</a>, <a href="#ex=errors">errors</a> and <a href="#ex=udp">udp</a>.</p>
+
+<blockquote>The virtual machine in this lab has no network card, so it cannot reach the internet. Instead, server and client run on the same machine and talk over loopback (127.0.0.1, the machine itself), which every computer has. The code works unchanged on a real network; what changes on a real PC is summarised near the end.</blockquote>
+
+<h2>Clients and Servers</h2>
+
+<p>Most network programs play one of two roles. A <strong>server</strong> waits at a known place for requests and answers them; a <strong>client</strong> makes the first contact and sends a request. A web browser is a client, the program that hands out a web site is a server. One computer can run both at the same time, and that is exactly what we do in this lab.</p>
+
+<pre><code>  client                              server
+  (makes contact)                     (waits)
+       |  ---- request ---------&gt;      |
+       |  &lt;--- response ---------      |</code></pre>
+
+<h2>IP Addresses, Ports and Loopback</h2>
+
+<h3>IP Address: Which Computer</h3>
+
+<p>An IP address is the number that identifies a computer (strictly, a network device) on a network. An IPv4 address is four numbers from 0 to 255 joined by dots, like <code>192.168.0.12</code>. Names that are easy for people to remember (<code>www.python.org</code>) are turned into IP addresses by a service called DNS. The oldest name list of all is the file <code>/etc/hosts</code>.</p>
+
+<h3>Port: Which Program on That Computer</h3>
+
+<p>Several servers can run on one computer at once, so an IP address alone is not enough. A port, a number from 0 to 65535, says which program on the computer the data is for. If the IP address is the building's street address, the port is the flat number. That is why an address always travels as an <code>(IP, port)</code> pair, and in Python it is written as a tuple such as <code>("127.0.0.1", 5000)</code>. Only one program at a time can hold a given port.</p>
+
+<table>
+<thead>
+<tr><th>Port</th><th>Common use</th></tr>
+</thead>
+<tbody>
+<tr><td>22</td><td>SSH (remote login)</td></tr>
+<tr><td>80</td><td>HTTP (the web)</td></tr>
+<tr><td>443</td><td>HTTPS (the encrypted web)</td></tr>
+<tr><td>5000, 8000, 8080</td><td>Numbers development servers like to use; in this lab the echo server, the file server and the API server</td></tr>
+</tbody>
+</table>
+
+<p>Ports below 1024 need administrator rights to open, so practice servers usually pick a number of 1024 or above.</p>
+
+<h3>Loopback: 127.0.0.1 and localhost</h3>
+
+<p><code>127.0.0.1</code> is a special address meaning "this very computer", and its name is <code>localhost</code>. Data sent there never goes out on a cable; the operating system turns it straight around. So you can test servers and clients without any internet. The first step of <a href="#ex=echo">echo</a>, <code>ip addr</code>, shows that this virtual machine has nothing but <code>lo</code> (loopback).</p>
+
+<h3>Thinking in Layers</h3>
+
+<p>Network communication is built from layers, each doing one job. An upper layer does not need to know how the layer below does its work. In this topic we work directly with the top two.</p>
+
+<table>
+<thead>
+<tr><th>Layer</th><th>Job</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Application</td><td>The format and order of what is exchanged (the protocol)</td><td>HTTP, our own echo rule</td></tr>
+<tr><td>Transport</td><td>Carries bytes to a program (a port)</td><td>TCP, UDP</td></tr>
+<tr><td>Internet</td><td>Finds the way to a computer (an IP address)</td><td>IP</td></tr>
+<tr><td>Link</td><td>Sends over an actual wire or radio</td><td>Ethernet, Wi-Fi, loopback</td></tr>
+</tbody>
+</table>
+
+<h2>TCP Sockets: an Echo Server and Client</h2>
+
+<h3>What Is a Socket?</h3>
+
+<p>A socket is the end point where a program meets the network. Just as opening a file gives you a file object to read and write, creating a socket gives you a socket object to send and receive bytes. <code>socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code> creates "a TCP socket using IPv4 addresses". TCP sets up a connection first and guarantees that the bytes you send arrive complete and in order, a bit like a phone call.</p>
+
+<h3>The Calls on Each Side</h3>
+
+<table>
+<thead>
+<tr><th>Server</th><th>Client</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>socket()</code></td><td><code>socket()</code></td><td>Create a socket</td></tr>
+<tr><td><code>bind((HOST, PORT))</code></td><td></td><td>Claim this address and port</td></tr>
+<tr><td><code>listen()</code></td><td></td><td>Get ready to take connections</td></tr>
+<tr><td><code>accept()</code></td><td><code>connect((HOST, PORT))</code></td><td>The connection is made; accept waits until a client arrives</td></tr>
+<tr><td><code>recv(1024)</code></td><td><code>sendall(data)</code></td><td>The client sends, the server receives</td></tr>
+<tr><td><code>sendall(data)</code></td><td><code>recv(1024)</code></td><td>The server answers, the client receives</td></tr>
+<tr><td><code>close()</code></td><td><code>close()</code></td><td>Close the connection (<code>with</code> does it for you)</td></tr>
+</tbody>
+</table>
+
+<h3>Reading the Server</h3>
+
+<pre><code>import socket
+
+HOST = "127.0.0.1"   # loopback: only programs on this computer can connect
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((HOST, PORT))
+    server.listen()
+    print(f"[server] listening on {HOST}:{PORT}")
+
+    while True:
+        conn, addr = server.accept()          # waits for the next client
+        with conn:
+            data = conn.recv(1024)            # bytes, at most 1024 of them
+            conn.sendall(data)                # echo the same bytes back</code></pre>
+
+<p>The server socket (<code>server</code>) is only a doorkeeper. Each time a client connects, <code>accept()</code> returns a new socket <code>conn</code> just for that client, plus the client's address <code>addr</code>; the actual conversation happens over <code>conn</code>. Thanks to <code>while True</code> the server goes back to waiting for the next client after each one. <code>SO_REUSEADDR</code> avoids an "address already in use" error when you stop the server and start it again right away.</p>
+
+<h3>Reading the Client</h3>
+
+<pre><code>import socket
+import sys
+
+message = " ".join(sys.argv[1:]) or "hello"
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+    client.connect(("127.0.0.1", 5000))
+    data = message.encode("utf-8")            # str -&gt; bytes
+    client.sendall(data)
+    reply = client.recv(1024)
+
+print(f"[client] sent {len(data)} bytes, got back: {reply.decode('utf-8')}")</code></pre>
+
+<p>The command-line arguments (<code>sys.argv</code>) become the message: run <code>python3 echo_client.py hello</code> and <code>message</code> is <code>"hello"</code>.</p>
+
+<h3>Bytes and Encodings</h3>
+
+<p>What travels over a network is always bytes (<code>bytes</code>). Turn a string into bytes with <code>encode("utf-8")</code> before sending, and turn received bytes back into a string with <code>decode("utf-8")</code>. An English letter is 1 byte, but a Korean character is 3 bytes in UTF-8, so <code>"안녕"</code> ("hi") is 2 characters and 6 bytes. Byte values print with a leading <code>b</code>, as in <code>b'hello'</code>.</p>
+
+<pre><code>text = "안녕"
+data = text.encode("utf-8")
+print(data, len(text), len(data))   # b'\xec\x95\x88\xeb\x85\x95' 2 6
+print(data.decode("utf-8"))         # 안녕</code></pre>
+
+<h3>Server and Client in One Terminal</h3>
+
+<p>A server is a program that never finishes. Run it normally and the terminal is tied up, so you cannot start the client. On a real PC you would simply open two terminal windows; in this lab we use the shell's job control instead.</p>
+
+<table>
+<thead>
+<tr><th>Command</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>python3 echo_server.py &amp;</code></td><td>The trailing <code>&amp;</code>: run in the background and give the prompt back at once</td></tr>
+<tr><td><code>sleep 2</code></td><td>Wait 2 seconds, giving the server time to open its port</td></tr>
+<tr><td><code>jobs</code></td><td>List the background jobs</td></tr>
+<tr><td><code>kill %1</code></td><td>Stop job number 1</td></tr>
+<tr><td><code>netstat -tln</code></td><td>List the TCP ports waiting for connections (LISTEN)</td></tr>
+</tbody>
+</table>
+
+<p>The background server prints to the same screen, so <code>[server]</code> and <code>[client]</code> lines appear mixed together. That is why the example programs mark each line with who printed it.</p>
+
+<pre><code>$ python3 echo_server.py &amp;
+$ sleep 2; python3 echo_client.py hello
+[server] listening on 127.0.0.1:5000
+[server] connection from 127.0.0.1
+[server] received 5 bytes: b'hello'
+[client] sent 5 bytes, got back: hello</code></pre>
+
+<h2>Protocols: HTTP Is an Agreement in Plain Text</h2>
+
+<h3>What Is a Protocol?</h3>
+
+<p>TCP carries bytes faithfully but has no idea what they mean. A protocol is the rule both sides agree on in advance: what to send, in which order and in which format. The echo server's rule was simply "send back what you get". The web's rule is HTTP. HTTP requests and responses are text a person can read, with lines ending in <code>\r\n</code>.</p>
+
+<h3>The Shape of a Request and a Response</h3>
+
+<pre><code>request (client -&gt; server)
+  GET /hello.txt HTTP/1.0          request line: method, path, version
+  Host: 127.0.0.1:8000             headers (name: value), any number
+                                   empty line = end of headers
+
+response (server -&gt; client)
+  HTTP/1.0 200 OK                  status line: version, status code, reason
+  Content-type: text/plain         headers
+  Content-Length: 57
+                                   empty line
+  Hello from the server!           body (57 bytes)
+  안녕하세요, 서버입니다.</code></pre>
+
+<p>Headers describe the body. <code>Content-Type</code> gives its kind (<code>text/plain</code>, <code>text/html</code>, <code>application/json</code>) and <code>Content-Length</code> its size in bytes. A browser looks at <code>Content-Type</code> to decide whether to show text or draw a web page. Header names ignore case, so the <code>Content-type</code> that <code>http.server</code> sends is the same header as <code>Content-Type</code>.</p>
+
+<h3>Status Codes</h3>
+
+<table>
+<thead>
+<tr><th>Code</th><th>Name</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td>200</td><td>OK</td><td>Success</td></tr>
+<tr><td>201</td><td>Created</td><td>Something new was created (a successful POST)</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>The request is malformed</td></tr>
+<tr><td>404</td><td>Not Found</td><td>No such path</td></tr>
+<tr><td>500</td><td>Internal Server Error</td><td>The server program failed</td></tr>
+</tbody>
+</table>
+
+<p>The first digit gives the broad class: 2xx success, 3xx go elsewhere, 4xx the client's fault, 5xx the server's fault. Note that a 404 is still a normal answer sent by the server; it is not the same as failing to connect at all.</p>
+
+<h3>Python's Web Server: http.server</h3>
+
+<p>The standard library includes a simple web server that hands out the files in a folder. <code>-m</code> runs a module as a program.</p>
+
+<pre><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;</code></pre>
+
+<p>It listens on port 8000 and treats the <code>site</code> folder as the root (<code>/</code>) of the site: a request for <code>/hello.txt</code> gets <code>site/hello.txt</code>, a request for <code>/</code> gets <code>site/index.html</code>. Each request leaves an access log line such as <code>127.0.0.1 - - [date] "GET /hello.txt HTTP/1.0" 200 -</code>. It is meant for development and practice, not for running a real service.</p>
+
+<h3>Sending a GET Over a Raw Socket</h3>
+
+<p><code>raw_get.py</code> in <a href="#ex=raw_http">raw_http</a> does by hand what a browser does: it builds the request text, sends it, receives until the server closes the connection, and splits head from body at the first empty line (<code>\r\n\r\n</code>).</p>
+
+<pre><code>request = f"GET {path} HTTP/1.0\r\nHost: {HOST}:{PORT}\r\n\r\n"
+
+with socket.create_connection((HOST, PORT)) as sock:
+    sock.sendall(request.encode("ascii"))
+    chunks = []
+    while True:                     # read until the server closes the connection
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        chunks.append(chunk)
+
+response = b"".join(chunks)
+head, _, body = response.partition(b"\r\n\r\n")
+lines = head.decode("iso-8859-1").split("\r\n")
+print("status line:", lines[0])</code></pre>
+
+<p><code>socket.create_connection((HOST, PORT))</code> is a shortcut that creates the socket and calls <code>connect</code> in one go. <code>recv</code> may return only part of the data, so the loop keeps collecting until it gets empty bytes (<code>b""</code>), which means the other side closed the connection. With HTTP/1.0 the server closes the connection after sending the whole response.</p>
+
+<p>You can run the same experiment without Python. <code>nc</code> (netcat) sends its input over a socket and prints whatever comes back.</p>
+
+<pre><code>printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000</code></pre>
+
+<h2>urllib.request: the Standard Library's HTTP Client</h2>
+
+<p>Writing requests by hand is great for learning how it works, but in practice there is a lot more to handle: redirects, compression, https encryption. <code>urllib.request.urlopen</code> does all of it given a single URL.</p>
+
+<pre><code>import json
+from urllib.request import urlopen
+
+with urlopen("http://127.0.0.1:8000/data.json", timeout=5) as response:
+    print(response.status, response.reason)        # 200 OK
+    content_type = response.headers.get("Content-Type")
+    body = response.read()                          # bytes
+
+data = json.loads(body)                             # JSON text -&gt; dict
+print(data["city"])                                 # Seoul</code></pre>
+
+<table>
+<thead>
+<tr><th>Response object</th><th>Contents</th></tr>
+</thead>
+<tbody>
+<tr><td><code>response.status</code></td><td>The status code (an int, e.g. 200)</td></tr>
+<tr><td><code>response.reason</code></td><td>The reason phrase (e.g. OK)</td></tr>
+<tr><td><code>response.headers</code></td><td>The headers; read them with <code>.get("Content-Type")</code> or <code>["Content-Type"]</code></td></tr>
+<tr><td><code>response.read()</code></td><td>The whole body (<code>bytes</code>); it can be read only once</td></tr>
+</tbody>
+</table>
+
+<p>A URL such as <code>http://127.0.0.1:8000/data.json</code> consists of a scheme (<code>http</code>), a host (<code>127.0.0.1</code>), a port (<code>8000</code>) and a path (<code>/data.json</code>). Leave out the port and it is 80 for http, 443 for https. In <a href="#ex=fetch">fetch</a> you fetch text, JSON and HTML in turn. <code>wget -q -O - URL</code> gets the same result: the server does not care who is asking, only whether the agreement is kept.</p>
+
+<p><code>requests</code>, which you often see in tutorials, is an external package that does the same job more conveniently; it has to be installed with <code>pip install requests</code>. This virtual machine has neither pip nor internet, so we stick to the standard library's <code>urllib</code>.</p>
+
+<h2>A Small JSON API Server</h2>
+
+<h3>APIs and Methods</h3>
+
+<p>A web page returns HTML for people to read; an API returns data (usually JSON) for programs to read. The method of a request says what you want to do.</p>
+
+<table>
+<thead>
+<tr><th>Request</th><th>Meaning</th><th>Successful answer</th></tr>
+</thead>
+<tbody>
+<tr><td><code>GET /memos</code></td><td>Give me the list of memos</td><td>200 with a JSON array</td></tr>
+<tr><td><code>GET /memos/2</code></td><td>Give me memo number 2</td><td>200 with a JSON object (404 if there is none)</td></tr>
+<tr><td><code>POST /memos</code></td><td>Create a new memo from the JSON in the body</td><td>201 with the new memo (400 if the body is wrong)</td></tr>
+</tbody>
+</table>
+
+<h3>The Server: BaseHTTPRequestHandler</h3>
+
+<p>Subclass <code>BaseHTTPRequestHandler</code> from <code>http.server</code> and give it <code>do_GET</code> and <code>do_POST</code> methods; the server calls the one matching the request's method. The request path is in <code>self.path</code>, the headers in <code>self.headers</code>, the body is read from <code>self.rfile</code>, and the response is written in the order status line, headers, empty line, body. The shape of the HTTP response you saw earlier becomes the order of the method calls.</p>
+
+<pre><code>def send_json(self, status, data):
+    body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    self.send_response(status)                       # status line
+    self.send_header("Content-Type", "application/json; charset=utf-8")
+    self.send_header("Content-Length", str(len(body)))
+    self.end_headers()                               # empty line
+    self.wfile.write(body)                           # body
+
+def do_POST(self):
+    length = int(self.headers.get("Content-Length", 0))
+    raw = self.rfile.read(length)                    # the request body
+    try:
+        text = json.loads(raw)["text"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        self.send_json(400, {"error": 'send JSON like {"text": "..."}'})
+        return
+    memo = {"id": len(memos) + 1, "text": text}
+    memos.append(memo)
+    self.send_json(201, memo)</code></pre>
+
+<p>The body is read for exactly the number of bytes the <code>Content-Length</code> header announced. Data from a client is checked, not trusted: if it is not JSON or has no <code>text</code> key, the server answers 400 instead of crashing. <code>ensure_ascii=False</code> sends Korean text as the characters themselves instead of escapes like <code>우</code>. The memos live only in a Python list, so they vanish when the server stops; to keep them you would save them to a file or a database.</p>
+
+<h3>The Client: Choosing Method and Body with Request</h3>
+
+<pre><code>def call(method, path, data=None):
+    body = None
+    headers = {}
+    if data is not None:
+        body = json.dumps(data).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    request = Request(BASE + path, data=body, headers=headers, method=method)
+    try:
+        with urlopen(request, timeout=5) as response:
+            return response.status, json.loads(response.read())
+    except HTTPError as error:              # 4xx/5xx: the body still has JSON
+        return error.code, json.loads(error.read())</code></pre>
+
+<p>Give <code>urlopen</code> a <code>Request</code> object instead of a URL string and you choose the method, headers and body. On a 4xx or 5xx answer <code>urlopen</code> raises <code>HTTPError</code>; that exception object also has <code>code</code> and <code>read()</code> like a response, so you can still read the error description the server sent. In <a href="#ex=json_api">json_api</a> you get 200, 201, 400 and 404 answers.</p>
+
+<pre><code>$ python3 api_client.py 우유 사기
+[server] POST /memos -&gt; 201
+POST /memos (201, {'id': 2, 'text': '우유 사기'})
+[server] GET /memos -&gt; 200
+GET  /memos (200, [{'id': 1, 'text': 'buy milk'}, {'id': 2, 'text': '우유 사기'}])</code></pre>
+
+<p>Splitting on every path with <code>if</code> soon gets tedious. Web frameworks such as Flask take this part over by pairing paths with functions (routes). The Flask examples (flask_hello and the rest) show how to build web apps on top of the HTTP you learned here.</p>
+
+<h2>Handling Network Errors</h2>
+
+<p>A file is usually just there, but a network can fail at any moment: the server may be down, slow, or at the wrong address. Each kind of failure raises a different exception. In <a href="#ex=errors">errors</a> you trigger them one by one.</p>
+
+<table>
+<thead>
+<tr><th>Situation</th><th>With socket</th><th>With urlopen</th></tr>
+</thead>
+<tbody>
+<tr><td>No server waiting on that port</td><td><code>ConnectionRefusedError</code></td><td><code>URLError</code> (reason: Connection refused)</td></tr>
+<tr><td>The server answered, but with 404, 500, ...</td><td>(you read the status line yourself)</td><td><code>HTTPError</code> (code: 404)</td></tr>
+<tr><td>Connected, but no answer comes</td><td><code>TimeoutError</code> (old name <code>socket.timeout</code>)</td><td><code>TimeoutError</code> or <code>URLError</code></td></tr>
+<tr><td>The name cannot be turned into an IP address</td><td><code>socket.gaierror</code></td><td><code>URLError</code> (reason: [Errno -3] ...)</td></tr>
+</tbody>
+</table>
+
+<pre><code>def fetch_text(url, timeout=3):
+    try:
+        with urlopen(url, timeout=timeout) as response:
+            return response.read().decode("utf-8")
+    except HTTPError as error:          # the server answered with 4xx/5xx
+        print(f"HTTP error {error.code} {error.reason}: {url}")
+    except URLError as error:           # no answer: refused, unknown host, ...
+        print(f"cannot reach {url}: {error.reason}")
+    except TimeoutError:                # connected, but the reply never came
+        print(f"timed out after {timeout} s: {url}")
+    return None</code></pre>
+
+<p>Three things to remember:</p>
+
+<ul>
+<li><strong>The order of except</strong>: <code>HTTPError</code> is a subclass of <code>URLError</code>. If <code>URLError</code> came first it would catch the 404 too, so the more specific <code>HTTPError</code> goes first.</li>
+<li><strong>Always set a timeout</strong>: without <code>timeout</code>, a server that never answers freezes your program forever. <code>silent_server.py</code> accepts connections but never replies, to show why a timeout matters. With sockets, set it with <code>create_connection(addr, timeout=2)</code> or <code>sock.settimeout(2)</code>.</li>
+<li><strong>What the user should see</strong>: instead of a traceback, one line saying what failed and why, and then the program carries on. If it makes sense, try again a little later.</li>
+</ul>
+
+<p>Opening <code>http://example.com/</code> in this virtual machine fails with <code>[Errno -3] Try again</code> because there is no DNS. On a PC with internet access the same code fetches the page.</p>
+
+<h2>UDP: Letters Without a Connection</h2>
+
+<p>UDP does not set up a connection; it throws data one chunk (a datagram) at a time. Change the socket type to <code>SOCK_DGRAM</code> and, with no <code>listen</code>, <code>accept</code> or <code>connect</code>, exchange data with <code>sendto(data, addr)</code> and <code>recvfrom(1024)</code>.</p>
+
+<pre><code># receiver
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("127.0.0.1", 5005))
+data, addr = sock.recvfrom(1024)      # one whole datagram + sender
+
+# sender
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto("하나".encode("utf-8"), ("127.0.0.1", 5005))</code></pre>
+
+<table>
+<thead>
+<tr><th></th><th>TCP</th><th>UDP</th></tr>
+</thead>
+<tbody>
+<tr><td>Connection</td><td>Set up first (connect/accept)</td><td>None</td></tr>
+<tr><td>Delivery</td><td>Complete and in order</td><td>Not guaranteed (data may vanish or arrive out of order)</td></tr>
+<tr><td>Boundaries</td><td>A stream of bytes, no message boundaries</td><td>One datagram is one message</td></tr>
+<tr><td>Nobody receiving</td><td><code>ConnectionRefusedError</code></td><td>Silently lost</td></tr>
+<tr><td>Used for</td><td>The web, file transfer, email</td><td>DNS, video calls, games</td></tr>
+</tbody>
+</table>
+
+<p>In the last step of <a href="#ex=udp">udp</a> the sender happily reports "sent" even though the receiver has already ended, without any error. Checking that the data arrived is up to your program.</p>
+
+<h2>What Changes on a Real PC</h2>
+
+<ul>
+<li><strong>Real IP addresses</strong>: besides loopback, a real PC has a device with an address like <code>192.168.0.12</code>. Other computers on the same Wi-Fi connect to that address.</li>
+<li><strong>127.0.0.1 versus 0.0.0.0</strong>: a server bound to <code>127.0.0.1</code> accepts connections only from the same computer. To let other computers in, bind to <code>0.0.0.0</code> (every device). That opens it to the outside, so keeping practice servers on <code>127.0.0.1</code> is the safe choice.</li>
+<li><strong>Firewalls</strong>: the operating system's firewall may block incoming connections. On Windows or macOS a window may ask whether to allow a server the first time it starts.</li>
+<li><strong>DNS and https</strong>: with internet access, <code>urlopen("https://www.python.org/")</code> opens named addresses and encrypted https just the same. In this virtual machine it fails because there is no DNS.</li>
+<li><strong>Two terminals</strong>: instead of <code>&amp;</code> and <code>kill %1</code>, run the server in one terminal window and the client in another. Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.</li>
+<li><strong>A browser</strong>: start <code>python3 -m http.server</code> and open <code>http://127.0.0.1:8000/</code> in your browser. The browser's requests show up in the server's access log.</li>
+</ul>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li><strong>Sending a string as is</strong>: <code>sock.sendall("hello")</code> gives <code>TypeError: a bytes-like object is required, not 'str'</code>. Send <code>"hello".encode("utf-8")</code> or <code>b"hello"</code>.</li>
+<li><strong>Starting the client before the server</strong>: you get <code>ConnectionRefusedError</code>. Start the server first and wait a moment until it is ready.</li>
+<li><strong>Starting a server twice on the same port</strong>: <code>OSError: [Errno 98] Address in use</code> (on a typical Linux PC, <code>Address already in use</code>). Find the leftover server with <code>jobs</code> and stop it with <code>kill %1</code>.</li>
+<li><strong>Running a server without &amp;</strong>: the terminal looks frozen. Nothing is broken; the server is waiting. Stop it with <kbd>Ctrl</kbd>+<kbd>C</kbd> and run it again with <code>&amp;</code>.</li>
+<li><strong>Trusting one recv to get everything</strong>: TCP is a stream of bytes, so a message may arrive in several pieces. One recv is enough for the short messages of the echo example, but for longer data either keep receiving until the end, as <code>raw_get.py</code> does, or use a rule that announces the length first (<code>Content-Length</code>).</li>
+<li><strong>Waiting without a timeout</strong>: a server that never answers freezes your program forever. Always set a time limit, as in <code>urlopen(url, timeout=5)</code>.</li>
+<li><strong>Mistaking a 404 for a failed connection</strong>: a 404 is a normal answer from the server. Handle <code>HTTPError</code> and <code>URLError</code> separately.</li>
+</ul>
+
+<h2>Summary</h2>
+
+<ul>
+<li>An address is an <code>(IP, port)</code> pair. <code>127.0.0.1</code> (<code>localhost</code>) is the machine itself.</li>
+<li>A TCP server does <code>bind → listen → accept → recv/sendall</code>, a client <code>connect → sendall → recv</code>. What travels is <code>bytes</code>, so <code>encode</code>/<code>decode</code>.</li>
+<li>A protocol is an agreement on what the bytes mean. HTTP is text made of a request line (or status line), headers, an empty line and a body.</li>
+<li><code>urllib.request.urlopen</code> is an HTTP client and <code>http.server</code> an HTTP server. JSON goes back and forth with <code>json.dumps</code>/<code>json.loads</code>.</li>
+<li>Network code sets a timeout and catches <code>HTTPError</code>, <code>URLError</code>, <code>TimeoutError</code> and <code>ConnectionRefusedError</code>.</li>
+<li>UDP sends datagrams with neither a connection nor guaranteed delivery.</li>
+</ul>
+</div><div lang="ko">
+<p>이번 주제는 네트워킹입니다. 프로그램 두 개가 서로 데이터를 주고받으려면 상대가 어디에 있는지(IP 주소와 포트), 어떤 통로로 보낼지(TCP 또는 UDP), 보낸 바이트를 어떻게 해석할지(HTTP 같은 프로토콜)를 정해야 합니다. 먼저 <code>socket</code> 모듈로 가장 작은 서버와 클라이언트를 만들고, 그 위에서 HTTP가 사실은 글자로 된 약속이라는 것을 직접 요청을 써 보며 확인합니다. 그다음 표준 라이브러리의 <code>urllib.request</code>와 <code>http.server</code>로 같은 일을 짧게 하고, JSON을 주고받는 작은 API 서버를 만든 뒤, 네트워크에서 일어나는 오류를 다루는 법과 UDP를 살펴봅니다. 실습 프로그램은 <a href="#ex=echo">echo</a>, <a href="#ex=raw_http">raw_http</a>, <a href="#ex=fetch">fetch</a>, <a href="#ex=json_api">json_api</a>, <a href="#ex=errors">errors</a>, <a href="#ex=udp">udp</a>입니다.</p>
+
+<blockquote>이 실습의 가상 머신에는 랜카드가 없어서 인터넷에 나갈 수 없습니다. 대신 모든 컴퓨터에 있는 루프백(127.0.0.1, 자기 자신)으로 서버와 클라이언트를 같은 컴퓨터 안에서 실행합니다. 코드는 실제 네트워크에서도 그대로 동작하며, 실제 PC에서 무엇이 달라지는지는 마지막 부분에 정리했습니다.</blockquote>
+
+<h2>클라이언트와 서버</h2>
+
+<p>네트워크 프로그램은 대부분 두 역할로 나뉩니다. <strong>서버</strong>는 정해진 자리에서 요청을 기다리다가 답하는 프로그램이고, <strong>클라이언트</strong>는 먼저 연락해서 요청을 보내는 프로그램입니다. 웹 브라우저는 클라이언트, 웹 사이트를 내보내는 프로그램은 서버입니다. 한 컴퓨터가 서버와 클라이언트를 동시에 실행할 수도 있습니다. 이번 실습이 바로 그렇습니다.</p>
+
+<pre><code>  클라이언트                          서버
+  (먼저 연락한다)                     (기다린다)
+       |  ---- 요청(request) ---->      |
+       |  &lt;--- 응답(response) ----      |</code></pre>
+
+<h2>IP 주소, 포트, 루프백</h2>
+
+<h3>IP 주소: 어느 컴퓨터인가</h3>
+
+<p>IP 주소는 네트워크 안에서 컴퓨터(정확히는 네트워크 장치)를 가리키는 번호입니다. IPv4 주소는 <code>192.168.0.12</code>처럼 0–255 사이의 수 네 개를 점으로 이은 모양입니다. 사람이 외우기 쉬운 이름(<code>www.python.org</code>)은 DNS라는 서비스가 IP 주소로 바꿔 줍니다. 가장 오래된 이름표는 <code>/etc/hosts</code> 파일입니다.</p>
+
+<h3>포트: 그 컴퓨터의 어느 프로그램인가</h3>
+
+<p>한 컴퓨터에서 여러 서버가 동시에 돌 수 있으므로 IP 주소만으로는 부족합니다. 포트는 0–65535 사이의 번호로, 컴퓨터 안의 어느 프로그램에게 가는 데이터인지 정합니다. IP 주소가 건물 주소라면 포트는 호수입니다. 그래서 주소는 늘 <code>(IP, 포트)</code> 한 쌍으로 다니며, 파이썬에서도 <code>("127.0.0.1", 5000)</code> 같은 튜플로 씁니다. 한 포트는 한 번에 한 프로그램만 차지할 수 있습니다.</p>
+
+<table>
+<thead>
+<tr><th>포트</th><th>흔한 용도</th></tr>
+</thead>
+<tbody>
+<tr><td>22</td><td>SSH(원격 접속)</td></tr>
+<tr><td>80</td><td>HTTP(웹)</td></tr>
+<tr><td>443</td><td>HTTPS(암호화된 웹)</td></tr>
+<tr><td>5000, 8000, 8080</td><td>개발용 서버가 자주 쓰는 번호. 이 실습의 에코 서버, 파일 서버, API 서버</td></tr>
+</tbody>
+</table>
+
+<p>1024보다 작은 포트는 관리자 권한이 있어야 열 수 있습니다. 그래서 연습용 서버는 보통 1024 이상의 번호를 씁니다.</p>
+
+<h3>루프백: 127.0.0.1과 localhost</h3>
+
+<p><code>127.0.0.1</code>은 "바로 이 컴퓨터"를 뜻하는 특별한 주소이고, 이름은 <code>localhost</code>입니다. 여기로 보낸 데이터는 랜선으로 나가지 않고 운영체제 안에서 곧바로 되돌아옵니다. 그래서 인터넷이 없어도 서버와 클라이언트를 시험할 수 있습니다. <a href="#ex=echo">echo</a>의 첫 단계 <code>ip addr</code>에서 이 가상 머신에 <code>lo</code>(루프백) 하나만 있는 것을 확인합니다.</p>
+
+<h3>층으로 나눠 보기</h3>
+
+<p>네트워크 통신은 여러 층이 각자 한 가지 일을 맡는 구조입니다. 위층은 아래층이 어떻게 일하는지 몰라도 됩니다. 이번 주제에서 우리가 직접 다루는 것은 위의 두 층입니다.</p>
+
+<table>
+<thead>
+<tr><th>층</th><th>하는 일</th><th>예</th></tr>
+</thead>
+<tbody>
+<tr><td>응용</td><td>주고받는 내용의 형식과 순서(프로토콜)</td><td>HTTP, 우리가 만든 에코 규칙</td></tr>
+<tr><td>전송</td><td>프로그램(포트)까지 바이트를 나른다</td><td>TCP, UDP</td></tr>
+<tr><td>인터넷</td><td>컴퓨터(IP 주소)까지 길을 찾는다</td><td>IP</td></tr>
+<tr><td>링크</td><td>실제 선이나 전파로 보낸다</td><td>이더넷, Wi-Fi, 루프백</td></tr>
+</tbody>
+</table>
+
+<h2>TCP 소켓: 에코 서버와 클라이언트</h2>
+
+<h3>소켓이란</h3>
+
+<p>소켓은 프로그램이 네트워크와 만나는 끝점입니다. 파일을 열면 파일 객체로 읽고 쓰듯, 소켓을 만들면 소켓 객체로 바이트를 보내고 받습니다. <code>socket.socket(socket.AF_INET, socket.SOCK_STREAM)</code>은 "IPv4 주소를 쓰는 TCP 소켓"을 만듭니다. TCP는 연결을 먼저 맺고, 보낸 바이트가 빠짐없이 순서대로 도착하도록 보장합니다. 전화와 비슷합니다.</p>
+
+<h3>서버와 클라이언트가 부르는 함수</h3>
+
+<table>
+<thead>
+<tr><th>서버</th><th>클라이언트</th><th>의미</th></tr>
+</thead>
+<tbody>
+<tr><td><code>socket()</code></td><td><code>socket()</code></td><td>소켓을 만든다</td></tr>
+<tr><td><code>bind((HOST, PORT))</code></td><td></td><td>이 주소와 포트를 내 것으로 정한다</td></tr>
+<tr><td><code>listen()</code></td><td></td><td>접속을 받을 준비를 한다</td></tr>
+<tr><td><code>accept()</code></td><td><code>connect((HOST, PORT))</code></td><td>연결이 맺어진다. accept는 클라이언트가 올 때까지 기다린다</td></tr>
+<tr><td><code>recv(1024)</code></td><td><code>sendall(data)</code></td><td>클라이언트가 보내고 서버가 받는다</td></tr>
+<tr><td><code>sendall(data)</code></td><td><code>recv(1024)</code></td><td>서버가 답하고 클라이언트가 받는다</td></tr>
+<tr><td><code>close()</code></td><td><code>close()</code></td><td>연결을 닫는다(<code>with</code>가 대신 해 준다)</td></tr>
+</tbody>
+</table>
+
+<h3>서버 코드 읽기</h3>
+
+<pre><code>import socket
+
+HOST = "127.0.0.1"   # loopback: only programs on this computer can connect
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((HOST, PORT))
+    server.listen()
+    print(f"[server] listening on {HOST}:{PORT}")
+
+    while True:
+        conn, addr = server.accept()          # waits for the next client
+        with conn:
+            data = conn.recv(1024)            # bytes, at most 1024 of them
+            conn.sendall(data)                # echo the same bytes back</code></pre>
+
+<p>서버 소켓(<code>server</code>)은 문지기 역할만 합니다. <code>accept()</code>는 클라이언트가 접속할 때마다 그 클라이언트 전용의 새 소켓 <code>conn</code>과 상대 주소 <code>addr</code>을 돌려주고, 실제 대화는 <code>conn</code>으로 합니다. <code>while True</code> 덕분에 한 클라이언트를 처리한 뒤 다음 클라이언트를 기다립니다. <code>SO_REUSEADDR</code>은 서버를 끄고 바로 다시 켤 때 포트가 아직 사용 중이라는 오류를 피하게 해 줍니다.</p>
+
+<h3>클라이언트 코드 읽기</h3>
+
+<pre><code>import socket
+import sys
+
+message = " ".join(sys.argv[1:]) or "hello"
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+    client.connect(("127.0.0.1", 5000))
+    data = message.encode("utf-8")            # str -&gt; bytes
+    client.sendall(data)
+    reply = client.recv(1024)
+
+print(f"[client] sent {len(data)} bytes, got back: {reply.decode('utf-8')}")</code></pre>
+
+<p>명령줄 인자(<code>sys.argv</code>)를 메시지로 씁니다. <code>python3 echo_client.py hello</code>라고 실행하면 <code>message</code>는 <code>"hello"</code>입니다.</p>
+
+<h3>바이트와 인코딩</h3>
+
+<p>네트워크로 오가는 것은 언제나 바이트(<code>bytes</code>)입니다. 문자열은 보내기 전에 <code>encode("utf-8")</code>로 바이트로 바꾸고, 받은 바이트는 <code>decode("utf-8")</code>로 다시 문자열로 만듭니다. 영어 한 글자는 1바이트지만 한글 한 글자는 UTF-8로 3바이트입니다. 그래서 <code>"안녕"</code>은 글자 2개, 바이트 6개입니다. 바이트 값은 <code>b'hello'</code>처럼 앞에 <code>b</code>가 붙어 출력됩니다.</p>
+
+<pre><code>text = "안녕"
+data = text.encode("utf-8")
+print(data, len(text), len(data))   # b'\xec\x95\x88\xeb\x85\x95' 2 6
+print(data.decode("utf-8"))         # 안녕</code></pre>
+
+<h3>터미널 하나에서 서버와 클라이언트 함께 돌리기</h3>
+
+<p>서버는 끝나지 않는 프로그램입니다. 그냥 실행하면 터미널이 서버에 묶여 클라이언트를 실행할 수 없습니다. 실제 PC라면 터미널 창을 두 개 열면 되지만, 이 실습에서는 셸의 작업 제어를 씁니다.</p>
+
+<table>
+<thead>
+<tr><th>명령</th><th>뜻</th></tr>
+</thead>
+<tbody>
+<tr><td><code>python3 echo_server.py &amp;</code></td><td>끝의 <code>&amp;</code>: 백그라운드에서 실행하고 프롬프트를 바로 돌려준다</td></tr>
+<tr><td><code>sleep 2</code></td><td>2초 기다린다. 서버가 포트를 열 시간을 준다</td></tr>
+<tr><td><code>jobs</code></td><td>백그라운드 작업 목록</td></tr>
+<tr><td><code>kill %1</code></td><td>1번 작업을 멈춘다</td></tr>
+<tr><td><code>netstat -tln</code></td><td>접속을 기다리는(LISTEN) TCP 포트 목록</td></tr>
+</tbody>
+</table>
+
+<p>백그라운드 서버의 출력도 같은 화면에 나오기 때문에 <code>[server]</code> 줄과 <code>[client]</code> 줄이 섞여 보입니다. 그래서 예제 프로그램은 줄 앞에 누가 찍었는지 표시해 둡니다.</p>
+
+<pre><code>$ python3 echo_server.py &amp;
+$ sleep 2; python3 echo_client.py hello
+[server] listening on 127.0.0.1:5000
+[server] connection from 127.0.0.1
+[server] received 5 bytes: b'hello'
+[client] sent 5 bytes, got back: hello</code></pre>
+
+<h2>프로토콜: HTTP는 글자로 된 약속</h2>
+
+<h3>프로토콜이란</h3>
+
+<p>TCP는 바이트를 정확히 날라 줄 뿐, 그 바이트가 무슨 뜻인지는 모릅니다. 양쪽이 "무엇을 어떤 순서와 형식으로 보낼지"를 미리 정한 규칙이 프로토콜입니다. 에코 서버의 규칙은 "받은 것을 그대로 돌려준다"뿐이었습니다. 웹의 규칙은 HTTP입니다. HTTP 요청과 응답은 사람이 읽을 수 있는 글자이고, 줄은 <code>\r\n</code>으로 끝납니다.</p>
+
+<h3>요청과 응답의 모양</h3>
+
+<pre><code>요청 (클라이언트 -&gt; 서버)
+  GET /hello.txt HTTP/1.0          요청 줄: 메서드, 경로, 버전
+  Host: 127.0.0.1:8000             헤더(이름: 값), 여러 줄 가능
+                                   빈 줄 = 헤더 끝
+
+응답 (서버 -&gt; 클라이언트)
+  HTTP/1.0 200 OK                  상태 줄: 버전, 상태 코드, 이유
+  Content-type: text/plain         헤더
+  Content-Length: 57
+                                   빈 줄
+  Hello from the server!           본문(바이트 57개)
+  안녕하세요, 서버입니다.</code></pre>
+
+<p>헤더는 본문에 대한 설명입니다. <code>Content-Type</code>은 본문의 종류(<code>text/plain</code>, <code>text/html</code>, <code>application/json</code>)를, <code>Content-Length</code>는 본문의 바이트 수를 알려 줍니다. 브라우저는 <code>Content-Type</code>을 보고 글자를 보여 줄지 웹 페이지로 그릴지 정합니다. 헤더 이름은 대소문자를 가리지 않으므로 <code>http.server</code>가 보내는 <code>Content-type</code>과 <code>Content-Type</code>은 같은 헤더입니다.</p>
+
+<h3>상태 코드</h3>
+
+<table>
+<thead>
+<tr><th>코드</th><th>이름</th><th>뜻</th></tr>
+</thead>
+<tbody>
+<tr><td>200</td><td>OK</td><td>성공</td></tr>
+<tr><td>201</td><td>Created</td><td>새로 만들었다(POST 성공)</td></tr>
+<tr><td>400</td><td>Bad Request</td><td>요청 형식이 잘못되었다</td></tr>
+<tr><td>404</td><td>Not Found</td><td>그런 경로가 없다</td></tr>
+<tr><td>500</td><td>Internal Server Error</td><td>서버 프로그램이 실패했다</td></tr>
+</tbody>
+</table>
+
+<p>첫 자리로 크게 나눕니다: 2xx 성공, 3xx 다른 곳으로 가라, 4xx 클라이언트 잘못, 5xx 서버 잘못. 404도 서버가 정상적으로 보낸 대답이라는 점이 중요합니다. 연결 자체가 실패한 것과는 다릅니다.</p>
+
+<h3>파이썬의 웹 서버: http.server</h3>
+
+<p>표준 라이브러리에는 폴더의 파일을 내보내는 간단한 웹 서버가 들어 있습니다. <code>-m</code>으로 모듈을 프로그램처럼 실행합니다.</p>
+
+<pre><code>python3 -m http.server 8000 --bind 127.0.0.1 --directory site &amp;</code></pre>
+
+<p>8000번 포트에서 <code>site</code> 폴더를 웹사이트의 뿌리(<code>/</code>)로 삼습니다. <code>/hello.txt</code> 요청에는 <code>site/hello.txt</code>를, <code>/</code> 요청에는 <code>site/index.html</code>을 돌려줍니다. 요청이 올 때마다 <code>127.0.0.1 - - [날짜] "GET /hello.txt HTTP/1.0" 200 -</code> 같은 접속 기록을 남깁니다. 개발과 실습용이며 실제 서비스용 서버는 아닙니다.</p>
+
+<h3>소켓으로 직접 GET 보내기</h3>
+
+<p><a href="#ex=raw_http">raw_http</a>의 <code>raw_get.py</code>는 브라우저가 하는 일을 손으로 합니다. 요청 글자를 만들어 보내고, 서버가 연결을 닫을 때까지 받은 뒤, 첫 빈 줄(<code>\r\n\r\n</code>)을 기준으로 머리와 본문을 나눕니다.</p>
+
+<pre><code>request = f"GET {path} HTTP/1.0\r\nHost: {HOST}:{PORT}\r\n\r\n"
+
+with socket.create_connection((HOST, PORT)) as sock:
+    sock.sendall(request.encode("ascii"))
+    chunks = []
+    while True:                     # read until the server closes the connection
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        chunks.append(chunk)
+
+response = b"".join(chunks)
+head, _, body = response.partition(b"\r\n\r\n")
+lines = head.decode("iso-8859-1").split("\r\n")
+print("status line:", lines[0])</code></pre>
+
+<p><code>socket.create_connection((HOST, PORT))</code>은 소켓 만들기와 <code>connect</code>를 한 번에 하는 지름길입니다. <code>recv</code>는 한 번에 일부만 돌려줄 수 있으므로, 빈 바이트(<code>b""</code>)가 올 때까지, 즉 상대가 연결을 닫을 때까지 반복해서 모읍니다. HTTP/1.0에서는 서버가 응답을 다 보낸 뒤 연결을 닫습니다.</p>
+
+<p>파이썬 없이도 같은 실험을 할 수 있습니다. <code>nc</code>(netcat)는 입력을 소켓으로 보내고 받은 것을 그대로 찍는 도구입니다.</p>
+
+<pre><code>printf 'GET /index.html HTTP/1.0\r\n\r\n' | nc 127.0.0.1 8000</code></pre>
+
+<h2>urllib.request: 표준 라이브러리 HTTP 클라이언트</h2>
+
+<p>요청을 직접 쓰는 것은 원리를 배우기에는 좋지만, 실제로는 리다이렉트, 압축, https 암호화처럼 처리할 것이 많습니다. <code>urllib.request.urlopen</code>은 URL 하나로 이 모든 일을 해 줍니다.</p>
+
+<pre><code>import json
+from urllib.request import urlopen
+
+with urlopen("http://127.0.0.1:8000/data.json", timeout=5) as response:
+    print(response.status, response.reason)        # 200 OK
+    content_type = response.headers.get("Content-Type")
+    body = response.read()                          # bytes
+
+data = json.loads(body)                             # JSON text -&gt; dict
+print(data["city"])                                 # Seoul</code></pre>
+
+<table>
+<thead>
+<tr><th>응답 객체</th><th>내용</th></tr>
+</thead>
+<tbody>
+<tr><td><code>response.status</code></td><td>상태 코드(정수, 예: 200)</td></tr>
+<tr><td><code>response.reason</code></td><td>이유 문구(예: OK)</td></tr>
+<tr><td><code>response.headers</code></td><td>헤더. <code>.get("Content-Type")</code>이나 <code>["Content-Type"]</code>으로 읽는다</td></tr>
+<tr><td><code>response.read()</code></td><td>본문 전체(<code>bytes</code>). 한 번만 읽을 수 있다</td></tr>
+</tbody>
+</table>
+
+<p>URL은 <code>http://127.0.0.1:8000/data.json</code>처럼 프로토콜(<code>http</code>), 호스트(<code>127.0.0.1</code>), 포트(<code>8000</code>), 경로(<code>/data.json</code>)로 이루어집니다. 포트를 생략하면 http는 80, https는 443입니다. <a href="#ex=fetch">fetch</a>에서 텍스트, JSON, HTML을 차례로 받아 봅니다. <code>wget -q -O - URL</code>로 받아도 결과는 같습니다. 서버는 누가 요청했는지가 아니라 약속을 지켰는지만 봅니다.</p>
+
+<p>인터넷 강좌에서 자주 보이는 <code>requests</code>는 같은 일을 더 편하게 해 주는 외부 패키지로, <code>pip install requests</code>로 설치해야 합니다. 이 가상 머신에는 pip도 인터넷도 없으므로 표준 라이브러리의 <code>urllib</code>만 씁니다.</p>
+
+<h2>작은 JSON API 서버</h2>
+
+<h3>API와 메서드</h3>
+
+<p>웹 페이지가 사람이 읽는 HTML을 돌려준다면, API는 프로그램이 읽는 데이터(대개 JSON)를 돌려줍니다. 요청의 메서드가 하려는 일을 나타냅니다.</p>
+
+<table>
+<thead>
+<tr><th>요청</th><th>뜻</th><th>성공 응답</th></tr>
+</thead>
+<tbody>
+<tr><td><code>GET /memos</code></td><td>메모 목록을 달라</td><td>200과 JSON 배열</td></tr>
+<tr><td><code>GET /memos/2</code></td><td>2번 메모를 달라</td><td>200과 JSON 객체(없으면 404)</td></tr>
+<tr><td><code>POST /memos</code></td><td>본문의 JSON으로 새 메모를 만들어라</td><td>201과 만든 메모(본문이 잘못되면 400)</td></tr>
+</tbody>
+</table>
+
+<h3>서버: BaseHTTPRequestHandler</h3>
+
+<p><code>http.server</code>의 <code>BaseHTTPRequestHandler</code>를 상속한 클래스에 <code>do_GET</code>, <code>do_POST</code> 메서드를 만들면, 서버가 요청의 메서드에 맞는 것을 불러 줍니다. 요청 경로는 <code>self.path</code>, 헤더는 <code>self.headers</code>, 본문은 <code>self.rfile</code>에서 읽고, 응답은 상태 줄, 헤더, 빈 줄, 본문 순서로 씁니다. 앞에서 본 HTTP 응답의 모양이 그대로 메서드 호출 순서가 됩니다.</p>
+
+<pre><code>def send_json(self, status, data):
+    body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    self.send_response(status)                       # status line
+    self.send_header("Content-Type", "application/json; charset=utf-8")
+    self.send_header("Content-Length", str(len(body)))
+    self.end_headers()                               # empty line
+    self.wfile.write(body)                           # body
+
+def do_POST(self):
+    length = int(self.headers.get("Content-Length", 0))
+    raw = self.rfile.read(length)                    # the request body
+    try:
+        text = json.loads(raw)["text"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        self.send_json(400, {"error": 'send JSON like {"text": "..."}'})
+        return
+    memo = {"id": len(memos) + 1, "text": text}
+    memos.append(memo)
+    self.send_json(201, memo)</code></pre>
+
+<p>본문은 <code>Content-Length</code> 헤더가 알려 준 바이트 수만큼 정확히 읽습니다. 클라이언트가 보낸 데이터는 믿지 않고 검사합니다. JSON이 아니거나 <code>text</code> 키가 없으면 서버가 죽는 대신 400으로 답합니다. <code>ensure_ascii=False</code>는 한글을 <code>우</code> 같은 이스케이프 대신 글자 그대로 내보냅니다. 메모는 파이썬 리스트에만 있으므로 서버를 끄면 사라집니다. 오래 보관하려면 파일이나 데이터베이스에 저장해야 합니다.</p>
+
+<h3>클라이언트: Request로 메서드와 본문 정하기</h3>
+
+<pre><code>def call(method, path, data=None):
+    body = None
+    headers = {}
+    if data is not None:
+        body = json.dumps(data).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    request = Request(BASE + path, data=body, headers=headers, method=method)
+    try:
+        with urlopen(request, timeout=5) as response:
+            return response.status, json.loads(response.read())
+    except HTTPError as error:              # 4xx/5xx: the body still has JSON
+        return error.code, json.loads(error.read())</code></pre>
+
+<p><code>urlopen</code>에 URL 문자열 대신 <code>Request</code> 객체를 주면 메서드, 헤더, 본문을 정할 수 있습니다. <code>urlopen</code>은 4xx·5xx 응답을 받으면 <code>HTTPError</code>를 일으키는데, 이 예외 객체도 응답처럼 <code>code</code>와 <code>read()</code>를 가지고 있어서 서버가 보낸 오류 설명을 읽을 수 있습니다. <a href="#ex=json_api">json_api</a>에서 200, 201, 400, 404를 모두 받아 봅니다.</p>
+
+<pre><code>$ python3 api_client.py 우유 사기
+[server] POST /memos -&gt; 201
+POST /memos (201, {'id': 2, 'text': '우유 사기'})
+[server] GET /memos -&gt; 200
+GET  /memos (200, [{'id': 1, 'text': 'buy milk'}, {'id': 2, 'text': '우유 사기'}])</code></pre>
+
+<p>경로마다 <code>if</code>로 나누는 일은 금방 번거로워집니다. Flask 같은 웹 프레임워크는 경로와 함수를 짝지어(라우트) 이 부분을 대신 해 줍니다. Flask 예제(flask_hello 등)는 이번에 배운 HTTP 위에 웹 앱을 쌓는 방법을 보여 줍니다.</p>
+
+<h2>네트워크 오류 다루기</h2>
+
+<p>파일은 대개 그 자리에 있지만 네트워크는 언제든 실패합니다. 서버가 꺼져 있을 수도, 느릴 수도, 주소가 틀렸을 수도 있습니다. 실패의 종류마다 다른 예외가 납니다. <a href="#ex=errors">errors</a>에서 하나씩 일으켜 봅니다.</p>
+
+<table>
+<thead>
+<tr><th>상황</th><th>socket에서</th><th>urlopen에서</th></tr>
+</thead>
+<tbody>
+<tr><td>그 포트에서 기다리는 서버가 없다</td><td><code>ConnectionRefusedError</code></td><td><code>URLError</code>(reason: Connection refused)</td></tr>
+<tr><td>서버가 답했지만 404, 500 등</td><td>(상태 줄을 직접 읽는다)</td><td><code>HTTPError</code>(code: 404)</td></tr>
+<tr><td>연결은 됐는데 답이 오지 않는다</td><td><code>TimeoutError</code>(옛 이름 <code>socket.timeout</code>)</td><td><code>TimeoutError</code> 또는 <code>URLError</code></td></tr>
+<tr><td>이름을 IP 주소로 바꾸지 못한다</td><td><code>socket.gaierror</code></td><td><code>URLError</code>(reason: [Errno -3] ...)</td></tr>
+</tbody>
+</table>
+
+<pre><code>def fetch_text(url, timeout=3):
+    try:
+        with urlopen(url, timeout=timeout) as response:
+            return response.read().decode("utf-8")
+    except HTTPError as error:          # the server answered with 4xx/5xx
+        print(f"HTTP error {error.code} {error.reason}: {url}")
+    except URLError as error:           # no answer: refused, unknown host, ...
+        print(f"cannot reach {url}: {error.reason}")
+    except TimeoutError:                # connected, but the reply never came
+        print(f"timed out after {timeout} s: {url}")
+    return None</code></pre>
+
+<p>세 가지를 기억합니다.</p>
+
+<ul>
+<li><strong>except 순서</strong>: <code>HTTPError</code>는 <code>URLError</code>의 자식 클래스입니다. <code>URLError</code>를 먼저 쓰면 404도 그쪽에서 잡혀 버리므로 더 구체적인 <code>HTTPError</code>를 먼저 씁니다.</li>
+<li><strong>timeout은 필수</strong>: <code>timeout</code>을 주지 않으면 답하지 않는 서버 앞에서 프로그램이 영원히 멈춥니다. <code>silent_server.py</code>는 연결만 받고 답하지 않는 서버로, timeout의 필요성을 보여 줍니다. 소켓에서는 <code>create_connection(addr, timeout=2)</code>나 <code>sock.settimeout(2)</code>로 정합니다.</li>
+<li><strong>무엇을 사용자에게 보여 줄까</strong>: Traceback 대신 무엇이 왜 실패했는지 한 줄로 알려 주고, 프로그램은 다음 일을 계속합니다. 필요하면 잠시 뒤 다시 시도합니다.</li>
+</ul>
+
+<p>이 가상 머신에서 <code>http://example.com/</code>을 열면 DNS가 없어서 <code>[Errno -3] Try again</code>으로 실패합니다. 인터넷이 되는 PC에서는 같은 코드가 페이지를 받아 옵니다.</p>
+
+<h2>UDP: 연결 없는 편지</h2>
+
+<p>UDP는 연결을 맺지 않고 데이터를 한 덩어리(데이터그램)씩 던집니다. 소켓 종류만 <code>SOCK_DGRAM</code>으로 바꾸고, <code>listen</code>, <code>accept</code>, <code>connect</code> 없이 <code>sendto(data, addr)</code>와 <code>recvfrom(1024)</code>로 주고받습니다.</p>
+
+<pre><code># receiver
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("127.0.0.1", 5005))
+data, addr = sock.recvfrom(1024)      # one whole datagram + sender
+
+# sender
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.sendto("하나".encode("utf-8"), ("127.0.0.1", 5005))</code></pre>
+
+<table>
+<thead>
+<tr><th></th><th>TCP</th><th>UDP</th></tr>
+</thead>
+<tbody>
+<tr><td>연결</td><td>먼저 맺는다(connect/accept)</td><td>없다</td></tr>
+<tr><td>도착 보장</td><td>빠짐없이, 순서대로</td><td>보장하지 않는다(사라지거나 순서가 바뀔 수 있다)</td></tr>
+<tr><td>경계</td><td>바이트의 흐름. 메시지 경계가 없다</td><td>데이터그램 하나가 메시지 하나</td></tr>
+<tr><td>받는 쪽이 없을 때</td><td><code>ConnectionRefusedError</code></td><td>오류 없이 사라진다</td></tr>
+<tr><td>쓰임</td><td>웹, 파일 전송, 이메일</td><td>DNS, 영상 통화, 게임</td></tr>
+</tbody>
+</table>
+
+<p><a href="#ex=udp">udp</a>의 마지막 단계에서 수신기가 끝난 뒤에도 송신기가 아무 오류 없이 "보냈다"고 말하는 것을 확인합니다. 받았는지 확인하는 일은 프로그램이 직접 해야 합니다.</p>
+
+<h2>실제 PC에서 달라지는 것</h2>
+
+<ul>
+<li><strong>진짜 IP 주소</strong>: 실제 PC에는 루프백 말고도 <code>192.168.0.12</code> 같은 주소를 가진 장치가 있습니다. 같은 Wi-Fi의 다른 컴퓨터는 그 주소로 접속합니다.</li>
+<li><strong>127.0.0.1과 0.0.0.0</strong>: 서버를 <code>127.0.0.1</code>에 bind하면 같은 컴퓨터에서만 접속할 수 있습니다. 다른 컴퓨터에서 접속하게 하려면 <code>0.0.0.0</code>(모든 장치)에 bind합니다. 외부에 공개하는 것이므로 연습용 서버는 <code>127.0.0.1</code>에 두는 것이 안전합니다.</li>
+<li><strong>방화벽</strong>: 운영체제의 방화벽이 들어오는 접속을 막을 수 있습니다. Windows나 macOS에서 서버를 처음 띄우면 허용할지 묻는 창이 뜨기도 합니다.</li>
+<li><strong>DNS와 https</strong>: 인터넷이 되면 <code>urlopen("https://www.python.org/")</code>처럼 이름으로 된 주소와 암호화된 https도 그대로 열립니다. 이 가상 머신에서는 DNS가 없어서 실패합니다.</li>
+<li><strong>터미널 두 개</strong>: <code>&amp;</code>와 <code>kill %1</code> 대신 터미널 창 하나에서 서버를 실행하고 다른 창에서 클라이언트를 실행할 수 있습니다. 서버는 <kbd>Ctrl</kbd>+<kbd>C</kbd>로 멈춥니다.</li>
+<li><strong>브라우저</strong>: <code>python3 -m http.server</code>를 띄우고 브라우저에서 <code>http://127.0.0.1:8000/</code>을 열어 보세요. 브라우저가 보내는 요청이 서버의 접속 기록에 그대로 찍힙니다.</li>
+</ul>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li><strong>문자열을 그대로 보내기</strong>: <code>sock.sendall("hello")</code>는 <code>TypeError: a bytes-like object is required, not 'str'</code>입니다. <code>"hello".encode("utf-8")</code>나 <code>b"hello"</code>를 보냅니다.</li>
+<li><strong>서버보다 클라이언트를 먼저 실행하기</strong>: <code>ConnectionRefusedError</code>가 납니다. 서버를 먼저 띄우고 준비될 때까지 잠깐 기다립니다.</li>
+<li><strong>같은 포트로 서버를 두 번 띄우기</strong>: <code>OSError: [Errno 98] Address in use</code>(일반 리눅스 PC에서는 <code>Address already in use</code>). <code>jobs</code>로 남은 서버를 찾아 <code>kill %1</code>로 멈춥니다.</li>
+<li><strong>서버를 &amp; 없이 실행하기</strong>: 터미널이 멈춘 것처럼 보입니다. 고장이 아니라 서버가 기다리는 중입니다. <kbd>Ctrl</kbd>+<kbd>C</kbd>로 멈추고 <code>&amp;</code>를 붙여 다시 실행합니다.</li>
+<li><strong>recv 한 번이면 다 온다고 믿기</strong>: TCP는 바이트의 흐름이라서 보낸 메시지가 여러 번에 나뉘어 도착할 수 있습니다. 에코 예제는 짧은 메시지라 한 번으로 충분하지만, 긴 데이터는 <code>raw_get.py</code>처럼 끝날 때까지 반복해서 받거나 길이(<code>Content-Length</code>)를 먼저 알려 주는 규칙을 둡니다.</li>
+<li><strong>timeout 없이 기다리기</strong>: 답하지 않는 서버 앞에서 영원히 멈춥니다. <code>urlopen(url, timeout=5)</code>처럼 항상 시간을 정합니다.</li>
+<li><strong>404를 연결 실패로 착각하기</strong>: 404는 서버가 보낸 정상적인 대답입니다. <code>HTTPError</code>와 <code>URLError</code>를 구분해서 처리합니다.</li>
+</ul>
+
+<h2>정리</h2>
+
+<ul>
+<li>주소는 <code>(IP, 포트)</code> 한 쌍입니다. <code>127.0.0.1</code>(<code>localhost</code>)은 자기 자신입니다.</li>
+<li>TCP 서버는 <code>bind → listen → accept → recv/sendall</code>, 클라이언트는 <code>connect → sendall → recv</code>입니다. 오가는 것은 <code>bytes</code>이므로 <code>encode</code>/<code>decode</code>합니다.</li>
+<li>프로토콜은 바이트의 의미에 대한 약속입니다. HTTP는 요청 줄(또는 상태 줄), 헤더, 빈 줄, 본문으로 된 글자입니다.</li>
+<li><code>urllib.request.urlopen</code>은 HTTP 클라이언트, <code>http.server</code>는 HTTP 서버입니다. JSON은 <code>json.dumps</code>/<code>json.loads</code>로 주고받습니다.</li>
+<li>네트워크 코드는 timeout을 정하고, <code>HTTPError</code>, <code>URLError</code>, <code>TimeoutError</code>, <code>ConnectionRefusedError</code>를 잡습니다.</li>
+<li>UDP는 연결도 도착 보장도 없는 데이터그램입니다.</li>
+</ul>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

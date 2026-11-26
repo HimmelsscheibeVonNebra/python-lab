@@ -68,11 +68,11 @@ try {
   r = await sh(`cd /tmp && python3 -c 'import matplotlib.pyplot as plt; plt.plot([1, 3, 2]); plt.title("chart"); plt.savefig("chart.png")' && head -c 4 chart.png | od -c | head -1; cd`, 240_000);
   check("matplotlib saves a PNG", r.status === 0 && r.out.includes("P   N   G"), r.out);
 
-  r = await sh(`cd ~/sample/sample2 && python3 -c 'from app import app; r = app.test_client().get("/?market=KOSPI"); print("flask", r.status_code, "+0.33%" in r.get_data(as_text=True))'; cd`, 240_000);
+  r = await sh(`cd ~/web/sample2 && python3 -c 'from app import app; r = app.test_client().get("/?market=KOSPI"); print("flask", r.status_code, "+0.33%" in r.get_data(as_text=True))'; cd`, 240_000);
   check("Flask app answers through test_client()", r.out.includes("flask 200 True"), r.out);
   // App preview bridge: the page writes /host/.web/req-*.json, "web start"'s
   // bridge answers in res-*.json (js/lab.js does the same in the browser).
-  r = await sh("cd ~/flask_hello && web start app.py; cd", 240_000);
+  r = await sh("cd ~/web/flask_hello && web start app.py; cd", 240_000);
   {
     const readJson = async (f) => { try { return JSON.parse(new TextDecoder().decode(await guest.readFile(f))); } catch { return null; } };
     // Like the page: wait for the bridge to announce the app first.
@@ -96,8 +96,8 @@ try {
   r = await sh("python3 -m http.server 8765 >/dev/null 2>&1 & sleep 4; wget -qO- http://127.0.0.1:8765/ | grep -c href; kill %1");
   check("loopback networking (127.0.0.1)", /^[1-9]\d*$/m.test(r.out), r.out);
 
-  r = await sh("ls ~/week01/starter ~/week13/examples/sqlite_lab");
-  check("course code in /home/student/weekNN", r.out.includes("bmi.py") && r.out.includes("create_db.py"), r.out);
+  r = await sh("ls ~/basics/starter ~/database/examples/sqlite_lab");
+  check("course code in /home/student (topic folders)", r.out.includes("bmi.py") && r.out.includes("create_db.py"), r.out);
 
   // Interactive REPL (the new PyREPL, driven as the page's xterm.js would)
   {

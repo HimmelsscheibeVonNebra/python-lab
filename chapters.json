@@ -1,0 +1,222 @@
+[
+  {
+    "id": "basics",
+    "nav": {
+      "en": "Basics",
+      "ko": "기초"
+    },
+    "title": {
+      "en": "Getting Started with Python",
+      "ko": "파이썬 시작하기"
+    },
+    "classes": [
+      "intro"
+    ]
+  },
+  {
+    "id": "conditionals",
+    "nav": {
+      "en": "Conditionals",
+      "ko": "조건문"
+    },
+    "title": {
+      "en": "Operators, Strings and Conditionals",
+      "ko": "연산자·문자열·조건문"
+    },
+    "classes": [
+      "operators",
+      "conditionals"
+    ]
+  },
+  {
+    "id": "loops",
+    "nav": {
+      "en": "Loops",
+      "ko": "반복문"
+    },
+    "title": {
+      "en": "Loops",
+      "ko": "반복문"
+    },
+    "classes": [
+      "loops"
+    ]
+  },
+  {
+    "id": "functions",
+    "nav": {
+      "en": "Functions",
+      "ko": "함수"
+    },
+    "title": {
+      "en": "Functions",
+      "ko": "함수"
+    },
+    "classes": [
+      "functions"
+    ]
+  },
+  {
+    "id": "modules",
+    "nav": {
+      "en": "Modules",
+      "ko": "모듈"
+    },
+    "title": {
+      "en": "Modules and the Standard Library",
+      "ko": "모듈과 표준 라이브러리"
+    },
+    "classes": [
+      "modules"
+    ]
+  },
+  {
+    "id": "files",
+    "nav": {
+      "en": "Files",
+      "ko": "파일·예외"
+    },
+    "title": {
+      "en": "Files, Exceptions and JSON",
+      "ko": "파일·예외·JSON"
+    },
+    "classes": [
+      "files"
+    ]
+  },
+  {
+    "id": "regex",
+    "nav": {
+      "en": "Regex",
+      "ko": "정규식"
+    },
+    "title": {
+      "en": "Regular Expressions and Text Processing",
+      "ko": "정규표현식·텍스트 처리"
+    },
+    "classes": [
+      "regex"
+    ]
+  },
+  {
+    "id": "data",
+    "nav": {
+      "en": "Data",
+      "ko": "데이터"
+    },
+    "title": {
+      "en": "Data Analysis: pandas and matplotlib",
+      "ko": "데이터 분석: pandas·matplotlib"
+    },
+    "classes": [
+      "pandas",
+      "files-and-charts"
+    ]
+  },
+  {
+    "id": "oop",
+    "nav": {
+      "en": "OOP",
+      "ko": "객체지향"
+    },
+    "title": {
+      "en": "Object-Oriented Programming",
+      "ko": "객체지향 프로그래밍"
+    },
+    "classes": [
+      "classes",
+      "objects"
+    ]
+  },
+  {
+    "id": "project",
+    "nav": {
+      "en": "Project",
+      "ko": "프로젝트"
+    },
+    "title": {
+      "en": "Building a Project: Requirements, Design and Git",
+      "ko": "프로젝트 만들기: 요구사항·설계·Git"
+    },
+    "classes": [
+      "requirements",
+      "design",
+      "git",
+      "project-docs",
+      "mvp"
+    ]
+  },
+  {
+    "id": "testing",
+    "nav": {
+      "en": "Testing",
+      "ko": "테스트"
+    },
+    "title": {
+      "en": "Debugging and Testing",
+      "ko": "디버깅과 테스트"
+    },
+    "classes": [
+      "debugging",
+      "feature-tests"
+    ]
+  },
+  {
+    "id": "database",
+    "nav": {
+      "en": "Database",
+      "ko": "DB"
+    },
+    "title": {
+      "en": "Databases with SQLite",
+      "ko": "데이터베이스: SQLite"
+    },
+    "classes": [
+      "sqlite",
+      "sqlite-storage",
+      "db-internals"
+    ]
+  },
+  {
+    "id": "network",
+    "nav": {
+      "en": "Network",
+      "ko": "네트워크"
+    },
+    "title": {
+      "en": "Networking",
+      "ko": "네트워크"
+    },
+    "classes": [
+      "network"
+    ]
+  },
+  {
+    "id": "web",
+    "nav": {
+      "en": "Web",
+      "ko": "웹"
+    },
+    "title": {
+      "en": "Web Apps with Flask",
+      "ko": "웹 앱: Flask"
+    },
+    "classes": [
+      "flask"
+    ]
+  },
+  {
+    "id": "concurrency",
+    "nav": {
+      "en": "Concurrency",
+      "ko": "동시성"
+    },
+    "title": {
+      "en": "Concurrency: Threads and asyncio",
+      "ko": "동시성: 스레드와 asyncio"
+    },
+    "classes": [
+      "concurrency"
+    ]
+  }
+]

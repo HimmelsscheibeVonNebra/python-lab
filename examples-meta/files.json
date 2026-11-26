@@ -1,0 +1,194 @@
+{
+  "class": "files",
+  "title": "파일 · 예외 · JSON",
+  "summary": "pathlib으로 경로를 다루고 open()과 with로 파일을 읽고 쓴다. try/except/else/finally로 오류를 처리하고, raise와 직접 만든 예외 클래스, raise ... from으로 오류를 알린다. json으로 저장 파일을 만들고, csv의 DictReader/DictWriter로 잘못된 줄을 건너뛰는 가져오기 프로그램을 만든다.",
+  "examples": [
+    {
+      "name": "paths",
+      "source": "files/paths/explore.py",
+      "also": [
+        "files/paths/notes/todo.txt"
+      ],
+      "summary": "pathlib의 Path로 notes 폴더를 둘러본다. exists()·is_dir()로 확인하고, iterdir()로 안의 항목을, glob()·rglob()으로 패턴에 맞는 파일만 골라 read_text(encoding=\"utf-8\")로 읽는다. / 연산자로 경로를 잇고 name·stem·suffix·parent로 쪼개 보며, write_text로 한글 파일을 써 본다.",
+      "steps": [
+        {
+          "cmd": "ls -R notes",
+          "note": "실습용 폴더 구조다. notes 안에 파일 세 개(memo.txt, scores.csv, todo.txt)와 하위 폴더 archive가 있고, archive 안에 old.txt가 있다."
+        },
+        {
+          "cmd": "python3 explore.py",
+          "note": "iterdir()는 폴더 바로 안의 항목만 돌려주고 순서가 정해져 있지 않아서 sorted()로 정렬했다. glob(\"*.txt\")는 notes 바로 안의 .txt 두 개만, rglob(\"*.txt\")는 archive/old.txt까지 세 개를 찾는다. 한글 파일도 encoding=\"utf-8\"로 읽으니 '오늘 할 일'이 그대로 나온다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom pathlib import Path\np = Path(\"notes\") / \"archive\" / \"old.txt\"\nprint(p)\nprint(p.name, p.stem, p.suffix)\nprint(p.parent, p.parent.parent)\nprint(p.with_suffix(\".bak\"))\nprint(p.exists(), Path(\"notes/nope.txt\").exists())\nprint(Path.cwd())\nprint(p.resolve())\nprint(Path.home())\nEOF",
+          "note": "/ 연산자가 경로 조각을 이어 notes/archive/old.txt를 만든다(문자열 더하기로 \"/\"를 직접 붙일 필요가 없다). name은 old.txt, stem은 old, suffix는 .txt, parent는 notes/archive다. with_suffix는 확장자만 바꾼 새 경로를 만들 뿐 파일은 건드리지 않는다. 상대 경로는 현재 폴더(Path.cwd())를 기준으로 하고, resolve()는 그것을 /home/student/files/paths/notes/archive/old.txt 같은 절대 경로로 바꾼다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom pathlib import Path\nout = Path(\"notes/hello.txt\")\nn = out.write_text(\"안녕하세요\\nHello\\n\", encoding=\"utf-8\")\nprint(n, \"characters written\")\nprint(out.read_text(encoding=\"utf-8\"), end=\"\")\nprint(len(out.read_bytes()), \"bytes on disk\")\nEOF",
+          "note": "write_text는 파일을 새로 만들거나 통째로 덮어쓰고, 쓴 글자 수 12를 돌려준다. 디스크에는 22바이트가 저장된다. UTF-8에서 한글 한 글자는 3바이트이기 때문이다(5×3 + 1 + 5 + 1). 다시 실행해도 덮어쓰므로 결과가 같다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom pathlib import Path\np = Path(\"notes/nope.txt\")\nif p.exists():\n    print(p.read_text(encoding=\"utf-8\"))\nelse:\n    print(p, \"does not exist, skipping\")\nPath(\"notes/out/2026\").mkdir(parents=True, exist_ok=True)\nprint(sorted(x.name for x in Path(\"notes\").iterdir()))\nEOF",
+          "note": "읽기 전에 exists()로 확인하면 없는 파일 때문에 멈추지 않는다(다음 예제에서는 try/except로 같은 일을 한다). mkdir(parents=True, exist_ok=True)는 중간 폴더 out까지 한 번에 만들고, 이미 있어도 오류를 내지 않는다. 목록에 hello.txt와 out이 새로 보인다."
+        },
+        {
+          "cmd": "rm -r notes/out notes/hello.txt; ls notes",
+          "note": "연습으로 만든 파일과 폴더를 지워 처음 상태로 돌린다."
+        }
+      ],
+      "expect": "todo.txt: 3 lines, first line '오늘 할 일'"
+    },
+    {
+      "name": "file_modes",
+      "source": "files/file_modes/diary.py",
+      "summary": "open()의 모드 r·w·a·x를 비교한다. diary.py는 명령줄로 받은 한 줄을 \"a\" 모드로 diary.txt 끝에 붙이고, 파일 객체를 for로 돌며 줄 번호를 붙여 전체를 출력한다. 이어서 w가 파일을 비우는 것, x가 덮어쓰기를 거부하는 것, with 블록이 끝나면 파일이 닫히는 것을 확인한다.",
+      "steps": [
+        {
+          "cmd": "rm -f diary.txt\npython3 diary.py 오늘 파이썬으로 파일을 썼다",
+          "note": "먼저 diary.txt를 지워 깨끗하게 시작한다. \"a\" 모드는 파일이 없으면 새로 만든다. 1: 오늘 파이썬으로 파일을 썼다."
+        },
+        {
+          "cmd": "python3 diary.py 두 번째 줄\ncat diary.txt",
+          "note": "\"a\"는 기존 내용 뒤에 덧붙인다. 이제 두 줄이다. write()는 줄바꿈을 붙여 주지 않으므로 프로그램이 entry + \"\\n\"을 썼다. 출력할 때는 rstrip()으로 줄 끝의 \\n을 떼어 빈 줄이 끼지 않게 했다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nwith open(\"diary.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"새 일기장\\n\")\nwith open(\"diary.txt\", encoding=\"utf-8\") as f:\n    print(repr(f.read()))\nEOF",
+          "note": "\"w\"는 파일을 여는 순간 내용을 모두 지운다. 앞의 두 줄은 사라지고 '새 일기장\\n'만 남는다. 기존 파일에 \"w\"를 쓰는 실수로 데이터를 잃는 일이 흔하다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ntry:\n    with open(\"diary.txt\", \"x\", encoding=\"utf-8\") as f:\n        f.write(\"never written\\n\")\nexcept FileExistsError as e:\n    print(\"x refused:\", e)\nwith open(\"fresh.txt\", \"x\", encoding=\"utf-8\") as f:\n    f.write(\"created\\n\")\nprint(\"fresh.txt created\")\nEOF\nrm fresh.txt",
+          "note": "\"x\"는 새 파일만 만든다. 이미 있으면 FileExistsError: [Errno 17] File exists: 'diary.txt'를 낸다. 덮어쓰면 안 되는 파일에 안전하다. 마지막의 rm은 다시 눌러도 같은 결과가 나오게 fresh.txt를 지운다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nf = open(\"diary.txt\", encoding=\"utf-8\")\nprint(\"after open:\", f.closed)\nf.close()\nprint(\"after close():\", f.closed)\nwith open(\"diary.txt\", encoding=\"utf-8\") as f:\n    print(\"inside with:\", f.closed)\nprint(\"after with:\", f.closed)\ntry:\n    f.read()\nexcept ValueError as e:\n    print(\"ValueError:\", e)\nEOF",
+          "note": "open()만 하면 close()를 부를 때까지 열려 있다. with 블록은 끝나는 순간(중간에 오류가 나도) 파일을 닫아 준다: inside with: False, after with: True. 닫힌 파일을 읽으면 ValueError: I/O operation on closed file.이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nwith open(\"log.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"a\")\n    f.write(\"b\\n\")\n    print(\"c\", \"d\", sep=\",\", file=f)\n    f.writelines([\"e\\n\", \"f\\n\"])\nwith open(\"log.txt\", encoding=\"utf-8\") as f:\n    print(repr(f.read()))\nwith open(\"log.txt\", encoding=\"utf-8\") as f:\n    print(f.readline(), end=\"\")\n    print(f.readlines())\nEOF\nrm log.txt",
+          "note": "쓰는 방법 세 가지: write()는 준 문자열 그대로(a와 b가 한 줄에 붙는다), print(..., file=f)는 화면과 같은 규칙으로 줄바꿈까지, writelines()는 리스트를 이어 쓴다(줄바꿈은 직접). 읽기: read()는 전체 문자열, readline()은 한 줄, readlines()는 남은 줄의 리스트다. 파일 객체는 읽은 위치를 기억해서 readline() 뒤의 readlines()에는 첫 줄이 없다."
+        }
+      ],
+      "expect": "x refused: [Errno 17] File exists: 'diary.txt'"
+    },
+    {
+      "name": "exceptions",
+      "source": "files/exceptions/calc.py",
+      "also": [
+        "files/exceptions/report.py"
+      ],
+      "summary": "try/except/else/finally의 흐름을 익힌다. calc.py는 입력 한 줄마다 \"a b\"를 나눠 a / b를 계산하고, 잘못된 줄은 ValueError·ZeroDivisionError를 따로 잡아 이유를 알린 뒤 다음 줄로 넘어간다. KeyError·FileNotFoundError도 잡아 보고, 마지막에는 잡지 않은 오류의 Traceback을 아래에서 위로 읽는다.",
+      "steps": [
+        {
+          "cmd": "printf '10 4\\n7 0\\nten 2\\n9\\n8 2\\n' | python3 calc.py",
+          "note": "다섯 줄을 넣는다. 둘째 줄은 ZeroDivisionError, 셋째 줄은 int('ten')의 ValueError, 넷째 줄은 숫자가 하나뿐이라 a_text, b_text = ... 풀기에서 ValueError(not enough values to unpack)가 난다. 각 줄의 try가 따로 있어서 나쁜 줄이 있어도 끝까지 처리한다: 2 done, 3 skipped. 성공한 줄만 else에서 출력한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\ndef to_int(text):\n    try:\n        n = int(text)\n    except ValueError:\n        print(f\"  except:  {text!r} is not a number\")\n        return None\n    else:\n        print(f\"  else:    got {n}\")\n        return n\n    finally:\n        print(\"  finally: always runs\")\n\nprint(to_int(\"42\"))\nprint(to_int(\"abc\"))\nEOF",
+          "note": "실행 순서를 본다. 성공하면 try → else → finally, 실패하면 try → except → finally다. finally는 return이 있어도 함수가 끝나기 직전에 반드시 실행된다. 그래서 파일 닫기 같은 정리 코드를 둔다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nprices = {\"apple\": 1200, \"pear\": 2500}\nfor item in [\"apple\", \"mango\"]:\n    try:\n        print(item, prices[item])\n    except KeyError as e:\n        print(\"no price for\", e)\nprint(prices.get(\"mango\", 0))\nEOF",
+          "note": "딕셔너리에 없는 키를 []로 꺼내면 KeyError다. as e로 받은 예외를 출력하면 빠진 키 'mango'가 보인다. 없을 수도 있는 키라면 get(키, 기본값)이 더 간단하다: 0."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfor name in [\"calc.py\", \"nope.txt\"]:\n    try:\n        with open(name, encoding=\"utf-8\") as f:\n            print(name, \"has\", len(f.readlines()), \"lines\")\n    except FileNotFoundError as e:\n        print(\"missing:\", e.filename, \"|\", e)\nEOF",
+          "note": "없는 파일을 열면 FileNotFoundError다. 예외 객체에는 정보가 들어 있다: e.filename은 nope.txt, 메시지는 [Errno 2] No such file or directory: 'nope.txt'. exists()로 미리 확인하는 대신 일단 열어 보고 실패를 처리하는 방식이다."
+        },
+        {
+          "cmd": "python3 report.py",
+          "note": "잡지 않은 오류는 프로그램을 멈추고 Traceback을 남긴다. Mina: 84.0은 출력됐지만 Joon에서 멈춰 Sora는 출력되지 않는다. 맨 아래 줄 ZeroDivisionError: division by zero가 무엇이 잘못됐는지, 바로 위 줄(average의 line 5)이 어디서 났는지, 그 위가 누가 불렀는지(report의 line 9, 그리고 맨 위 line 13의 report(\"Joon\", []))를 알려 준다. ~~~^^^ 표시는 줄 안에서 문제가 된 부분이다."
+        }
+      ],
+      "expect": "2 done, 3 skipped",
+      "traceback": true
+    },
+    {
+      "name": "custom_errors",
+      "source": "files/custom_errors/bank.py",
+      "also": [
+        "files/custom_errors/config.py",
+        "files/custom_errors/bad_port.txt"
+      ],
+      "summary": "raise로 직접 예외를 일으킨다. bank.py는 Exception을 상속한 BankError와 그 하위 InsufficientFunds를 만들고, 잘못된 금액에는 ValueError를, 잔액 부족에는 InsufficientFunds를 raise한다. config.py는 파일 없음·숫자 아님 같은 낮은 수준의 오류를 raise ConfigError(...) from e로 바꿔 호출하는 쪽이 한 가지만 잡으면 되게 한다(예외 연결).",
+      "steps": [
+        {
+          "cmd": "python3 bank.py",
+          "note": "잔액 10000에서 네 번 출금한다. -500은 withdraw가 raise한 ValueError, 20000은 InsufficientFunds다. 예외 객체에 담아 둔 e.amount와 e.balance로 부족한 금액 13000을 계산했다. 실패한 출금은 잔액을 바꾸지 않으므로 마지막 7000은 성공하고 잔액이 0이 된다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom bank import Account, BankError, InsufficientFunds\naccount = Account(\"Joon\", 500)\ntry:\n    account.withdraw(1000)\nexcept BankError as e:\n    print(type(e).__name__, \"|\", e)\nprint(issubclass(InsufficientFunds, BankError), issubclass(BankError, Exception))\nEOF",
+          "note": "except BankError는 그 하위 클래스인 InsufficientFunds도 잡는다. 모듈의 오류를 모두 한 부모 클래스 아래 두면, 쓰는 쪽은 필요한 만큼만 자세히 잡을 수 있다. 상속 관계는 InsufficientFunds → BankError → Exception이다: True True."
+        },
+        {
+          "cmd": "cat port.txt bad_port.txt big_port.txt\npython3 config.py port.txt bad_port.txt big_port.txt nope.txt",
+          "note": "설정 파일 네 개를 읽는다. 8080은 성공, eighty는 ValueError, 99999는 범위 검사에서 직접 raise, nope.txt는 FileNotFoundError다. 호출하는 쪽은 except ConfigError 하나로 모두 처리한다. from e로 연결한 원래 오류는 e.__cause__에 남는다(직접 raise한 경우는 None)."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom config import read_port\nread_port(\"bad_port.txt\")\nEOF",
+          "note": "ConfigError를 잡지 않으면 Traceback이 두 개 이어서 나온다. 위는 원인(ValueError: invalid literal for int()...), 가운데 The above exception was the direct cause of the following exception:, 아래가 최종 오류 ConfigError다. from이 원인을 숨기지 않고 함께 보여 준다."
+        }
+      ],
+      "expect": "The above exception was the direct cause of the following exception",
+      "traceback": true
+    },
+    {
+      "name": "json_save",
+      "source": "files/json_save/save.py",
+      "summary": "게임 저장 파일을 JSON으로 만든다. save.py는 save.json을 json.load로 읽어(없으면 FileNotFoundError, 깨졌으면 JSONDecodeError를 잡아 새 게임) 점수 하나를 더하고, json.dump(..., ensure_ascii=False, indent=2)로 사람이 읽을 수 있게 다시 저장한다. dumps/loads로 파이썬 값과 JSON 값이 어떻게 대응하는지, 저장할 수 없는 값은 무엇인지 확인한다.",
+      "steps": [
+        {
+          "cmd": "rm -f save.json\npython3 save.py 120",
+          "note": "저장 파일을 지우고 시작한다. 파일이 없으니 FileNotFoundError를 잡아 새 게임을 만들고, 첫 판 120점을 저장한다: 민지: play 1, score 120, best 120."
+        },
+        {
+          "cmd": "python3 save.py 80\npython3 save.py 150\ncat save.json",
+          "note": "실행할 때마다 save.json을 읽고 고쳐 다시 쓰므로 기록이 이어진다: play 3, best 150. 파일을 열어 보면 indent=2 덕분에 들여쓰기가 되어 있고, ensure_ascii=False라서 \"민지\"가 한글 그대로다. 파이썬의 True와 리스트가 JSON의 true와 [ ]로 저장됐다. best는 처음에 None(JSON의 null)이었고 이제는 숫자다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport json\ndata = {\"name\": \"민지\", \"age\": 20, \"height\": 162.5, \"tags\": (\"a\", \"b\"), \"pet\": None, \"ok\": True, 1: \"one\"}\ntext = json.dumps(data, ensure_ascii=False)\nprint(text)\nprint(json.dumps({\"name\": \"민지\"}))\nback = json.loads(text)\nprint(back[\"tags\"], back[\"pet\"], back[\"ok\"], back[\"1\"])\nprint(back == data)\nEOF",
+          "note": "dumps는 값을 JSON 문자열로, loads는 다시 값으로 바꾼다(s = string). 튜플은 리스트 [\"a\", \"b\"]로, None은 null로, 숫자 키 1은 문자열 \"1\"로 바뀐다. 그래서 되돌린 값은 원래와 같지 않다(False). ensure_ascii=False를 빼면 한글이 \\ubbfc\\uc9c0처럼 이스케이프된다. 틀린 것은 아니지만 사람이 읽기 어렵다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport json\nfrom datetime import date\nfor value in [{1, 2}, date(2026, 3, 2)]:\n    try:\n        json.dumps(value)\n    except TypeError as e:\n        print(\"TypeError:\", e)\nprint(json.dumps({\"day\": date(2026, 3, 2).isoformat()}))\ntry:\n    json.loads(\"{'name': 'Mina'}\")\nexcept json.JSONDecodeError as e:\n    print(\"JSONDecodeError:\", e)\nEOF",
+          "note": "JSON에는 문자열·숫자·true/false·null·배열·객체만 있다. set이나 date는 TypeError: Object of type ... is not JSON serializable이 나므로 리스트나 \"2026-03-02\" 같은 문자열로 바꿔 저장한다. 반대로 JSON 문자열은 반드시 큰따옴표를 써야 한다. 파이썬 딕셔너리처럼 작은따옴표로 쓰면 JSONDecodeError다."
+        },
+        {
+          "cmd": "printf '{\"player\": \"민지\", \"plays\": 3,' > save.json\npython3 save.py 90\ncat save.json",
+          "note": "저장 도중 끊긴 것처럼 반쯤 쓰인 파일을 만든다. json.load가 JSONDecodeError를 내고, save.py는 이를 잡아 어디가 깨졌는지(line 1 column 29) 알린 뒤 새 게임으로 이어 간다. 예외를 잡지 않았다면 저장 파일 하나 때문에 게임이 아예 시작되지 않는다."
+        }
+      ],
+      "expect": "\"player\": \"민지\""
+    },
+    {
+      "name": "csv_import",
+      "source": "files/csv_import/importer.py",
+      "also": [
+        "files/csv_import/scores.csv"
+      ],
+      "summary": "잘못된 줄이 섞인 성적 CSV를 견고하게 가져온다. importer.py는 csv.DictReader로 줄마다 딕셔너리를 받아 parse()에서 검사하고, 문제가 있으면 직접 만든 BadRow 예외를 raise한다. main은 BadRow를 잡아 줄 번호와 이유를 알리고 다음 줄로 넘어가며, 좋은 줄만 csv.DictWriter로 clean.csv에 쓴다. 입력 파일이 없으면 오류 메시지와 종료 코드 1로 끝난다.",
+      "steps": [
+        {
+          "cmd": "cat -n scores.csv",
+          "note": "헤더 다음에 열 줄이 있다. 빈 점수(서연), 숫자가 아닌 점수(eighty), 범위를 넘는 점수(105), 열이 모자란 줄(지우), 빈 이름, 열이 남는 줄(유나)이 섞여 있다. \"Kim, Jiwoo\"는 이름 안에 쉼표가 있어 큰따옴표로 감쌌다. cat -n이 붙인 줄 번호는 importer가 보고하는 line 번호와 같다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport csv\nprint('\"Kim, Jiwoo\",math,88'.split(\",\"))\nwith open(\"scores.csv\", encoding=\"utf-8\", newline=\"\") as f:\n    for row in csv.DictReader(f):\n        print(row)\nEOF",
+          "note": "split(\",\")은 따옴표 안의 쉼표까지 잘라 네 조각을 만든다. csv 모듈은 \"Kim, Jiwoo\"를 한 칸으로 읽는다. DictReader는 헤더를 키로 써서 줄마다 딕셔너리를 준다. 값은 모두 문자열이다. 열이 모자라면 그 키의 값이 None, 남으면 None 키에 리스트로 들어간다. 파일은 newline=\"\"로 연다(csv 모듈 문서의 권장)."
+        },
+        {
+          "cmd": "python3 importer.py scores.csv",
+          "note": "나쁜 줄 여섯 개가 각각 이유와 함께 보고되고(line 번호는 헤더를 1로 센 파일의 줄 번호), 좋은 줄 네 개만 남는다: 4 rows saved to clean.csv, 6 skipped. 줄마다 try가 따로 있어서 한 줄이 나빠도 전체가 멈추지 않는다."
+        },
+        {
+          "cmd": "cat clean.csv",
+          "note": "DictWriter가 쓴 결과다. writeheader()가 첫 줄을, writerows()가 나머지를 쓴다. 쉼표가 들어 있는 \"Kim, Jiwoo\"는 자동으로 다시 따옴표로 감싸진다. 다시 실행해도 \"w\" 모드로 덮어쓰므로 같은 파일이 나온다."
+        },
+        {
+          "cmd": "python3 importer.py nope.csv; echo \"exit=$?\"",
+          "note": "입력 파일이 없으면 Traceback 대신 error: nope.csv not found를 출력하고 종료 코드 1(실패)로 끝난다. 셸 스크립트나 다른 프로그램이 이 코드로 성공·실패를 구분할 수 있다."
+        }
+      ],
+      "expect": "4 rows saved to clean.csv, 6 skipped"
+    }
+  ]
+}

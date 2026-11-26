@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Web Apps with Flask · Python Lab" data-title-ko="웹 앱: Flask · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Apps with Flask · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="web/flask_hello">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html" aria-current="page"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" aria-current="page" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 14 · 4 examples</span><span lang="ko">14장 · 예제 4개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../network/index.html" title="Networking / 네트워크">← 13 <span lang="en">Network</span><span lang="ko">네트워크</span></a><a class="next" href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio">15 <span lang="en">Concurrency</span><span lang="ko">동시성</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></h1>
+    <p class="lead"><span lang="en">Move the validate → analyze → HTML flow from the 'Building a Project' chapter into Flask web apps. Start with the smallest app (flask_hello), then run Korean stocks (sample2), US stocks (sample1) and SQLite storage (sample4) as servers inside the virtual machine and send them requests with the web command.</span><span lang="ko">'프로젝트 만들기' 장의 검증 → 분석 → HTML 흐름을 Flask 웹 앱으로 옮긴다. 가장 작은 앱(flask_hello)으로 시작해 한국 주식(sample2), 미국 주식(sample1), SQLite 저장(sample4)을 가상 머신 안에서 서버로 띄우고 web 명령으로 요청해 본다.</span> <a href="#notes-flask"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="flask_hello" aria-pressed="true">flask_hello</button>
+          <button type="button" data-pick="sample2_korea" aria-pressed="false">sample2_korea</button>
+          <button type="button" data-pick="sample1_us" aria-pressed="false">sample1_us</button>
+          <button type="button" data-pick="sample4_sqlite" aria-pressed="false">sample4_sqlite</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="flask_hello" data-dir="web/flask_hello">
+        <h2>flask_hello <span class="muted">~/web/flask_hello</span></h2>
+        <p><span lang="en">The smallest Flask app: two addresses (routes), each connected to one function, and a value read from the query string. Learn how to start a server and send it requests with the web command first.</span><span lang="ko">가장 작은 Flask 앱. 주소(라우트) 두 개가 각각 함수 하나에 연결되고, 쿼리 문자열로 값을 받는다. 서버를 띄우고 web 명령으로 요청을 보내는 방법을 먼저 익힌다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web start app.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start app.py">▶</button><code>web start app.py</code></div>
+          <p><span lang="en">Start app.py as a background server (about 10 seconds). When it is ready, the app preview panel opens under the terminal with the first page. The preview panel plays the browser's role in this lab.</span><span lang="ko">app.py를 백그라운드 서버로 띄운다(10초 정도). 준비되면 터미널 아래에 앱 미리보기 창이 열리고 첫 화면이 보인다. 미리보기 창이 이 실습의 브라우저 역할을 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Send a request to the address /. The HTML returned by home(), the function marked @app.get(&quot;/&quot;), is shown as text. HTTP 200 means success.</span><span lang="ko">주소 /로 요청을 보낸다. @app.get(&quot;/&quot;)가 붙은 home()이 돌려준 HTML이 글자로 보인다. HTTP 200은 성공이라는 뜻이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web show '/hello?name=Mina'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show '/hello?name=Mina'">▶</button><code>web show '/hello?name=Mina'</code></div>
+          <p><span lang="en">web show puts an address in the preview panel; web get shows the same page as text in the terminal.</span><span lang="ko">web show는 주소를 미리보기 창에 띄운다. web get은 같은 화면을 터미널에 글자로 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/hello?name=Mina'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/hello?name=Mina'">▶</button><code>web get '/hello?name=Mina'</code></div>
+          <p><span lang="en">name=Mina after the ? is the query string. hello() reads it with request.args.get(&quot;name&quot;) and builds Hello, Mina!. Typing /hello?name=Mina in the preview panel's address box and pressing Open does the same.</span><span lang="ko">? 뒤의 name=Mina가 쿼리 문자열이다. hello()가 request.args.get(&quot;name&quot;)으로 읽어 Hello, Mina!를 만든다. 미리보기 창의 주소 칸에 /hello?name=Mina를 넣고 열기를 눌러도 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /hello" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /hello">▶</button><code>web get /hello</code></div>
+          <p><span lang="en">Without name, get() uses its default &quot;world&quot;: Hello, world!</span><span lang="ko">name이 없으면 get()의 기본값 &quot;world&quot;를 쓴다: Hello, world!</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'">▶</button><code>web html '/hello?name=&lt;b&gt;Mina&lt;/b&gt;'</code></div>
+          <p><span lang="en">web html shows the raw HTML. Thanks to escape(), &lt;b&gt; became &amp;lt;b&amp;gt;, so the tag you typed is shown as text instead of being run.</span><span lang="ko">web html은 HTML 원문을 보여 준다. escape() 덕분에 &lt;b&gt;가 &amp;lt;b&amp;gt;로 바뀌어, 입력한 태그가 실행되지 않고 글자로 표시된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /nothing" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /nothing">▶</button><code>web get /nothing</code></div>
+          <p><span lang="en">For an address that does not exist, Flask answers HTTP 404 (Not Found).</span><span lang="ko">없는 주소는 Flask가 HTTP 404(Not Found)로 답한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web log">▶</button><code>web log</code></div>
+          <p><span lang="en">The server log has one line per request with its address and status code (200, 404).</span><span lang="ko">서버 로그: 요청마다 주소와 상태 코드(200, 404)가 한 줄씩 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server. While it runs, saving a change to app.py is enough: web notices it, restarts the app by itself, and the preview panel redraws with the new code.</span><span lang="ko">서버를 끈다. 서버가 켜져 있는 동안 app.py를 고쳐 저장하면 web이 알아채고 앱을 저절로 다시 시작하며, 미리보기 창도 새 코드로 다시 그려진다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      <p class="callout"><span lang="en">web is a helper command made for this lab (type web alone to see its usage). While the server runs, the app preview panel under the terminal plays the browser's role. On a real PC you run python app.py and open http://127.0.0.1:5000 in your browser.</span><span lang="ko">web은 이 실습용 도우미 명령이다(web 만 입력하면 사용법이 나온다). 서버가 켜져 있는 동안 터미널 아래 앱 미리보기 창이 브라우저 역할을 한다. 실제 PC에서는 python app.py로 실행하고 브라우저에서 http://127.0.0.1:5000 을 연다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="sample2_korea" data-dir="web/sample2" hidden>
+        <h2>sample2_korea <span class="muted">~/web/sample2</span></h2>
+        <p><span lang="en">Korean stock analysis app. app.py receives the request, storage.py reads the CSV, logic.py validates and analyzes it, and templates/index.html (Jinja) draws the page. Check the KOSPI/KOSDAQ filter, the ranking by change, the sample mean and the 400 response to bad input.</span><span lang="ko">한국 주식 분석 앱. app.py가 요청을 받고 storage.py로 CSV를 읽어 logic.py로 검증·분석한 뒤 templates/index.html(Jinja)로 그린다. KOSPI/KOSDAQ 필터, 등락률 순위, 표본 평균, 잘못된 입력의 400 응답을 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat data/prices.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat data/prices.csv">▶</button><code>cat data/prices.csv</code></div>
+          <p><span lang="en">A one-day (2026-11-05) fictional snapshot of 5 stocks. Prices are whole won (KRW), and codes such as 005930 are handled as strings to keep the leading 0.</span><span lang="ko">2026-11-05 하루치 가상 데이터 5종목. 가격은 정수 원(KRW)이고 005930 같은 종목 코드는 앞의 0을 지키기 위해 문자열로 다룬다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
+          <p><span lang="en">Start app.py as a server (port 5002). The first page opens in the preview panel under the terminal. Choose a market there and press 조회 (Search): the page changes just like in a real browser.</span><span lang="ko">app.py를 서버로 띄운다(포트 5002). 터미널 아래 미리보기 창에 첫 화면이 열린다. 창 안에서 시장을 고르고 조회를 누르면 실제 브라우저처럼 화면이 바뀐다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">The first page (market ALL). The summary is 5 stocks · up 2 / down 2 / flat 1 · sample mean +0.40%, and the table is sorted by change, largest first.</span><span lang="ko">첫 화면(시장 ALL). 요약은 종목 5개 · 상승 2 / 하락 2 / 보합 1 · 표본 평균 +0.40%이고, 표는 등락률이 큰 순서다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSPI'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSPI'">▶</button><code>web get '/?market=KOSPI'</code></div>
+          <p><span lang="en">?market=KOSPI reaches the app through request.args.get('market'). Only the 3 KOSPI stocks remain; their mean is +0.33%. It is the same address the preview panel's address box shows after you choose KOSPI there.</span><span lang="ko">?market=KOSPI가 request.args.get('market')으로 전달된다. KOSPI 3종목만 남고 평균은 +0.33%. 미리보기 창에서 KOSPI를 골라 조회했을 때 주소 칸에 나오는 주소와 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=KOSDAQ'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=KOSDAQ'">▶</button><code>web get '/?market=KOSDAQ'</code></div>
+          <p><span lang="en">The mean of the 2 KOSDAQ stocks is +0.50%. It is an equal-weight sample mean of the selected stocks, not a market index return.</span><span lang="ko">KOSDAQ 2종목의 평균은 +0.50%. 평균은 선택된 종목의 동일 가중 표본 평균이지 시장 지수 수익률이 아니다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=BAD'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=BAD'">▶</button><code>web get '/?market=BAD'</code></div>
+          <p><span lang="en">For an unknown market, analyze() raises ValueError and app.py answers HTTP 400. The program does not crash; it shows the error message (market must be ALL, KOSPI or KOSDAQ) on the page.</span><span lang="ko">모르는 시장은 analyze()가 ValueError를 내고 app.py가 HTTP 400으로 답한다. 프로그램이 죽지 않고 오류 메시지(market must be ALL, KOSPI or KOSDAQ)를 화면에 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web show '/?market=BAD'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show '/?market=BAD'">▶</button><code>web show '/?market=BAD'</code></div>
+          <p><span lang="en">Error pages show in the preview panel too: HTTP 400 and a red error message.</span><span lang="ko">오류 화면도 미리보기 창에서 볼 수 있다: HTTP 400과 빨간 오류 메시지.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web log" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web log">▶</button><code>web log</code></div>
+          <p><span lang="en">One line per request with its address and status code (200, 200, 200, 400).</span><span lang="ko">요청마다 주소와 상태 코드(200, 200, 200, 400)가 한 줄씩 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web save sample2.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web save sample2.html">▶</button><code>web save sample2.html</code></div>
+          <p><span lang="en">Save the page, CSS included, as one HTML file in /mnt/host. Type sample2.html in the box above and press Download to open it in your own browser.</span><span lang="ko">화면을 CSS까지 담은 HTML 한 파일로 /mnt/host에 저장한다. 위 입력란에 sample2.html을 적고 받기를 누르면 내 브라우저에서 열어 볼 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server.</span><span lang="ko">서버를 끈다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      <p class="callout"><span lang="en">On a real PC, install Flask in a virtual environment as the README says, run python app.py and open http://127.0.0.1:5002 in your browser. In this web lab the app preview panel under the terminal plays that browser's role.</span><span lang="ko">실제 PC에서는 README대로 가상환경에 Flask를 설치하고 python app.py로 실행한 뒤 브라우저에서 http://127.0.0.1:5002 를 연다. 이 웹 실습에서는 터미널 아래의 앱 미리보기 창이 그 브라우저 역할을 한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="sample1_us" data-dir="web/sample1" hidden>
+        <h2>sample1_us <span class="muted">~/web/sample1</span></h2>
+        <p><span lang="en">A US stock app with the same structure. Prices are stored as whole cents and converted to USD only on screen (scale=100); the markets are NASDAQ/NYSE and codes are uppercase tickers. Compare it with sample2.</span><span lang="ko">같은 구조의 미국 주식 앱. 가격을 정수 센트로 저장하고 화면에서만 USD로 바꾸며(scale=100), 시장은 NASDAQ/NYSE, 코드는 대문자 티커다. sample2와 어디가 다른지 비교한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat data/prices.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat data/prices.csv">▶</button><code>cat data/prices.csv</code></div>
+          <p><span lang="en">A price of 22000 is $220.00. Amounts are stored as whole cents to avoid floating-point errors.</span><span lang="ko">가격 22000은 220.00달러다. 부동소수점 오차를 피하려고 금액을 정수 센트로 저장한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="diff ../sample2/logic.py logic.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: diff ../sample2/logic.py logic.py">▶</button><code>diff ../sample2/logic.py logic.py</code></div>
+          <p><span lang="en">The only differences between the two apps are in logic.py: the market list (MARKETS) and the code check (six digits ↔ uppercase ticker). The rest of the flow is the same.</span><span lang="ko">두 앱의 차이는 logic.py의 시장 목록(MARKETS)과 종목 코드 검사(6자리 숫자 ↔ 대문자 티커)뿐이다. 나머지 흐름은 같다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
+          <p><span lang="en">Start the server on port 5001. Try choosing NASDAQ/NYSE in the preview panel.</span><span lang="ko">포트 5001에서 서버를 띄운다. 미리보기 창에서 NASDAQ/NYSE를 골라 보자.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Prices in the table are shown in dollars (NVIDIA 140.00 → 144.20). The template turns cents into dollars with row.close / scale. The mean is +0.40%.</span><span lang="ko">표의 가격이 달러로 보인다(NVIDIA 140.00 → 144.20). 템플릿이 row.close / scale로 센트를 달러로 바꾼다. 평균은 +0.40%.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get '/?market=NYSE'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get '/?market=NYSE'">▶</button><code>web get '/?market=NYSE'</code></div>
+          <p><span lang="en">NYSE has 2 stocks: JPM (flat) and KO (down). Mean -1.00%.</span><span lang="ko">NYSE 2종목: JPM(보합)과 KO(하락). 평균 -1.00%.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server.</span><span lang="ko">서버를 끈다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="sample4_sqlite" data-dir="web/sample4" hidden>
+        <h2>sample4_sqlite <span class="muted">~/web/sample4</span></h2>
+        <p><span lang="en">An app that validates the CSV, stores it in SQLite in one transaction and draws the page from the database. Before flask --app app init-db imports the data there is no database and the page answers 500; edits to the CSV appear only after another import; and an invalid CSV does not erase the existing data.</span><span lang="ko">CSV를 검증한 뒤 SQLite에 한 트랜잭션으로 저장하고, 화면은 DB에서 읽는 앱. flask --app app init-db로 가져오기 전에는 DB가 없어 500이 나고, CSV를 고쳐도 다시 가져와야 반영되며, 잘못된 CSV는 기존 데이터를 지우지 않는다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web start" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web start">▶</button><code>web start</code></div>
+          <p><span lang="en">Start the server (port 5004). This app draws the page from an SQLite database, not from the CSV. There is no database yet, so the preview panel shows an error page.</span><span lang="ko">서버를 띄운다(포트 5004). 이 앱은 화면을 CSV가 아니라 SQLite DB에서 읽는다. 아직 DB가 없어 미리보기 창에는 오류 화면이 뜬다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">There is no database yet (instance/market.sqlite3), so you get HTTP 500 with the hint to run flask --app app init-db first.</span><span lang="ko">아직 DB(instance/market.sqlite3)가 없어 HTTP 500과 함께 &quot;먼저 flask --app app init-db를 실행하세요&quot;라는 안내가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db">▶</button><code>flask --app app init-db</code></div>
+          <p><span lang="en">The command that validates the CSV and loads it into the database in one transaction: Imported 5 quotes. It is fine to run it while the server is running.</span><span lang="ko">CSV를 검증하고 한 트랜잭션으로 DB에 넣는 명령이다: Imported 5 quotes. 서버를 켜 둔 채로 실행해도 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Now HTTP 200. Sample mean +0.40% — the same data as sample2, so the same result.</span><span lang="ko">이제 HTTP 200. 표본 평균 +0.40% — sample2와 같은 데이터이므로 같은 결과다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web show /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web show /">▶</button><code>web show /</code></div>
+          <p><span lang="en">After creating the database, reopen the page in the preview panel to see the change (the Open button by the address box works too).</span><span lang="ko">DB를 만든 뒤에는 미리보기 창도 다시 열어야 바뀐 화면이 보인다(주소 칸의 열기 버튼도 된다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /">▶</button><code>sed -i 's/70000,71400/70000,77000/' data/prices.csv &amp;&amp; web get /</code></div>
+          <p><span lang="en">Changing Samsung Electronics' close to 77000 in the CSV leaves the page at +0.40%, because the page reads the database.</span><span lang="ko">CSV에서 삼성전자 종가를 77000으로 바꿔도 화면은 그대로 +0.40%다. 화면은 DB를 읽기 때문이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="flask --app app init-db &amp;&amp; web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: flask --app app init-db &amp;&amp; web get /">▶</button><code>flask --app app init-db &amp;&amp; web get /</code></div>
+          <p><span lang="en">After another import the change shows: Samsung's change goes from +2% to +10%, so the mean becomes +2.00%.</span><span lang="ko">다시 가져오면 반영된다. 삼성전자 등락률이 +2%에서 +10%로 바뀌어 평균이 +2.00%가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed -n 2p data/prices.csv &gt;&gt; data/prices.csv
+flask --app app init-db 2&gt;&amp;1 | tail -n 1" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed -n 2p data/prices.csv &gt;&gt; data/prices.csv
+flask --app app init-db 2&gt;&amp;1 | tail -n 1">▶</button><code>sed -n 2p data/prices.csv &gt;&gt; data/prices.csv
+flask --app app init-db 2&gt;&amp;1 | tail -n 1</code></div>
+          <p><span lang="en">Appending a copy of a stock's row fails validation: ValueError: duplicate code in snapshot.</span><span lang="ko">같은 종목 줄을 하나 더 붙이면 검증에서 실패한다: ValueError: duplicate code in snapshot.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web get /" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web get /">▶</button><code>web get /</code></div>
+          <p><span lang="en">Validation runs before the DELETE and the import is one transaction, so the database keeps the previous 5 stocks (mean +2.00%).</span><span lang="ko">검증이 DELETE보다 먼저이고 저장은 한 트랜잭션이므로, DB에는 직전의 5종목(평균 +2.00%)이 그대로 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="web stop" title="Run in the terminal / 터미널에서 실행" aria-label="Run: web stop">▶</button><code>web stop</code></div>
+          <p><span lang="en">Stop the server. Reloading the page restores the CSV and the database.</span><span lang="ko">서버를 끈다. 페이지를 새로 고치면 CSV와 DB가 처음 상태로 돌아간다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="flask_hello">
+    <details class="source" open data-path="/home/student/web/flask_hello/app.py">
+      <summary>app.py <span class="muted src-lines" data-lines="21"><span lang="en">21 lines</span><span lang="ko">21줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;The smallest Flask app: two routes.  Run: web start app.py&quot;&quot;&quot;</span>
+<span class="ln">from flask import Flask, request</span>
+<span class="ln">from markupsafe import escape</span>
+<span class="ln"> </span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">@app.get(&quot;/&quot;)</span>
+<span class="ln">def home():</span>
+<span class="ln">    return &quot;&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">@app.get(&quot;/hello&quot;)</span>
+<span class="ln">def hello():</span>
+<span class="ln">    name = request.args.get(&quot;name&quot;, &quot;world&quot;)</span>
+<span class="ln">    # escape(): a name like &lt;b&gt;hi&lt;/b&gt; is shown as text, not run as HTML</span>
+<span class="ln">    return f&quot;&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    app.run(host=&quot;127.0.0.1&quot;, port=5000)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="sample2_korea" hidden>
+    <details class="source" open data-path="/home/student/web/sample2/app.py">
+      <summary>app.py <span class="muted src-lines" data-lines="30"><span lang="en">30 lines</span><span lang="ko">30줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Flask routes: input → analysis → escaped Jinja view.&quot;&quot;&quot;</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from flask import Flask, render_template, request</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import load_quotes</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln">app.config['DATA_PATH'] = BASE / 'data/prices.csv'</span>
+<span class="ln"> </span>
+<span class="ln">@app.get('/')</span>
+<span class="ln">def index():</span>
+<span class="ln">    market = request.args.get('market', 'ALL')</span>
+<span class="ln">    rows, summary, day, error, status = [], summarize([]), None, None, 200</span>
+<span class="ln">    try:</span>
+<span class="ln">        quotes = load_quotes(app.config['DATA_PATH'])</span>
+<span class="ln">        rows = analyze(quotes, market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0]['date'] if quotes else None</span>
+<span class="ln">    except ValueError as exc:</span>
+<span class="ln">        error, status = str(exc), 400</span>
+<span class="ln">    except OSError:</span>
+<span class="ln">        error, status = '데이터 파일을 읽을 수 없습니다.', 500</span>
+<span class="ln">    return render_template('index.html', title='한국 주식 분석',</span>
+<span class="ln">        currency='KRW', scale=1, database=False,</span>
+<span class="ln">        markets=MARKETS, market=market, rows=rows, summary=summary,</span>
+<span class="ln">        day=day, error=error), status</span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    app.run(host='127.0.0.1', port=5002)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample2/logic.py">
+      <summary>logic.py <span class="muted src-lines" data-lines="65"><span lang="en">65 lines</span><span lang="ko">65줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; prices are integer KRW.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;KOSPI&quot;, &quot;KOSDAQ&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if len(code) != 6 or not code.isascii() or not code.isdigit():</span>
+<span class="ln">        raise ValueError(&quot;code must be six ASCII digits&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and KOSPI/KOSDAQ market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, KOSPI or KOSDAQ&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample2/storage.py">
+      <summary>storage.py <span class="muted src-lines" data-lines="23"><span lang="en">23 lines</span><span lang="ko">23줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CSV input and atomic HTML output; all file I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample2/templates/index.html">
+      <summary>templates/index.html <span class="muted src-lines" data-lines="5"><span lang="en">5 lines</span><span lang="ko">5줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&lt;!doctype html&gt;&lt;html lang=&quot;ko&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;title&gt;{{ title }}&lt;/title&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;{{ url_for('static', filename='style.css') }}&quot;&gt;&lt;body&gt;</span>
+<span class="ln">&lt;header&gt;&lt;h1&gt;{{ title }}&lt;/h1&gt;&lt;p&gt;가상 수업용 주가 · {{ currency }} · 기준일 {{ day or 'N/A' }}&lt;/p&gt;&lt;small&gt;출처: 제공된 가상 CSV{% if database %} → SQLite{% endif %}. 표본 평균은 시장 지수 수익률이 아닙니다.&lt;/small&gt;&lt;/header&gt;</span>
+<span class="ln">&lt;section&gt;&lt;form&gt;&lt;label&gt;시장 &lt;select name=&quot;market&quot;&gt;{% for item in markets %}&lt;option {% if item == market %}selected{% endif %}&gt;{{ item }}&lt;/option&gt;{% endfor %}&lt;/select&gt;&lt;/label&gt;&lt;button&gt;조회&lt;/button&gt;&lt;/form&gt;</span>
+<span class="ln">{% if error %}&lt;p class=&quot;error&quot; role=&quot;alert&quot;&gt;{{ error }}&lt;/p&gt;{% else %}&lt;p&gt;종목 {{ summary.count }}개 · 상승 {{ summary.up }} / 하락 {{ summary.down }} / 보합 {{ summary.flat }} · 표본 평균 {% if summary.mean is none %}N/A{% else %}{{ '%+.2f'|format(summary.mean) }}%{% endif %}&lt;/p&gt;</span>
+<span class="ln">&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;종목&lt;/th&gt;&lt;th&gt;시장&lt;/th&gt;&lt;th&gt;전일 종가&lt;/th&gt;&lt;th&gt;종가&lt;/th&gt;&lt;th&gt;등락률&lt;/th&gt;&lt;th&gt;거래량(주)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;{% for row in rows %}&lt;tr&gt;&lt;td&gt;{{ row.name }} ({{ row.code }})&lt;/td&gt;&lt;td&gt;{{ row.market }}&lt;/td&gt;&lt;td&gt;{{ '{:,.2f}'.format(row.previous_close / scale) }}&lt;/td&gt;&lt;td&gt;{{ '{:,.2f}'.format(row.close / scale) }}&lt;/td&gt;&lt;td class=&quot;{{ 'up' if row.change_pct &gt; 0 else 'down' if row.change_pct &lt; 0 else '' }}&quot;&gt;{{ '%+.2f'|format(row.change_pct) }}%&lt;/td&gt;&lt;td&gt;{{ '{:,}'.format(row.volume) }}&lt;/td&gt;&lt;/tr&gt;{% else %}&lt;tr&gt;&lt;td colspan=&quot;6&quot;&gt;조회된 종목이 없습니다.&lt;/td&gt;&lt;/tr&gt;{% endfor %}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;{% endif %}&lt;/section&gt;&lt;/body&gt;&lt;/html&gt;</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample2/data/prices.csv">
+      <summary>data/prices.csv <span class="muted src-lines" data-lines="6"><span lang="en">6 lines</span><span lang="ko">6줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample2/README.md">
+      <summary>README.md <span class="muted src-lines" data-lines="35"><span lang="en">35 lines</span><span lang="ko">35줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln"># Sample 2: 한국 주식 분석</span>
+<span class="ln"> </span>
+<span class="ln">Python 3.10 이상과 Flask를 사용합니다. 이 폴더만 복사해도 실행할 수 있습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실행</span>
+<span class="ln"> </span>
+<span class="ln">저장소 루트에서:</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd Sample/sample2</span>
+<span class="ln">python3 -m venv .venv</span>
+<span class="ln">source .venv/bin/activate</span>
+<span class="ln">python -m pip install -r requirements.txt</span>
+<span class="ln">python app.py</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">Windows PowerShell에서는 활성화 명령을 `.venv\Scripts\Activate.ps1`로 바꿉니다.</span>
+<span class="ln">브라우저에서 http://127.0.0.1:5002 을 엽니다. Ctrl+C로 종료합니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실습 흐름</span>
+<span class="ln"> </span>
+<span class="ln">1. `data/prices.csv`를 확인합니다. 모든 수치는 2026-11-05 기준 **가상 수업 데이터**입니다.</span>
+<span class="ln">2. 웹에서 시장을 선택하여 등락률 순위와 상승·하락·보합 수를 비교합니다.</span>
+<span class="ln">3. CSV의 종가를 바꾸어 다시 조회합니다.</span>
+<span class="ln">4. 0인 가격이나 중복 코드를 넣고 오류 처리를 확인합니다.</span>
+<span class="ln"> </span>
+<span class="ln">등락률 = (종가 − 전일 종가) / 전일 종가 × 100. 같은 가격 기준을 사용하며,</span>
+<span class="ln">계산값은 유지하고 화면에서만 소수 둘째 자리로 표시합니다.</span>
+<span class="ln">평균은 선택된 종목의 동일 가중 표본 평균이며 시장 지수 수익률이 아닙니다.</span>
+<span class="ln"> </span>
+<span class="ln">`app.py`: HTTP 요청과 오류 처리 → `storage.py`: CSV 읽기 → `logic.py`: 검증·분석 → `templates/index.html`: Jinja 렌더링.</span>
+<span class="ln">Jinja 자동 escaping을 사용하며 종목명에 HTML을 넣어도 실행하지 않습니다.</span>
+<span class="ln">헤더만 있는 CSV는 유효한 빈 표본(평균 N/A), 파일 누락은 오류입니다.</span>
+<span class="ln"> </span>
+<span class="ln">한국 가격은 정수 원(KRW), 거래량은 정수 주입니다. 005930 같은 코드를 문자열로 유지합니다. ALL 평균 +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="sample1_us" hidden>
+    <details class="source" open data-path="/home/student/web/sample1/app.py">
+      <summary>app.py <span class="muted src-lines" data-lines="30"><span lang="en">30 lines</span><span lang="ko">30줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Flask routes: input → analysis → escaped Jinja view.&quot;&quot;&quot;</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from flask import Flask, render_template, request</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import load_quotes</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln">app.config['DATA_PATH'] = BASE / 'data/prices.csv'</span>
+<span class="ln"> </span>
+<span class="ln">@app.get('/')</span>
+<span class="ln">def index():</span>
+<span class="ln">    market = request.args.get('market', 'ALL')</span>
+<span class="ln">    rows, summary, day, error, status = [], summarize([]), None, None, 200</span>
+<span class="ln">    try:</span>
+<span class="ln">        quotes = load_quotes(app.config['DATA_PATH'])</span>
+<span class="ln">        rows = analyze(quotes, market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0]['date'] if quotes else None</span>
+<span class="ln">    except ValueError as exc:</span>
+<span class="ln">        error, status = str(exc), 400</span>
+<span class="ln">    except OSError:</span>
+<span class="ln">        error, status = '데이터 파일을 읽을 수 없습니다.', 500</span>
+<span class="ln">    return render_template('index.html', title='미국 주식 분석',</span>
+<span class="ln">        currency='USD', scale=100, database=False,</span>
+<span class="ln">        markets=MARKETS, market=market, rows=rows, summary=summary,</span>
+<span class="ln">        day=day, error=error), status</span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    app.run(host='127.0.0.1', port=5001)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample1/logic.py">
+      <summary>logic.py <span class="muted src-lines" data-lines="65"><span lang="en">65 lines</span><span lang="ko">65줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; US prices are integer cents.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;NASDAQ&quot;, &quot;NYSE&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if not (1 &lt;= len(code) &lt;= 10) or not code.isascii() or not code.replace(&quot;.&quot;, &quot;&quot;).isalpha() or code != code.upper():</span>
+<span class="ln">        raise ValueError(&quot;code must be an uppercase ticker&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and NASDAQ/NYSE market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, NASDAQ or NYSE&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample1/storage.py">
+      <summary>storage.py <span class="muted src-lines" data-lines="23"><span lang="en">23 lines</span><span lang="ko">23줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CSV input and atomic HTML output; all file I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample1/templates/index.html">
+      <summary>templates/index.html <span class="muted src-lines" data-lines="5"><span lang="en">5 lines</span><span lang="ko">5줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&lt;!doctype html&gt;&lt;html lang=&quot;ko&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;title&gt;{{ title }}&lt;/title&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;{{ url_for('static', filename='style.css') }}&quot;&gt;&lt;body&gt;</span>
+<span class="ln">&lt;header&gt;&lt;h1&gt;{{ title }}&lt;/h1&gt;&lt;p&gt;가상 수업용 주가 · {{ currency }} · 기준일 {{ day or 'N/A' }}&lt;/p&gt;&lt;small&gt;출처: 제공된 가상 CSV{% if database %} → SQLite{% endif %}. 표본 평균은 시장 지수 수익률이 아닙니다.&lt;/small&gt;&lt;/header&gt;</span>
+<span class="ln">&lt;section&gt;&lt;form&gt;&lt;label&gt;시장 &lt;select name=&quot;market&quot;&gt;{% for item in markets %}&lt;option {% if item == market %}selected{% endif %}&gt;{{ item }}&lt;/option&gt;{% endfor %}&lt;/select&gt;&lt;/label&gt;&lt;button&gt;조회&lt;/button&gt;&lt;/form&gt;</span>
+<span class="ln">{% if error %}&lt;p class=&quot;error&quot; role=&quot;alert&quot;&gt;{{ error }}&lt;/p&gt;{% else %}&lt;p&gt;종목 {{ summary.count }}개 · 상승 {{ summary.up }} / 하락 {{ summary.down }} / 보합 {{ summary.flat }} · 표본 평균 {% if summary.mean is none %}N/A{% else %}{{ '%+.2f'|format(summary.mean) }}%{% endif %}&lt;/p&gt;</span>
+<span class="ln">&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;종목&lt;/th&gt;&lt;th&gt;시장&lt;/th&gt;&lt;th&gt;전일 종가&lt;/th&gt;&lt;th&gt;종가&lt;/th&gt;&lt;th&gt;등락률&lt;/th&gt;&lt;th&gt;거래량(주)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;{% for row in rows %}&lt;tr&gt;&lt;td&gt;{{ row.name }} ({{ row.code }})&lt;/td&gt;&lt;td&gt;{{ row.market }}&lt;/td&gt;&lt;td&gt;{{ '{:,.2f}'.format(row.previous_close / scale) }}&lt;/td&gt;&lt;td&gt;{{ '{:,.2f}'.format(row.close / scale) }}&lt;/td&gt;&lt;td class=&quot;{{ 'up' if row.change_pct &gt; 0 else 'down' if row.change_pct &lt; 0 else '' }}&quot;&gt;{{ '%+.2f'|format(row.change_pct) }}%&lt;/td&gt;&lt;td&gt;{{ '{:,}'.format(row.volume) }}&lt;/td&gt;&lt;/tr&gt;{% else %}&lt;tr&gt;&lt;td colspan=&quot;6&quot;&gt;조회된 종목이 없습니다.&lt;/td&gt;&lt;/tr&gt;{% endfor %}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;{% endif %}&lt;/section&gt;&lt;/body&gt;&lt;/html&gt;</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample1/data/prices.csv">
+      <summary>data/prices.csv <span class="muted src-lines" data-lines="6"><span lang="en">6 lines</span><span lang="ko">6줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,AAPL,Apple,NASDAQ,22000,22440,1000000</span>
+<span class="ln">2026-11-05,MSFT,Microsoft,NASDAQ,42000,41580,800000</span>
+<span class="ln">2026-11-05,NVDA,NVIDIA,NASDAQ,14000,14420,2000000</span>
+<span class="ln">2026-11-05,JPM,JPMorgan Chase,NYSE,21000,21000,600000</span>
+<span class="ln">2026-11-05,KO,Coca-Cola,NYSE,6500,6370,500000</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample1/README.md">
+      <summary>README.md <span class="muted src-lines" data-lines="35"><span lang="en">35 lines</span><span lang="ko">35줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln"># Sample 1: 미국 주식 분석</span>
+<span class="ln"> </span>
+<span class="ln">Python 3.10 이상과 Flask를 사용합니다. 이 폴더만 복사해도 실행할 수 있습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실행</span>
+<span class="ln"> </span>
+<span class="ln">저장소 루트에서:</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd Sample/sample1</span>
+<span class="ln">python3 -m venv .venv</span>
+<span class="ln">source .venv/bin/activate</span>
+<span class="ln">python -m pip install -r requirements.txt</span>
+<span class="ln">python app.py</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">Windows PowerShell에서는 활성화 명령을 `.venv\Scripts\Activate.ps1`로 바꿉니다.</span>
+<span class="ln">브라우저에서 http://127.0.0.1:5001 을 엽니다. Ctrl+C로 종료합니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실습 흐름</span>
+<span class="ln"> </span>
+<span class="ln">1. `data/prices.csv`를 확인합니다. 모든 수치는 2026-11-05 기준 **가상 수업 데이터**입니다.</span>
+<span class="ln">2. 웹에서 시장을 선택하여 등락률 순위와 상승·하락·보합 수를 비교합니다.</span>
+<span class="ln">3. CSV의 종가를 바꾸어 다시 조회합니다.</span>
+<span class="ln">4. 0인 가격이나 중복 코드를 넣고 오류 처리를 확인합니다.</span>
+<span class="ln"> </span>
+<span class="ln">등락률 = (종가 − 전일 종가) / 전일 종가 × 100. 같은 가격 기준을 사용하며,</span>
+<span class="ln">계산값은 유지하고 화면에서만 소수 둘째 자리로 표시합니다.</span>
+<span class="ln">평균은 선택된 종목의 동일 가중 표본 평균이며 시장 지수 수익률이 아닙니다.</span>
+<span class="ln"> </span>
+<span class="ln">`app.py`: HTTP 요청과 오류 처리 → `storage.py`: CSV 읽기 → `logic.py`: 검증·분석 → `templates/index.html`: Jinja 렌더링.</span>
+<span class="ln">Jinja 자동 escaping을 사용하며 종목명에 HTML을 넣어도 실행하지 않습니다.</span>
+<span class="ln">헤더만 있는 CSV는 유효한 빈 표본(평균 N/A), 파일 누락은 오류입니다.</span>
+<span class="ln"> </span>
+<span class="ln">미국 가격은 CSV에 **정수 센트**로 저장하고 화면에서 USD로 변환합니다. 시장은 NASDAQ/NYSE, 코드는 대문자 티커입니다. ALL 표본 평균은 +0.40%입니다.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="sample4_sqlite" hidden>
+    <details class="source" open data-path="/home/student/web/sample4/app.py">
+      <summary>app.py <span class="muted src-lines" data-lines="41"><span lang="en">41 lines</span><span lang="ko">41줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Flask routes: input → analysis → escaped Jinja view.&quot;&quot;&quot;</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from flask import Flask, render_template, request</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import load_quotes</span>
+<span class="ln">from database import read_quotes, import_snapshot</span>
+<span class="ln">import sqlite3</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln">app = Flask(__name__)</span>
+<span class="ln">app.config['DATA_PATH'] = BASE / 'data/prices.csv'</span>
+<span class="ln">app.config['DATABASE'] = BASE / 'instance/market.sqlite3'</span>
+<span class="ln"> </span>
+<span class="ln">@app.get('/')</span>
+<span class="ln">def index():</span>
+<span class="ln">    market = request.args.get('market', 'ALL')</span>
+<span class="ln">    rows, summary, day, error, status = [], summarize([]), None, None, 200</span>
+<span class="ln">    try:</span>
+<span class="ln">        quotes = read_quotes(app.config['DATABASE'])</span>
+<span class="ln">        rows = analyze(quotes, market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0]['date'] if quotes else None</span>
+<span class="ln">    except ValueError as exc:</span>
+<span class="ln">        error, status = str(exc), 400</span>
+<span class="ln">    except (OSError, sqlite3.Error):</span>
+<span class="ln">        error, status = 'DB를 읽을 수 없습니다. 먼저 flask --app app init-db를 실행하세요.', 500</span>
+<span class="ln">    return render_template('index.html', title='SQLite 한국 주식 분석',</span>
+<span class="ln">        currency='KRW', scale=1, database=True,</span>
+<span class="ln">        markets=MARKETS, market=market, rows=rows, summary=summary,</span>
+<span class="ln">        day=day, error=error), status</span>
+<span class="ln"> </span>
+<span class="ln">@app.cli.command('init-db')</span>
+<span class="ln">def init_db():</span>
+<span class="ln">    &quot;&quot;&quot;Validate CSV, then transactionally replace the stored snapshot.&quot;&quot;&quot;</span>
+<span class="ln">    quotes = load_quotes(app.config['DATA_PATH'])</span>
+<span class="ln">    analyze(quotes, 'ALL')</span>
+<span class="ln">    import_snapshot(app.config['DATABASE'], quotes)</span>
+<span class="ln">    print(f&quot;Imported {len(quotes)} quotes.&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    app.run(host='127.0.0.1', port=5004)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample4/database.py">
+      <summary>database.py <span class="muted src-lines" data-lines="48"><span lang="en">48 lines</span><span lang="ko">48줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;SQLite connections are short-lived; imports commit as one transaction.&quot;&quot;&quot;</span>
+<span class="ln">import sqlite3</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, analyze, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def import_snapshot(path, quotes):</span>
+<span class="ln">    # Validate before deleting any existing rows, including calls outside Flask CLI.</span>
+<span class="ln">    quotes = [parse_row({key: str(row[key]) for key in FIELDS}) for row in quotes]</span>
+<span class="ln">    analyze(quotes, 'ALL')</span>
+<span class="ln">    Path(path).parent.mkdir(parents=True, exist_ok=True)</span>
+<span class="ln">    connection = sqlite3.connect(path)</span>
+<span class="ln">    try:</span>
+<span class="ln">        with connection:</span>
+<span class="ln">            connection.execute('''CREATE TABLE IF NOT EXISTS quotes (</span>
+<span class="ln">                date TEXT NOT NULL, code TEXT PRIMARY KEY, name TEXT NOT NULL,</span>
+<span class="ln">                market TEXT NOT NULL CHECK(market IN ('KOSPI','KOSDAQ')),</span>
+<span class="ln">                previous_close INTEGER NOT NULL CHECK(previous_close &gt; 0),</span>
+<span class="ln">                close INTEGER NOT NULL CHECK(close &gt; 0),</span>
+<span class="ln">                volume INTEGER NOT NULL CHECK(volume &gt;= 0))''')</span>
+<span class="ln">            connection.execute('DELETE FROM quotes')</span>
+<span class="ln">            connection.executemany(</span>
+<span class="ln">                'INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)',</span>
+<span class="ln">                [tuple(row[key] for key in FIELDS) for row in quotes])</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def read_quotes(path):</span>
+<span class="ln">    # mode=rw prevents an accidental empty database on a missing path.</span>
+<span class="ln">    connection = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=rw', uri=True)</span>
+<span class="ln">    connection.row_factory = sqlite3.Row</span>
+<span class="ln">    try:</span>
+<span class="ln">        rows = connection.execute('SELECT * FROM quotes ORDER BY code').fetchall()</span>
+<span class="ln">        return [parse_row({key: str(row[key]) for key in FIELDS}) for row in rows]</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def read_quotes(path):</span>
+<span class="ln">    # Read-only connection prevents a request from creating an empty DB by accident.</span>
+<span class="ln">    connection = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True)</span>
+<span class="ln">    try:</span>
+<span class="ln">        connection.row_factory = sqlite3.Row</span>
+<span class="ln">        rows = connection.execute('SELECT * FROM quotes ORDER BY code').fetchall()</span>
+<span class="ln">        return [parse_row({key: str(row[key]) for key in FIELDS}) for row in rows]</span>
+<span class="ln">    finally:</span>
+<span class="ln">        connection.close()</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample4/logic.py">
+      <summary>logic.py <span class="muted src-lines" data-lines="65"><span lang="en">65 lines</span><span lang="ko">65줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; prices are integer KRW.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;KOSPI&quot;, &quot;KOSDAQ&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if len(code) != 6 or not code.isascii() or not code.isdigit():</span>
+<span class="ln">        raise ValueError(&quot;code must be six ASCII digits&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and KOSPI/KOSDAQ market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, KOSPI or KOSDAQ&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample4/storage.py">
+      <summary>storage.py <span class="muted src-lines" data-lines="23"><span lang="en">23 lines</span><span lang="ko">23줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CSV input and atomic HTML output; all file I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample4/data/prices.csv">
+      <summary>data/prices.csv <span class="muted src-lines" data-lines="6"><span lang="en">6 lines</span><span lang="ko">6줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/web/sample4/README.md">
+      <summary>README.md <span class="muted src-lines" data-lines="51"><span lang="en">51 lines</span><span lang="ko">51줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln"># Sample 4: SQLite 주가 저장·분석</span>
+<span class="ln"> </span>
+<span class="ln">Python 3.10 이상과 Flask를 사용합니다. 이 폴더만 복사해도 실행할 수 있습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실행</span>
+<span class="ln"> </span>
+<span class="ln">저장소 루트에서:</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd Sample/sample4</span>
+<span class="ln">python3 -m venv .venv</span>
+<span class="ln">source .venv/bin/activate</span>
+<span class="ln">python -m pip install -r requirements.txt</span>
+<span class="ln">flask --app app init-db</span>
+<span class="ln">python app.py</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">Windows PowerShell에서는 활성화 명령을 `.venv\Scripts\Activate.ps1`로 바꿉니다.</span>
+<span class="ln">브라우저에서 http://127.0.0.1:5004 을 엽니다. Ctrl+C로 종료합니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실습 흐름</span>
+<span class="ln"> </span>
+<span class="ln">1. `data/prices.csv`를 확인합니다. 모든 수치는 2026-11-05 기준 **가상 수업 데이터**입니다.</span>
+<span class="ln">2. 웹에서 시장을 선택하여 등락률 순위와 상승·하락·보합 수를 비교합니다.</span>
+<span class="ln">3. CSV의 종가를 바꾸어 다시 조회합니다. SQLite 예제는 변경 후 `flask --app app init-db`로 다시 가져와야 반영됩니다.</span>
+<span class="ln">4. 0인 가격이나 중복 코드를 넣고 오류 처리를 확인합니다.</span>
+<span class="ln"> </span>
+<span class="ln">등락률 = (종가 − 전일 종가) / 전일 종가 × 100. 같은 가격 기준을 사용하며,</span>
+<span class="ln">계산값은 유지하고 화면에서만 소수 둘째 자리로 표시합니다.</span>
+<span class="ln">평균은 선택된 종목의 동일 가중 표본 평균이며 시장 지수 수익률이 아닙니다.</span>
+<span class="ln"> </span>
+<span class="ln">`app.py`: HTTP 요청과 오류 처리 → `storage.py`: CSV 읽기 → `logic.py`: 검증·분석 → `templates/index.html`: Jinja 렌더링.</span>
+<span class="ln">Jinja 자동 escaping을 사용하며 종목명에 HTML을 넣어도 실행하지 않습니다.</span>
+<span class="ln">헤더만 있는 CSV는 유효한 빈 표본(평균 N/A), 파일 누락은 오류입니다.</span>
+<span class="ln"> </span>
+<span class="ln">한국 가격은 정수 원(KRW), 거래량은 정수 주입니다. 005930 같은 코드를 문자열로 유지합니다. ALL 평균 +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</span>
+<span class="ln"> </span>
+<span class="ln">## SQLite</span>
+<span class="ln"> </span>
+<span class="ln">`database.py`가 Python 표준 라이브러리 sqlite3를 사용합니다. 별도 DB 서버가 필요 없습니다.</span>
+<span class="ln">`flask --app app init-db`가 CSV 전체를 검증한 후 `instance/market.sqlite3`를 만듭니다.</span>
+<span class="ln">웹 요청은 CSV 대신 SQLite를 조회합니다. 초기화 전에는 안내 오류를 보여 줍니다.</span>
+<span class="ln">재실행하면 기존 스냅샷을 한 트랜잭션에서 교체하며, 검증/쓰기 실패 시 기존 데이터가 보존됩니다.</span>
+<span class="ln">SQL에는 매개변수 바인딩을 사용합니다. 종목 코드는 TEXT 기본키입니다.</span>
+<span class="ln">이 예제는 단일 날짜 스냅샷 저장이며 여러 날짜의 가격 이력은 저장하지 않습니다.</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">python -m sqlite3 instance/market.sqlite3 &quot;SELECT code, name, close FROM quotes;&quot;</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">위 조회 CLI는 Python 3.12 이상에서 사용할 수 있습니다.</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-flask">
+      <h2 class="notes-title"><span lang="en">Extending the project into a Flask web app</span><span lang="ko">Flask 웹 앱으로 확장하기</span></h2>
+<div lang="en">
+<p>The stock MVP from the 'Building a Project' chapter was a command-line program: it read a CSV (<code>storage.py</code>), validated and analyzed it (<code>logic.py</code>) and wrote an HTML report to a file (<code>report.py</code>). These examples move the same flow into a Flask web app. Instead of writing a report file, the app reads and analyzes the data each time a browser sends a request and builds the HTML on the spot. First learn how to start a server and send it requests with <a href="#ex=flask_hello">flask_hello</a>, the smallest app with two routes; then <a href="#ex=sample2_korea">sample2_korea</a>, the closest to the lecture, then <a href="#ex=sample1_us">sample1_us</a> with a different currency and code format, and finish with <a href="#ex=sample4_sqlite">sample4_sqlite</a>, which stores the data in SQLite. All numbers are fictional class data for 2026-11-05, not live prices.</p>
+
+<h2>The smallest Flask app</h2>
+
+<p>A Flask app is an <code>app</code> object made with <code>Flask(__name__)</code>, with connections (routes) attached that say "when a request comes to this address, run this function". The string the function returns becomes the response HTML.</p>
+
+<pre><code>from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.get("/")
+def home():
+    return "&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;"
+
+@app.get("/hello")
+def hello():
+    name = request.args.get("name", "world")
+    return f"&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;"</code></pre>
+
+<ul>
+<li><code>@app.get("/hello")</code>: connects GET requests for the address <code>/hello</code> to <code>hello()</code>.</li>
+<li><code>request.args.get("name", "world")</code>: reads the value from the <code>?name=Mina</code> part of the address (the query string), with a default when it is missing.</li>
+<li><code>escape(name)</code>: replaces special characters in a value the user sent before it goes into the HTML, so a tag they typed is not run.</li>
+<li>For an address with no route, Flask answers 404 (Not Found).</li>
+</ul>
+
+<p>The stock apps below have the same structure, except that they use a template file instead of building strings, and split the work across several files.</p>
+
+<h2>Project structure</h2>
+
+<p>All three projects are split into the same four parts. Each file does one job, so you can change the page or the way data is stored without touching the other files.</p>
+
+<table>
+<thead><tr><th>File</th><th>Job</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>Receives HTTP requests, turns errors into status codes (400, 500) and renders the template</td></tr>
+<tr><td><code>storage.py</code></td><td>Reads the CSV. All file I/O lives here</td></tr>
+<tr><td><code>logic.py</code></td><td>Validates one row (<code>parse_row</code>), filters by market and sorts by change (<code>analyze</code>), and summarizes (<code>summarize</code>). Pure functions with no I/O</td></tr>
+<tr><td><code>templates/index.html</code></td><td>The Jinja template that draws the table and the summary</td></tr>
+</tbody>
+</table>
+
+<p>sample4 has one more file, <code>database.py</code>, for SQLite.</p>
+
+<h2>Routes and query strings</h2>
+
+<p><code>@app.get('/')</code> connects GET requests for the address <code>/</code> to the function <code>index()</code>. The chosen market arrives in the query string after the address, <code>?market=KOSPI</code>, and is read with <code>request.args.get('market', 'ALL')</code>. Without a value it defaults to <code>ALL</code>.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>Note that error handling splits into two branches. When the <strong>input</strong> is wrong, such as an unknown market name or a bad CSV row, a <code>ValueError</code> is raised and the app answers 400 (Bad Request). When the problem is on the <strong>server</strong> side, such as an unreadable data file, it answers 500. Either way the program does not crash; it returns a page with the error message.</p>
+
+<h2>Calculation rules</h2>
+
+<p>The change is (close − previous close) / previous close × 100. The computed value is kept unrounded and shown with two decimal places only on screen. The mean is an equal-weight sample mean of the selected stocks, so it is not a market index return. A CSV with only a header is a valid empty sample and shows the mean as N/A, but a missing file is an error.</p>
+
+<ul>
+<li>Korean stocks (sample2, sample4): prices are whole won and volumes whole shares. Codes such as <code>005930</code> are handled as strings to keep the leading 0. Means: ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%.</li>
+<li>US stocks (sample1): prices are stored as whole <strong>cents</strong> and converted to USD on screen (<code>scale=100</code>). The markets are NASDAQ/NYSE and codes are uppercase tickers. The ALL mean is +0.40%.</li>
+</ul>
+
+<h2>Jinja auto-escaping</h2>
+
+<p>Jinja, Flask's template engine, automatically replaces HTML special characters when it prints a value such as <code>{{ row.name }}</code>. So even if a stock name contains a tag like <code>&lt;script&gt;</code>, it is not executed but printed literally as <code>&amp;lt;script&amp;gt;</code>. That is why we don't write code that pastes data straight into the page ourselves.</p>
+
+<h2>Storing data in SQLite (sample4)</h2>
+
+<p>sample4 draws the page from an SQLite database instead of the CSV. Loading the data is not done by a web request but by a separate command, <code>flask --app app init-db</code>, registered with <code>@app.cli.command('init-db')</code>.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>Validate first</strong>: <code>import_snapshot()</code> validates every row before deleting the existing ones. Bad data such as a duplicate code is rejected before the database is touched.</li>
+<li><strong>One transaction</strong>: the delete and the inserts are committed together inside <code>with connection:</code>, so if anything fails the previous data stays.</li>
+<li><strong>Read-only connection</strong>: <code>read_quotes()</code> opens the file with <code>mode=ro</code>. When the database file is missing it fails instead of creating an empty database, and the page tells you to run init-db first.</li>
+<li>After editing the CSV, import it again with <code>init-db</code> to see the change on the page.</li>
+</ul>
+
+<p><code>database.py</code> defines <code>read_quotes()</code> twice. In Python the later definition replaces the earlier one, so the one actually used is the second (<code>mode=ro</code>).</p>
+
+<h2>Running it in this web lab</h2>
+
+<p>On a real PC you create a virtual environment for each project, install Flask with <code>pip install -r requirements.txt</code>, run <code>python app.py</code> and open an address such as <code>http://127.0.0.1:5002</code> in your browser. The virtual machine in this web lab already has Flask, but it has no network link to your browser, so your browser cannot reach its server. Instead, use the lab's helper command <code>web</code>. When <code>web start</code> starts the server, the <strong>App preview</strong> panel opens under the terminal. It plays the browser's role: click a link, or choose a market in a form and press 조회 (Search), and the request goes to the server inside the virtual machine and the answer is drawn again. You can also type an address such as <code>/?market=KOSPI</code> in the address box above it and press Open. When the server stops, the panel is dimmed.</p>
+
+<p>The preview panel exchanges requests and answers as files through the shared folder <code>/mnt/host/.web</code>, so each request takes about 0.2–1 second. The app's CSS and images are put into the answer, and JavaScript on the app's pages is not run.</p>
+
+<p><code>web start</code> runs <code>python3 app.py</code> as it is. There is only one terminal, though, so it runs the server in the background, together with the relay that connects it to the preview panel. While the server runs, edit the code with <code>nano app.py</code> and save: the app restarts by itself and the preview panel redraws with the new code. If the edited code has an error, the panel shows the error message, and the app comes back once you fix it and save. The Flask packages are downloaded in one go the first time they are used, so the first <code>web start</code> takes a little longer.</p>
+
+<p>Commands you can use in the terminal:</p>
+
+<table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>web start</code></td><td>Starts <code>app.py</code> in the current directory as a server and waits until it is ready (about 10 seconds); the preview panel then opens</td></tr>
+<tr><td><code>web show /</code></td><td>Shows an address in the preview panel</td></tr>
+<tr><td><code>web get /</code></td><td>Sends a request and shows the status code and the page as text; tables are shown one row per line, split by <code>|</code></td></tr>
+<tr><td><code>web get '/?market=KOSPI'</code></td><td>Put an address with a query string in single quotes</td></tr>
+<tr><td><code>web html /</code></td><td>Shows the raw HTML</td></tr>
+<tr><td><code>web save file.html</code></td><td>Saves the page, CSS included, in <code>/mnt/host</code>. Type its name in the box above and press <strong>Download</strong> to open it in your own browser</td></tr>
+<tr><td><code>web log</code></td><td>The server log (address and status code of each request)</td></tr>
+<tr><td><code>web restart</code></td><td>Restarts the app. Usually not needed: while the server runs, saving a <code>.py</code>, template or CSS file restarts it by itself</td></tr>
+<tr><td><code>web stop</code></td><td>Stops the server</td></tr>
+</tbody>
+</table>
+
+<p>sample3, which uses the Naver news API, needs an external network and is not included in this lab.</p>
+</div><div lang="ko">
+<p>'프로젝트 만들기' 장에서 만든 주가 MVP는 CSV를 읽고(<code>storage.py</code>), 검증·분석하고(<code>logic.py</code>), HTML 보고서를 파일로 쓰는(<code>report.py</code>) 명령행 프로그램이었습니다. 이 예제들은 같은 흐름을 Flask 웹 앱으로 옮깁니다. 파일로 보고서를 쓰는 대신, 브라우저의 요청이 올 때마다 데이터를 읽고 분석해 그 자리에서 HTML을 만들어 돌려줍니다. 먼저 라우트 두 개짜리 가장 작은 앱 <a href="#ex=flask_hello">flask_hello</a>로 서버를 띄우고 요청하는 방법을 익힌 뒤, 강의와 가장 가까운 <a href="#ex=sample2_korea">sample2_korea</a>, 통화와 종목 코드가 다른 <a href="#ex=sample1_us">sample1_us</a>, 데이터를 SQLite에 저장하는 <a href="#ex=sample4_sqlite">sample4_sqlite</a> 순서입니다. 모든 수치는 2026-11-05 기준 가상 수업 데이터이며 실시간 시세가 아닙니다.</p>
+
+<h2>가장 작은 Flask 앱</h2>
+
+<p>Flask 앱은 <code>Flask(__name__)</code>로 만든 <code>app</code> 객체에 "이 주소로 요청이 오면 이 함수를 실행하라"는 연결(라우트)을 붙인 것입니다. 함수가 돌려준 문자열이 그대로 응답 HTML이 됩니다.</p>
+
+<pre><code>from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.get("/")
+def home():
+    return "&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;"
+
+@app.get("/hello")
+def hello():
+    name = request.args.get("name", "world")
+    return f"&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;"</code></pre>
+
+<ul>
+<li><code>@app.get("/hello")</code>: 주소 <code>/hello</code>로 오는 GET 요청을 <code>hello()</code>에 연결합니다.</li>
+<li><code>request.args.get("name", "world")</code>: 주소의 <code>?name=Mina</code> 부분(쿼리 문자열)에서 값을 읽고, 없으면 기본값을 씁니다.</li>
+<li><code>escape(name)</code>: 사용자가 보낸 값을 HTML에 넣기 전에 특수 문자를 바꿔, 입력한 태그가 실행되지 않게 합니다.</li>
+<li>연결되지 않은 주소에는 Flask가 404(Not Found)로 답합니다.</li>
+</ul>
+
+<p>아래의 주식 앱들도 같은 구조입니다. 다만 문자열을 직접 만드는 대신 템플릿 파일을 쓰고, 일을 여러 파일로 나눕니다.</p>
+
+<h2>프로젝트 구조</h2>
+
+<p>세 프로젝트는 모두 같은 네 부분으로 나뉩니다. 각 파일이 한 가지 일만 하므로, 화면을 바꾸거나 데이터 저장 방식을 바꿀 때 다른 파일은 그대로 둘 수 있습니다.</p>
+
+<table>
+<thead><tr><th>파일</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>HTTP 요청을 받고, 오류를 상태 코드(400, 500)로 바꾸고, 템플릿을 렌더링한다</td></tr>
+<tr><td><code>storage.py</code></td><td>CSV를 읽는다. 파일 입출력은 여기에만 있다</td></tr>
+<tr><td><code>logic.py</code></td><td>한 행을 검증하고(<code>parse_row</code>), 시장으로 거르고 등락률 순으로 정렬하고(<code>analyze</code>), 요약한다(<code>summarize</code>). 입출력이 없는 순수 함수</td></tr>
+<tr><td><code>templates/index.html</code></td><td>Jinja 템플릿. 표와 요약을 그린다</td></tr>
+</tbody>
+</table>
+
+<p>sample4에는 SQLite를 다루는 <code>database.py</code>가 하나 더 있습니다.</p>
+
+<h2>라우트와 쿼리 문자열</h2>
+
+<p><code>@app.get('/')</code>는 주소 <code>/</code>로 오는 GET 요청을 <code>index()</code> 함수에 연결합니다. 시장 선택은 주소 뒤의 쿼리 문자열 <code>?market=KOSPI</code>로 전달되고, <code>request.args.get('market', 'ALL')</code>로 읽습니다. 값이 없으면 기본값 <code>ALL</code>입니다.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>오류 처리가 두 갈래로 나뉜다는 점이 중요합니다. 잘못된 시장 이름이나 잘못된 CSV 행처럼 <strong>입력</strong>이 문제면 <code>ValueError</code>가 나고 400(Bad Request)으로 응답합니다. 데이터 파일을 읽을 수 없는 것처럼 <strong>서버 쪽</strong>이 문제면 500으로 응답합니다. 어느 경우든 프로그램이 죽지 않고 오류 메시지를 담은 화면을 돌려줍니다.</p>
+
+<h2>계산 규칙</h2>
+
+<p>등락률은 (종가 − 전일 종가) / 전일 종가 × 100입니다. 계산값은 반올림하지 않고 유지하며, 화면에서만 소수 둘째 자리로 표시합니다. 평균은 선택된 종목들의 동일 가중 표본 평균이므로 시장 지수 수익률과는 다릅니다. 헤더만 있는 CSV는 유효한 빈 표본으로 보고 평균을 N/A로 표시하지만, 파일이 없으면 오류입니다.</p>
+
+<ul>
+<li>한국 주식(sample2, sample4): 가격은 정수 원, 거래량은 정수 주. <code>005930</code> 같은 코드는 앞의 0을 지키기 위해 문자열로 다룹니다. 평균은 ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</li>
+<li>미국 주식(sample1): 가격을 정수 <strong>센트</strong>로 저장하고 화면에서 USD로 바꿉니다(<code>scale=100</code>). 시장은 NASDAQ/NYSE, 코드는 대문자 티커입니다. ALL 평균은 +0.40%입니다.</li>
+</ul>
+
+<h2>Jinja 자동 escaping</h2>
+
+<p>Flask의 템플릿 엔진 Jinja는 <code>{{ row.name }}</code>처럼 값을 출력할 때 HTML 특수 문자를 자동으로 바꿉니다. 그래서 종목 이름에 <code>&lt;script&gt;</code> 같은 태그가 들어 있어도 실행되지 않고 글자 그대로 <code>&amp;lt;script&amp;gt;</code>로 출력됩니다. 데이터를 화면에 그대로 끼워 넣는 코드를 직접 짜지 않는 이유입니다.</p>
+
+<h2>SQLite에 저장하기 (sample4)</h2>
+
+<p>sample4는 화면을 CSV가 아니라 SQLite 데이터베이스에서 읽습니다. 데이터를 넣는 일은 웹 요청이 아니라 별도의 명령 <code>flask --app app init-db</code>가 맡습니다. 이 명령은 <code>@app.cli.command('init-db')</code>로 등록되어 있습니다.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>검증이 먼저</strong>: <code>import_snapshot()</code>은 모든 행을 검증한 뒤에 기존 행을 지웁니다. 중복 코드 같은 잘못된 데이터는 DB에 손대기 전에 거부됩니다.</li>
+<li><strong>한 트랜잭션</strong>: 삭제와 삽입이 <code>with connection:</code> 안에서 한 번에 커밋되므로, 중간에 실패해도 직전 데이터가 그대로 남습니다.</li>
+<li><strong>읽기 전용 연결</strong>: <code>read_quotes()</code>는 <code>mode=ro</code>로 엽니다. DB 파일이 없을 때 빈 DB를 새로 만들어 버리지 않고 오류를 내므로, 화면은 "먼저 init-db를 실행하세요"라고 안내합니다.</li>
+<li>CSV를 고친 뒤에는 <code>init-db</code>로 다시 가져와야 화면에 반영됩니다.</li>
+</ul>
+
+<p><code>database.py</code>에는 <code>read_quotes()</code>가 두 번 정의되어 있습니다. Python에서는 나중 정의가 앞의 것을 덮어쓰므로 실제로 쓰이는 것은 두 번째(<code>mode=ro</code>) 정의입니다.</p>
+
+<h2>이 웹 실습에서 실행하기</h2>
+
+<p>실제 PC에서는 프로젝트마다 가상환경을 만들고 <code>pip install -r requirements.txt</code>로 Flask를 설치한 뒤 <code>python app.py</code>로 실행하고, 브라우저에서 <code>http://127.0.0.1:5002</code> 같은 주소를 엽니다. 이 웹 실습의 가상 머신에는 Flask가 이미 들어 있지만, 내 브라우저와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수는 없습니다. 대신 실습용 도우미 명령 <code>web</code>을 씁니다. <code>web start</code>로 서버를 띄우면 터미널 아래에 <strong>앱 미리보기</strong> 창이 열립니다. 이 창이 브라우저 역할을 해서, 링크를 누르거나 폼에서 시장을 고르고 조회를 누르면 요청이 가상 머신 안의 서버로 전달되고 응답 화면이 다시 그려집니다. 창 위의 주소 칸에 <code>/?market=KOSPI</code> 같은 주소를 넣고 열기를 눌러도 됩니다. 서버를 끄면 창이 흐려집니다.</p>
+
+<p>미리보기 창은 공유 폴더 <code>/mnt/host/.web</code>를 통해 요청과 응답을 파일로 주고받으므로, 요청 하나에 0.2~1초쯤 걸립니다. 앱의 CSS와 그림은 응답에 함께 넣어 보여 주고, 앱 페이지의 JavaScript는 실행하지 않습니다.</p>
+
+<p><code>web start</code>는 안에서 <code>python3 app.py</code>를 그대로 실행합니다. 다만 터미널이 하나뿐이라 서버를 백그라운드로 돌리고, 미리보기 창과 이어 주는 중계 프로그램을 함께 띄웁니다. 서버가 켜진 동안 <code>nano app.py</code>로 코드를 고쳐 저장하면 앱이 저절로 다시 시작되고 미리보기 창이 새 코드로 다시 그려집니다. 고친 코드에 오류가 있으면 미리보기 창에 오류 메시지가 나오고, 고쳐 저장하면 다시 살아납니다. Flask 패키지는 처음 쓸 때 한 번에 내려받으므로 첫 <code>web start</code>는 조금 더 걸립니다.</p>
+
+<p>터미널에서 쓸 수 있는 명령은 다음과 같습니다.</p>
+
+<table>
+<thead><tr><th>명령</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td><code>web start</code></td><td>현재 디렉터리의 <code>app.py</code>를 서버로 띄우고 준비될 때까지 기다린다 (10초 정도). 준비되면 미리보기 창이 열린다</td></tr>
+<tr><td><code>web show /</code></td><td>주소를 미리보기 창에 띄운다</td></tr>
+<tr><td><code>web get /</code></td><td>주소로 요청을 보내고 상태 코드와 화면 내용을 글자로 보여 준다. 표는 한 행씩 <code>|</code>로 나눠 보인다</td></tr>
+<tr><td><code>web get '/?market=KOSPI'</code></td><td>쿼리 문자열이 있는 주소는 작은따옴표로 감싼다</td></tr>
+<tr><td><code>web html /</code></td><td>HTML 원문을 그대로 보여 준다</td></tr>
+<tr><td><code>web save 파일.html</code></td><td>화면을 CSS까지 담아 <code>/mnt/host</code>에 저장한다. 위 입력란에 이름을 적고 <strong>받기</strong>를 누르면 내 브라우저에서 열어 볼 수 있다</td></tr>
+<tr><td><code>web log</code></td><td>서버 로그 (요청마다 주소와 상태 코드)</td></tr>
+<tr><td><code>web restart</code></td><td>앱을 다시 시작한다. 보통은 필요 없다: 서버가 켜진 동안 <code>.py</code>·템플릿·CSS 파일을 고쳐 저장하면 저절로 다시 시작한다</td></tr>
+<tr><td><code>web stop</code></td><td>서버를 끈다</td></tr>
+</tbody>
+</table>
+
+<p>네이버 뉴스 API를 쓰는 sample3은 외부 네트워크가 필요하므로 이 실습에는 넣지 않았습니다.</p>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

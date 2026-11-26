@@ -18,8 +18,10 @@ null::sysinit:/bin/ln -sf /proc/self/fd/2 /dev/stderr
 #   /mnt/host -> 9p/host   files uploaded from (and downloaded to) the page
 #   /opt/py   -> 9p/py     pandas, matplotlib, numpy ...
 ::sysinit:/bin/sh -c 'mount -t 9p -o trans=virtio,version=9p2000.L host9p /mnt/9p 2>/dev/null && chmod 777 /mnt/9p/host || echo "host9p: not available (pandas/matplotlib and file upload disabled)"'
-# Forget the app preview of a previous boot (see /usr/local/bin/web)
-::sysinit:/bin/rm -rf /mnt/9p/host/.web
+# Forget the app preview (see /usr/local/bin/web) and the source copies of a previous boot
+::sysinit:/bin/rm -rf /mnt/9p/host/.web /mnt/9p/host/.src /mnt/9p/host/.srcwatch
+# Copies the files shown under "Source" on the page when they change
+null::respawn:/bin/nice -n 10 /usr/local/bin/lab-srcwatch
 
 # Serial console = terminal on the web page (and automated tests);
 # VGA console kept as a spare root shell.

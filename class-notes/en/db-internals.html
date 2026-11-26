@@ -1,0 +1,149 @@
+<p>This lesson is an introduction adapted from the first unit of a Database Systems course. Starting from storing data, we draw the whole map, up to systems that handle sharing, change and failure. We answer three questions. Why is it needed (what goes wrong when files are all you have)? What does it look like (models, schemas and query languages hide the details)? What happens inside (storage, query and transaction modules handle each request)? "SQLite: Your First Database" gave the short answer to the first question; this lesson is the whole map. Some of the concepts are collected in <a href="db_internals.html">db_internals</a> so you can look at them directly with that lesson's market.db.</p>
+
+<h2>ACT 1 · Why it is needed</h2>
+
+<h3>A database is shared memory</h3>
+
+<p>When repeated work is shared among many people, you need a database. Customers, products, payments, payroll, stock. Accounts, courses, bookings, call records, routes. The work differs, but the core need is the same: an accurate state has to be shared for a long time.</p>
+
+<h3>Files fail at sharing and failure</h3>
+
+<p>A file stores data, but it cannot manage business rules or concurrency.</p>
+
+<ul>
+<li>Every new need takes a new program.</li>
+<li>Data sits isolated in many files and formats.</li>
+<li>Rules hide all over the code, so change is hard.</li>
+</ul>
+
+<h3>A DBMS keeps shared state safe</h3>
+
+<p>Shared data + explicit rules + consistent execution.</p>
+
+<ul>
+<li><strong>Structure</strong>: declare schemas and relationships.</li>
+<li><strong>Access</strong>: find the data you need with queries.</li>
+<li><strong>Protection</strong>: apply permissions and integrity rules.</li>
+<li><strong>Recovery</strong>: keep the state through concurrent runs and failures.</li>
+</ul>
+
+<p>A DBMS is not a pile of files. It is a system that guards shared state.</p>
+
+<h2>ACT 2 · Model: what it looks like</h2>
+
+<h3>A data model translates reality</h3>
+
+<p>A data model says four things: data, relationships, meaning and constraints. It says more than what is stored: it says how things connect and which rules they keep. Older models include the network and hierarchical models.</p>
+
+<h3>The relational model uses tables</h3>
+
+<p>A relation is a table. A column is an attribute, with its kind and its meaning; a row is one record, also called a tuple. The tables and their relationships carry the meaning of the data. Ted Codd proposed this model, and he received the Turing Award in 1981.</p>
+
+<h3>Linked tables make one world</h3>
+
+<p>The instructor table and the department table hold different facts. A department's building and budget are not repeated for every instructor. To combine the two tables, follow <code>dept_name</code>. Store separately; combine by following relationships. In <a href="db_internals.html">db_internals</a> you can build small instructor and department tables and combine them (JOIN) on dept_name.</p>
+
+<h3>Three levels hide complexity</h3>
+
+<ul>
+<li><strong>View level</strong>: the part each user needs.</li>
+<li><strong>Logical level</strong>: the logical structure of all the data.</li>
+<li><strong>Physical level</strong>: how files, pages and indexes actually store it.</li>
+</ul>
+
+<p>Each level hides the complexity of the one below.</p>
+
+<h3>Schema is design, instance is now</h3>
+
+<p>The schema is the structure; the instance is the content at one moment. The schema is which tables and attributes exist and how they relate, like a type in a program. The instance changes as rows are added, changed and deleted, like a variable's current value. Physical data independence means the storage can change while the logical schema stays the same. In <a href="db_internals.html">db_internals</a> you can see that deleting rows changes the instance (the row count) but not the schema (the column list), and that after adding an index to change how the data is stored, the same SQL gives the same result.</p>
+
+<h3>DDL declares structure and rules</h3>
+
+<pre><code>CREATE TABLE instructor (
+    ID        CHAR(5),
+    name      VARCHAR(20),
+    dept_name VARCHAR(20),
+    salary    NUMERIC(8,2)
+);</code></pre>
+
+<p>DDL (Data Definition Language) defines table structure and data types, keys and integrity constraints, and access permissions. These definitions are stored as metadata in the data dictionary. In SQLite, <code>sqlite_master</code> plays that role, and it holds the quotes definition created from the <code>schema.sql</code> in "SQLite: Your First Database" (<a href="db_internals.html">db_internals</a>).</p>
+
+<h3>SQL asks for the result you want</h3>
+
+<pre><code>SELECT name
+FROM instructor
+WHERE dept_name = 'Comp. Sci.';</code></pre>
+
+<p>SQL is declarative: say what you need, and the DBMS finds the way. Tables go in and a table comes out. The result in this example is the names of the instructors in the Comp. Sci. department. SQL is the most widely used commercial query language.</p>
+
+<h3>SQL is one part of an application</h3>
+
+<p>The host language (Java, Python, C/C++) handles input, screens and networks, and SQL handles data. The interfaces between them include embedded SQL, ODBC and JDBC; for us, it is the <code>sqlite3</code> module. The database runs the SQL. Nobody builds a whole application in SQL; it is the language for the data layer.</p>
+
+<h2>ACT 3 · Engine: what happens inside</h2>
+
+<h3>Three jobs inside the engine</h3>
+
+<p>Where to store it, how to compute it, how to trust it.</p>
+
+<ul>
+<li><strong>Storage manager</strong>: sits between the operating system's files and the data.</li>
+<li><strong>Query processor</strong>: picks a low-cost plan and runs it.</li>
+<li><strong>Transaction manager</strong>: keeps consistency through failures and concurrent runs.</li>
+</ul>
+
+<h3>From query to result</h3>
+
+<p>The execution plan decides the performance. First, parsing and translation turn SQL into an internal form; in optimization, the lowest-cost plan is chosen; in evaluation, the execution engine produces the result. In SQLite you can see the chosen plan with <code>EXPLAIN QUERY PLAN</code>. Searching by the primary key gives a SEARCH that uses an index; searching by a column without an index gives a SCAN that reads the whole table (<a href="db_internals.html">db_internals</a>).</p>
+
+<h3>A transaction is all or nothing</h3>
+
+<p>A transaction is a group of operations that performs one logical function. In a bank transfer, the withdrawal and the deposit both finish, or both are cancelled. If two users read a balance of 100 and each withdraw 50, the orders can collide; the concurrency controller arranges the order. Failure recovery and concurrency control together give shared state you can trust. Unlike the lost update reproduced with a file in "SQLite: Your First Database", in the last step of <a href="db_internals.html">db_internals</a> you see that when two connections try to change the same row at the same time, SQLite blocks the second write with <code>database is locked</code> and accepts it only after the first has committed, so both changes are applied. The <code>with con</code> in "From CSV to SQLite" showed the all-or-nothing nature of transactions.</p>
+
+<h3>Architecture follows scale</h3>
+
+<p>The architecture depends on where the work runs and how much work there is.</p>
+
+<ul>
+<li><strong>Centralized</strong>: one system does the work.</li>
+<li><strong>Client-server</strong>: one server, many clients.</li>
+<li><strong>Parallel</strong>: many cores or nodes work together.</li>
+<li><strong>Distributed</strong>: data is spread over several locations.</li>
+</ul>
+
+<p>Choose by throughput, latency, scalability, failure scope and data location. The SQLite we use is an embedded engine that runs inside the application and writes a single file.</p>
+
+<h3>Two tiers or three</h3>
+
+<p>The difference is where the responsibilities sit. In a two-tier architecture, the client calls the database server directly. In a three-tier architecture, an application server in between holds the business rules and the data access. In the "Web Apps with Flask" chapter, Flask becomes our application server.</p>
+
+<h2>ACT 4 · People and history</h2>
+
+<h3>Different users, different access</h3>
+
+<ul>
+<li><strong>Naive users</strong>: use ready-made applications.</li>
+<li><strong>Application developers</strong>: write database applications.</li>
+<li><strong>Sophisticated users</strong>: use query languages and analysis tools.</li>
+<li><strong>Specialized users</strong>: CAD, graphics, audio, video.</li>
+</ul>
+
+<p>The DBA (database administrator) has central control of the whole system and is responsible for running it.</p>
+
+<h3>Databases grew with workloads</h3>
+
+<p>Each decade brought new hardware and new workloads, and storage and scale changed. Even so, the relational core of relations and queries survived all of these changes.</p>
+
+<h2>Today's core: a DBMS manages boundaries</h2>
+
+<p>Five boundaries, one system.</p>
+
+<ol>
+<li><strong>File and shared state</strong>: it controls redundancy, concurrency and failure.</li>
+<li><strong>Reality and data model</strong>: it expresses relationships and constraints as structure.</li>
+<li><strong>Logical and physical</strong>: data independence limits the effect of change.</li>
+<li><strong>Request and execution</strong>: it turns SQL into a plan and optimizes it.</li>
+<li><strong>User and system</strong>: it separates application layers, permissions and operations.</li>
+</ol>
+
+<p>Next, we work with the relational model and SQL in practice, using SQLite.</p>

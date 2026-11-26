@@ -110,9 +110,9 @@ docker run --rm \
 		fi
 
 		cp -R /src/rootfs/overlay/. "$R"/
-		# Course code: course/weekNN -> ~/weekNN, course/sample -> ~/sample
+		# Course code in topic folders (course-layout.json): course/<topic> -> ~/<topic>
 		cp -R /src/course/. "$R/home/student/"
-		chmod 755 "$R/init" "$R/sbin/lab-shell" "$R/usr/bin/flask" "$R/usr/local/bin/web"
+		chmod 755 "$R/init" "$R/sbin/lab-shell" "$R/usr/bin/flask" "$R/usr/local/bin/web" "$R/usr/local/bin/lab-srcwatch"
 		mkdir -p "$R"/proc "$R"/sys "$R"/dev "$R"/tmp "$R"/run "$R"/mnt/9p "$R"/root "$R"/opt
 		ln -sfn 9p/host "$R/mnt/host"
 		ln -sfn /mnt/9p/py "$R/opt/py"

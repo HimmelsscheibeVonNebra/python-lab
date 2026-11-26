@@ -1,0 +1,433 @@
+<p>This chapter is about regular expressions (regex for short). A regular expression is a small language for writing down the <em>shape</em> of text, such as "three digits, a dash, four digits". Once the shape is written down, Python's <code>re</code> module can find it (<code>search</code>, <code>findall</code>), split text on it (<code>split</code>) and rewrite it (<code>sub</code>). We start by seeing where <code>in</code> and <code>split</code> run out of steam, learn the pattern syntax piece by piece with a small test bench, and then move on to groups and substitution, input validation and its limits, analysing a web server log, and processing Korean text. The practice programs are <a href="first_search.html">first_search</a>, <a href="try_pattern.html">try_pattern</a>, <a href="reformat.html">reformat</a>, <a href="validate.html">validate</a>, <a href="log_report.html">log_report</a> and <a href="hangul.html">hangul</a>.</p>
+
+<h2>Why Regular Expressions?</h2>
+
+<h3>Where in and split Fall Short</h3>
+
+<p>The string methods <code>strip</code>, <code>lower</code>, <code>split</code> and <code>in</code> are enough when you are dealing with fixed characters. But once you need to find a <em>shape</em> rather than fixed characters, as in "find every mobile number starting with 010", the code grows quickly. <code>"010-" in text</code> only tells you yes or no, and after splitting into words with <code>split</code> you still have to remove brackets and commas, split again on the dash, and check each piece's length and digits.</p>
+
+<pre><code>found = []
+for word in text.replace("(", " ").replace(",", " ").split():
+    word = word.strip(".")
+    parts = word.split("-")
+    if (len(parts) == 3 and parts[0] == "010"
+            and len(parts[1]) == 4 and len(parts[2]) == 4
+            and parts[1].isdigit() and parts[2].isdigit()):
+        found.append(word)</code></pre>
+
+<p>With a regular expression the same job is one line describing the shape. <code>\d</code> is one digit and <code>{4}</code> means "four times".</p>
+
+<pre><code>import re
+
+pattern = r"010-\d{4}-\d{4}"
+print(re.findall(pattern, text))   # ['010-1234-5678', '010-9876-5432']</code></pre>
+
+<p>A regex is not always the answer. For finding fixed text or splitting on spaces, <code>in</code>, <code>startswith</code> and <code>split</code> are easier to read and faster. Reach for a regex when the text has a shape: numbers, dates, log lines.</p>
+
+<h3>Raw Strings r"..."</h3>
+
+<p>Regular expressions are full of backslashes: <code>\d</code>, <code>\w</code>, <code>\b</code>. In an ordinary string, though, Python interprets backslashes first: <code>"\n"</code> becomes one newline character and <code>"\b"</code> one backspace character. A raw string, with an <code>r</code> in front, leaves backslashes alone. That is why patterns are <strong>always</strong> written as <code>r"..."</code>.</p>
+
+<pre><code>print(len("\n"), len(r"\n"))    # 1 2
+print("C:\temp\new")            # \t is a tab, \n a newline: the path breaks
+print(r"C:\temp\new")           # C:\temp\new</code></pre>
+
+<p>Forget the r and Python 3.14 prints <code>SyntaxWarning: "\d" is an invalid escape sequence</code>. It happens to work for now, but it is going to become an error. You can see the warning yourself in the third step of <a href="first_search.html">first_search</a>.</p>
+
+<h2>Functions of the re Module</h2>
+
+<h3>Finding: search, match, fullmatch</h3>
+
+<p>All three return a Match object when they match and <code>None</code> when they do not. They differ in <em>where</em> the match has to be.</p>
+
+<pre><code>import re
+
+s = "주문 010-1234-5678"
+print(re.search(r"\d+", s))            # &lt;re.Match object; span=(3, 6), match='010'&gt;
+print(re.match(r"\d+", s))             # None: only tries at the start
+print(re.fullmatch(r"\d+", "2026"))    # match: the whole string is digits
+print(re.fullmatch(r"\d+", "2026년"))  # None</code></pre>
+
+<p>On a Match object, <code>group()</code> is the matched text, <code>start()</code> and <code>end()</code> are positions, and <code>span()</code> is a tuple of the two. Like a slice, <code>end()</code> is the position <em>after</em> the match.</p>
+
+<pre><code>m = re.search(r"010-\d{4}-\d{4}", text)
+print(m.group(), m.start(), m.end())   # 010-1234-5678 4 17</code></pre>
+
+<h3>Checking for None</h3>
+
+<p>Call <code>m.group()</code> when nothing matched and you get <code>AttributeError: 'NoneType' object has no attribute 'group'</code>, the most common regex error of all. Check with <code>if m:</code> before using the result: a Match object is true and <code>None</code> is false.</p>
+
+<pre><code>m = re.search(r"\d+", text)
+if m:
+    print(m.group())
+else:
+    print("no number")</code></pre>
+
+<h3>Finding All: findall, finditer</h3>
+
+<p><code>findall</code> returns the matched strings as a list; <code>finditer</code> hands out Match objects one at a time. When you also need positions, use <code>finditer</code>.</p>
+
+<pre><code>text = "사과 3개, 배 12개, 귤 7개"
+print(re.findall(r"\d+", text))        # ['3', '12', '7']
+for m in re.finditer(r"\d+", text):
+    print(m.group(), m.span())         # 3 (3, 4)  12 (9, 11)  7 (16, 17)</code></pre>
+
+<h3>At a Glance</h3>
+
+<table>
+<thead>
+<tr><th>Function</th><th>What it does</th><th>Returns</th></tr>
+</thead>
+<tbody>
+<tr><td><code>re.search(p, s)</code></td><td>first match anywhere</td><td>Match or <code>None</code></td></tr>
+<tr><td><code>re.match(p, s)</code></td><td>only at the very start</td><td>Match or <code>None</code></td></tr>
+<tr><td><code>re.fullmatch(p, s)</code></td><td>the whole string must match</td><td>Match or <code>None</code></td></tr>
+<tr><td><code>re.findall(p, s)</code></td><td>every match</td><td>list of strings (or of groups, if any)</td></tr>
+<tr><td><code>re.finditer(p, s)</code></td><td>every match</td><td>iterator of Match objects</td></tr>
+<tr><td><code>re.sub(p, repl, s)</code></td><td>replace every match</td><td>a new string</td></tr>
+<tr><td><code>re.split(p, s)</code></td><td>split on the matches</td><td>list of strings</td></tr>
+<tr><td><code>re.compile(p, flags)</code></td><td>parse the pattern once</td><td>a Pattern object with the methods above</td></tr>
+</tbody>
+</table>
+
+<h2>Pattern Syntax</h2>
+
+<p><a href="try_pattern.html">try_pattern</a> is a test bench: give it a pattern and a sentence, and it wraps every match in <code>[ ]</code>. Put both arguments in single quotes so the shell leaves the special characters alone.</p>
+
+<pre><code>$ python3 try_pattern.py '\d+' 'Room 101, 2nd floor'
+pattern \d+
+  text   Room 101, 2nd floor
+  marked Room [101], [2]nd floor
+    5-8   '101'
+   10-11  '2'
+  2 match(es)</code></pre>
+
+<h3>Syntax Table</h3>
+
+<table>
+<thead>
+<tr><th>Pattern</th><th>Meaning</th><th>Example</th></tr>
+</thead>
+<tbody>
+<tr><td><code>abc</code></td><td>these characters literally</td><td><code>cat</code> matches "cat"</td></tr>
+<tr><td><code>.</code></td><td>any one character except a newline</td><td><code>3.14</code> also matches "3714"</td></tr>
+<tr><td><code>\.</code></td><td>a real full stop (escaping a special character)</td><td><code>3\.14</code></td></tr>
+<tr><td><code>\d</code> / <code>\D</code></td><td>a digit / anything but a digit</td><td><code>\d{4}</code></td></tr>
+<tr><td><code>\w</code> / <code>\W</code></td><td>letter, digit or underscore (Unicode) / anything else</td><td><code>\w+</code> matches "한글123"</td></tr>
+<tr><td><code>\s</code> / <code>\S</code></td><td>whitespace (space, tab, newline) / anything else</td><td><code>\s+</code></td></tr>
+<tr><td><code>[aeiou]</code></td><td>one character from the set</td><td>one vowel</td></tr>
+<tr><td><code>[a-z0-9]</code></td><td>a range</td><td>one lowercase letter or digit</td></tr>
+<tr><td><code>[^a-z ]</code></td><td>one character not in the set</td><td>neither a lowercase letter nor a space</td></tr>
+<tr><td><code>*</code> <code>+</code> <code>?</code></td><td>0 or more / 1 or more / 0 or 1</td><td><code>colou?r</code></td></tr>
+<tr><td><code>{n}</code> <code>{m,n}</code> <code>{m,}</code></td><td>exactly n / m to n / m or more</td><td><code>\d{3,4}</code></td></tr>
+<tr><td><code>*?</code> <code>+?</code> <code>??</code></td><td>non-greedy (as few as possible)</td><td><code>&lt;.+?&gt;</code></td></tr>
+<tr><td><code>^</code> <code>$</code></td><td>start / end of the string (positions)</td><td><code>^\d+</code></td></tr>
+<tr><td><code>\b</code></td><td>word boundary (a position)</td><td><code>\bcat\b</code></td></tr>
+<tr><td><code>a|b</code></td><td>a or b</td><td><code>cat|dog</code></td></tr>
+<tr><td><code>( )</code></td><td>group and capture</td><td><code>(\d{4})-(\d{2})</code></td></tr>
+<tr><td><code>(?: )</code></td><td>group without capturing</td><td><code>(?:ab)+</code></td></tr>
+<tr><td><code>(?P&lt;name&gt; )</code></td><td>named group</td><td><code>(?P&lt;year&gt;\d{4})</code></td></tr>
+<tr><td><code>\1</code></td><td>inside a pattern: the same text group 1 caught</td><td><code>(\w+) \1</code></td></tr>
+</tbody>
+</table>
+
+<h3>Character Classes</h3>
+
+<p>Square brackets mean "one character from this set". Inside, <code>-</code> writes a range, and a <code>^</code> right at the start negates the set. <code>\d</code>, <code>\w</code> and <code>\s</code> are shorthands for common classes; the capitals <code>\D</code>, <code>\W</code> and <code>\S</code> are their opposites. <code>\w</code> includes the underscore but not the hyphen, so <code>kebab-case</code> splits into two words.</p>
+
+<pre><code>$ python3 try_pattern.py '[^a-z ]' 'Hello, World 42!'
+  marked [H]ello[,] [W]orld [4][2][!]
+$ python3 try_pattern.py '\w+' 'snake_case, kebab-case, 한글123'
+  marked [snake_case], [kebab]-[case], [한글123]</code></pre>
+
+<h3>Quantifiers</h3>
+
+<p>A quantifier applies to the single character (or group) right before it: in <code>colou?r</code> the <code>?</code> applies only to the u. Quantifiers are <strong>greedy</strong> by default and take as much as they can, which is why <code>\d{3,4}</code> takes 1234 out of 12345.</p>
+
+<pre><code>$ python3 try_pattern.py '\d{3,4}' '12 123 1234 12345'
+  marked 12 [123] [1234] [1234]5</code></pre>
+
+<h3>Anchors and Word Boundaries</h3>
+
+<p><code>^</code>, <code>$</code> and <code>\b</code> match <em>positions</em>, not characters. <code>\b</code> sits between a word character and a non-word character (or the end of the string). Use it to find "cat" without the cat inside concat or cats.</p>
+
+<pre><code>$ python3 try_pattern.py '\bcat\b' 'cat concat cats cat.'
+  marked [cat] concat cats [cat].</code></pre>
+
+<h3>Greedy and Non-Greedy Matching</h3>
+
+<p>Looking for HTML tags with <code>&lt;.+&gt;</code>: it starts at the first <code>&lt;</code>, <code>.+</code> runs to the end of the sentence, and then it backs up one character at a time until it finds a <code>&gt;</code>. The result is the whole sentence up to the last <code>&gt;</code>. Put a <code>?</code> after the quantifier and it becomes non-greedy, stopping at the nearest <code>&gt;</code>.</p>
+
+<pre><code>$ python3 try_pattern.py '&lt;.+&gt;' '&lt;b&gt;bold&lt;/b&gt; and &lt;i&gt;it&lt;/i&gt;'
+  marked [&lt;b&gt;bold&lt;/b&gt; and &lt;i&gt;it&lt;/i&gt;]
+$ python3 try_pattern.py '&lt;.+?&gt;' '&lt;b&gt;bold&lt;/b&gt; and &lt;i&gt;it&lt;/i&gt;'
+  marked [&lt;b&gt;]bold[&lt;/b&gt;] and [&lt;i&gt;]it[&lt;/i&gt;]</code></pre>
+
+<p>An even more precise approach is to repeat "anything but the delimiter". <code>&lt;[^&gt;]+&gt;</code> repeats only characters that are not <code>&gt;</code>, so it never needs to back up. The <code>\[([^\]]+)\]</code> in the log pattern works the same way.</p>
+
+<h3>Or (|) and Brackets</h3>
+
+<p><code>|</code> has the lowest precedence, so <code>\bcat|dog\b</code> means "<code>\bcat</code> or <code>dog\b</code>". Use brackets to group it the way you mean: <code>\b(cat|dog)\b</code>.</p>
+
+<h2>Groups and Substitution</h2>
+
+<h3>Numbered and Named Groups</h3>
+
+<p>Whatever sits inside brackets can be pulled out separately. Groups are numbered 1, 2, 3 in the order of their opening brackets, and <code>group(0)</code> is the whole match. With many groups the numbers get confusing, so give them names with <code>(?P&lt;name&gt;...)</code> and read them with <code>m["name"]</code>. That is how <a href="reformat.html">reformat</a> takes apart the dates and phone numbers in <code>schedule.txt</code>.</p>
+
+<pre><code>DATE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+PHONE = re.compile(r"(?P&lt;head&gt;01[0-9])-(?P&lt;mid&gt;\d{3,4})-(?P&lt;last&gt;\d{4})")
+
+m = DATE.search(text)
+print(m.groups())                  # ('2026', '03', '02')
+year, month, day = m.groups()
+
+p = PHONE.search(text)
+print(p["mid"], p.group("last"))   # 1234 5678
+print(p.groupdict())               # {'head': '010', 'mid': '1234', 'last': '5678'}</code></pre>
+
+<h3>findall and Groups</h3>
+
+<p>When the pattern has groups, <code>findall</code> returns the <em>groups</em> instead of the whole match: the group's string if there is one group, tuples if there are several. To group without capturing, use <code>(?:...)</code>.</p>
+
+<pre><code>text = "2026-03-02, 2026-04-20"
+re.findall(r"\d{4}-\d{2}-\d{2}", text)          # ['2026-03-02', '2026-04-20']
+re.findall(r"(\d{4})-(\d{2})-(\d{2})", text)    # [('2026', '03', '02'), ('2026', '04', '20')]
+re.findall(r"(\d{4})-(?:\d{2})-(?:\d{2})", text)  # ['2026', '2026']</code></pre>
+
+<h3>re.sub with Backreferences</h3>
+
+<p><code>re.sub(pattern, replacement, string)</code> returns a new string with every match replaced. In the replacement, <code>\1</code> and <code>\2</code> stand for what the groups caught, and <code>\g&lt;name&gt;</code> for a named group. The replacement needs an r too: without it, <code>"\3"</code> becomes character code 3 and an invisible character is inserted.</p>
+
+<pre><code>print(DATE.sub(r"\3.\2.\1", "2026-03-02 개강"))   # 02.03.2026 개강
+
+date = re.compile(r"(?P&lt;y&gt;\d{4})-(?P&lt;m&gt;\d{2})-(?P&lt;d&gt;\d{2})")
+print(date.sub(r"\g&lt;d&gt;/\g&lt;m&gt;/\g&lt;y&gt;", "due 2026-06-15"))   # due 15/06/2026
+print(re.subn(r"\d", "#", "PIN 4821, room 301"))  # ('PIN ####, room ###', 7)</code></pre>
+
+<h3>re.sub with a Function</h3>
+
+<p>Pass a function as the replacement and it is called with the Match object for every match; the string it returns takes the match's place. Use this when the replacement differs from match to match. The function below prints as many <code>*</code> as the middle part has digits.</p>
+
+<pre><code>def mask(m):
+    return m["head"] + "-" + "*" * len(m["mid"]) + "-" + m["last"]
+
+print(PHONE.sub(mask, "담당 김민지 010-1234-5678"))   # 담당 김민지 010-****-5678</code></pre>
+
+<h3>re.split and Backreferences in a Pattern</h3>
+
+<p><code>str.split</code> knows only one separator; <code>re.split</code> uses a pattern as the separator. Inside a pattern, <code>\1</code> means "exactly the text group 1 caught", so you can find a word written twice in a row.</p>
+
+<pre><code>re.split(r"\s*[,;/]\s*", "사과, 배;귤  /감 ,  포도")   # ['사과', '배', '귤', '감', '포도']
+re.findall(r"\b(\w+) \1\b", "this is is a test test")  # ['is', 'test']</code></pre>
+
+<h2>compile and Flags</h2>
+
+<p><code>re.compile</code> parses a pattern once and keeps it as a Pattern object. The <code>re</code> module caches recent patterns, so the speed difference is small, but naming a reused pattern, as in <code>PHONE</code> or <code>DATE</code>, makes the code easier to read. Flags change how the pattern is interpreted and can be combined with <code>|</code> (<code>re.I | re.M</code>).</p>
+
+<table>
+<thead>
+<tr><th>Flag</th><th>Short</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code>re.IGNORECASE</code></td><td><code>re.I</code></td><td>match regardless of case</td></tr>
+<tr><td><code>re.MULTILINE</code></td><td><code>re.M</code></td><td><code>^</code> and <code>$</code> match at every line, not only the whole string</td></tr>
+<tr><td><code>re.VERBOSE</code></td><td><code>re.X</code></td><td>ignore whitespace and <code>#</code> comments in the pattern: long patterns over several lines</td></tr>
+<tr><td><code>re.ASCII</code></td><td><code>re.A</code></td><td><code>\w</code>, <code>\d</code>, <code>\b</code> cover ASCII characters only</td></tr>
+<tr><td><code>re.DOTALL</code></td><td><code>re.S</code></td><td><code>.</code> matches a newline too</td></tr>
+</tbody>
+</table>
+
+<p>Because <code>re.VERBOSE</code> ignores whitespace, a real space must be written as <code>\s</code> or <code>\ </code>. The email pattern in <a href="validate.html">validate</a> uses this flag to explain itself line by line.</p>
+
+<pre><code>EMAIL = re.compile(r"""
+    [\w.+-]+        # local part: letters, digits, . + -
+    @
+    [\w-]+          # first domain label
+    (\.[\w-]+)+     # one or more .labels: .com  .co.kr
+""", re.VERBOSE)</code></pre>
+
+<h2>Input Validation</h2>
+
+<h3>Check the Whole String with fullmatch</h3>
+
+<p><a href="validate.html">validate</a> reads "kind value" lines and judges mobile numbers, email addresses and dates. Validation must use <code>fullmatch</code>: <code>search</code> finds a match even with anything stuck before or after it. <code>^...$</code> looks similar, but <code>$</code> also matches just before a newline at the end of the string, so it lets <code>"123\n"</code> through.</p>
+
+<pre><code>PHONE = re.compile(r"01[016-9]-?\d{3,4}-?\d{4}")
+
+PHONE.search("tel:010-1234-5678 (call me)")   # match: wrong for validation
+PHONE.fullmatch("tel:010-1234-5678 (call me)")  # None
+re.match(r"^\d+$", "123\n")                    # match!
+re.fullmatch(r"\d+", "123\n")                  # None</code></pre>
+
+<pre><code>$ python3 validate.py &lt; samples.txt
+phone  010-1234-5678              ok
+phone  01012345678                ok
+phone  010-12-5678                invalid
+phone  02-123-4567                invalid
+email  user+tag@mail.co.kr        ok
+email  a@b                        invalid
+email  홍길동@예시.한국                  ok
+date   2026-02-30                 invalid (no such date)
+date   26-11-2026                 invalid (shape)
+...</code></pre>
+
+<h3>The Limits of Regex Validation</h3>
+
+<p>A regex checks the <strong>shape</strong> only. The results above show its limits:</p>
+
+<ul>
+<li>Dates: even a careful pattern that limits months to 01–12 and days to 01–31 accepts 2026-02-31. Putting the length of every month and leap years into a pattern would make it unreadable. So <code>validate.py</code> checks only the shape with a regex and lets <code>datetime.date(year, month, day)</code> decide whether the day exists (it raises <code>ValueError</code> if not).</li>
+<li>Email: the standard allows so many forms of address that a complete regex is practically unusable. A practical pattern only filters out clearly broken input; the real check is sending a confirmation message. Because <code>\w</code> is Unicode, 홍길동@예시.한국 passes too; whether to accept it is the program's decision.</li>
+<li>Phone numbers: the right shape does not mean the number is in service. With two <code>-?</code>, 010-12345678 (only one dash) passes as well. The more you allow, the more of these cases slip in.</li>
+</ul>
+
+<p>Remember the rule: check the shape with a regex and the meaning with code.</p>
+
+<h3>f-string Alignment and Hangul</h3>
+
+<p>The result table lines up its columns with <code>f"{kind:&lt;6} {value:&lt;26} {result}"</code>, yet the line with Korean is pushed out of line. Format specs count <em>characters</em>, but each Hangul character takes two columns in the terminal. A table of English letters and digits has no such problem; to align Korean text you would have to compute the display width yourself (<code>unicodedata.east_asian_width</code>).</p>
+
+<h2>A Log Analyzer</h2>
+
+<h3>Taking One Log Line Apart</h3>
+
+<p>A web server writes one log line per request. The <code>access.log</code> of <a href="log_report.html">log_report</a> has 40 lines like this:</p>
+
+<pre><code>192.168.0.12 - - [26/Nov/2026:09:18:05 +0900] "GET /static/app.js HTTP/1.1" 200 40213</code></pre>
+
+<p>Client IP, the time in square brackets, the request in quotes (method, path, protocol), status code, response size. <code>report.py</code> writes this shape over several lines with <code>re.VERBOSE</code> and names every part it needs.</p>
+
+<pre><code>LINE = re.compile(r"""
+    (?P&lt;ip&gt;\d{1,3}(?:\.\d{1,3}){3})       # 192.168.0.12
+    \s-\s-\s
+    \[(?P&lt;day&gt;[^:\]]+):(?P&lt;hour&gt;\d{2}):\d{2}:\d{2}[^\]]*\]\s
+    "(?P&lt;method&gt;[A-Z]+)\s(?P&lt;path&gt;\S+)\s[^"]*"\s
+    (?P&lt;status&gt;\d{3})\s
+    (?P&lt;size&gt;\d+|-)
+""", re.VERBOSE)</code></pre>
+
+<p>An IP is "1 to 3 digits, then (a dot and 1 to 3 digits) three times": the repeated part is grouped with <code>(?:...)</code> and given <code>{3}</code>. Inside the brackets and quotes, "anything but the closing symbol" (<code>[^\]]</code>, <code>[^"]</code>) avoids the greedy-matching trap.</p>
+
+<h3>Counting with Counter</h3>
+
+<p><code>collections.Counter</code> is a dictionary that counts "how many times per key". <code>+= 1</code> on a missing key is no error; it starts from 0. <code>most_common(n)</code> returns the n most frequent entries. Lines that do not fit are not allowed to stop the program; only their line numbers are recorded.</p>
+
+<pre><code>paths = Counter()
+bad = []
+with open(filename, encoding="utf-8") as f:
+    for number, line in enumerate(f, start=1):
+        m = LINE.match(line)
+        if not m:
+            bad.append(number)
+            continue
+        paths[m["path"]] += 1
+        ...
+print(paths.most_common(3))   # [('/index.html', 10), ('/static/app.js', 7), ('/api/items', 6)]</code></pre>
+
+<h3>An Aligned Report</h3>
+
+<p>Format specs line up the columns. <code>:&lt;16</code> left-aligns in 16 columns, <code>:&gt;5</code> right-aligns in 5, <code>:&gt;7.1%</code> multiplies by 100 and prints one decimal place and a % sign, right-aligned in 7 columns, and <code>:,</code> adds thousands separators. Numbers on the right and names on the left make a table easy to read.</p>
+
+<pre><code>def print_top(title, counter, n, total):
+    print(f"\nTop {n} {title}")
+    print(f"  {'':&lt;16} {'hits':&gt;5} {'share':&gt;7}")
+    for key, hits in counter.most_common(n):
+        print(f"  {key:&lt;16} {hits:&gt;5} {hits / total:&gt;7.1%}")</code></pre>
+
+<pre><code>$ python3 report.py access.log
+Requests : 38
+Skipped  : 2 line(s) [18, 31]
+Bytes    : 354,285
+Status   : 200x30, 403x1, 404x6, 500x1
+Per hour : 09h=15, 10h=14, 11h=9
+
+Top 3 paths
+                    hits   share
+  /index.html         10   26.3%
+  /static/app.js       7   18.4%
+  /api/items           6   15.8%
+...
+Errors (4xx/5xx): 8
+  line  3: 404 GET /favicon.ico
+  ...</code></pre>
+
+<p>Skipped line 18 is a note, not a request, and line 31 has the status <code>2OO</code> (the letter O). Real logs contain broken lines like these too, so counting and reporting them beats crashing.</p>
+
+<h3>MULTILINE and the Shell's grep</h3>
+
+<p>Read the whole file as one string and <code>^</code> matches only once, at the very start. You need <code>re.MULTILINE</code> for it to match at every line.</p>
+
+<pre><code>text = open("access.log", encoding="utf-8").read()
+ip = r"^\d+\.\d+\.\d+\.\d+"
+re.findall(ip, text)                     # ['192.168.0.12']: only the first line
+len(re.findall(ip, text, re.MULTILINE))  # 39</code></pre>
+
+<p>The shell's <code>grep</code> speaks regular expressions too: <code>grep -E '" [45][0-9]{2} ' access.log</code> shows the error lines straight away. The syntax of <code>grep -E</code> (extended regular expressions) has no <code>\d</code>, though, so write <code>[0-9]</code>. grep is handy for a quick look; Python is better for counting and building tables.</p>
+
+<h2>Korean Text</h2>
+
+<h3>The Unicode Range [가-힣]</h3>
+
+<p>The 11,172 precomposed Hangul syllables form one unbroken block of Unicode from U+AC00 (가) to U+D7A3 (힣), so <code>[가-힣]</code> alone covers every complete Hangul syllable. Single letters such as ㅋ and ㅠ (compatibility jamo) live in another block (U+3131–U+3163) and need their own class, <code>[ㄱ-ㅎㅏ-ㅣ]</code>.</p>
+
+<pre><code>print(hex(ord("가")), hex(ord("힣")))          # 0xac00 0xd7a3
+re.findall(r"[가-힣]", "한글 ㅎㅏㄴ 漢字 abc")       # ['한', '글']
+re.findall(r"[ㄱ-ㅎㅏ-ㅣ]", "한글 ㅎㅏㄴ 漢字 abc")   # ['ㅎ', 'ㅏ', 'ㄴ']</code></pre>
+
+<p><a href="hangul.html">hangul</a> picks Hangul words, jamo (ㅋㅋㅋ, ㅠㅠ), English words and star ratings out of product reviews, and builds clean sentences with the symbols and jamo removed.</p>
+
+<pre><code>HANGUL_WORD = re.compile(r"[가-힣]+")
+JAMO_RUN = re.compile(r"[ㄱ-ㅎㅏ-ㅣ]+")
+ENGLISH = re.compile(r"[a-z]+", re.IGNORECASE)
+RATING = re.compile(r"별점\s*(\d)점")
+
+cleaned = JAMO_RUN.sub("", text)
+cleaned = re.sub(r"[^가-힣A-Za-z0-9\s]", "", cleaned)   # keep Hangul, letters, digits, spaces</code></pre>
+
+<h3>\w Is Unicode</h3>
+
+<p>In Python 3, <code>\w</code>, <code>\d</code> and <code>\b</code> in str patterns follow Unicode: Hangul and accented letters such as ï are word characters. If you want English letters and digits only, pass <code>re.ASCII</code> or spell it out as <code>[A-Za-z0-9_]</code>.</p>
+
+<pre><code>re.findall(r"\w+", "파이썬3 최고! naïve_code")            # ['파이썬3', '최고', 'naïve_code']
+re.findall(r"\w+", "파이썬3 최고! naïve_code", re.ASCII)  # ['3', 'na', 've_code']</code></pre>
+
+<h3>A Limit: Particles Cannot Be Told by Shape</h3>
+
+<p>To count "배송이" and "배송은" as the same word, you might write a pattern that strips the particle at the end. It works for 배송이, 품질은, 포장도 and 고기를, but cuts "나이" (age) down to "나": whether a final "이" is a particle or part of the word cannot be told from the shape alone. Analysing Korean words is a job for a morphological analyser with a dictionary; regexes are for the clean-up before that (removing symbols, picking out numbers and jamo).</p>
+
+<pre><code>josa = re.compile(r"([가-힣]+?)(은|는|이|가|을|를|도)?")
+for w in ["배송이", "품질은", "포장도", "고기를", "나이"]:
+    print(w, "-&gt;", josa.fullmatch(w)[1])   # 배송 품질 포장 고기 나(!)</code></pre>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li><strong>Leaving out the r.</strong> <code>"\b"</code> is a backspace character, not a word boundary. Write both patterns and replacements as <code>r"..."</code>.</li>
+<li><strong>Not checking for None.</strong> Chaining <code>re.search(...).group()</code> raises <code>AttributeError</code> when nothing matches.</li>
+<li><strong>Validating with search or match.</strong> To check the whole input, use <code>fullmatch</code>.</li>
+<li><strong>Not escaping the dot.</strong> <code>.</code> is any character. A real full stop is <code>\.</code> (or <code>[.]</code> inside brackets).</li>
+<li><strong>Being surprised by a greedy <code>.*</code>.</strong> Use <code>.*?</code> or <code>[^delimiter]*</code>.</li>
+<li><strong>Forgetting that findall returns groups.</strong> To group without capturing, use <code>(?:...)</code>.</li>
+<li><strong>Trying to do everything with a regex.</strong> Whether a date exists or an email arrives is checked with code and other means. For nested structures like HTML or JSON, use a real parser (<code>html.parser</code>, <code>json</code>).</li>
+</ul>
+
+<h2>Summary and Exercises</h2>
+
+<ul>
+<li>A regular expression is a language for the shape of text; the <code>re</code> module finds it (search, findall, finditer), checks it (fullmatch), splits on it (split) and rewrites it (sub).</li>
+<li>Character classes say "which character", quantifiers "how many times", anchors "where".</li>
+<li>Groups pull out parts of a match; backreferences and functions rewrite them.</li>
+<li>Give frequently used patterns a name with <code>re.compile</code>, and comment long ones with <code>re.VERBOSE</code>.</li>
+</ul>
+
+<p>Exercises:</p>
+
+<ol>
+<li>With <a href="try_pattern.html">try_pattern</a>, write a pattern that catches just the year, month and day numbers in "2026년 11월 26일". Then write one that catches each number together with its unit, such as "11월".</li>
+<li>Add a <code>zip</code> kind (a five-digit postcode) to <code>validate.py</code>. One more function in the <code>CHECKS</code> dictionary is all it takes.</li>
+<li>Add a count per method (GET, POST) to <code>report.py</code>. The <code>method</code> group already exists, so one Counter and one line of output are enough.</li>
+<li>Change the pattern in <code>hangul.py</code> so that it finds only runs of three or more "ㅋ" (hint: <code>{3,}</code>).</li>
+</ol>
+
+<p>The full syntax is in the official Python documentation: the <a href="https://docs.python.org/3/library/re.html">re module</a> and the <a href="https://docs.python.org/3/howto/regex.html">Regular Expression HOWTO</a>.</p>

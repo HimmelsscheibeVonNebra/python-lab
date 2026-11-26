@@ -1,0 +1,419 @@
+<p>This topic is concurrency. Much of what programs do is not computing but waiting: for a web page to arrive, for a file to be read, for the user to type. If a program does something else while it waits, the same work can finish in far less time. First we use <code>threading</code> to create threads and overlap waits, and look at the race conditions that appear when several threads change the same value, and at <code>Lock</code>. Then we cover the producer/consumer pattern with <code>queue.Queue</code>, <code>concurrent.futures</code>, which manages threads for you, and <code>asyncio</code>, which handles many waits on a single thread. Finally we build an asyncio TCP echo server. The practice pages are <a href="threads.html">threads</a>, <a href="race_lock.html">race_lock</a>, <a href="producer_consumer.html">producer_consumer</a>, <a href="thread_pool.html">thread_pool</a>, <a href="asyncio_basics.html">asyncio_basics</a> and <a href="echo_server.html">echo_server</a>.</p>
+
+<h2>What concurrency is: overlapping waits</h2>
+
+<h3>The barista</h3>
+
+<p>Say a barista takes an order for three coffees. If they stand by the machine for the minute it takes to brew one cup and only then start the next, it takes three minutes. If they put the first cup on, then the second and third right away, it takes about one minute. There is still one barista with two hands. The only change is that the waiting times overlap. That is concurrency.</p>
+
+<p>With three baristas, three people really move their hands at the same time. That is parallelism. Concurrency means <em>dealing with several tasks at once by taking turns</em>; parallelism means <em>actually running several tasks at the same instant</em>. Running in parallel needs several CPU cores.</p>
+
+<h3>I/O-bound and CPU-bound work</h3>
+
+<p>Whether a task can get faster depends on what it spends its time on.</p>
+
+<table>
+<thead>
+<tr><th>Kind</th><th>Time goes into</th><th>Examples</th><th>With threads or asyncio</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O-bound</td><td>waiting for the outside world: network, disk, the user</td><td>downloads, database queries, a server answering clients</td><td>the waits overlap, so it gets faster</td></tr>
+<tr><td>CPU-bound</td><td>computing</td><td>counting primes, image processing, big matrix products</td><td>no faster on one core</td></tr>
+</tbody>
+</table>
+
+<p>In this lab, <code>time.sleep</code> stands in for a real network wait. A sleeping thread does not use the CPU, so it behaves just like a real I/O wait.</p>
+
+<h3>About this virtual machine</h3>
+
+<p>The virtual machine in your browser has <strong>one</strong> CPU core, and because it is emulated it is much slower than a real PC. <code>os.cpu_count()</code> returns 1. Examples that overlap waits therefore speed up exactly as they would on a PC, but pure computation does not get faster whether you split it into threads or processes. The section on CPU-bound work below explains what changes on a PC with several cores.</p>
+
+<h2>threading: creating threads</h2>
+
+<h3>What a thread is</h3>
+
+<p>A thread is a separate flow of execution inside one program (process). A program starts with a single main thread. New threads see the same memory (the same variables, the same objects) while each runs its own function. While one thread waits in <code>time.sleep</code> or a network read, other threads run.</p>
+
+<h3>Thread, start, join</h3>
+
+<p><code>threading.Thread(target=function, args=(argument,))</code> creates a thread object, <code>start()</code> sets it going and <code>join()</code> waits for it to finish. Here is the heart of the <a href="threads.html">threads</a> example.</p>
+
+<pre><code>import threading
+import time
+
+def download(name):
+    print(f"  start {name}")
+    time.sleep(1.0)             # waiting: this thread sleeps, the CPU is free
+    print(f"  done  {name}")
+
+threads = [threading.Thread(target=download, args=(name,)) for name in FILES]
+for t in threads:
+    t.start()                   # starts running download(name) in the background
+for t in threads:
+    t.join()                    # waits until that thread has finished</code></pre>
+
+<p>Splitting the starting and the waiting into two loops matters. If you call <code>join()</code> right after <code>start()</code> in the same loop, the second thread does not start until the first has finished, which is the same as running them one by one. Start them all, then wait for them all.</p>
+
+<h3>Measuring time: time.perf_counter</h3>
+
+<p>Measure elapsed time with <code>time.perf_counter()</code>. Its value by itself means nothing; the difference between two calls is the number of seconds in between. It is not affected by changes to the clock, which makes it right for measurements. Measurements vary a little from run to run, so the examples round them with <code>round()</code> and print things like "about 1 s".</p>
+
+<pre><code>start = time.perf_counter()
+func()
+elapsed = time.perf_counter() - start
+print(f"about {round(elapsed)} s")</code></pre>
+
+<pre><code>sequential: about 3 s
+threaded: about 1 s</code></pre>
+
+<p>In the threaded run the three start lines come first, followed by the three done lines. Which thread prints first is up to the operating system, so the order can change between runs. Never write code that depends on the order in which threads print.</p>
+
+<h3>Getting results out of a thread</h3>
+
+<p>The <code>return</code> value of a thread's function is thrown away. If you need results, put them in a dictionary or list that all threads can see, and read it after <code>join()</code> has confirmed they are all done. Right after <code>start()</code> it is still empty. <code>concurrent.futures</code>, below, is the more convenient way to get results back.</p>
+
+<pre><code>results = {}
+
+def work(name, seconds):
+    time.sleep(seconds)
+    results[name] = seconds      # each thread writes its own key
+
+# ... start all, then join all ...
+print(results)</code></pre>
+
+<h3>Without join</h3>
+
+<p>Without <code>join()</code>, the main thread does not wait for the threads and moves straight on. The program still does not vanish before the work is done, because Python ends the process only when every non-daemon thread has finished. A daemon thread, created with <code>Thread(..., daemon=True)</code>, is stopped when the main thread ends. Wherever you need the results, always <code>join()</code> first.</p>
+
+<h2>Shared state and race conditions</h2>
+
+<h3>Disappearing deposits</h3>
+
+<p>Threads share memory, which is convenient, and that is exactly what makes them dangerous. In the <a href="race_lock.html">race_lock</a> example, four threads each add 1 to a single <code>balance</code> 1000 times. The result should be 4000.</p>
+
+<pre><code>def deposit(times):
+    global balance
+    for _ in range(times):
+        current = balance          # 1. read
+        time.sleep(0)              # 2. pause: another thread may run now
+        balance = current + 1      # 3. write back (maybe a stale value)</code></pre>
+
+<pre><code>without lock: expected 4000, got 1001
+lost updates: 2999</code></pre>
+
+<p>When two threads A and B take turns, this happens:</p>
+
+<table>
+<thead>
+<tr><th>Step</th><th>Thread A</th><th>Thread B</th><th>balance</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><code>current = balance</code> (10)</td><td></td><td>10</td></tr>
+<tr><td>2</td><td></td><td><code>current = balance</code> (10)</td><td>10</td></tr>
+<tr><td>3</td><td><code>balance = 11</code></td><td></td><td>11</td></tr>
+<tr><td>4</td><td></td><td><code>balance = 11</code></td><td>11</td></tr>
+</tbody>
+</table>
+
+<p>Two deposits were made but the value went up by only 1, because B read the old value before A wrote. When the result depends on the order in which threads happen to run, that is a race condition. There is no error message, and some runs happen to come out right, which makes these bugs hard to find. The <code>time.sleep(0)</code> in the example deliberately hands over the turn between the read and the write so that the problem shows up every time.</p>
+
+<h3>One line is not safe either</h3>
+
+<p><code>counter += 1</code> is one line but not one action. Looking at the bytecode with <code>dis.dis</code> shows it split into a read, an add and a write.</p>
+
+<pre><code>LOAD_GLOBAL              0 (counter)
+LOAD_SMALL_INT           1
+BINARY_OP               13 (+=)
+STORE_GLOBAL             0 (counter)</code></pre>
+
+<p>On the lab machine, doing plain <code>counter += 1</code> 400,000 times with no sleep usually gives exactly 400000, because today's CPython rarely switches threads in the middle of such short code. But that is an accident of the implementation, not a promise of the language. A different version, slightly longer code, or a build without the GIL running on several cores can give a wrong value. A correct result is not proof that the code is safe.</p>
+
+<h3>threading.Lock</h3>
+
+<p>A <code>Lock</code> is a key that only one thread can hold at a time. Entering a <code>with lock:</code> block takes the key (acquire) and leaving it gives the key back (release). If another thread holds the key, you wait until it is returned. Even if an exception happens inside the block, <code>with</code> gives the key back, so it is safer than calling <code>acquire()</code> and <code>release()</code> yourself.</p>
+
+<pre><code>lock = threading.Lock()
+
+def deposit(times):
+    global balance
+    for _ in range(times):
+        with lock:                 # only one thread at a time in here
+            current = balance
+            time.sleep(0)
+            balance = current + 1</code></pre>
+
+<pre><code>with lock: expected 4000, got 4000
+correct</code></pre>
+
+<p>Keep the part inside the lock (the critical section) down to the minimum that reads and changes the shared value. If you wait for a long time inside the lock, every other thread stops too and the threads gain you nothing.</p>
+
+<h3>Deadlock</h3>
+
+<p>A <code>Lock</code> cannot be taken again even by the thread that already holds it. If a thread inside <code>with lock:</code> tries to take <code>lock</code> again, it waits for itself forever. The same happens when two threads each wait for the other's lock. This is called a deadlock. The example uses <code>lock.acquire(timeout=1)</code> to wait for just one second and see <code>False</code>. When the same thread needs to take a lock several times, use <code>threading.RLock</code>. If you use several locks, make every thread take them in the same order.</p>
+
+<h2>queue.Queue: producers and consumers</h2>
+
+<h3>The safest way to share work</h3>
+
+<p>Instead of guarding shared variables with locks, have threads pass messages to each other; there is less room for mistakes. A <code>queue.Queue</code> is a first-in, first-out line that many threads can use at the same time safely. The side that creates work (the producer) puts items in with <code>put()</code>, and the side that handles it (the consumer) takes them out with <code>get()</code>. The queue does the locking itself.</p>
+
+<table>
+<thead>
+<tr><th>Method</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>q.put(item)</code></td><td>adds an item; if <code>maxsize</code> is reached, waits until there is room</td></tr>
+<tr><td><code>q.get()</code></td><td>takes out the oldest item; if the queue is empty, waits until one arrives</td></tr>
+<tr><td><code>q.get(timeout=1)</code></td><td>waits at most 1 second, then raises <code>queue.Empty</code></td></tr>
+<tr><td><code>q.put_nowait(item)</code></td><td>does not wait; raises <code>queue.Full</code> if the queue is full</td></tr>
+<tr><td><code>q.qsize()</code></td><td>how many items are in it right now (other threads may change that at any moment)</td></tr>
+</tbody>
+</table>
+
+<h3>The waiter and the cooks</h3>
+
+<p>In <code>kitchen.py</code> from <a href="producer_consumer.html">producer_consumer</a>, a waiter thread puts orders into a queue, and two cook threads take them out one at a time and cook each for 0.5 seconds.</p>
+
+<pre><code>orders = queue.Queue(maxsize=3)   # the counter holds at most 3 tickets
+
+def waiter():
+    for dish in ORDERS:
+        orders.put(dish)              # blocks while the counter is full
+    for _ in range(COOKS):
+        orders.put(None)              # one stop signal per cook
+
+def cook(name):
+    while True:
+        dish = orders.get()           # blocks until there is an order
+        if dish is None:
+            break
+        time.sleep(COOK_TIME)
+        served.put((dish, name))</code></pre>
+
+<p>The cooks keep taking orders in a <code>while True</code> loop, so they need some way to learn that the work is over. Here the waiter puts one <code>None</code> per cook, and a cook who takes out <code>None</code> leaves the loop. A special value like this is called a sentinel. With only one sentinel, only one cook would stop; the other would wait in <code>get()</code> forever and the program would never end.</p>
+
+<p><code>maxsize=3</code> limits the size of the queue. When the producer is faster than the consumers, it pauses the producer so that work does not pile up in memory without end (backpressure). When you run it, you can see the waiter stop after five orders until a dish is finished.</p>
+
+<pre><code>served 6 dishes: bibimbap, japchae, kimbap, mandu, ramen, tteokbokki
+2 cooks: about 1.5 s (one cook would need 3.0 s)</code></pre>
+
+<p>With three cooks it takes about 1.0 s. Only the number of consumers changes; the producer code stays the same. The list of results is printed with <code>sorted()</code> because which dish finishes first can change from run to run. Queues also offer <code>task_done()</code> and <code>join()</code> for "wait until everything that was put in has been handled".</p>
+
+<h2>concurrent.futures: thread pools</h2>
+
+<h3>ThreadPoolExecutor and map</h3>
+
+<p>Creating threads, starting them, waiting for them and collecting results looks much the same every time. <code>concurrent.futures.ThreadPoolExecutor</code> keeps a few worker threads ready (a pool), shares out the jobs you give it and hands back the results. Leaving the <code>with</code> block waits for all jobs to finish and cleans up the threads.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    for result in pool.map(fetch, PAGES):
+        print("  got", result)</code></pre>
+
+<p><code>pool.map(function, inputs)</code> is used like the built-in <code>map</code> but runs in several threads. Results come out <strong>in the order of the inputs</strong>. If home, which takes 1.5 seconds, is the first input, then news, done after 0.5 seconds, still waits for home and comes out second. You get the function's return value directly, so no shared dictionary is needed.</p>
+
+<h3>submit, Future, as_completed</h3>
+
+<p><code>pool.submit(function, argument)</code> hands over one job and immediately returns a <code>Future</code>, a receipt for a result that will come later. <code>future.result()</code> waits for the result and returns it. <code>as_completed(futures)</code> yields the futures one by one <strong>in the order they finish</strong>. Use it when you want to handle whichever result is ready first.</p>
+
+<pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    futures = [pool.submit(fetch, page) for page in PAGES]
+    for future in as_completed(futures):
+        print("  got", future.result())</code></pre>
+
+<pre><code>map: results in the order of the inputs
+  got home.html
+  got news.html
+  got about.html
+submit + as_completed: results in the order they finish
+  got news.html
+  got about.html
+  got home.html
+total: about 3 s (one by one: 6 s)</code></pre>
+
+<h3>Exceptions inside jobs</h3>
+
+<p>When a worker thread raises an exception, nothing shows at that moment. The exception is stored in the Future and raised again when you call <code>future.result()</code>, which is why that call is wrapped in <code>try</code>. If you never call <code>result()</code>, the exception disappears silently, so watch out.</p>
+
+<pre><code>for n, future in zip(range(1, 5), futures):
+    try:
+        print(n, "->", future.result())
+    except ValueError as error:
+        print(n, "-> error:", error)</code></pre>
+
+<h3>max_workers</h3>
+
+<p><code>max_workers</code> is the number of threads working at once. With 1 it is the same as one by one, and more workers than jobs does not help. For work that is mostly waiting, even dozens of workers are fine, but it is polite to keep the number reasonable so you do not hit someone else's server with too many requests at once.</p>
+
+<h2>CPU-bound work, the GIL and processes</h2>
+
+<h3>Why computation does not get faster</h3>
+
+<p><code>cpu_pool.py</code> splits a pure computation, counting primes, into four chunks and runs them one by one, in a thread pool and in a process pool. Here is the result on this virtual machine (the seconds change from run to run).</p>
+
+<pre><code>CPU cores: 1
+one by one 1862 primes  0.7 s
+threads    1862 primes  0.7 s
+processes  1862 primes  3.3 s
+threads: about the same as one by one
+processes: slower than one by one</code></pre>
+
+<p>With one core, only one computation can run at a time. Threads and processes just take turns, and the total amount of computing stays the same. The processes are even slower, because starting new Python processes and passing data to and from them adds its own cost.</p>
+
+<h3>The GIL</h3>
+
+<p>Even on a PC with several cores, splitting computation across threads does not speed it up in standard CPython. A lock called the GIL (Global Interpreter Lock) means that only one thread in a process runs Python code at any moment. Threads do release the GIL while they wait, in <code>time.sleep</code>, file reads or socket reads, which is why I/O-bound work overlaps well in threads. Since Python 3.13 there is also a separate free-threaded build without the GIL, in which threads can compute together on several cores, but the default install is still the build with the GIL. The Python in this virtual machine has the GIL enabled too.</p>
+
+<h3>ProcessPoolExecutor</h3>
+
+<p>The standard way to spread computation over several cores is processes. Each process has its own interpreter and its own GIL, so as many can compute at once as there are cores. <code>ProcessPoolExecutor</code> is used just like <code>ThreadPoolExecutor</code>.</p>
+
+<pre><code>from concurrent.futures import ProcessPoolExecutor
+
+def main():
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        total = sum(pool.map(count_primes, CHUNKS))
+
+if __name__ == "__main__":   # required: worker processes import this file
+    main()</code></pre>
+
+<p>There are some differences. The worker processes import this file to find <code>count_primes</code>, so the <code>if __name__ == "__main__":</code> guard is required and the code has to live in a file (code fed through standard input with <code>python3 -</code> cannot be imported, so it fails). Arguments and results are copied between processes, so they must be values that pickle can convert, and big ones are slow to send. Processes do not share memory, so changing a global variable in one is invisible to the others. On a PC with several cores and a big enough job (at least tens of milliseconds per chunk), a process pool runs faster than one by one by a factor close to the number of cores. If the job is too small, starting the processes costs more than it saves, even on a PC.</p>
+
+<table>
+<thead>
+<tr><th></th><th>One core (this virtual machine)</th><th>PC with several cores</th></tr>
+</thead>
+<tbody>
+<tr><td>I/O-bound + threads/asyncio</td><td>faster</td><td>faster</td></tr>
+<tr><td>CPU-bound + threads</td><td>no change</td><td>no change (GIL); can be faster on a free-threaded build</td></tr>
+<tr><td>CPU-bound + processes</td><td>even slower</td><td>faster if the job is big enough</td></tr>
+</tbody>
+</table>
+
+<h2>asyncio: overlapping waits on one thread</h2>
+
+<h3>Coroutines and the event loop</h3>
+
+<p>The operating system can switch threads at any moment, so with threads you always have to watch for race conditions. <code>asyncio</code> works differently. There is one thread, and it moves on to other work only at the points where a function itself says "I am waiting here" (<code>await</code>). A function defined with <code>async def</code> is a coroutine function, and the manager that runs coroutines in turn is the event loop. <code>asyncio.run(main())</code> starts the event loop and runs it until <code>main()</code> finishes.</p>
+
+<pre><code>import asyncio
+
+async def brew(drink, seconds):
+    print(f"  start {drink}")
+    await asyncio.sleep(seconds)     # pause here; other coroutines run meanwhile
+    print(f"  done  {drink}")
+    return f"{drink} ({seconds} s)"
+
+async def together():
+    return await asyncio.gather(brew("coffee", 1), brew("tea", 1), brew("cocoa", 1))
+
+asyncio.run(together())</code></pre>
+
+<h3>Awaiting one at a time vs gather</h3>
+
+<p>Writing <code>await brew(...)</code> three times in a row starts each one only after the previous one has finished, so it takes 3 seconds. Passing several coroutines to <code>asyncio.gather(...)</code> runs them all together, and when they are all done it returns their results as a list <strong>in the order you passed them</strong>. Here is the output of <a href="asyncio_basics.html">asyncio_basics</a>.</p>
+
+<pre><code>one after another: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 3 s
+gather: ['coffee (1 s)', 'tea (1 s)', 'cocoa (1 s)'] in about 1 s</code></pre>
+
+<h3>create_task and time limits</h3>
+
+<p><code>asyncio.create_task(coroutine)</code> puts the coroutine on the event loop right away and returns a Task. The caller carries on without waiting and later gets the result with <code>await task</code> when it needs it. Give waits that might never get an answer a time limit with <code>async with asyncio.timeout(seconds):</code>. When the time is up, the awaited work is cancelled and <code>TimeoutError</code> is raised.</p>
+
+<pre><code>task = asyncio.create_task(slow())
+try:
+    async with asyncio.timeout(0.5):
+        await task
+except TimeoutError:
+    print("gave up after 0.5 s, task cancelled:", task.cancelled())</code></pre>
+
+<h3>Two asyncio traps</h3>
+
+<p>First, if you forget <code>await</code>, nothing happens. Just calling a coroutine function does not run its body; it only creates a coroutine object. Such a coroutine shows up later as the warning <code>RuntimeWarning: coroutine 'hello' was never awaited</code>.</p>
+
+<p>Second, calling an ordinary function that waits, such as <code>time.sleep()</code>, inside a coroutine stops the whole event loop. There is no <code>await</code> point, so there is no chance to switch to another coroutine. In the example, even under <code>gather</code>, <code>bad</code> takes about 3 s while <code>good</code>, which uses <code>asyncio.sleep</code>, takes about 1 s. Inside coroutines, use awaitable functions such as <code>asyncio.sleep</code> and <code>asyncio.open_connection</code>. If you really must call an ordinary function that waits, run it in a separate thread with <code>await asyncio.to_thread(function, argument)</code>.</p>
+
+<h2>An asyncio TCP echo server</h2>
+
+<h3>The server: start_server</h3>
+
+<p>asyncio shines brightest in network servers that handle many connections at once. Most clients are quiet most of the time, so one thread can move from connection to connection, handling only the data that has arrived. <code>echo_server.py</code> in <a href="echo_server.html">echo_server</a> is a server that sends each line it receives back in capitals.</p>
+
+<pre><code>async def handle(reader, writer):
+    """Called once per connection; echoes each line back in capitals."""
+    while True:
+        line = await reader.readline()        # b"" when the client hangs up
+        if not line:
+            break
+        writer.write(line.upper())
+        await writer.drain()
+    writer.close()
+    await writer.wait_closed()
+
+server = await asyncio.start_server(handle, "127.0.0.1", 8765)</code></pre>
+
+<p><code>asyncio.start_server</code> starts a new <code>handle</code> coroutine for every connection that comes in and passes it a <code>reader</code> for reading and a <code>writer</code> for writing. <code>reader.readline()</code> waits until a line arrives, and returns the empty bytes <code>b""</code> when the other side hangs up. <code>writer.write()</code> only puts the data in a buffer; <code>await writer.drain()</code> waits until it can actually be sent. What travels over a socket is bytes, not strings, so convert with <code>encode()</code> and <code>decode()</code>.</p>
+
+<h3>The client: open_connection</h3>
+
+<pre><code>reader, writer = await asyncio.open_connection("127.0.0.1", port)
+writer.write(b"hi\n")
+await writer.drain()
+reply = await reader.readline()</code></pre>
+
+<p>Run without arguments, the example opens the server and runs three clients together with <code>gather</code>, all in one script. Port <code>0</code> lets the operating system pick a free port, so it cannot clash with other programs. Each client rests half a second between messages, and meanwhile the server answers the other clients: one thread handling three connections together.</p>
+
+<pre><code>client got: ['MINA: HI', 'MINA: BYE']
+client got: ['JUN: HELLO', 'JUN: SEE YOU']
+client got: ['SORA: HEY', 'SORA: LATER']</code></pre>
+
+<h3>A server in its own process</h3>
+
+<p><code>python3 echo_server.py serve &amp;</code> runs only the server, in the background on port 8765, and <code>echo_client.py</code>, a separate process, connects to it. <code>127.0.0.1</code> is the address that means "this machine" (loopback), so only programs on the same computer can connect. This server stops by itself after two clients or 30 seconds. Giving a practice server a way to end means a forgotten process never sits on the port. Connecting after the server has ended raises <code>ConnectionRefusedError</code>; the client catches it and prints <code>client: no server on 127.0.0.1:8765</code>.</p>
+
+<h2>Which one to choose</h2>
+
+<table>
+<thead>
+<tr><th>Tool</th><th>Good for</th><th>Watch out for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>threading.Thread</code></td><td>overlapping a few tasks that wait</td><td>guard shared values with a Lock; getting results back is clumsy</td></tr>
+<tr><td><code>queue.Queue</code></td><td>a flow split into a producing side and a handling side</td><td>send the consumers a stop signal</td></tr>
+<tr><td><code>ThreadPoolExecutor</code></td><td>I/O-bound work running one function on many inputs</td><td>exceptions come out of <code>result()</code></td></tr>
+<tr><td><code>asyncio</code></td><td>network programs with very many connections</td><td>every wait must be an await</td></tr>
+<tr><td><code>ProcessPoolExecutor</code></td><td>big computations on several cores</td><td>the <code>__main__</code> guard, copying costs, no gain on one core</td></tr>
+</tbody>
+</table>
+
+<p>Most of the time a <code>ThreadPoolExecutor</code> is simpler and safer than handling <code>Thread</code> yourself. If you already use libraries built on asyncio (web frameworks, network clients), go with asyncio. If a computation is slow, first improve the algorithm and data structures, and only then think about processes.</p>
+
+<h2>Common mistakes</h2>
+
+<ul>
+<li><strong><code>target=f(x)</code></strong>: calls the function right there. Write <code>target=f, args=(x,)</code>. With a single argument, <code>args=(x)</code> is not a tuple; add the comma: <code>(x,)</code>.</li>
+<li><strong><code>join()</code> right after <code>start()</code> in the loop</strong>: the same as running one by one. Start them all, then wait for them all.</li>
+<li><strong>Reading results before <code>join()</code></strong>: they are still empty or incomplete.</li>
+<li><strong>"It was right when I tested it"</strong>: race conditions show up only sometimes. Guard values that several threads change with a Lock, or pass them through a Queue.</li>
+<li><strong>Waiting a long time inside a lock, taking the same Lock twice</strong>: things slow down or deadlock.</li>
+<li><strong>Not sending the consumers a stop signal</strong>: <code>get()</code> waits forever and the program never ends.</li>
+<li><strong>Never calling <code>future.result()</code></strong>: exceptions inside jobs vanish silently.</li>
+<li><strong>Forgetting await, <code>time.sleep</code> inside a coroutine</strong>: the code does not run, or the whole event loop stops.</li>
+<li><strong>Trying to speed up computation with threads</strong>: the GIL prevents it. With several cores, use processes.</li>
+<li><strong>Relying on output order or exact timings</strong>: they change from run to run. Sort results or collect them in the order you submitted them, and treat times as approximate.</li>
+</ul>
+
+<h2>Summary</h2>
+
+<ul>
+<li>Concurrency is overlapping waits; parallelism is actually running at the same time on several cores.</li>
+<li>Overlapping I/O waits with <code>Thread(target=..., args=...)</code>, <code>start()</code> and <code>join()</code> turns a 3-second job into a 1-second one.</li>
+<li>Code that reads, changes and writes a shared value creates race conditions. <code>with lock:</code> lets only one thread run it at a time.</li>
+<li><code>queue.Queue</code> is a safe channel for passing work between threads; a sentinel signals the end.</li>
+<li><code>ThreadPoolExecutor</code>'s <code>map</code> gives results in input order, <code>as_completed</code> in the order they finish.</li>
+<li><code>asyncio</code> overlaps waits on one thread by switching coroutines at every <code>await</code>; <code>gather</code> waits for them together.</li>
+<li>Pure computation does not get faster on this one-core virtual machine. On a multi-core PC, split it across processes.</li>
+</ul>

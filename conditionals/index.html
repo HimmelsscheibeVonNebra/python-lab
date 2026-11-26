@@ -1,0 +1,2817 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Operators, Strings and Conditionals · Python Lab" data-title-ko="연산자·문자열·조건문 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operators, Strings and Conditionals · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="conditionals/solutions">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html" aria-current="page"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" aria-current="page" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 02 · 2 parts · 7 examples</span><span lang="ko">02장 · 2부분 · 예제 7개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기">← 01 <span lang="en">Basics</span><span lang="ko">기초</span></a><a class="next" href="../loops/index.html" title="Loops / 반복문">03 <span lang="en">Loops</span><span lang="ko">반복문</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></h1>
+    <ul class="sessions">
+      <li><a href="#notes-operators"><strong><span lang="en">Operators, Strings &amp; Conditionals (Theory)</span><span lang="ko">연산자, 문자열, 조건문 (이론)</span></strong><span class="sess-sum"><span lang="en">Run short pieces of code for arithmetic, comparison and logical operators and precedence, string indexing, slicing and methods, and if / elif / else, and check the results predicted on the slides.</span><span lang="ko">산술·비교·논리 연산자와 우선순위, 문자열 인덱싱·슬라이싱·메서드, if / elif / else를 짧은 코드로 직접 실행해 슬라이드의 예상 결과를 확인한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
+      <li><a href="#notes-conditionals"><strong><span lang="en">Operators, Strings &amp; Conditionals (Practice)</span><span lang="ko">연산자, 문자열, 조건문 (실습)</span></strong><span class="sess-sum"><span lang="en">Complete four programs, string processing, a grade classifier, rock-paper-scissors and a leap-year calculator, and test them with boundary values and invalid input.</span><span lang="ko">문자열 처리, 성적 분류, 가위바위보, 윤년 계산 네 프로그램을 완성하고 경계값과 잘못된 입력으로 테스트한다.</span></span><span class="sess-more"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></span></a></li>
+    </ul>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <h3><span lang="en">Operators, Strings &amp; Conditionals (Theory)</span><span lang="ko">연산자, 문자열, 조건문 (이론)</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="operators" aria-pressed="true">operators</button>
+          <button type="button" data-pick="string_basics" aria-pressed="false">string_basics</button>
+          <button type="button" data-pick="conditionals" aria-pressed="false">conditionals</button>
+        </div>
+      </div>
+      <div class="ex-group">
+        <h3><span lang="en">Operators, Strings &amp; Conditionals (Practice)</span><span lang="ko">연산자, 문자열, 조건문 (실습)</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="strings" aria-pressed="false">strings</button>
+          <button type="button" data-pick="grades" aria-pressed="false">grades</button>
+          <button type="button" data-pick="rps" aria-pressed="false">rps</button>
+          <button type="button" data-pick="leap_year" aria-pressed="false">leap_year</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="operators" data-dir="conditionals/solutions">
+        <h2>operators <span class="muted">~/conditionals/solutions</span></h2>
+        <p><span lang="en">Run the operator examples from the slides as short programs. Check the value and type of expressions, // and %, comparisons and ranges, short-circuiting with and / or, precedence and compound assignment. At the end, run a leap-year program that uses all of these operators (the solution to Lab 4).</span><span lang="ko">슬라이드의 연산자 예제를 짧은 프로그램으로 실행한다. 식의 값과 자료형, //와 %, 비교와 범위, and·or의 단락 평가, 우선순위와 복합 대입을 확인한다. 마지막에 이 연산자들을 모두 쓰는 윤년 프로그램(실습 4의 답안)을 돌려 본다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+print(8 + 2, type(8 + 2))
+print(8 / 2, type(8 / 2))
+print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+print(8 + 2, type(8 + 2))
+print(8 / 2, type(8 / 2))
+print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+print(8 + 2, type(8 + 2))
+print(8 / 2, type(8 / 2))
+print(&quot;8&quot; + &quot;2&quot;, type(&quot;8&quot; + &quot;2&quot;))
+EOF</code></div>
+          <p><span lang="en">8 / 2 is the float 4.0 even though both operands are integers, and &quot;8&quot; + &quot;2&quot; is the str 82. Predict the value and type before running it.</span><span lang="ko">8 / 2는 정수끼리 나눠도 float 4.0이고, &quot;8&quot; + &quot;2&quot;는 str 82다. 실행 전에 값과 자료형을 먼저 예측해 본다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+raw = &quot; 12 &quot;
+clean = raw.strip()
+number = int(clean)
+print(repr(raw), repr(clean))
+print(number + 3, clean + &quot;3&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+raw = &quot; 12 &quot;
+clean = raw.strip()
+number = int(clean)
+print(repr(raw), repr(clean))
+print(number + 3, clean + &quot;3&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+raw = &quot; 12 &quot;
+clean = raw.strip()
+number = int(clean)
+print(repr(raw), repr(clean))
+print(number + 3, clean + &quot;3&quot;)
+EOF</code></div>
+          <p><span lang="en">Seen with repr, raw still has its leading and trailing spaces. The numeric addition gives 15, and the string concatenation gives 123.</span><span lang="ko">repr로 보면 raw의 앞뒤 공백이 그대로 남아 있다. 숫자 덧셈은 15, 문자열 연결은 123이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+a, b = 7, 3
+print(a + b, a - b, a * b, a / b)
+print(a // b, a % b, a ** b, -7 // 3)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+a, b = 7, 3
+print(a + b, a - b, a * b, a / b)
+print(a // b, a % b, a ** b, -7 // 3)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+a, b = 7, 3
+print(a + b, a - b, a * b, a / b)
+print(a // b, a % b, a ** b, -7 // 3)
+EOF</code></div>
+          <p><span lang="en">7 // 3 is 2, 7 % 3 is 1 and 7 ** 3 is 343. -7 // 3 rounds down, so it is -3, not -2.</span><span lang="ko">7 // 3은 2, 7 % 3은 1, 7 ** 3은 343이다. -7 // 3은 내림이라 -2가 아니라 -3이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+minutes = 185
+print(minutes // 60, minutes % 60)
+students = 29
+print(students // 4, students % 4)
+print(3 * 60 + 5, 7 * 4 + 1)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+minutes = 185
+print(minutes // 60, minutes % 60)
+students = 29
+print(students // 4, students % 4)
+print(3 * 60 + 5, 7 * 4 + 1)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+minutes = 185
+print(minutes // 60, minutes % 60)
+students = 29
+print(students // 4, students % 4)
+print(3 * 60 + 5, 7 * 4 + 1)
+EOF</code></div>
+          <p><span lang="en">Answers to the exercise: 3 hours 5 minutes, and 7 groups of 4 with 1 student left. Check that quotient × divisor + remainder gives back the original values 185 and 29.</span><span lang="ko">연습 문제의 답: 3시간 5분, 4명씩 7모둠에 1명 남음. 몫 × 나누는 수 + 나머지가 원래 값 185, 29로 돌아오는지 확인한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+score = 85
+print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+score = 85
+print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+score = 85
+print(score == 85, score != 85, score &gt;= 60, 0 &lt;= score &lt;= 100, &quot;85&quot; == 85)
+EOF</code></div>
+          <p><span lang="en">Comparisons return True/False. The string &quot;85&quot; and the integer 85 are not equal, so input must be converted before comparing.</span><span lang="ko">비교 결과는 True/False다. 문자열 &quot;85&quot;와 정수 85는 같지 않으므로 입력은 비교 전에 변환해야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'">▶</button><code>python3 -c 'for score in (0, 100, 101): print(score, 0 &lt;= score &lt;= 100, 0 &lt; score &lt; 100)'</code></div>
+          <p><span lang="en">&lt;= includes the endpoint and &lt; excludes it. The two results differ at 0 and 100, and for 101 both are False.</span><span lang="ko">&lt;=는 끝값을 포함하고 &lt;는 제외한다. 0과 100에서 두 결과가 갈리고, 101은 둘 다 False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+age = 20
+has_id = True
+print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+age = 20
+has_id = True
+print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+age = 20
+has_id = True
+print(age &gt;= 18 and has_id, age &lt; 18 or has_id, not has_id)
+EOF</code></div>
+          <p><span lang="en">and is True when both are true, or is True when at least one is true, and not reverses the value.</span><span lang="ko">and는 둘 다 참일 때, or는 하나만 참이어도 True, not은 뒤집는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+text = &quot;&quot;
+print(text != &quot;&quot; and text[0] == &quot;A&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+text = &quot;&quot;
+print(text != &quot;&quot; and text[0] == &quot;A&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+text = &quot;&quot;
+print(text != &quot;&quot; and text[0] == &quot;A&quot;)
+EOF</code></div>
+          <p><span lang="en">Both print False and there is no error. The first condition is False, so 10 / n and text[0] are never evaluated (short-circuiting).</span><span lang="ko">둘 다 False가 나오고 오류가 없다. 앞쪽 조건이 False라 10 / n과 text[0]은 평가되지 않는다(단락 평가).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2)
+print(True or False and False, (True or False) and False)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2)
+print(True or False and False, (True or False) and False)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2)
+print(True or False and False, (True or False) and False)
+EOF</code></div>
+          <p><span lang="en">14, 20, -4, 4. ** binds more tightly than unary -, so -2 ** 2 is -4. and comes before or, so the first expression is True; with parentheses it is False.</span><span lang="ko">14, 20, -4, 4. **가 단항 -보다 먼저라 -2 ** 2는 -4다. and가 or보다 먼저라 첫 식은 True, 괄호를 치면 False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+score = 80
+score += 5
+print(score)
+x = 5
+x += 3
+x *= 2
+print(x)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+score = 80
+score += 5
+print(score)
+x = 5
+x += 3
+x *= 2
+print(x)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+score = 80
+score += 5
+print(score)
+x = 5
+x += 3
+x *= 2
+print(x)
+EOF</code></div>
+          <p><span lang="en">Compound assignments run in written order: 85, and then (5 + 3) × 2 = 16.</span><span lang="ko">복합 대입은 적힌 순서대로 실행된다: 85, 그리고 (5 + 3) × 2 = 16.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done">▶</button><code>for y in 2000 1900 2024; do echo $y | python3 leap_year.py; done</code></div>
+          <p><span lang="en">A leap-year test that combines %, ==, and, or and not in one expression. After the Year: prompt you get 2000: Leap year, 1900: Not a leap year. It is worked through in detail in Lab 4.</span><span lang="ko">%, ==, and, or, not을 한 식에 묶은 윤년 판정이다. 프롬프트 Year: 뒤에 2000: Leap year, 1900: Not a leap year가 나온다. 자세한 풀이는 실습 4에서 한다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="string_basics" data-dir="conditionals/solutions" hidden>
+        <h2>string_basics <span class="muted">~/conditionals/solutions</span></h2>
+        <p><span lang="en">Run string indices and negative indices, IndexError, slicing and reversing, immutability, strip, lower, upper, replace, split and in, string joining and f-strings, and the receipt example. At the end, run a string processing program that combines them (the solution to Lab 1).</span><span lang="ko">문자열 인덱스와 음수 인덱스, IndexError, 슬라이싱과 역순, 불변성, strip·lower·upper·replace·split과 in, 문자열 연결과 f-string, 영수증 예제를 실행한다. 마지막에 이를 조합한 문자열 처리 프로그램(실습 1의 답안)을 돌린다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(len(text), text[0], text[2], text[-1], text[-2])
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(len(text), text[0], text[2], text[-1], text[-2])
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(len(text), text[0], text[2], text[-1], text[-2])
+EOF</code></div>
+          <p><span lang="en">Length 6, first character P (index 0), text[2] is t, and the negative indices -1 and -2 count from the end: n, o.</span><span lang="ko">길이 6, 첫 글자 P(인덱스 0), text[2]는 t, 음수 인덱스 -1과 -2는 끝에서부터 n, o다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'text = &quot;Python&quot;; print(text[5]); print(text[6])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">With length 6, the valid indices are 0 to 5. text[5] is n, and text[6] is IndexError: string index out of range.</span><span lang="ko">길이 6이면 유효한 인덱스는 0~5다. text[5]는 n이고, text[6]은 IndexError: string index out of range다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'print(&quot;A&quot;[0] == &quot;A&quot;[-1]); print(&quot;&quot;[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">In a one-character string the first and last characters are the same (True). An empty string has no valid index, so it is an IndexError.</span><span lang="ko">한 글자 문자열은 첫 글자와 마지막 글자가 같다(True). 빈 문자열에는 유효한 인덱스가 없어 IndexError다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+text = &quot;Python&quot;
+print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])
+EOF</code></div>
+          <p><span lang="en">Py, thon, Pyth, Pto, nohtyP, Python. The stop index is not included, and a slice past the end, [:99], is cut at the end without an error.</span><span lang="ko">Py, thon, Pyth, Pto, nohtyP, Python. stop 인덱스는 포함되지 않고, 범위를 넘는 슬라이스 [:99]는 오류 없이 끝까지 잘린다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+text = &quot;PYTHON&quot;
+print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+text = &quot;PYTHON&quot;
+print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+text = &quot;PYTHON&quot;
+print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))
+EOF</code></div>
+          <p><span lang="en">Answers to the exercise: YTH, PYT, HON, YHN, NOHTYP. When start and stop are equal the result is an empty string, shown by repr as ''.</span><span lang="ko">연습 문제의 답: YTH, PYT, HON, YHN, NOHTYP. start와 stop이 같으면 빈 문자열이고 repr로 ''가 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+text = &quot;Python&quot;
+text = &quot;J&quot; + text[1:]
+print(text)
+text[0] = &quot;J&quot;
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+text = &quot;Python&quot;
+text = &quot;J&quot; + text[1:]
+print(text)
+text[0] = &quot;J&quot;
+EOF">▶</button><code>python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+text = &quot;Python&quot;
+text = &quot;J&quot; + text[1:]
+print(text)
+text[0] = &quot;J&quot;
+EOF</code></div>
+          <p><span lang="en">Building a new string gives Jython. Strings are immutable, so assigning to text[0] gives TypeError: 'str' object does not support item assignment.</span><span lang="ko">새 문자열을 만들면 Jython이 된다. 문자열은 불변이라 text[0]에 대입하면 TypeError: 'str' object does not support item assignment다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;))
+print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;))
+print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+print(clean.lower(), &quot;|&quot;, clean.upper(), &quot;|&quot;, clean.replace(&quot;Python&quot;, &quot;AI&quot;))
+print(clean.split(), &quot;Python&quot; in clean, &quot;python&quot; in clean)
+EOF</code></div>
+          <p><span lang="en">Methods return a new string. split() makes the list ['Hello', 'Python'], and in is case-sensitive: True, False.</span><span lang="ko">메서드는 새 문자열을 돌려준다. split()은 ['Hello', 'Python'] 리스트를 만들고, in은 대소문자를 구별해 True, False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(&quot; &quot;, &quot;-&quot;)
+print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(&quot; &quot;, &quot;-&quot;)
+print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+raw = &quot;  Hello Python  &quot;
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(&quot; &quot;, &quot;-&quot;)
+print(repr(raw), clean, lowered, slug, sep=&quot; / &quot;)
+EOF</code></div>
+          <p><span lang="en">A text-cleaning pipeline: strip affects only the ends, while replace also changes the space in the middle, giving hello-python. The original raw is unchanged.</span><span lang="ko">문자열 정리 과정: strip은 양끝만, replace는 가운데 공백까지 바꿔 hello-python이 된다. 원래 raw는 그대로 남아 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+name = &quot;Mina&quot;
+score = 87.5
+print(&quot;Hi, &quot; + name)
+print(&quot;-&quot; * 5)
+print(&quot;Score: &quot; + str(score))
+print(f&quot;{name}: {score:.2f}&quot;)
+print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+name = &quot;Mina&quot;
+score = 87.5
+print(&quot;Hi, &quot; + name)
+print(&quot;-&quot; * 5)
+print(&quot;Score: &quot; + str(score))
+print(f&quot;{name}: {score:.2f}&quot;)
+print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+name = &quot;Mina&quot;
+score = 87.5
+print(&quot;Hi, &quot; + name)
+print(&quot;-&quot; * 5)
+print(&quot;Score: &quot; + str(score))
+print(f&quot;{name}: {score:.2f}&quot;)
+print(&quot; YES &quot;.strip().lower() == &quot;yes&quot;)
+EOF</code></div>
+          <p><span lang="en">+ joins and * repeats. To join a number with +, you need str(). After normalizing the input, &quot; YES &quot; equals &quot;yes&quot; (True).</span><span lang="ko">+는 연결, *는 반복이다. 숫자를 +로 붙이려면 str()이 필요하다. 입력을 정규화하면 &quot; YES &quot;도 &quot;yes&quot;와 같다(True).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+item = &quot;Notebook&quot;
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f&quot;Item: {item}&quot;)
+print(f&quot;Quantity: {quantity}&quot;)
+print(f&quot;Total: {total:.2f}&quot;)
+print(total)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+item = &quot;Notebook&quot;
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f&quot;Item: {item}&quot;)
+print(f&quot;Quantity: {quantity}&quot;)
+print(f&quot;Total: {total:.2f}&quot;)
+print(total)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+item = &quot;Notebook&quot;
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f&quot;Item: {item}&quot;)
+print(f&quot;Quantity: {quantity}&quot;)
+print(f&quot;Total: {total:.2f}&quot;)
+print(total)
+EOF</code></div>
+          <p><span lang="en">The receipt example: the display is Total: 7.50, but the total variable still holds the number 7.5.</span><span lang="ko">영수증 예제: 표시는 Total: 7.50이지만 total 변수에는 여전히 숫자 7.5가 들어 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '  Python  \n' | python3 strings.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '  Python  \n' | python3 strings.py">▶</button><code>printf '  Python  \n' | python3 strings.py</code></div>
+          <p><span lang="en">A program that combines strip, len, upper, [::-1] and an empty-string check. Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.</span><span lang="ko">strip, len, upper, [::-1], 빈 문자열 검사를 조합한 프로그램이다. Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="conditionals" data-dir="conditionals/solutions" hidden>
+        <h2>conditionals <span class="muted">~/conditionals/solutions</span></h2>
+        <p><span lang="en">Run and check the order of execution of if / else, the difference between an elif chain and separate if statements, a nested condition that prevents division by zero, input validation, and a discount condition bug caused by misusing or, together with its fix. At the end, run the grade classifier (the solution to Lab 2).</span><span lang="ko">if / else의 실행 순서, elif 사슬과 독립된 if의 차이, 0으로 나누기를 막는 중첩 조건, 입력 검증, or를 잘못 쓴 할인 조건 버그와 수정을 실행해 확인한다. 마지막에 성적 분류 프로그램(실습 2의 답안)을 돌린다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for age in 17 18; do
+python3 - &lt;&lt;EOF
+age = $age
+print(&quot;Start&quot;)
+if age &gt;= 18:
+    print(&quot;Adult&quot;)
+else:
+    print(&quot;Under 18&quot;)
+print(&quot;Done&quot;)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for age in 17 18; do
+python3 - &lt;&lt;EOF
+age = $age
+print(&quot;Start&quot;)
+if age &gt;= 18:
+    print(&quot;Adult&quot;)
+else:
+    print(&quot;Under 18&quot;)
+print(&quot;Done&quot;)
+EOF
+done">▶</button><code>for age in 17 18; do
+python3 - &lt;&lt;EOF
+age = $age
+print(&quot;Start&quot;)
+if age &gt;= 18:
+    print(&quot;Adult&quot;)
+else:
+    print(&quot;Under 18&quot;)
+print(&quot;Done&quot;)
+EOF
+done</code></div>
+          <p><span lang="en">Exactly one of if and else runs. With 17 you get Under 18, with 18 you get Adult, and Start and Done, outside the indentation, are always printed.</span><span lang="ko">if와 else 중 정확히 하나만 실행된다. 17이면 Under 18, 18이면 Adult이고 들여쓰기 밖의 Start와 Done은 항상 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 90:
+    print(&quot;A&quot;)
+if score &gt;= 80:
+    print(&quot;B&quot;)
+print(&quot;--- if/elif ---&quot;)
+if score &gt;= 90:
+    print(&quot;A&quot;)
+elif score &gt;= 80:
+    print(&quot;B&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 90:
+    print(&quot;A&quot;)
+if score &gt;= 80:
+    print(&quot;B&quot;)
+print(&quot;--- if/elif ---&quot;)
+if score &gt;= 90:
+    print(&quot;A&quot;)
+elif score &gt;= 80:
+    print(&quot;B&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 90:
+    print(&quot;A&quot;)
+if score &gt;= 80:
+    print(&quot;B&quot;)
+print(&quot;--- if/elif ---&quot;)
+if score &gt;= 90:
+    print(&quot;A&quot;)
+elif score &gt;= 80:
+    print(&quot;B&quot;)
+EOF</code></div>
+          <p><span lang="en">Two separate if statements each check their own condition, so both A and B are printed. The elif chain stops at A, the first match.</span><span lang="ko">독립된 if 두 개는 각자 검사해 A와 B가 모두 나온다. elif 사슬은 처음 맞은 A에서 멈춘다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat &gt; /tmp/divide.py &lt;&lt;'EOF'
+a = float(input(&quot;First number: &quot;))
+b = float(input(&quot;Second number: &quot;))
+if b == 0:
+    print(&quot;Cannot divide by zero&quot;)
+else:
+    result = a / b
+    if result &lt; 0:
+        print(&quot;Negative result&quot;)
+    print(f&quot;Result: {result:.2f}&quot;)
+EOF
+printf '7\n0\n' | python3 /tmp/divide.py
+echo
+printf -- '-6\n4\n' | python3 /tmp/divide.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat &gt; /tmp/divide.py &lt;&lt;'EOF'
+a = float(input(&quot;First number: &quot;))
+b = float(input(&quot;Second number: &quot;))
+if b == 0:
+    print(&quot;Cannot divide by zero&quot;)
+else:
+    result = a / b
+    if result &lt; 0:
+        print(&quot;Negative result&quot;)
+    print(f&quot;Result: {result:.2f}&quot;)
+EOF
+printf '7\n0\n' | python3 /tmp/divide.py
+echo
+printf -- '-6\n4\n' | python3 /tmp/divide.py">▶</button><code>cat &gt; /tmp/divide.py &lt;&lt;'EOF'
+a = float(input(&quot;First number: &quot;))
+b = float(input(&quot;Second number: &quot;))
+if b == 0:
+    print(&quot;Cannot divide by zero&quot;)
+else:
+    result = a / b
+    if result &lt; 0:
+        print(&quot;Negative result&quot;)
+    print(f&quot;Result: {result:.2f}&quot;)
+EOF
+printf '7\n0\n' | python3 /tmp/divide.py
+echo
+printf -- '-6\n4\n' | python3 /tmp/divide.py</code></div>
+          <p><span lang="en">The nested condition from the slides is saved as /tmp/divide.py and run twice. 7, 0 gives Cannot divide by zero; -6, 4 gives Negative result followed by Result: -1.50.</span><span lang="ko">슬라이드의 중첩 조건을 /tmp/divide.py로 저장해 두 번 실행했다. 7, 0은 Cannot divide by zero, -6, 4는 Negative result 다음에 Result: -1.50이 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for t in -1 0 2; do
+python3 - &lt;&lt;EOF
+tickets = $t
+if tickets &lt; 0:
+    print(tickets, &quot;Invalid quantity&quot;)
+else:
+    if tickets == 0:
+        print(tickets, &quot;No booking&quot;)
+    else:
+        print(tickets, f&quot;Booked: {tickets}&quot;)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for t in -1 0 2; do
+python3 - &lt;&lt;EOF
+tickets = $t
+if tickets &lt; 0:
+    print(tickets, &quot;Invalid quantity&quot;)
+else:
+    if tickets == 0:
+        print(tickets, &quot;No booking&quot;)
+    else:
+        print(tickets, f&quot;Booked: {tickets}&quot;)
+EOF
+done">▶</button><code>for t in -1 0 2; do
+python3 - &lt;&lt;EOF
+tickets = $t
+if tickets &lt; 0:
+    print(tickets, &quot;Invalid quantity&quot;)
+else:
+    if tickets == 0:
+        print(tickets, &quot;No booking&quot;)
+    else:
+        print(tickets, f&quot;Booked: {tickets}&quot;)
+EOF
+done</code></div>
+          <p><span lang="en">Validate first and put the normal processing inside else. The three cases, negative, zero and positive, each give a different message.</span><span lang="ko">검증을 먼저 하고 정상 처리를 else 안에 둔다. 음수·0·양수 세 경우가 각각 다른 메시지를 낸다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done">▶</button><code>for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done</code></div>
+          <p><span lang="en">The bug from the debugging exercise: even adult gets the discount, 80.0. The &quot;senior&quot; on the right of or is a non-empty string, so it is always true.</span><span lang="ko">디버깅 연습의 버그: adult까지 80.0으로 할인된다. or 오른쪽의 &quot;senior&quot;는 비어 있지 않은 문자열이라 항상 참이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or customer == &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or customer == &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done">▶</button><code>for c in adult student senior; do
+python3 - &lt;&lt;EOF
+customer = &quot;$c&quot;
+price = 100
+if customer == &quot;student&quot; or customer == &quot;senior&quot;:
+    price *= 0.8
+print(customer, price)
+EOF
+done</code></div>
+          <p><span lang="en">Comparing both sides with customer == gives adult 100, student 80.0, senior 80.0.</span><span lang="ko">양쪽을 모두 customer == 로 비교하면 adult 100, student 80.0, senior 80.0이 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(bool(&quot;False&quot;), bool(&quot;&quot;), bool(&quot;senior&quot;))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(bool(&quot;False&quot;), bool(&quot;&quot;), bool(&quot;senior&quot;))'">▶</button><code>python3 -c 'print(bool(&quot;False&quot;), bool(&quot;&quot;), bool(&quot;senior&quot;))'</code></div>
+          <p><span lang="en">&quot;False&quot; is also a non-empty string, so it is True. Only the empty string is False.</span><span lang="ko">&quot;False&quot;도 비어 있지 않은 문자열이므로 True다. 빈 문자열만 False다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for s in 85 95 59; do echo $s | python3 grades.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for s in 85 95 59; do echo $s | python3 grades.py; done">▶</button><code>for s in 85 95 59; do echo $s | python3 grades.py; done</code></div>
+          <p><span lang="en">An elif chain that checks the highest threshold first. After Score: you get B, A, F.</span><span lang="ko">높은 기준부터 검사하는 elif 사슬이다. Score: 뒤에 B, A, F가 나온다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="strings" data-dir="conditionals/starter" hidden>
+        <h2>strings <span class="muted">~/conditionals/starter</span></h2>
+        <p><span lang="en">Lab 1: remove the leading and trailing spaces from the input and print Length, Upper and Reverse. If the text is not empty, print its first character with First; if it is empty, print No text entered.</span><span lang="ko">실습 1: 입력의 앞뒤 공백을 제거하고 Length, Upper, Reverse를 출력한다. 비어 있지 않으면 First로 첫 글자를, 비어 있으면 No text entered를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '  Python  \n' | python3 strings.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '  Python  \n' | python3 strings.py; echo">▶</button><code>printf '  Python  \n' | python3 strings.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the Text: prompt. The input is piped in; you can also run python3 strings.py and type it yourself.</span><span lang="ko">시작 코드는 Text: 프롬프트만 출력한다. 입력을 파이프로 넣었으며, python3 strings.py로 실행해 직접 입력해도 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '  Python  \n' | python3 ../solutions/strings.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '  Python  \n' | python3 ../solutions/strings.py">▶</button><code>printf '  Python  \n' | python3 ../solutions/strings.py</code></div>
+          <p><span lang="en">The spaces are removed, giving Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P.</span><span lang="ko">공백이 제거돼 Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '   \n' | python3 ../solutions/strings.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '   \n' | python3 ../solutions/strings.py">▶</button><code>printf '   \n' | python3 ../solutions/strings.py</code></div>
+          <p><span lang="en">Input of spaces only becomes an empty string after strip. Length: 0, Upper: and Reverse: are empty, and No text entered is printed. Even for an empty string, the first three lines must be printed.</span><span lang="ko">공백만 입력하면 strip 뒤 빈 문자열이 된다. Length: 0, Upper:와 Reverse:는 비어 있고 No text entered가 나온다. 빈 문자열에서도 앞의 세 줄은 출력돼야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf ' A \n' | python3 ../solutions/strings.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf ' A \n' | python3 ../solutions/strings.py">▶</button><code>printf ' A \n' | python3 ../solutions/strings.py</code></div>
+          <p><span lang="en">One character gives Length: 1, and Upper, Reverse and First are all A.</span><span lang="ko">한 글자는 Length: 1이고 Upper, Reverse, First가 모두 A다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'text = &quot;   &quot;.strip(); print(text[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'text = &quot;   &quot;.strip(); print(text[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'text = &quot;   &quot;.strip(); print(text[0])' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">The defect you get by indexing without a check. An empty string raises IndexError, so it must be guarded with if text:.</span><span lang="ko">검사 없이 인덱싱하면 생기는 결함이다. 빈 문자열에서 IndexError가 나므로 if text:로 막아야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'word = &quot;Level&quot;.lower(); print(word == word[::-1])'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'word = &quot;Level&quot;.lower(); print(word == word[::-1])'">▶</button><code>python3 -c 'word = &quot;Level&quot;.lower(); print(word == word[::-1])'</code></div>
+          <p><span lang="en">Optional extension: after converting to lowercase and comparing with the reverse, the palindrome Level gives True.</span><span lang="ko">선택 확장 과제: 소문자로 바꾼 뒤 역순과 비교하면 회문 Level은 True다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Fill in the TODOs with nano strings.py, then run it with the same three inputs (an ordinary word, spaces only, one character) and compare with the solution's output. Record the test inputs and expected results as comments at the bottom of the file.</span><span lang="ko">nano strings.py로 TODO를 채운 뒤 같은 세 입력(일반 단어, 공백만, 한 글자)으로 실행해 답안 출력과 비교한다. 테스트 입력과 예상 결과를 파일 아래 주석으로 기록한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="grades" data-dir="conditionals/starter" hidden>
+        <h2>grades <span class="muted">~/conditionals/starter</span></h2>
+        <p><span lang="en">Lab 2: classify an integer score from 0 to 100 as A (90–100), B (80–89), C (70–79), D (60–69) or F (0–59), and print Invalid score if it is out of range.</span><span lang="ko">실습 2: 0~100 정수 점수를 A(90~100), B(80~89), C(70~79), D(60~69), F(0~59)로 분류하고, 범위 밖이면 Invalid score를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 85 | python3 grades.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 85 | python3 grades.py; echo">▶</button><code>echo 85 | python3 grades.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the Score: prompt and no grade.</span><span lang="ko">시작 코드는 Score: 프롬프트만 출력하고 등급은 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for s in -1 0 59 60 69 70 79 80 89 90 100 101; do printf '%4s -&gt; ' $s; echo $s | python3 ../solutions/grades.py | sed 's/^Score: //'; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for s in -1 0 59 60 69 70 79 80 89 90 100 101; do printf '%4s -&gt; ' $s; echo $s | python3 ../solutions/grades.py | sed 's/^Score: //'; done">▶</button><code>for s in -1 0 59 60 69 70 79 80 89 90 100 101; do printf '%4s -&gt; ' $s; echo $s | python3 ../solutions/grades.py | sed 's/^Score: //'; done</code></div>
+          <p><span lang="en">A boundary test table. It uses the value just below each threshold and the threshold itself, the two endpoints 0 and 100, and the out-of-range values -1 and 101. 59 must be F, 60 D, 89 B, 90 A, and 101 Invalid score.</span><span lang="ko">경계값 테스트 표다. 각 기준의 바로 아래 값과 기준 값, 두 끝값 0과 100, 범위 밖 -1과 101을 넣었다. 59는 F, 60은 D, 89는 B, 90은 A, 101은 Invalid score여야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 60:
+    print(&quot;D&quot;)
+elif score &gt;= 90:
+    print(&quot;A&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 60:
+    print(&quot;D&quot;)
+elif score &gt;= 90:
+    print(&quot;A&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+score = 95
+if score &gt;= 60:
+    print(&quot;D&quot;)
+elif score &gt;= 90:
+    print(&quot;A&quot;)
+EOF</code></div>
+          <p><span lang="en">A wrong chain that checks the low threshold first. 95 comes out as D. This is why thresholds must be checked from the highest.</span><span lang="ko">낮은 기준을 먼저 검사한 잘못된 사슬이다. 95가 D로 나온다. 높은 기준부터 검사해야 하는 이유다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for s in 59 60 101; do
+python3 - &lt;&lt;EOF
+score = $s
+if not 0 &lt;= score &lt;= 100:
+    print(score, &quot;Invalid score&quot;)
+else:
+    if score &gt;= 60:
+        print(score, &quot;Pass&quot;)
+    else:
+        print(score, &quot;Fail&quot;)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for s in 59 60 101; do
+python3 - &lt;&lt;EOF
+score = $s
+if not 0 &lt;= score &lt;= 100:
+    print(score, &quot;Invalid score&quot;)
+else:
+    if score &gt;= 60:
+        print(score, &quot;Pass&quot;)
+    else:
+        print(score, &quot;Fail&quot;)
+EOF
+done">▶</button><code>for s in 59 60 101; do
+python3 - &lt;&lt;EOF
+score = $s
+if not 0 &lt;= score &lt;= 100:
+    print(score, &quot;Invalid score&quot;)
+else:
+    if score &gt;= 60:
+        print(score, &quot;Pass&quot;)
+    else:
+        print(score, &quot;Fail&quot;)
+EOF
+done</code></div>
+          <p><span lang="en">Optional Pass/Fail task: the decision is placed inside the valid-score branch, so 101 gets no Pass/Fail.</span><span lang="ko">선택 과제 Pass/Fail: 판정을 유효 점수 분기 안에 넣었기 때문에 101에는 Pass/Fail이 붙지 않는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">You can test your own grades.py with the same for loop. Replace ../solutions/grades.py with grades.py, run it, and compare the two tables.</span><span lang="ko">자기 grades.py도 같은 for 반복문으로 시험할 수 있다. ../solutions/grades.py 자리를 grades.py로 바꿔 실행하고 두 표를 비교한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="rps" data-dir="conditionals/starter" hidden>
+        <h2>rps <span class="muted">~/conditionals/starter</span></h2>
+        <p><span lang="en">Lab 3: clean the input with strip().lower(), check that it is rock, paper or scissors, compare it with the computer's choice made by random.choice, and print Tie, You win or You lose.</span><span lang="ko">실습 3: 입력을 strip().lower()로 정리해 rock, paper, scissors인지 검사하고, random.choice로 고른 컴퓨터 선택과 비교해 Tie, You win, You lose를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo rock | python3 rps.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo rock | python3 rps.py; echo">▶</button><code>echo rock | python3 rps.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the prompt. The computer's choice is already made, but there is no comparison code.</span><span lang="ko">시작 코드는 프롬프트만 출력한다. 컴퓨터 선택은 이미 만들어지지만 비교 코드가 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done">▶</button><code>for i in 1 2 3; do echo rock | python3 ../solutions/rps.py; done</code></div>
+          <p><span lang="en">Even with the same rock entered three times, the computer's choice and the result can differ each time because of random.choice. So as it is, the test cannot be repeated.</span><span lang="ko">같은 rock을 세 번 넣어도 random.choice 때문에 컴퓨터 선택과 결과가 매번 달라질 수 있다. 그래서 이대로는 테스트를 반복할 수 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py
+grep -n 'computer =' /tmp/rps_fixed.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py
+grep -n 'computer =' /tmp/rps_fixed.py">▶</button><code>sed 's/random.choice(options)/&quot;scissors&quot;/' ../solutions/rps.py &gt; /tmp/rps_fixed.py
+grep -n 'computer =' /tmp/rps_fixed.py</code></div>
+          <p><span lang="en">The reproducible test from the slides: a copy with the computer's choice fixed to &quot;scissors&quot; is made in /tmp. The original file is not changed.</span><span lang="ko">슬라이드의 재현 가능한 테스트: 컴퓨터 선택을 &quot;scissors&quot;로 고정한 사본을 /tmp에 만들었다. 원본 파일은 바꾸지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done">▶</button><code>for p in ' ROCK ' paper scissors lizard ''; do printf '[%s] ' &quot;$p&quot;; echo &quot;$p&quot; | python3 /tmp/rps_fixed.py; done</code></div>
+          <p><span lang="en">With the computer on scissors: ROCK with spaces and capitals is cleaned up and gives You win, paper gives You lose, scissors gives Tie, and lizard and the empty input give Invalid choice.</span><span lang="ko">컴퓨터가 scissors일 때: 공백과 대문자가 섞인 ROCK은 정리돼 You win, paper는 You lose, scissors는 Tie, lizard와 빈 입력은 Invalid choice다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done">▶</button><code>for c in rock paper scissors; do sed &quot;s/random.choice(options)/\&quot;$c\&quot;/&quot; ../solutions/rps.py &gt; /tmp/rps_$c.py; done; for p in rock paper scissors; do for c in rock paper scissors; do printf '%-9s %-9s ' $p $c; echo $p | python3 /tmp/rps_$c.py | tail -1; done; done</code></div>
+          <p><span lang="en">Prints all 9 possible pairs as a table. As in the table on the slides, there must be 3 Ties, 3 You wins and 3 You loses.</span><span lang="ko">가능한 9가지 조합 전체를 표로 출력한다. 슬라이드의 표와 같이 Tie 3번, You win 3번, You lose 3번이어야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]
+print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]
+print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]
+print(&quot;ROCK&quot; in options, &quot;ROCK&quot;.strip().lower() in options)
+EOF</code></div>
+          <p><span lang="en">Without lower(), ROCK is treated as invalid input (False). After normalizing, it is True.</span><span lang="ko">lower()를 빠뜨리면 ROCK이 잘못된 입력(False)으로 처리된다. 정규화한 뒤에는 True다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">When testing your own rps.py, temporarily fix computer = &quot;scissors&quot; as on the slides, and change it back to random.choice(options) before submitting. If you replace ../solutions/rps.py with rps.py in the sed command above, you can run the same test without editing your file.</span><span lang="ko">자기 rps.py를 테스트할 때는 슬라이드처럼 computer = &quot;scissors&quot;로 잠시 고정해 보고, 제출 전에 random.choice(options)로 되돌린다. 위의 sed 명령에서 ../solutions/rps.py를 rps.py로 바꾸면 파일을 고치지 않고 같은 시험을 할 수 있다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="leap_year" data-dir="conditionals/starter" hidden>
+        <h2>leap_year <span class="muted">~/conditionals/starter</span></h2>
+        <p><span lang="en">Lab 4: read a positive integer year and decide that it is a leap year if it is a multiple of 400, or a multiple of 4 but not of 100. If it is 0 or less, print Enter a positive year.</span><span lang="ko">실습 4: 양의 정수 연도를 입력받아 400의 배수이거나, 4의 배수이면서 100의 배수가 아니면 윤년으로 판정한다. 0 이하이면 Enter a positive year를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 2024 | python3 leap_year.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 2024 | python3 leap_year.py; echo">▶</button><code>echo 2024 | python3 leap_year.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the Year: prompt.</span><span lang="ko">시작 코드는 Year: 프롬프트만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for y in 1900 2000 2024 2023; do
+python3 - &lt;&lt;EOF
+year = $y
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(year, by4, by100, by400, by400 or (by4 and not by100))
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for y in 1900 2000 2024 2023; do
+python3 - &lt;&lt;EOF
+year = $y
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(year, by4, by100, by400, by400 or (by4 and not by100))
+EOF
+done">▶</button><code>for y in 1900 2000 2024 2023; do
+python3 - &lt;&lt;EOF
+year = $y
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(year, by4, by100, by400, by400 or (by4 and not by100))
+EOF
+done</code></div>
+          <p><span lang="en">Work out the three divisibility tests first. 1900 gives True True False, so it is not a leap year (False); 2000 is a multiple of 400, so it is a leap year. 2024 is True, 2023 is False.</span><span lang="ko">나눗셈 검사 세 개를 먼저 계산해 본다. 1900은 True True False라 윤년이 아니고(False), 2000은 400의 배수라 윤년이다. 2024는 True, 2023은 False.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for y in 2024 2000 2023 1900 0 -4; do echo $y | python3 ../solutions/leap_year.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for y in 2024 2000 2023 1900 0 -4; do echo $y | python3 ../solutions/leap_year.py; done">▶</button><code>for y in 2024 2000 2023 1900 0 -4; do echo $y | python3 ../solutions/leap_year.py; done</code></div>
+          <p><span lang="en">Running the solution: 2024 and 2000 are Leap year, 2023 and 1900 are Not a leap year, and 0 and -4 give Enter a positive year.</span><span lang="ko">답안 실행: 2024와 2000은 Leap year, 2023과 1900은 Not a leap year, 0과 -4는 Enter a positive year다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for y in 1900 2000; do
+python3 - &lt;&lt;EOF
+year = $y
+if year &lt;= 0:
+    print(&quot;Enter a positive year&quot;)
+elif year % 400 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+elif year % 100 == 0:
+    print(f&quot;{year}: Not a leap year&quot;)
+elif year % 4 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+else:
+    print(f&quot;{year}: Not a leap year&quot;)
+EOF
+done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for y in 1900 2000; do
+python3 - &lt;&lt;EOF
+year = $y
+if year &lt;= 0:
+    print(&quot;Enter a positive year&quot;)
+elif year % 400 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+elif year % 100 == 0:
+    print(f&quot;{year}: Not a leap year&quot;)
+elif year % 4 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+else:
+    print(f&quot;{year}: Not a leap year&quot;)
+EOF
+done">▶</button><code>for y in 1900 2000; do
+python3 - &lt;&lt;EOF
+year = $y
+if year &lt;= 0:
+    print(&quot;Enter a positive year&quot;)
+elif year % 400 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+elif year % 100 == 0:
+    print(f&quot;{year}: Not a leap year&quot;)
+elif year % 4 == 0:
+    print(f&quot;{year}: Leap year&quot;)
+else:
+    print(f&quot;{year}: Not a leap year&quot;)
+EOF
+done</code></div>
+          <p><span lang="en">The if/elif solution to the challenge. Checking in the order 400 → 100 → 4 gives the same results as the Boolean-expression solution.</span><span lang="ko">도전 과제의 if/elif 풀이다. 400 → 100 → 4 순서로 검사하면 불리언 식 풀이와 같은 결과가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'year = 1900; print(year % 4 == 0)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'year = 1900; print(year % 4 == 0)'">▶</button><code>python3 -c 'year = 1900; print(year % 4 == 0)'</code></div>
+          <p><span lang="en">A common defect, checking only for multiples of 4: 1900 comes out True and is wrongly judged a leap year. 1900 is the test that exposes this defect.</span><span lang="ko">4의 배수만 검사하는 흔한 결함: 1900이 True로 나와 윤년으로 잘못 판정된다. 1900이 이 결함을 드러내는 테스트다.</span></p>
+        </li>
+      </ol>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="operators">
+    <details class="source" open data-path="/home/student/conditionals/solutions/leap_year.py">
+      <summary>leap_year.py <span class="muted src-lines" data-lines="18"><span lang="en">18 lines</span><span lang="ko">18줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 reference solution: the Gregorian leap-year rule.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume integer-formatted input. Range validation follows conversion.</span>
+<span class="ln">year = int(input(&quot;Year: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">if year &lt;= 0:</span>
+<span class="ln">    print(&quot;Enter a positive year&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    is_leap = year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)</span>
+<span class="ln">    if is_leap:</span>
+<span class="ln">        print(f&quot;{year}: Leap year&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(f&quot;{year}: Not a leap year&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># 2024, 2000 -&gt; &lt;year&gt;: Leap year</span>
+<span class="ln"># 2023, 1900 -&gt; &lt;year&gt;: Not a leap year</span>
+<span class="ln"># 0, -4 -&gt; Enter a positive year</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="string_basics" hidden>
+    <details class="source" open data-path="/home/student/conditionals/solutions/strings.py">
+      <summary>strings.py <span class="muted src-lines" data-lines="17"><span lang="en">17 lines</span><span lang="ko">17줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 reference solution: string manipulation.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Text: &quot;).strip()</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;Length: {len(text)}&quot;)</span>
+<span class="ln">print(f&quot;Upper: {text.upper()}&quot;)</span>
+<span class="ln">print(f&quot;Reverse: {text[::-1]}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">if text:</span>
+<span class="ln">    print(f&quot;First: {text[0]}&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;No text entered&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># &quot;  Python  &quot; -&gt; Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P</span>
+<span class="ln"># &quot; A &quot; -&gt; Length: 1, Upper: A, Reverse: A, First: A</span>
+<span class="ln"># &quot;   &quot; -&gt; Length: 0, empty Upper/Reverse, No text entered</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="conditionals" hidden>
+    <details class="source" open data-path="/home/student/conditionals/solutions/grades.py">
+      <summary>grades.py <span class="muted src-lines" data-lines="22"><span lang="en">22 lines</span><span lang="ko">22줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 reference solution: integer scores and grade thresholds.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume integer-formatted input. Range validation follows conversion.</span>
+<span class="ln">score = int(input(&quot;Score: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">if not 0 &lt;= score &lt;= 100:</span>
+<span class="ln">    print(&quot;Invalid score&quot;)</span>
+<span class="ln">elif score &gt;= 90:</span>
+<span class="ln">    print(&quot;A&quot;)</span>
+<span class="ln">elif score &gt;= 80:</span>
+<span class="ln">    print(&quot;B&quot;)</span>
+<span class="ln">elif score &gt;= 70:</span>
+<span class="ln">    print(&quot;C&quot;)</span>
+<span class="ln">elif score &gt;= 60:</span>
+<span class="ln">    print(&quot;D&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;F&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># -1, 101 -&gt; Invalid score</span>
+<span class="ln"># 0, 59 -&gt; F; 60, 69 -&gt; D; 70, 79 -&gt; C</span>
+<span class="ln"># 80, 89 -&gt; B; 90, 100 -&gt; A</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="strings" hidden>
+    <details class="source" open data-path="/home/student/conditionals/starter/strings.py">
+      <summary>strings.py <span class="muted src-lines" data-lines="9"><span lang="en">9 lines</span><span lang="ko">9줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1: Complete the TODOs using string methods and a conditional.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Text: &quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Remove surrounding whitespace and assign the result to text.</span>
+<span class="ln"># TODO: Print Length, Upper and Reverse with the labels in the README.</span>
+<span class="ln"># TODO: Print First only for nonempty text. Otherwise print No text entered.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/conditionals/solutions/strings.py">
+      <summary>conditionals/solutions/strings.py <span class="muted src-lines" data-lines="17"><span lang="en">17 lines</span><span lang="ko">17줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 reference solution: string manipulation.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Text: &quot;).strip()</span>
+<span class="ln"> </span>
+<span class="ln">print(f&quot;Length: {len(text)}&quot;)</span>
+<span class="ln">print(f&quot;Upper: {text.upper()}&quot;)</span>
+<span class="ln">print(f&quot;Reverse: {text[::-1]}&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">if text:</span>
+<span class="ln">    print(f&quot;First: {text[0]}&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;No text entered&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># &quot;  Python  &quot; -&gt; Length: 6, Upper: PYTHON, Reverse: nohtyP, First: P</span>
+<span class="ln"># &quot; A &quot; -&gt; Length: 1, Upper: A, Reverse: A, First: A</span>
+<span class="ln"># &quot;   &quot; -&gt; Length: 0, empty Upper/Reverse, No text entered</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="grades" hidden>
+    <details class="source" open data-path="/home/student/conditionals/starter/grades.py">
+      <summary>grades.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: Classify an integer score using if / elif / else.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume the user enters integer-formatted text.</span>
+<span class="ln">score = int(input(&quot;Score: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Reject scores outside 0 through 100 with Invalid score.</span>
+<span class="ln"># TODO: Check thresholds from highest to lowest and print A, B, C, D or F.</span>
+<span class="ln"># See the README for the exact grade boundaries.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/conditionals/solutions/grades.py">
+      <summary>conditionals/solutions/grades.py <span class="muted src-lines" data-lines="22"><span lang="en">22 lines</span><span lang="ko">22줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 reference solution: integer scores and grade thresholds.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume integer-formatted input. Range validation follows conversion.</span>
+<span class="ln">score = int(input(&quot;Score: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">if not 0 &lt;= score &lt;= 100:</span>
+<span class="ln">    print(&quot;Invalid score&quot;)</span>
+<span class="ln">elif score &gt;= 90:</span>
+<span class="ln">    print(&quot;A&quot;)</span>
+<span class="ln">elif score &gt;= 80:</span>
+<span class="ln">    print(&quot;B&quot;)</span>
+<span class="ln">elif score &gt;= 70:</span>
+<span class="ln">    print(&quot;C&quot;)</span>
+<span class="ln">elif score &gt;= 60:</span>
+<span class="ln">    print(&quot;D&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;F&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># -1, 101 -&gt; Invalid score</span>
+<span class="ln"># 0, 59 -&gt; F; 60, 69 -&gt; D; 70, 79 -&gt; C</span>
+<span class="ln"># 80, 89 -&gt; B; 90, 100 -&gt; A</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="rps" hidden>
+    <details class="source" open data-path="/home/student/conditionals/starter/rps.py">
+      <summary>rps.py <span class="muted src-lines" data-lines="16"><span lang="en">16 lines</span><span lang="ko">16줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: Complete one round of rock-paper-scissors.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]</span>
+<span class="ln">player = input(&quot;Your choice: &quot;).strip().lower()</span>
+<span class="ln">computer = random.choice(options)</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Print Invalid choice if player is not in options.</span>
+<span class="ln"># TODO: For valid input, print the player and computer choices.</span>
+<span class="ln"># TODO: Check for a tie, the three winning combinations, then a loss.</span>
+<span class="ln"># Print exactly Tie, You win or You lose for the outcome.</span>
+<span class="ln"> </span>
+<span class="ln"># Testing tip: temporarily set computer = &quot;scissors&quot; for predictable results.</span>
+<span class="ln"># Restore random.choice(options) before submission.</span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/conditionals/solutions/rps.py">
+      <summary>conditionals/solutions/rps.py <span class="muted src-lines" data-lines="29"><span lang="en">29 lines</span><span lang="ko">29줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 reference solution: one round of rock-paper-scissors.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">options = [&quot;rock&quot;, &quot;paper&quot;, &quot;scissors&quot;]</span>
+<span class="ln">player = input(&quot;Your choice: &quot;).strip().lower()</span>
+<span class="ln">computer = random.choice(options)</span>
+<span class="ln"> </span>
+<span class="ln">if player not in options:</span>
+<span class="ln">    print(&quot;Invalid choice&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(f&quot;You: {player}, computer: {computer}&quot;)</span>
+<span class="ln">    if player == computer:</span>
+<span class="ln">        print(&quot;Tie&quot;)</span>
+<span class="ln">    elif (</span>
+<span class="ln">        (player == &quot;rock&quot; and computer == &quot;scissors&quot;)</span>
+<span class="ln">        or (player == &quot;scissors&quot; and computer == &quot;paper&quot;)</span>
+<span class="ln">        or (player == &quot;paper&quot; and computer == &quot;rock&quot;)</span>
+<span class="ln">    ):</span>
+<span class="ln">        print(&quot;You win&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;You lose&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests with computer temporarily fixed to &quot;scissors&quot;:</span>
+<span class="ln"># &quot; ROCK &quot; -&gt; You win</span>
+<span class="ln"># &quot;paper&quot; -&gt; You lose</span>
+<span class="ln"># &quot;scissors&quot; -&gt; Tie</span>
+<span class="ln"># &quot;lizard&quot; or &quot;&quot; -&gt; Invalid choice</span>
+<span class="ln"># Restore random.choice(options) after testing.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="leap_year" hidden>
+    <details class="source" open data-path="/home/student/conditionals/starter/leap_year.py">
+      <summary>leap_year.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: Apply the Gregorian leap-year rule to a positive integer year.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume the user enters integer-formatted text.</span>
+<span class="ln">year = int(input(&quot;Year: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln"># TODO: Reject zero or negative values with Enter a positive year.</span>
+<span class="ln"># TODO: A leap year is divisible by 400, or divisible by 4 but not by 100.</span>
+<span class="ln"># TODO: Print &lt;year&gt;: Leap year or &lt;year&gt;: Not a leap year for valid input.</span>
+<span class="ln"> </span>
+<span class="ln"># Add at least three test inputs and expected results here.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/conditionals/solutions/leap_year.py">
+      <summary>conditionals/solutions/leap_year.py <span class="muted src-lines" data-lines="18"><span lang="en">18 lines</span><span lang="ko">18줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 reference solution: the Gregorian leap-year rule.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"># Assume integer-formatted input. Range validation follows conversion.</span>
+<span class="ln">year = int(input(&quot;Year: &quot;))</span>
+<span class="ln"> </span>
+<span class="ln">if year &lt;= 0:</span>
+<span class="ln">    print(&quot;Enter a positive year&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    is_leap = year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)</span>
+<span class="ln">    if is_leap:</span>
+<span class="ln">        print(f&quot;{year}: Leap year&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(f&quot;{year}: Not a leap year&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"># Tests:</span>
+<span class="ln"># 2024, 2000 -&gt; &lt;year&gt;: Leap year</span>
+<span class="ln"># 2023, 1900 -&gt; &lt;year&gt;: Not a leap year</span>
+<span class="ln"># 0, -4 -&gt; Enter a positive year</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-operators">
+      <h2 class="notes-title"><span lang="en">Operators, Strings &amp; Conditionals (Theory)</span><span lang="ko">연산자, 문자열, 조건문 (이론)</span></h2>
+<div lang="en">
+<p>This chapter is split into theory and practice. In the theory part we learn operators that calculate and compare values, how to extract and transform characters in a string, and <code>if</code> / <code>elif</code> / <code>else</code>, which chooses which code to run based on a condition. Throughout the slides you are asked again and again to "predict the result before running the code". Run each piece of code yourself on the example pages below and compare it with your prediction. Operators are collected in <a href="#ex=operators">operators</a>, strings in <a href="#ex=string_basics">string_basics</a>, and conditionals in <a href="#ex=conditionals">conditionals</a>. In the practice part that follows we use this material to build four programs: string processing, a grade classifier, rock-paper-scissors and a leap-year calculator.</p>
+
+<p>Most steps on the example pages run a one-line program with <code>python3 -c '...'</code>, or feed in a multi-line program with <code>printf '%s\n' 'first line' 'second line' ... | python3 -</code>. When you experiment on your own, you can also type <code>python3</code> and enter code line by line in interactive mode.</p>
+
+<h2>Review: Expression, Value &amp; Type</h2>
+
+<h3>An Expression Produces a Value</h3>
+
+<p>An expression is evaluated to produce a value. The type of that value determines which operations are allowed. Before running the code, predict both the value and its type, then check with <code>type()</code>.</p>
+
+<pre><code>print(8 + 2)              # 10
+print(type(8 + 2))        # int
+print(8 / 2)              # 4.0
+print(type(8 / 2))        # float
+print("8" + "2")          # 82
+print(type("8" + "2"))    # str</code></pre>
+
+<p>Confirm that the result of <code>/</code> is always a <code>float</code>, even when both operands are integers, and that <code>+</code> on strings is not addition but concatenation.</p>
+
+<h3>Review: Input, Types &amp; Output</h3>
+
+<p><code>input()</code> returns a string, even for numeric input. Numeric text must be converted with <code>int()</code> or <code>float()</code> before you can calculate with it. An expression combines values and operators.</p>
+
+<pre><code>a = "12"
+b = "3"
+print(a + b)                  # 123
+print(int(a) + int(b))        # 15
+
+price = 12.5
+quantity = 3
+total = price * quantity
+print(f"Total: {total:.2f}")  # Total: 37.50</code></pre>
+
+<h3>Tracing Input Conversion</h3>
+
+<p>Treat <code>raw</code> as text read from <code>input()</code>. <code>strip()</code> removes surrounding whitespace, and <code>int()</code> creates an integer from numeric text. Converting a value does not change the original <code>raw</code>. With <code>repr()</code>, the spaces are shown as they are inside the quotes.</p>
+
+<pre><code>raw = " 12 "
+clean = raw.strip()
+number = int(clean)
+print(repr(raw))      # ' 12 '
+print(repr(clean))    # '12'
+print(number + 3)     # 15
+print(clean + "3")    # 123</code></pre>
+
+<p>The last two lines give different results because <code>number</code> is an integer and so is added, while <code>clean</code> is a string and so is concatenated.</p>
+
+<h2>Arithmetic Operators</h2>
+
+<p><code>+</code> and <code>-</code> add and subtract, and <code>*</code> multiplies. <code>/</code> performs division, <code>//</code> is floor division, which rounds the quotient down to an integer, <code>%</code> gives the remainder, and <code>**</code> raises a power. Floor division rounds down, so <code>-7 // 3</code> is -3, not -2. Division or remainder by zero raises an error.</p>
+
+<pre><code>a, b = 7, 3
+print(a + b)     # 10
+print(a - b)     # 4
+print(a * b)     # 21
+print(a / b)     # 2.333...
+print(a // b)    # 2
+print(a % b)     # 1
+print(a ** b)    # 343
+
+minutes = 135
+print(minutes // 60)   # 2 hours
+print(minutes % 60)    # 15 minutes</code></pre>
+
+<h3>Exercise: Hours &amp; Student Groups</h3>
+
+<p>Convert 185 minutes into hours and minutes, and pack 29 students into groups of 4 to find the number of full groups and the number of students left. Both calculations use <code>//</code> and <code>%</code>. The expected answers are 3 hours 5 minutes, and 7 groups with 1 student left.</p>
+
+<pre><code>minutes = 185
+hours = minutes // 60
+left = minutes % 60
+print(hours, left)           # 3 5
+print(hours * 60 + left)     # 185
+
+students = 29
+groups = students // 4
+left = students % 4
+print(groups, left)          # 7 1
+print(groups * 4 + left)     # 29</code></pre>
+
+<p>The quotient counts complete units, and the remainder counts what is left over. Get into the habit of checking that <strong>quotient × divisor + remainder</strong> equals the original value. Repeat with 180 minutes and 28 students. You can run these calculations in <a href="#ex=operators">operators</a>.</p>
+
+<h2>Comparison Operators</h2>
+
+<p><code>==</code> tests equality and <code>!=</code> tests inequality. <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code> and <code>&gt;=</code> compare sizes. Comparisons return <code>True</code> or <code>False</code>. Be careful to distinguish <code>=</code>, which assigns, from <code>==</code>, which compares. Chaining comparisons lets you check a range at once.</p>
+
+<pre><code>score = 85
+print(score == 85)          # True
+print(score != 85)          # False
+print(score &gt;= 60)          # True
+print(score &lt; 60)           # False
+print(0 &lt;= score &lt;= 100)    # True
+
+print("85" == 85)           # False
+# Convert input before comparing.</code></pre>
+
+<p>The string <code>"85"</code> and the integer <code>85</code> are not equal. Values read from input must be converted before comparing.</p>
+
+<h3>Inclusive &amp; Exclusive Boundaries</h3>
+
+<p>A boundary that accepts the endpoint, like <code>&lt;=</code>, is called an inclusive boundary, and one that rejects the endpoint, like <code>&lt;</code>, is called an exclusive boundary. Compare the two results at 0 and 100.</p>
+
+<pre><code>score = 100
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 0
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 101
+print(0 &lt;= score &lt;= 100)    # False</code></pre>
+
+<p>When testing a score range, test just below, at and just above each endpoint. This principle carries over to the boundary tests of the grade classifier in the practice part.</p>
+
+<h2>Logical Operators</h2>
+
+<p><code>and</code> is true only when both conditions are true, <code>or</code> is true when at least one condition is true, and <code>not</code> reverses the truth value.</p>
+
+<pre><code>age = 20
+has_id = True
+print(age &gt;= 18 and has_id)   # True
+print(age &lt; 18 or has_id)     # True
+print(not has_id)             # False
+
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+# False: 10 / n is never evaluated.</code></pre>
+
+<h3>Boolean Results &amp; Short-Circuiting</h3>
+
+<p>Summing up the four combinations: <code>and</code> is true only when both inputs are true, and <code>or</code> is false only when both inputs are false.</p>
+
+<pre><code>print(True and True)      # True
+print(True and False)     # False
+print(False and True)     # False
+print(False and False)    # False
+print(False or True)      # True
+print(False or False)     # False</code></pre>
+
+<p>Once the result is already decided, Python does not evaluate the remaining operand. This is called short-circuiting. In <code>A and B</code>, if <code>A</code> is false, <code>B</code> is skipped. Using this, the earlier condition acts as a "guard" that keeps the later expression safe. <code>n != 0 and 10 / n &gt; 2</code> above never divides by zero, and the code below never takes <code>text[0]</code> from an empty string, so neither raises an error.</p>
+
+<pre><code>text = ""
+print(text != "" and text[0] == "A")
+# False: text[0] is not evaluated.</code></pre>
+
+<h2>Precedence &amp; Assignment Updates</h2>
+
+<p><code>**</code> has the highest precedence, followed by <code>*</code> <code>/</code> <code>//</code> <code>%</code>, then <code>+</code> <code>-</code>. Below those come the comparison operators, then <code>not</code>, <code>and</code> and <code>or</code>, in that order. Use parentheses to make the intended grouping clear. <code>+=</code>, <code>-=</code> and <code>*=</code> update an existing variable.</p>
+
+<pre><code>print(2 + 3 * 4)        # 14
+print((2 + 3) * 4)      # 20
+print(-2 ** 2)          # -4
+print((-2) ** 2)        # 4
+
+score = 80
+score += 5
+print(score)            # 85
+
+# Which output do you expect?
+print(True or False and False)
+# True</code></pre>
+
+<p><code>-2 ** 2</code> is -4 because <code>**</code> is evaluated before the sign <code>-</code>, giving <code>-(2 ** 2)</code>. In the last expression <code>and</code> comes first, so it is <code>True or (False and False)</code>, that is, <code>True</code>.</p>
+
+<h3>Exercise: Parentheses &amp; Updates</h3>
+
+<p>Predict each result before looking at the comments. Multiplication happens before addition, and update statements run in written order. The last two lines show how parentheses change the result.</p>
+
+<pre><code>print(10 - 2 * 3)       # 4
+print((10 - 2) * 3)     # 24
+
+x = 5
+x += 3
+x *= 2
+print(x)                # 16
+
+print(True or False and False)
+# True
+print((True or False) and False)
+# False</code></pre>
+
+<p>You can run precedence and compound assignment in the second half of <a href="#ex=operators">operators</a>. The last step of that example runs a leap-year program that combines <code>%</code>, <code>==</code>, <code>and</code>, <code>or</code> and <code>not</code> in one expression. It is the solution to Lab 4.</p>
+
+<h2>Strings &amp; Indexing</h2>
+
+<p>A string is a sequence of characters. The first character has index 0, and negative indices count from the end. <code>len(text)</code> returns the number of characters. Using an index outside the string raises an <code>IndexError</code>.</p>
+
+<pre><code>text = "Python"
+#       012345
+print(len(text))    # 6
+print(text[0])      # P
+print(text[2])      # t
+print(text[-1])     # n
+print(text[-2])     # o
+# text[6] raises IndexError
+# ""[0] also raises IndexError</code></pre>
+
+<h3>Valid Indices &amp; Empty Strings</h3>
+
+<p>For a string of length n, the nonnegative valid indices are 0 through n − 1. In a non-empty string, <code>-1</code> refers to the last character. In a one-character string, the first and last characters are the same. An empty string has no valid index at all.</p>
+
+<pre><code>text = "Code"
+print(len(text))    # 4
+print(text[0])      # C
+print(text[3])      # e
+print(text[-1])     # e
+
+text = "A"
+print(text[0] == text[-1])   # True
+
+# "Code"[4] raises IndexError.
+# ""[0] raises IndexError.</code></pre>
+
+<p>In <a href="#ex=string_basics">string_basics</a> you can see that <code>text[6]</code> and <code>""[0]</code> really do raise <code>IndexError: string index out of range</code>. Preventing indexing into an empty string is the key point of the string processing lab.</p>
+
+<h2>String Slicing</h2>
+
+<p><code>text[start:stop]</code> is the substring that includes <code>start</code> and excludes <code>stop</code>. If <code>start</code> is omitted it starts from 0, and if <code>stop</code> is omitted it goes to the end. The third value is the step, and <code>[::-1]</code> reverses the string. A slice that goes past the end does not raise an error; it simply cuts as far as the string goes.</p>
+
+<p>Strings are immutable values. Changing a single character, as in <code>text[0] = "J"</code>, is not allowed, so you build a new string with the change and assign it again.</p>
+
+<pre><code>text = "Python"
+print(text[0:2])     # Py
+print(text[2:])      # thon
+print(text[:4])      # Pyth
+print(text[::2])     # Pto
+print(text[::-1])    # nohtyP
+print(text[:99])     # Python
+
+# text[0] = "J" is invalid.
+text = "J" + text[1:]
+print(text)          # Jython</code></pre>
+
+<h3>Exercise: Reading Slices</h3>
+
+<p>Write the selected indices on paper first. Remember that the <code>stop</code> index is left out. With a positive step, if <code>start</code> and <code>stop</code> are equal the result is an empty string, and with <code>repr()</code> the empty result shows as two quotation marks.</p>
+
+<pre><code>text = "PYTHON"
+print(text[1:4])          # YTH
+print(text[:3])           # PYT
+print(text[-3:])          # HON
+print(text[1::2])         # YHN
+print(text[::-1])         # NOHTYP
+print(repr(text[2:2]))    # ''
+print(text[:99])          # PYTHON</code></pre>
+
+<h2>String Methods &amp; Membership</h2>
+
+<p>String methods do not change the original string; they return a new result.</p>
+
+<ul>
+<li><code>strip()</code> removes whitespace from both ends.</li>
+<li><code>lower()</code> and <code>upper()</code> change the case.</li>
+<li><code>replace(old, new)</code> returns the replaced string.</li>
+<li><code>split()</code> splits a string into a list of strings.</li>
+<li><code>in</code> checks whether a substring is contained. It is case-sensitive.</li>
+</ul>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+print(clean)                          # Hello Python
+print(clean.lower())                  # hello python
+print(clean.upper())                  # HELLO PYTHON
+print(clean.replace("Python", "AI"))  # Hello AI
+print(clean.split())                  # ['Hello', 'Python']
+print("Python" in clean)              # True
+print("python" in clean)              # False</code></pre>
+
+<h3>A Text-Cleaning Pipeline</h3>
+
+<p>While you are learning, storing intermediate results in variables makes it easy to check each step. <code>strip()</code> affects only the two ends, while <code>replace()</code> can also change spaces inside the string. Each method returns a new string, so the original <code>raw</code> value stays as it was.</p>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(" ", "-")
+print(repr(raw))
+# '  Hello Python  '
+print(clean)      # Hello Python
+print(lowered)    # hello python
+print(slug)       # hello-python</code></pre>
+
+<h2>Joining Text &amp; Formatting Values</h2>
+
+<p><code>+</code> joins strings and <code>*</code> repeats them. To join a number to a string with <code>+</code>, you must convert it with <code>str()</code>. An f-string puts an expression inside braces, and <code>.2f</code> shows two decimal places. Before comparing user input, normalize it, for example with <code>strip().lower()</code>.</p>
+
+<pre><code>name = "Mina"
+score = 87.5
+print("Hi, " + name)            # Hi, Mina
+print("-" * 5)                  # -----
+print("Score: " + str(score))
+print(f"{name}: {score:.2f}")   # Mina: 87.50
+
+answer = " YES "
+print(answer.strip().lower() == "yes")
+# True</code></pre>
+
+<h3>Worked Example: A Receipt</h3>
+
+<p>Keep prices numeric while calculating, and format them only when showing them on screen. A format such as <code>.2f</code> changes only the displayed text; it does not change the number stored in <code>total</code>.</p>
+
+<pre><code>item = "Notebook"
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f"Item: {item}")
+print(f"Quantity: {quantity}")
+print(f"Total: {total:.2f}")
+print(total)    # 7.5, still numeric</code></pre>
+
+<p>All the examples from indexing to the receipt are in <a href="#ex=string_basics">string_basics</a>, in order. The last step runs the solution to Lab 1, which combines these tools.</p>
+
+<h2>Conditionals: if &amp; else</h2>
+
+<p><code>if</code> runs the indented block when the condition is true, and <code>else</code> runs when that condition is false. The <code>if</code> and <code>else</code> lines end with a colon (<code>:</code>), and each level of indentation is four spaces. The code after the block runs whichever branch was taken.</p>
+
+<pre><code>age = 17
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Check complete")
+# Output:
+# Under 18
+# Check complete</code></pre>
+
+<h3>Tracing a Branch</h3>
+
+<p>Evaluate the condition before reading the branches. Exactly one of the <code>if</code>/<code>else</code> blocks runs, and the final <code>print</code> outside the indentation always runs. Change <code>age</code> to 18 and trace it again (the first step of <a href="#ex=conditionals">conditionals</a> runs both 17 and 18).</p>
+
+<pre><code>age = 17
+print("Start")
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Done")
+# Start
+# Under 18
+# Done</code></pre>
+
+<h2>Multiple Branches with elif</h2>
+
+<p><code>elif</code> checks another condition when all the earlier conditions were false. Only the first matching branch runs, and the final <code>else</code>, which is optional, handles every remaining case. Grade thresholds are checked from highest to lowest.</p>
+
+<pre><code>score = 85
+if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+elif score &gt;= 70:
+    grade = "C"
+elif score &gt;= 60:
+    grade = "D"
+else:
+    grade = "F"
+print(grade)    # B</code></pre>
+
+<h3>Separate if Statements &amp; elif</h3>
+
+<p>Separate <code>if</code> statements each evaluate their own condition, so several blocks can run. An <code>if</code>/<code>elif</code> chain stops at the first matching branch. Use a chain for mutually exclusive categories such as grades, and separate checks when you want to print several messages together.</p>
+
+<pre><code>score = 95
+if score &gt;= 90:
+    print("A")
+if score &gt;= 80:
+    print("B")
+# Both A and B are printed above.
+
+if score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+# Only A is printed by this chain.</code></pre>
+
+<h2>Validation &amp; Nested Conditions</h2>
+
+<p>Validate a value before using it. A nested <code>if</code> runs inside another branch. The code below uses a guard to prevent division by zero, and only when the division was done does it check again whether the result is negative.</p>
+
+<pre><code>a = float(input("First number: "))
+b = float(input("Second number: "))
+if b == 0:
+    print("Cannot divide by zero")
+else:
+    result = a / b
+    if result &lt; 0:
+        print("Negative result")
+    print(f"Result: {result:.2f}")</code></pre>
+
+<p>In this lab we assume that numeric input arrives in the required format. How to handle input that cannot be converted to a number, such as <code>"abc"</code> (exception handling), comes later. In <a href="#ex=conditionals">conditionals</a> this code is run with 7, 0 and with -6, 4.</p>
+
+<h3>Validation Before Classification</h3>
+
+<p>Reject values outside the allowed range first, and keep the normal decision inside the valid case. Test negative, zero and valid positive values.</p>
+
+<pre><code>tickets = -1
+if tickets &lt; 0:
+    print("Invalid quantity")
+else:
+    if tickets == 0:
+        print("No booking")
+    else:
+        print(f"Booked: {tickets}")
+# -1: Invalid quantity
+# 0: No booking
+# 2: Booked: 2</code></pre>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>To test equality, use <code>==</code>, not the assignment <code>=</code>.</li>
+<li>A missing colon or wrong indentation breaks the block.</li>
+<li>To compare as numbers, convert the string first.</li>
+<li><code>"False"</code> is a non-empty string, so <code>bool("False")</code> is <code>True</code>.</li>
+<li>When you use <code>or</code>, compare both cases explicitly.</li>
+</ul>
+
+<pre><code>choice = "paper"
+
+# Incorrect: "scissors" is truthy.
+if choice == "rock" or "scissors":
+    print("This always runs")
+
+# Correct:
+if (choice == "rock"
+        or choice == "scissors"):
+    print("Rock or scissors")</code></pre>
+
+<p>The incorrect code is read as <code>(choice == "rock") or "scissors"</code>. Even if the left side is false, the <code>"scissors"</code> on the right is a non-empty string and is treated as true, so the whole condition is always true.</p>
+
+<h3>Debugging Exercise: A Discount</h3>
+
+<p>A discount should apply only to student or senior customers, but the program below applies it to every customer. Explain which part of the condition is always true, fix the condition, and test it with all three kinds of customer.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if customer == "student" or "senior":
+    price *= 0.8
+print(price)    # 80.0: incorrect for adult
+
+# Expected after repair:
+# adult: 100
+# student: 80.0
+# senior: 80.0</code></pre>
+
+<p>The solution is to compare <code>customer</code> explicitly in both cases. Run the fixed code with adult, student and senior, and explain when the indented update statement runs.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if (customer == "student"
+        or customer == "senior"):
+    price *= 0.8
+print(price)    # 100</code></pre>
+
+<p>In <a href="#ex=conditionals">conditionals</a> you can run the code before and after the fix side by side for the three customers. Before the fix, adult also gets 80.0; after the fix, it gets 100.</p>
+
+<h2>Exit Check</h2>
+
+<p>Before moving on to the practice, review slicing, Boolean expressions and the order of branches. Check yourself with these two questions.</p>
+
+<ol>
+<li><strong>What is <code>"Python"[1:4]</code>?</strong> It is <code>yth</code>. Indices 1, 2 and 3 are selected, and 4 is left out.</li>
+<li><strong>Why check <code>score &gt;= 90</code> before <code>score &gt;= 60</code>?</strong> Because the first matching branch runs. If 60 were checked first, even a score of 95 would get a D.</li>
+</ol>
+</div><div lang="ko">
+<p>이 장은 이론과 실습으로 나뉩니다. 이론 부분에서는 값을 계산하고 비교하는 연산자, 문자열에서 글자를 꺼내고 바꾸는 방법, 조건에 따라 실행할 코드를 고르는 <code>if</code> / <code>elif</code> / <code>else</code>를 배웁니다. 슬라이드의 예제마다 "실행하기 전에 결과를 먼저 예측하라"는 요구가 반복됩니다. 아래 예제 페이지에서 각 코드를 직접 실행해 예측과 비교해 보세요. 연산자는 <a href="#ex=operators">operators</a>, 문자열은 <a href="#ex=string_basics">string_basics</a>, 조건문은 <a href="#ex=conditionals">conditionals</a>에 모아 두었습니다. 이어지는 실습에서는 이 내용으로 문자열 처리, 성적 분류, 가위바위보, 윤년 계산 네 프로그램을 만듭니다.</p>
+
+<p>예제 페이지의 단계는 대부분 <code>python3 -c '...'</code>로 한 줄짜리 프로그램을 실행하거나, <code>printf '%s\n' '첫 줄' '둘째 줄' ... | python3 -</code>로 여러 줄 프로그램을 흘려 넣습니다. 직접 실험할 때는 <code>python3</code>를 입력해 대화형 모드에서 한 줄씩 입력해도 됩니다.</p>
+
+<h2>복습: 식, 값, 자료형</h2>
+
+<h3>식은 값이 된다</h3>
+
+<p>식(expression)은 계산되어 하나의 값이 됩니다. 그 값의 자료형에 따라 할 수 있는 연산이 정해집니다. 실행하기 전에 값과 자료형을 모두 예측하고, <code>type()</code>으로 확인해 봅니다.</p>
+
+<pre><code>print(8 + 2)              # 10
+print(type(8 + 2))        # int
+print(8 / 2)              # 4.0
+print(type(8 / 2))        # float
+print("8" + "2")          # 82
+print(type("8" + "2"))    # str</code></pre>
+
+<p>정수끼리 나누어도 <code>/</code>의 결과는 항상 <code>float</code>라는 점, 그리고 문자열의 <code>+</code>는 덧셈이 아니라 이어 붙이기라는 점을 확인합니다.</p>
+
+<h3>입력, 자료형, 출력 복습</h3>
+
+<p><code>input()</code>은 숫자를 입력해도 문자열을 돌려줍니다. 숫자 문자열은 <code>int()</code>나 <code>float()</code>로 바꿔야 계산할 수 있습니다. 식은 값과 연산자를 조합한 것입니다.</p>
+
+<pre><code>a = "12"
+b = "3"
+print(a + b)                  # 123
+print(int(a) + int(b))        # 15
+
+price = 12.5
+quantity = 3
+total = price * quantity
+print(f"Total: {total:.2f}")  # Total: 37.50</code></pre>
+
+<h3>입력 변환 추적하기</h3>
+
+<p><code>raw</code>를 <code>input()</code>에서 읽은 문자열이라고 생각합니다. <code>strip()</code>은 앞뒤 공백을 지우고, <code>int()</code>는 숫자 문자열로 정수를 만듭니다. 값을 변환해도 원래의 <code>raw</code>는 바뀌지 않습니다. <code>repr()</code>을 쓰면 공백이 따옴표 안에 그대로 보입니다.</p>
+
+<pre><code>raw = " 12 "
+clean = raw.strip()
+number = int(clean)
+print(repr(raw))      # ' 12 '
+print(repr(clean))    # '12'
+print(number + 3)     # 15
+print(clean + "3")    # 123</code></pre>
+
+<p>마지막 두 줄의 결과가 다른 이유는 <code>number</code>는 정수라서 덧셈을, <code>clean</code>은 문자열이라서 이어 붙이기를 하기 때문입니다.</p>
+
+<h2>산술 연산자</h2>
+
+<p><code>+</code>와 <code>-</code>는 덧셈과 뺄셈, <code>*</code>는 곱셈입니다. <code>/</code>는 나눗셈, <code>//</code>는 몫을 내림한 정수 나눗셈, <code>%</code>는 나머지, <code>**</code>는 거듭제곱입니다. 정수 나눗셈은 아래쪽으로 내림하므로 <code>-7 // 3</code>은 -2가 아니라 -3입니다. 0으로 나누거나 0으로 나머지를 구하면 오류가 납니다.</p>
+
+<pre><code>a, b = 7, 3
+print(a + b)     # 10
+print(a - b)     # 4
+print(a * b)     # 21
+print(a / b)     # 2.333...
+print(a // b)    # 2
+print(a % b)     # 1
+print(a ** b)    # 343
+
+minutes = 135
+print(minutes // 60)   # 2 hours
+print(minutes % 60)    # 15 minutes</code></pre>
+
+<h3>연습: 시간 변환과 모둠 나누기</h3>
+
+<p>185분을 몇 시간 몇 분으로 바꾸고, 학생 29명을 4명씩 모둠으로 나눴을 때 꽉 찬 모둠 수와 남는 학생 수를 구합니다. 두 계산 모두 <code>//</code>와 <code>%</code>를 씁니다. 기대하는 답은 3시간 5분, 7모둠과 1명입니다.</p>
+
+<pre><code>minutes = 185
+hours = minutes // 60
+left = minutes % 60
+print(hours, left)           # 3 5
+print(hours * 60 + left)     # 185
+
+students = 29
+groups = students // 4
+left = students % 4
+print(groups, left)          # 7 1
+print(groups * 4 + left)     # 29</code></pre>
+
+<p>몫은 완전히 채운 단위의 수를, 나머지는 남은 양을 셉니다. <strong>몫 × 나누는 수 + 나머지</strong>가 원래 값과 같은지 확인하는 습관을 들입니다. 180분과 28명으로도 다시 해 봅니다. 이 계산은 <a href="#ex=operators">operators</a>에서 실행해 볼 수 있습니다.</p>
+
+<h2>비교 연산자</h2>
+
+<p><code>==</code>는 같은지, <code>!=</code>는 다른지 검사합니다. <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>는 크기를 비교합니다. 비교의 결과는 <code>True</code> 또는 <code>False</code>입니다. <code>=</code>는 대입이고 <code>==</code>는 비교라는 점을 구별해야 합니다. 비교를 이어 쓰면 범위를 한 번에 검사할 수 있습니다.</p>
+
+<pre><code>score = 85
+print(score == 85)          # True
+print(score != 85)          # False
+print(score &gt;= 60)          # True
+print(score &lt; 60)           # False
+print(0 &lt;= score &lt;= 100)    # True
+
+print("85" == 85)           # False
+# Convert input before comparing.</code></pre>
+
+<p>문자열 <code>"85"</code>와 정수 <code>85</code>는 같지 않습니다. 입력받은 값은 비교하기 전에 변환해야 합니다.</p>
+
+<h3>포함 경계와 제외 경계</h3>
+
+<p><code>&lt;=</code>처럼 끝값을 받아들이는 경계를 포함 경계, <code>&lt;</code>처럼 끝값을 거부하는 경계를 제외 경계라고 합니다. 0과 100에서 두 결과를 비교해 봅니다.</p>
+
+<pre><code>score = 100
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 0
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 101
+print(0 &lt;= score &lt;= 100)    # False</code></pre>
+
+<p>점수 범위를 테스트할 때는 각 끝값의 바로 아래, 끝값 자체, 바로 위를 모두 시험합니다. 이 원칙은 실습의 성적 분류 경계값 테스트로 이어집니다.</p>
+
+<h2>논리 연산자</h2>
+
+<p><code>and</code>는 두 조건이 모두 참이어야 참이고, <code>or</code>는 하나만 참이어도 참이며, <code>not</code>은 참과 거짓을 뒤집습니다.</p>
+
+<pre><code>age = 20
+has_id = True
+print(age &gt;= 18 and has_id)   # True
+print(age &lt; 18 or has_id)     # True
+print(not has_id)             # False
+
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+# False: 10 / n is never evaluated.</code></pre>
+
+<h3>불리언 결과와 단락 평가</h3>
+
+<p>네 가지 조합을 정리하면 <code>and</code>는 둘 다 참일 때만 참, <code>or</code>는 둘 다 거짓일 때만 거짓입니다.</p>
+
+<pre><code>print(True and True)      # True
+print(True and False)     # False
+print(False and True)     # False
+print(False and False)    # False
+print(False or True)      # True
+print(False or False)     # False</code></pre>
+
+<p>Python은 결과가 이미 정해지면 나머지 피연산자를 계산하지 않습니다. 이를 단락 평가(short-circuit)라고 합니다. <code>A and B</code>에서 <code>A</code>가 거짓이면 <code>B</code>는 건너뜁니다. 이 성질을 이용하면 앞쪽 조건이 뒤쪽 식을 안전하게 지키는 "가드" 역할을 합니다. 위의 <code>n != 0 and 10 / n &gt; 2</code>는 0으로 나누지 않고, 아래 코드는 빈 문자열에서 <code>text[0]</code>을 꺼내지 않으므로 오류가 나지 않습니다.</p>
+
+<pre><code>text = ""
+print(text != "" and text[0] == "A")
+# False: text[0] is not evaluated.</code></pre>
+
+<h2>연산자 우선순위와 복합 대입</h2>
+
+<p>우선순위는 <code>**</code>가 가장 높고, 그다음 <code>*</code> <code>/</code> <code>//</code> <code>%</code>, 그다음 <code>+</code> <code>-</code>입니다. 그 아래로 비교 연산자, <code>not</code>, <code>and</code>, <code>or</code> 순서입니다. 의도한 묶음을 분명히 하려면 괄호를 씁니다. <code>+=</code>, <code>-=</code>, <code>*=</code>는 이미 있는 변수를 갱신합니다.</p>
+
+<pre><code>print(2 + 3 * 4)        # 14
+print((2 + 3) * 4)      # 20
+print(-2 ** 2)          # -4
+print((-2) ** 2)        # 4
+
+score = 80
+score += 5
+print(score)            # 85
+
+# Which output do you expect?
+print(True or False and False)
+# True</code></pre>
+
+<p><code>-2 ** 2</code>가 -4인 것은 <code>**</code>가 부호 <code>-</code>보다 먼저 계산되어 <code>-(2 ** 2)</code>가 되기 때문입니다. 마지막 식은 <code>and</code>가 먼저라서 <code>True or (False and False)</code>, 즉 <code>True</code>입니다.</p>
+
+<h3>연습: 괄호와 갱신</h3>
+
+<p>주석을 보기 전에 결과를 예측해 봅니다. 곱셈이 덧셈보다 먼저 계산되고, 갱신문은 적힌 순서대로 실행됩니다. 마지막 두 줄은 괄호가 결과를 어떻게 바꾸는지 보여 줍니다.</p>
+
+<pre><code>print(10 - 2 * 3)       # 4
+print((10 - 2) * 3)     # 24
+
+x = 5
+x += 3
+x *= 2
+print(x)                # 16
+
+print(True or False and False)
+# True
+print((True or False) and False)
+# False</code></pre>
+
+<p>우선순위와 복합 대입은 <a href="#ex=operators">operators</a>의 뒷부분에서 실행해 볼 수 있습니다. 이 예제의 마지막 단계는 <code>%</code>, <code>==</code>, <code>and</code>, <code>or</code>, <code>not</code>을 한 식에 묶은 윤년 판정 프로그램을 실행합니다. 실습 4의 답안입니다.</p>
+
+<h2>문자열 인덱싱</h2>
+
+<p>문자열은 문자가 차례로 늘어선 시퀀스입니다. 첫 문자의 인덱스는 0이고, 음수 인덱스는 끝에서부터 셉니다. <code>len(text)</code>는 문자 개수를 돌려줍니다. 문자열 범위를 벗어난 인덱스를 쓰면 <code>IndexError</code>가 납니다.</p>
+
+<pre><code>text = "Python"
+#       012345
+print(len(text))    # 6
+print(text[0])      # P
+print(text[2])      # t
+print(text[-1])     # n
+print(text[-2])     # o
+# text[6] raises IndexError
+# ""[0] also raises IndexError</code></pre>
+
+<h3>유효한 인덱스와 빈 문자열</h3>
+
+<p>길이가 n인 문자열에서 0 이상의 유효한 인덱스는 0부터 n − 1까지입니다. 비어 있지 않은 문자열에서 <code>-1</code>은 마지막 문자를 가리킵니다. 한 글자짜리 문자열은 첫 문자와 마지막 문자가 같습니다. 빈 문자열에는 유효한 인덱스가 하나도 없습니다.</p>
+
+<pre><code>text = "Code"
+print(len(text))    # 4
+print(text[0])      # C
+print(text[3])      # e
+print(text[-1])     # e
+
+text = "A"
+print(text[0] == text[-1])   # True
+
+# "Code"[4] raises IndexError.
+# ""[0] raises IndexError.</code></pre>
+
+<p><a href="#ex=string_basics">string_basics</a>에서 <code>text[6]</code>과 <code>""[0]</code>이 실제로 <code>IndexError: string index out of range</code>를 내는 것을 확인할 수 있습니다. 빈 문자열에서 인덱싱하지 않도록 막는 일은 문자열 처리 실습의 핵심입니다.</p>
+
+<h2>문자열 슬라이싱</h2>
+
+<p><code>text[start:stop]</code>은 <code>start</code>는 포함하고 <code>stop</code>은 제외한 부분 문자열입니다. <code>start</code>를 생략하면 0부터, <code>stop</code>을 생략하면 끝까지입니다. 세 번째 값은 간격(step)이고, <code>[::-1]</code>은 문자열을 뒤집습니다. 슬라이스는 범위를 넘어서도 오류 없이 있는 데까지만 잘라 줍니다.</p>
+
+<p>문자열은 바꿀 수 없는(immutable) 값입니다. <code>text[0] = "J"</code>처럼 한 글자만 바꾸는 것은 허용되지 않으므로, 바꾼 내용으로 새 문자열을 만들어 다시 대입합니다.</p>
+
+<pre><code>text = "Python"
+print(text[0:2])     # Py
+print(text[2:])      # thon
+print(text[:4])      # Pyth
+print(text[::2])     # Pto
+print(text[::-1])    # nohtyP
+print(text[:99])     # Python
+
+# text[0] = "J" is invalid.
+text = "J" + text[1:]
+print(text)          # Jython</code></pre>
+
+<h3>연습: 슬라이스 읽기</h3>
+
+<p>먼저 종이에 선택되는 인덱스를 적어 봅니다. <code>stop</code> 인덱스는 빠진다는 것을 기억합니다. 간격이 양수일 때 <code>start</code>와 <code>stop</code>이 같으면 빈 문자열이 되며, <code>repr()</code>을 쓰면 빈 결과가 따옴표 두 개로 보입니다.</p>
+
+<pre><code>text = "PYTHON"
+print(text[1:4])          # YTH
+print(text[:3])           # PYT
+print(text[-3:])          # HON
+print(text[1::2])         # YHN
+print(text[::-1])         # NOHTYP
+print(repr(text[2:2]))    # ''
+print(text[:99])          # PYTHON</code></pre>
+
+<h2>문자열 메서드와 포함 여부</h2>
+
+<p>문자열 메서드는 원래 문자열을 바꾸지 않고 결과를 새로 돌려줍니다.</p>
+
+<ul>
+<li><code>strip()</code>은 양 끝의 공백을 지웁니다.</li>
+<li><code>lower()</code>와 <code>upper()</code>는 대소문자를 바꿉니다.</li>
+<li><code>replace(old, new)</code>는 바꾼 문자열을 돌려줍니다.</li>
+<li><code>split()</code>은 문자열을 나눠 문자열의 리스트로 만듭니다.</li>
+<li><code>in</code>은 부분 문자열이 들어 있는지 검사합니다. 대소문자를 구별합니다.</li>
+</ul>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+print(clean)                          # Hello Python
+print(clean.lower())                  # hello python
+print(clean.upper())                  # HELLO PYTHON
+print(clean.replace("Python", "AI"))  # Hello AI
+print(clean.split())                  # ['Hello', 'Python']
+print("Python" in clean)              # True
+print("python" in clean)              # False</code></pre>
+
+<h3>문자열 정리 과정</h3>
+
+<p>배우는 동안에는 중간 결과를 변수에 저장해 두면 각 단계를 확인하기 좋습니다. <code>strip()</code>은 양 끝에만 영향을 주고, <code>replace()</code>는 문자열 안쪽의 공백도 바꿀 수 있습니다. 메서드마다 새 문자열을 돌려주므로 원래의 <code>raw</code> 값은 그대로 남아 있습니다.</p>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(" ", "-")
+print(repr(raw))
+# '  Hello Python  '
+print(clean)      # Hello Python
+print(lowered)    # hello python
+print(slug)       # hello-python</code></pre>
+
+<h2>문자열 연결과 값 형식 지정</h2>
+
+<p><code>+</code>는 문자열을 이어 붙이고 <code>*</code>는 반복합니다. 숫자를 문자열과 <code>+</code>로 붙이려면 <code>str()</code>로 바꿔야 합니다. f-string은 중괄호 안에 식을 넣고, <code>.2f</code>는 소수점 아래 두 자리를 표시합니다. 사용자 입력을 비교하기 전에는 <code>strip().lower()</code>처럼 정규화합니다.</p>
+
+<pre><code>name = "Mina"
+score = 87.5
+print("Hi, " + name)            # Hi, Mina
+print("-" * 5)                  # -----
+print("Score: " + str(score))
+print(f"{name}: {score:.2f}")   # Mina: 87.50
+
+answer = " YES "
+print(answer.strip().lower() == "yes")
+# True</code></pre>
+
+<h3>풀이 예제: 영수증</h3>
+
+<p>계산하는 동안에는 가격을 숫자로 유지하고, 화면에 보여 줄 때만 형식을 지정합니다. <code>.2f</code> 같은 형식은 표시되는 텍스트만 바꿀 뿐, <code>total</code>에 저장된 숫자를 바꾸지 않습니다.</p>
+
+<pre><code>item = "Notebook"
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f"Item: {item}")
+print(f"Quantity: {quantity}")
+print(f"Total: {total:.2f}")
+print(total)    # 7.5, still numeric</code></pre>
+
+<p>인덱싱부터 영수증까지의 예제는 모두 <a href="#ex=string_basics">string_basics</a>에 순서대로 있습니다. 마지막 단계는 이 도구들을 조합한 실습 1의 답안을 실행합니다.</p>
+
+<h2>조건문: if와 else</h2>
+
+<p><code>if</code>는 조건이 참일 때 들여 쓴 블록을 실행하고, <code>else</code>는 그 조건이 거짓일 때 실행합니다. <code>if</code>와 <code>else</code> 줄은 콜론(<code>:</code>)으로 끝나고, 들여쓰기는 단계마다 공백 네 칸입니다. 블록 다음에 오는 코드는 어느 쪽으로 갔든 실행됩니다.</p>
+
+<pre><code>age = 17
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Check complete")
+# Output:
+# Under 18
+# Check complete</code></pre>
+
+<h3>분기 추적하기</h3>
+
+<p>분기를 읽기 전에 조건부터 계산합니다. <code>if</code>/<code>else</code> 블록 중 정확히 하나만 실행되고, 들여쓰기 밖의 마지막 <code>print</code>는 항상 실행됩니다. <code>age</code>를 18로 바꾸고 다시 추적해 봅니다(<a href="#ex=conditionals">conditionals</a>의 첫 단계가 17과 18을 모두 실행합니다).</p>
+
+<pre><code>age = 17
+print("Start")
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Done")
+# Start
+# Under 18
+# Done</code></pre>
+
+<h2>elif로 여러 갈래 만들기</h2>
+
+<p><code>elif</code>는 앞의 조건이 모두 거짓일 때 다른 조건을 검사합니다. 처음으로 맞은 갈래 하나만 실행되고, 마지막의 <code>else</code>는 선택 사항으로 나머지 모든 경우를 처리합니다. 성적 기준은 높은 것부터 낮은 것 순서로 검사합니다.</p>
+
+<pre><code>score = 85
+if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+elif score &gt;= 70:
+    grade = "C"
+elif score &gt;= 60:
+    grade = "D"
+else:
+    grade = "F"
+print(grade)    # B</code></pre>
+
+<h3>독립된 if와 elif의 차이</h3>
+
+<p>따로 떨어진 <code>if</code> 문은 각자 자기 조건을 검사하므로 여러 블록이 실행될 수 있습니다. <code>if</code>/<code>elif</code> 사슬은 처음 맞은 갈래에서 멈춥니다. 등급처럼 서로 배타적인 분류에는 사슬을 쓰고, 여러 메시지를 함께 출력하려는 경우에는 독립된 검사를 씁니다.</p>
+
+<pre><code>score = 95
+if score &gt;= 90:
+    print("A")
+if score &gt;= 80:
+    print("B")
+# Both A and B are printed above.
+
+if score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+# Only A is printed by this chain.</code></pre>
+
+<h2>입력 검증과 중첩 조건</h2>
+
+<p>값을 사용하기 전에 먼저 검증합니다. 중첩된 <code>if</code>는 다른 갈래 안에서 실행됩니다. 아래 코드는 가드를 두어 0으로 나누기를 막고, 나눗셈을 한 경우에만 결과가 음수인지 다시 검사합니다.</p>
+
+<pre><code>a = float(input("First number: "))
+b = float(input("Second number: "))
+if b == 0:
+    print("Cannot divide by zero")
+else:
+    result = a / b
+    if result &lt; 0:
+        print("Negative result")
+    print(f"Result: {result:.2f}")</code></pre>
+
+<p>이번 실습에서는 숫자 입력이 요구한 형식대로 들어온다고 가정합니다. <code>"abc"</code>처럼 숫자로 바꿀 수 없는 입력을 처리하는 방법(예외 처리)은 나중에 배웁니다. <a href="#ex=conditionals">conditionals</a>에서는 이 코드를 7, 0과 -6, 4로 실행합니다.</p>
+
+<h3>분류 전에 검증하기</h3>
+
+<p>허용 범위 밖의 값을 먼저 거부하고, 정상적인 판단은 유효한 경우 안에 둡니다. 음수, 0, 유효한 양수를 모두 테스트합니다.</p>
+
+<pre><code>tickets = -1
+if tickets &lt; 0:
+    print("Invalid quantity")
+else:
+    if tickets == 0:
+        print("No booking")
+    else:
+        print(f"Booked: {tickets}")
+# -1: Invalid quantity
+# 0: No booking
+# 2: Booked: 2</code></pre>
+
+<h2>자주 하는 실수</h2>
+
+<ul>
+<li>같은지 비교할 때는 대입 <code>=</code>가 아니라 <code>==</code>를 씁니다.</li>
+<li>콜론을 빠뜨리거나 들여쓰기가 맞지 않으면 블록이 깨집니다.</li>
+<li>숫자로 비교하려면 먼저 문자열을 변환합니다.</li>
+<li><code>"False"</code>는 비어 있지 않은 문자열이므로 <code>bool("False")</code>는 <code>True</code>입니다.</li>
+<li><code>or</code>를 쓸 때는 두 경우를 모두 명시적으로 비교합니다.</li>
+</ul>
+
+<pre><code>choice = "paper"
+
+# Incorrect: "scissors" is truthy.
+if choice == "rock" or "scissors":
+    print("This always runs")
+
+# Correct:
+if (choice == "rock"
+        or choice == "scissors"):
+    print("Rock or scissors")</code></pre>
+
+<p>잘못된 코드는 <code>(choice == "rock") or "scissors"</code>로 해석됩니다. 앞쪽이 거짓이어도 뒤쪽의 <code>"scissors"</code>는 비어 있지 않은 문자열이라 참으로 취급되므로, 조건 전체가 항상 참이 됩니다.</p>
+
+<h3>디버깅 연습: 할인</h3>
+
+<p>학생(student)이나 경로 우대(senior) 손님에게만 할인을 적용해야 하는데, 아래 프로그램은 모든 손님에게 할인을 적용합니다. 조건의 어느 부분이 항상 참인지 설명하고, 조건을 고친 뒤 세 종류의 손님으로 테스트합니다.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if customer == "student" or "senior":
+    price *= 0.8
+print(price)    # 80.0: incorrect for adult
+
+# Expected after repair:
+# adult: 100
+# student: 80.0
+# senior: 80.0</code></pre>
+
+<p>풀이는 두 경우 모두에서 <code>customer</code>를 명시적으로 비교하는 것입니다. 고친 코드를 adult, student, senior로 실행하고, 들여 쓴 갱신문이 언제 실행되는지 설명해 봅니다.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if (customer == "student"
+        or customer == "senior"):
+    price *= 0.8
+print(price)    # 100</code></pre>
+
+<p><a href="#ex=conditionals">conditionals</a>에서 고치기 전과 후를 세 손님에 대해 나란히 실행해 볼 수 있습니다. 고치기 전에는 adult도 80.0이고, 고친 뒤에는 100입니다.</p>
+
+<h2>마무리 확인</h2>
+
+<p>실습에 들어가기 전에 슬라이싱, 불리언 식, 갈래의 순서를 복습해 둡니다. 다음 두 질문으로 확인해 봅니다.</p>
+
+<ol>
+<li><strong><code>"Python"[1:4]</code>는 무엇인가?</strong> <code>yth</code>입니다. 인덱스 1, 2, 3이 선택되고 4는 빠집니다.</li>
+<li><strong>왜 <code>score &gt;= 90</code>을 <code>score &gt;= 60</code>보다 먼저 검사하는가?</strong> 처음 맞은 갈래가 실행되기 때문입니다. 60을 먼저 검사하면 95점도 D가 됩니다.</li>
+</ol>
+</div>
+    </article>
+    <article class="notes" id="notes-conditionals">
+      <h2 class="notes-title"><span lang="en">Operators, Strings &amp; Conditionals (Practice)</span><span lang="ko">연산자, 문자열, 조건문 (실습)</span></h2>
+<div lang="en">
+<p>This is the practice part of the chapter. Using the operators, strings and conditionals from the theory part, we build four short programs: string processing (<a href="#ex=strings">strings</a>, 20 minutes), a grade classifier (<a href="#ex=grades">grades</a>, 25 minutes), rock-paper-scissors (<a href="#ex=rps">rps</a>, 40 minutes) and a leap-year calculator (<a href="#ex=leap_year">leap_year</a>, 25 minutes), in that order, and in the last 10 minutes we test and submit. Each example page opens in the starter folder, and the sample solution is shown below it as well. Edit the starter code with <code>nano</code> to complete it, then use the example steps to compare with the solution's output.</p>
+
+<h2>Keyboard Input with input()</h2>
+
+<p><code>input()</code> displays a prompt and waits for keyboard input. When you type a value and press <kbd>Enter</kbd>, the program continues. The returned value is always a string, even when you type a number, so labs that need an integer use <code>int(input(...))</code>. To try a different input, run the program again.</p>
+
+<pre><code>name = input("Name: ")
+print(f"Hello, {name}!")
+# Type Mina, then press Enter.
+# Output: Hello, Mina!
+
+score = int(input("Score: "))
+print(score + 1)
+# Type 85, then press Enter.
+# Output: 86
+# Enter integer-formatted text for score.</code></pre>
+
+<p>The example steps in this lab supply the input in advance and run automatically. For example, <code>echo 85 | python3 grades.py</code> is the same as typing 85 and pressing <kbd>Enter</kbd>. Because the input is not shown on screen, the output appears right after the prompt, as in <code>Score: B</code>. To type the input yourself, just run <code>python3 grades.py</code>.</p>
+
+<h2>f-Strings: Values Inside Text</h2>
+
+<p><code>print()</code> is a function that displays a value, and the <code>f</code> is not syntax that <code>print()</code> requires. Without the <code>f</code>, the braces and variable name are printed literally. With an <code>f</code> in front of the quotation mark, the current value of <code>name</code> is put in place of <code>{name}</code>. Python builds the string first, and then <code>print()</code> displays it. For simple output, you can also list the values separated by commas.</p>
+
+<pre><code>name = "Mina"
+score = 85
+print("Hello, Mina!")
+# Hello, Mina!
+print("Hello, {name}!")
+# Hello, {name}!
+print(f"Hello, {name}!")
+# Hello, Mina!
+print(f"Score: {score}")
+# Score: 85
+print("Score:", score)
+# Score: 85</code></pre>
+
+<h2>Lab Workflow: Input to Test</h2>
+
+<p>Before you start coding, write down the input, the transformation and the required output separately. Write the expected result for a small example first, and run the program each time you implement one requirement. Before submitting, also test boundary values and invalid input. The extra exercises are optional, within the lab time.</p>
+
+<pre><code># Example plan for strings.py
+# Input:   "  Python  "
+# Clean:   "Python"
+# Length:  6
+# Upper:   PYTHON
+# Reverse: nohtyP
+# First:   P
+# Empty input is a separate test case.
+# Write expected output before coding.</code></pre>
+
+<h2>Lab 1: String Manipulation</h2>
+
+<p><code>strings.py</code> reads one line, removes the leading and trailing spaces, and prints the length, the uppercase version and the reversed string. The first character is printed only when the text is not empty. Test with an ordinary word, input of spaces only, and a single character.</p>
+
+<pre><code>text = input("Text: ").strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+# Input: Python
+# Length: 6, Upper: PYTHON
+# Reverse: nohtyP, First: P</code></pre>
+
+<p>The starter code has only the line that reads the input; the rest is TODO. The output labels <code>Length:</code>, <code>Upper:</code>, <code>Reverse:</code> and <code>First:</code>, and <code>No text entered</code> for empty input, must match exactly.</p>
+
+<h3>Step-by-Step Trace</h3>
+
+<p>Trace each intermediate value for a word padded with spaces. Do the transformations on the cleaned <code>text</code>, and check explicitly that it is not empty before indexing. In the lab, use <code>input()</code> instead of the fixed <code>raw</code> value.</p>
+
+<pre><code>raw = "  Python  "
+text = raw.strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if len(text) &gt; 0:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")</code></pre>
+
+<h3>Empty Input &amp; Extension</h3>
+
+<p>Empty input and input of spaces only both become an empty string after <code>strip()</code>. Even in the empty case, the three lines for length, uppercase and reverse must be printed (<code>Length: 0</code>, and an empty <code>Upper:</code> and <code>Reverse:</code>), and you must make sure that indexing never runs on the empty string. Running <code>text[0]</code> without a check raises an <code>IndexError</code>.</p>
+
+<pre><code>text = "   ".strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+word = "Level".lower()
+print(word == word[::-1])    # True</code></pre>
+
+<p>The optional extension is to print whether the cleaned, lowercased text equals its own reverse (whether it is a palindrome). In the <a href="#ex=strings">strings</a> example you can run all three inputs, the IndexError and the palindrome check.</p>
+
+<h2>Lab 2: Grade Classifier</h2>
+
+<p><code>grades.py</code> reads an integer score. It accepts only 0 to 100 (both ends included) and reports any other value with <code>Invalid score</code>. The grades are A: 90–100, B: 80–89, C: 70–79, D: 60–69, F: 0–59.</p>
+
+<pre><code>score = int(input("Score: "))
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+elif score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+elif score &gt;= 70:
+    print("C")
+elif score &gt;= 60:
+    print("D")
+else:
+    print("F")</code></pre>
+
+<p>Because the range check is at the front of the chain, the <code>elif</code>s after it only see valid scores. Thresholds are checked from the highest. Test with 59, 60, 89, 90, 100 and 101.</p>
+
+<h3>Boundary Test Design</h3>
+
+<p>A test checks one input against an expected result. At each threshold, test the value just below it and the threshold itself, and also test the two endpoints and values out of range. If 89 comes out as A, check the comparison operators and the threshold values.</p>
+
+<pre><code># Input    Expected
+# -1       Invalid score
+# 0, 59    F
+# 60, 69   D
+# 70, 79   C
+# 80, 89   B
+# 90, 100  A
+# 101      Invalid score
+
+# Run grades.py once for each input.
+# Record actual output beside expected.</code></pre>
+
+<p>Running the program once for each input can be done all at once with a shell <code>for</code> loop. The second step of the <a href="#ex=grades">grades</a> example runs all 12 inputs from the table above and builds a table such as <code>59 -&gt; F</code>. Try your own file with the same command.</p>
+
+<h3>Optional Pass/Fail Output</h3>
+
+<p>A valid score of 60 or more also receives Pass, and below 60 Fail. An invalid score must not get Pass/Fail, so put the extra decision inside the valid-score branch. Test with 59, 60 and 101.</p>
+
+<pre><code>score = 59
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+else:
+    # Keep grade classification here.
+    if score &gt;= 60:
+        print("Pass")
+    else:
+        print("Fail")
+# Test 59, 60 and 101.</code></pre>
+
+<h2>Lab 3: Rock-Paper-Scissors</h2>
+
+<h3>Rules</h3>
+
+<p><code>rps.py</code> plays one round against the computer. The input is cleaned with <code>strip().lower()</code>, and only rock, paper or scissors is accepted. If both are the same it is a tie; rock beats scissors, scissors beats paper, and paper beats rock. Invalid input is rejected, and for valid input both choices are printed. The computer's choice is picked from a list with <code>random.choice()</code>.</p>
+
+<pre><code>import random
+
+# choice() picks one item.
+computer = random.choice(
+    ["rock", "paper", "scissors"]
+)
+
+# First, test with fixed values:
+player = "rock"
+computer = "scissors"
+# Expected outcome: You win</code></pre>
+
+<h3>All Nine Valid Pairs</h3>
+
+<p>Three player choices and three computer choices give 9 pairs. Of these, 3 are ties, 3 are wins and 3 are losses. Read the table from the player's point of view, and use these expected results to check every branch.</p>
+
+<table>
+<thead><tr><th>Player</th><th>Computer</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>rock</td><td>rock</td><td>Tie</td></tr>
+<tr><td>rock</td><td>paper</td><td>You lose</td></tr>
+<tr><td>rock</td><td>scissors</td><td>You win</td></tr>
+<tr><td>paper</td><td>rock</td><td>You win</td></tr>
+<tr><td>paper</td><td>paper</td><td>Tie</td></tr>
+<tr><td>paper</td><td>scissors</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>rock</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>paper</td><td>You win</td></tr>
+<tr><td>scissors</td><td>scissors</td><td>Tie</td></tr>
+</tbody>
+</table>
+
+<h3>Branching Example</h3>
+
+<p>Validate the player's choice before deciding the outcome. Check for a tie before win or loss, and list all three winning pairs. Everything else is a loss.</p>
+
+<pre><code>import random
+p = input("Your choice: ").strip().lower()
+options = ["rock", "paper", "scissors"]
+c = random.choice(options)
+if p not in ["rock", "paper", "scissors"]:
+    print("Invalid choice")
+else:
+    print(f"You: {p}, computer: {c}")
+    if p == c:
+        print("Tie")
+    elif ((p == "rock" and c == "scissors")
+          or (p == "scissors" and c == "paper")
+          or (p == "paper" and c == "rock")):
+        print("You win")
+    else:
+        print("You lose")</code></pre>
+
+<p>The output must be exactly one of <code>Tie</code>, <code>You win</code> and <code>You lose</code>.</p>
+
+<h3>Reproducible Testing</h3>
+
+<p>If the computer's choice is random, the same input gives a different result on each run, so the test cannot be repeated. So while testing, temporarily fix the computer's choice. Check that input with mixed spaces and case is cleaned up and that an invalid word and empty input are each rejected, and put <code>random.choice(options)</code> back before submitting.</p>
+
+<pre><code>computer = "scissors"
+player = " ROCK ".strip().lower()
+print(player, computer)
+# rock scissors: expected You win
+
+# With computer fixed to scissors:
+# rock     -&gt; You win
+# paper    -&gt; You lose
+# scissors -&gt; Tie
+# lizard   -&gt; Invalid choice
+# empty    -&gt; Invalid choice</code></pre>
+
+<p>The <a href="#ex=rps">rps</a> example does not edit the file directly; it uses <code>sed</code> to make a copy in <code>/tmp</code> in which <code>random.choice(options)</code> is replaced by a fixed value, and tests that. In the same way, you can print all 9 pairs as a table and compare it with the table above.</p>
+
+<h2>Lab 4: Leap-Year Calculator</h2>
+
+<h3>Leap-Year Rules</h3>
+
+<p><code>leap_year.py</code> reads a positive integer year and decides whether it is a leap year by the Gregorian calendar rules. If it is divisible by 400, it is a leap year. Otherwise, if it is divisible by 100, it is not a leap year. Otherwise, if it is divisible by 4, it is a leap year. Everything else is not a leap year. Divisibility is tested with the remainder operator <code>%</code>.</p>
+
+<pre><code># Divisibility uses remainder:
+print(2024 % 4 == 0)      # True
+print(1900 % 100 == 0)    # True
+print(2000 % 400 == 0)    # True
+
+# Expected classifications:
+# 2024: Leap year
+# 1900: Not a leap year
+# 2000: Leap year
+# 2023: Not a leap year</code></pre>
+
+<h3>Tracing the Leap-Year Rule</h3>
+
+<p>First find the results of the three divisibility tests. A year that is a multiple of 100 is a leap year only if it is also divisible by 400, and an ordinary multiple of 4 is a leap year. Explain why 1900 and 2000 give different results.</p>
+
+<pre><code>year = 1900
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(by4, by100, by400)
+# True True False
+print(by400 or (by4 and not by100))
+# False
+
+# Repeat with 2000, 2024 and 2023.
+# Expected: True, True, False.</code></pre>
+
+<h3>Leap-Year Calculator</h3>
+
+<p>Reject 0 and negative years. Combine the rules with <code>and</code> and <code>or</code>, and use parentheses to separate the two cases that make a leap year. Print a clear result for the year entered.</p>
+
+<pre><code>year = int(input("Year: "))
+if year &lt;= 0:
+    print("Enter a positive year")
+else:
+    is_leap = (year % 400 == 0 or
+               (year % 4 == 0 and
+                year % 100 != 0))
+    if is_leap:
+        print(f"{year}: Leap year")
+    else:
+        print(f"{year}: Not a leap year")</code></pre>
+
+<h3>An Equivalent Branch Chain</h3>
+
+<p>The challenge is to express the same rule with <code>if</code>/<code>elif</code>/<code>else</code>. Keep the positive-year check first, check multiples of 400 before multiples of 100, and multiples of 100 before multiples of 4. Compare the results with the Boolean-expression version.</p>
+
+<pre><code>year = 2000
+if year &lt;= 0:
+    print("Enter a positive year")
+elif year % 400 == 0:
+    print(f"{year}: Leap year")
+elif year % 100 == 0:
+    print(f"{year}: Not a leap year")
+elif year % 4 == 0:
+    print(f"{year}: Leap year")
+else:
+    print(f"{year}: Not a leap year")</code></pre>
+
+<p>In the <a href="#ex=leap_year">leap_year</a> example you can run the trace for four years, the solution with six inputs (2024, 2000, 2023, 1900, 0, -4), and the <code>if</code>/<code>elif</code> version.</p>
+
+<h2>Debugging Review Before Submission</h2>
+
+<p>For each defect, choose one input that exposes it. Before changing the code, first explain why it fails, and after the fix, run both the normal input and the input that used to fail again. Leave the test inputs and expected results as comments in the file.</p>
+
+<table>
+<thead><tr><th>Defect</th><th>Exposing test</th></tr></thead>
+<tbody>
+<tr><td>Indexing before checking</td><td><code>""</code></td></tr>
+<tr><td>Missing <code>strip()</code></td><td><code>"  "</code></td></tr>
+<tr><td>Checking the low grade first</td><td><code>95</code></td></tr>
+<tr><td>Missing <code>lower()</code></td><td><code>"ROCK"</code></td></tr>
+<tr><td>Checking only <code>year % 4 == 0</code></td><td><code>1900</code></td></tr>
+</tbody>
+</table>
+
+<p>The fixes are, respectively: check before indexing, normalize the text, order the grade thresholds from highest, and apply the leap-year rule in full. Each example page contains a step that reproduces one of these defects. For example, in <a href="#ex=grades">grades</a> a chain that checks the low threshold first classifies 95 as D, and in <a href="#ex=leap_year">leap_year</a> checking only for multiples of 4 wrongly reports 1900 as a leap year.</p>
+
+<h2>Testing &amp; Submission</h2>
+
+<p>Run each file and compare the output with the expected results. Check the boundary values and invalid choices, and for rock-paper-scissors try all 9 pairs.</p>
+
+<table>
+<thead><tr><th>Program</th><th>Input</th><th>Expected result</th></tr></thead>
+<tbody>
+<tr><td>strings.py</td><td><code>"   "</code></td><td>No text entered</td></tr>
+<tr><td>strings.py</td><td><code>" A "</code></td><td>Length: 1</td></tr>
+<tr><td>grades.py</td><td>59 / 60</td><td>F / D</td></tr>
+<tr><td>grades.py</td><td>100 / 101</td><td>A / Invalid score</td></tr>
+<tr><td>leap_year.py</td><td>1900 / 2000</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>2023 / 2024</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>0</td><td>Positive-year message</td></tr>
+</tbody>
+</table>
+
+<p>Submit <code>strings.py</code>, <code>grades.py</code>, <code>rps.py</code> and <code>leap_year.py</code>. In each file, record at least three test inputs and expected results as comments. Files you complete in this lab can be copied, as in <code>cp strings.py /mnt/host/</code>, and then downloaded to your computer with the page's Download box.</p>
+
+<h2>Summary &amp; Next Chapter</h2>
+
+<ul>
+<li>Operators build expressions and comparisons.</li>
+<li>String indices start at 0, and a slice does not include the stop index.</li>
+<li>String methods only return a result; the string itself does not change.</li>
+<li><code>if</code>/<code>elif</code>/<code>else</code> picks the first matching branch.</li>
+<li>Boundary tests reveal missing cases.</li>
+</ul>
+
+<p>In the next chapter, 'Loops', we learn the <code>for</code> and <code>while</code> loops, <code>range()</code>, and <code>break</code> and <code>continue</code>, and the 'Functions' chapter follows. The preview on the slides also mentions lists, tuples, dictionaries and sets, but these data structures are covered separately later. A question to think about in advance: "How could we repeat rock-paper-scissors until the user says they want to stop?"</p>
+</div><div lang="ko">
+<p>이 장의 실습 부분입니다. 앞에서 배운 연산자, 문자열, 조건문으로 짧은 프로그램 네 개를 만듭니다. 문자열 처리(<a href="#ex=strings">strings</a>, 20분), 성적 분류(<a href="#ex=grades">grades</a>, 25분), 가위바위보(<a href="#ex=rps">rps</a>, 40분), 윤년 계산(<a href="#ex=leap_year">leap_year</a>, 25분)을 차례로 하고, 마지막 10분에 테스트하고 제출합니다. 예제 페이지는 시작 코드(starter) 폴더에서 열리며, 아래쪽에 예시 답안도 함께 보입니다. 시작 코드를 <code>nano</code>로 편집해 완성한 뒤, 예제 단계로 답안의 출력과 비교해 보세요.</p>
+
+<h2>키보드 입력: input()</h2>
+
+<p><code>input()</code>은 프롬프트를 보여 주고 키보드 입력을 기다립니다. 값을 입력하고 <kbd>Enter</kbd>를 누르면 프로그램이 계속됩니다. 돌려받는 값은 숫자를 입력해도 항상 문자열이므로, 정수가 필요한 실습에서는 <code>int(input(...))</code>을 씁니다. 다른 입력을 시험하려면 프로그램을 다시 실행합니다.</p>
+
+<pre><code>name = input("Name: ")
+print(f"Hello, {name}!")
+# Type Mina, then press Enter.
+# Output: Hello, Mina!
+
+score = int(input("Score: "))
+print(score + 1)
+# Type 85, then press Enter.
+# Output: 86
+# Enter integer-formatted text for score.</code></pre>
+
+<p>이 실습실의 예제 단계는 입력을 미리 넣어 자동으로 실행합니다. 예를 들어 <code>echo 85 | python3 grades.py</code>는 85를 입력하고 <kbd>Enter</kbd>를 누른 것과 같습니다. 입력이 화면에 보이지 않기 때문에 출력이 <code>Score: B</code>처럼 프롬프트 바로 뒤에 붙어 나옵니다. 직접 입력해 보려면 <code>python3 grades.py</code>만 실행하면 됩니다.</p>
+
+<h2>f-string: 텍스트 안에 값 넣기</h2>
+
+<p><code>print()</code>는 값을 보여 주는 함수이고, <code>f</code>는 <code>print()</code>에 꼭 필요한 문법이 아닙니다. <code>f</code>를 붙이지 않으면 중괄호와 변수 이름이 글자 그대로 출력됩니다. 따옴표 앞에 <code>f</code>를 붙이면 <code>{name}</code> 자리에 <code>name</code>의 현재 값이 들어갑니다. Python이 먼저 문자열을 완성하고, 그다음 <code>print()</code>가 그것을 보여 줍니다. 간단한 출력은 쉼표로 값을 나열해도 됩니다.</p>
+
+<pre><code>name = "Mina"
+score = 85
+print("Hello, Mina!")
+# Hello, Mina!
+print("Hello, {name}!")
+# Hello, {name}!
+print(f"Hello, {name}!")
+# Hello, Mina!
+print(f"Score: {score}")
+# Score: 85
+print("Score:", score)
+# Score: 85</code></pre>
+
+<h2>실습 진행 방법: 입력에서 테스트까지</h2>
+
+<p>코딩을 시작하기 전에 입력, 변환, 요구되는 출력을 나눠 적습니다. 작은 예에 대한 기대 결과를 먼저 쓰고, 요구 사항을 하나 구현할 때마다 프로그램을 실행합니다. 제출 전에는 경계값과 잘못된 입력도 추가로 테스트합니다. 추가 연습 문제는 실습 시간 안에서 선택적으로 합니다.</p>
+
+<pre><code># Example plan for strings.py
+# Input:   "  Python  "
+# Clean:   "Python"
+# Length:  6
+# Upper:   PYTHON
+# Reverse: nohtyP
+# First:   P
+# Empty input is a separate test case.
+# Write expected output before coding.</code></pre>
+
+<h2>실습 1: 문자열 처리</h2>
+
+<p><code>strings.py</code>는 한 줄을 입력받아 앞뒤 공백을 지운 뒤 길이, 대문자 변환 결과, 역순 문자열을 출력합니다. 첫 글자는 비어 있지 않을 때만 출력합니다. 일반 단어, 공백만 있는 입력, 한 글자로 테스트합니다.</p>
+
+<pre><code>text = input("Text: ").strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+# Input: Python
+# Length: 6, Upper: PYTHON
+# Reverse: nohtyP, First: P</code></pre>
+
+<p>시작 코드에는 입력을 받는 줄만 있고 나머지는 TODO입니다. 출력 레이블 <code>Length:</code>, <code>Upper:</code>, <code>Reverse:</code>, <code>First:</code>와 빈 입력의 <code>No text entered</code>를 정확히 맞춰야 합니다.</p>
+
+<h3>단계별 추적</h3>
+
+<p>앞뒤에 공백이 붙은 단어로 중간 값을 하나씩 추적합니다. 변환은 정리된 <code>text</code>에 대해 하고, 인덱싱하기 전에 비어 있지 않은지 명시적으로 검사합니다. 실습에서는 고정된 <code>raw</code> 값 대신 <code>input()</code>을 씁니다.</p>
+
+<pre><code>raw = "  Python  "
+text = raw.strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if len(text) &gt; 0:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")</code></pre>
+
+<h3>빈 입력과 확장 과제</h3>
+
+<p>아무것도 입력하지 않은 경우와 공백만 입력한 경우 모두 <code>strip()</code> 뒤에는 빈 문자열이 됩니다. 빈 경우에도 길이, 대문자, 역순 세 줄은 출력되어야 하며(<code>Length: 0</code>, 그리고 비어 있는 <code>Upper:</code>와 <code>Reverse:</code>), 빈 문자열에서 인덱싱이 절대 실행되지 않는지 확인합니다. 검사 없이 <code>text[0]</code>을 실행하면 <code>IndexError</code>가 납니다.</p>
+
+<pre><code>text = "   ".strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+word = "Level".lower()
+print(word == word[::-1])    # True</code></pre>
+
+<p>선택 확장 과제는 정리하고 소문자로 바꾼 텍스트가 자기 역순과 같은지(회문인지) 출력하는 것입니다. <a href="#ex=strings">strings</a> 예제에서 세 가지 입력과 IndexError, 회문 검사를 모두 실행해 볼 수 있습니다.</p>
+
+<h2>실습 2: 성적 분류</h2>
+
+<p><code>grades.py</code>는 정수 점수를 입력받습니다. 0부터 100까지(양 끝 포함)만 받아들이고, 그 밖의 값은 <code>Invalid score</code>로 알립니다. 등급은 A: 90–100, B: 80–89, C: 70–79, D: 60–69, F: 0–59입니다.</p>
+
+<pre><code>score = int(input("Score: "))
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+elif score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+elif score &gt;= 70:
+    print("C")
+elif score &gt;= 60:
+    print("D")
+else:
+    print("F")</code></pre>
+
+<p>범위 검사를 사슬의 맨 앞에 두었기 때문에, 그 뒤의 <code>elif</code>는 유효한 점수만 만납니다. 기준은 높은 것부터 검사합니다. 59, 60, 89, 90, 100, 101로 테스트합니다.</p>
+
+<h3>경계값 테스트 설계</h3>
+
+<p>테스트 하나는 입력 하나를 기대 결과와 비교하는 것입니다. 각 기준에서 바로 아래 값과 기준 값 자체를 시험하고, 두 끝값과 범위 밖의 값도 시험합니다. 89가 A로 나온다면 비교 연산자와 기준 값을 확인합니다.</p>
+
+<pre><code># Input    Expected
+# -1       Invalid score
+# 0, 59    F
+# 60, 69   D
+# 70, 79   C
+# 80, 89   B
+# 90, 100  A
+# 101      Invalid score
+
+# Run grades.py once for each input.
+# Record actual output beside expected.</code></pre>
+
+<p>입력마다 프로그램을 한 번씩 실행하는 일은 셸의 <code>for</code> 반복으로 한꺼번에 할 수 있습니다. <a href="#ex=grades">grades</a> 예제의 두 번째 단계가 위 표의 12개 입력을 모두 실행해 <code>59 -&gt; F</code> 같은 표를 만듭니다. 자기 파일도 같은 명령으로 시험해 보세요.</p>
+
+<h3>선택 과제: Pass/Fail 출력</h3>
+
+<p>유효한 점수가 60 이상이면 Pass, 60 미만이면 Fail도 함께 출력합니다. 잘못된 점수에는 Pass/Fail을 붙이면 안 되므로, 추가 판단은 유효한 점수 갈래 안에 넣습니다. 59, 60, 101로 테스트합니다.</p>
+
+<pre><code>score = 59
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+else:
+    # Keep grade classification here.
+    if score &gt;= 60:
+        print("Pass")
+    else:
+        print("Fail")
+# Test 59, 60 and 101.</code></pre>
+
+<h2>실습 3: 가위바위보</h2>
+
+<h3>규칙</h3>
+
+<p><code>rps.py</code>는 컴퓨터와 한 판을 겨룹니다. 입력은 <code>strip().lower()</code>로 정리한 뒤 rock, paper, scissors 중 하나만 받아들입니다. 둘이 같으면 무승부이고, 바위는 가위를, 가위는 보를, 보는 바위를 이깁니다. 잘못된 입력은 거부하고, 유효하면 양쪽의 선택을 출력합니다. 컴퓨터의 선택은 <code>random.choice()</code>로 리스트에서 하나를 고릅니다.</p>
+
+<pre><code>import random
+
+# choice() picks one item.
+computer = random.choice(
+    ["rock", "paper", "scissors"]
+)
+
+# First, test with fixed values:
+player = "rock"
+computer = "scissors"
+# Expected outcome: You win</code></pre>
+
+<h3>가능한 9가지 조합</h3>
+
+<p>사람의 선택 3가지와 컴퓨터의 선택 3가지로 9가지 조합이 나옵니다. 그중 무승부, 승리, 패배가 각각 3개입니다. 표는 사람의 입장에서 읽으며, 이 기대 결과로 모든 갈래를 확인합니다.</p>
+
+<table>
+<thead><tr><th>Player</th><th>Computer</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>rock</td><td>rock</td><td>Tie</td></tr>
+<tr><td>rock</td><td>paper</td><td>You lose</td></tr>
+<tr><td>rock</td><td>scissors</td><td>You win</td></tr>
+<tr><td>paper</td><td>rock</td><td>You win</td></tr>
+<tr><td>paper</td><td>paper</td><td>Tie</td></tr>
+<tr><td>paper</td><td>scissors</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>rock</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>paper</td><td>You win</td></tr>
+<tr><td>scissors</td><td>scissors</td><td>Tie</td></tr>
+</tbody>
+</table>
+
+<h3>분기 예제</h3>
+
+<p>결과를 판단하기 전에 사람의 선택부터 검증합니다. 승패보다 무승부를 먼저 검사하고, 이기는 세 조합을 모두 나열합니다. 나머지는 모두 패배입니다.</p>
+
+<pre><code>import random
+p = input("Your choice: ").strip().lower()
+options = ["rock", "paper", "scissors"]
+c = random.choice(options)
+if p not in ["rock", "paper", "scissors"]:
+    print("Invalid choice")
+else:
+    print(f"You: {p}, computer: {c}")
+    if p == c:
+        print("Tie")
+    elif ((p == "rock" and c == "scissors")
+          or (p == "scissors" and c == "paper")
+          or (p == "paper" and c == "rock")):
+        print("You win")
+    else:
+        print("You lose")</code></pre>
+
+<p>출력은 <code>Tie</code>, <code>You win</code>, <code>You lose</code> 중 정확히 하나여야 합니다.</p>
+
+<h3>재현 가능한 테스트</h3>
+
+<p>컴퓨터의 선택이 무작위이면 같은 입력도 실행할 때마다 결과가 달라서 테스트를 반복할 수 없습니다. 그래서 테스트하는 동안에는 컴퓨터 선택을 임시로 고정합니다. 공백과 대소문자가 섞인 입력이 정리되는지, 잘못된 단어와 빈 입력이 각각 거부되는지 확인하고, 제출하기 전에 <code>random.choice(options)</code>를 되돌려 놓습니다.</p>
+
+<pre><code>computer = "scissors"
+player = " ROCK ".strip().lower()
+print(player, computer)
+# rock scissors: expected You win
+
+# With computer fixed to scissors:
+# rock     -&gt; You win
+# paper    -&gt; You lose
+# scissors -&gt; Tie
+# lizard   -&gt; Invalid choice
+# empty    -&gt; Invalid choice</code></pre>
+
+<p><a href="#ex=rps">rps</a> 예제는 파일을 직접 고치지 않고, <code>sed</code>로 <code>random.choice(options)</code>를 고정값으로 바꾼 사본을 <code>/tmp</code>에 만들어 테스트합니다. 같은 방법으로 9가지 조합 전체를 표로 출력해 위 표와 비교할 수 있습니다.</p>
+
+<h2>실습 4: 윤년 계산</h2>
+
+<h3>윤년 규칙</h3>
+
+<p><code>leap_year.py</code>는 양의 정수 연도를 입력받아 그레고리력 규칙으로 윤년인지 판단합니다. 400으로 나누어떨어지면 윤년입니다. 그렇지 않고 100으로 나누어떨어지면 윤년이 아닙니다. 그렇지 않고 4로 나누어떨어지면 윤년입니다. 나머지는 모두 윤년이 아닙니다. 나누어떨어지는지는 나머지 연산 <code>%</code>로 검사합니다.</p>
+
+<pre><code># Divisibility uses remainder:
+print(2024 % 4 == 0)      # True
+print(1900 % 100 == 0)    # True
+print(2000 % 400 == 0)    # True
+
+# Expected classifications:
+# 2024: Leap year
+# 1900: Not a leap year
+# 2000: Leap year
+# 2023: Not a leap year</code></pre>
+
+<h3>규칙 추적하기</h3>
+
+<p>먼저 세 가지 나눗셈 검사의 결과를 구합니다. 100의 배수인 해는 400으로도 나누어떨어져야 윤년이고, 일반적인 4의 배수는 윤년입니다. 1900과 2000의 결과가 왜 다른지 설명해 봅니다.</p>
+
+<pre><code>year = 1900
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(by4, by100, by400)
+# True True False
+print(by400 or (by4 and not by100))
+# False
+
+# Repeat with 2000, 2024 and 2023.
+# Expected: True, True, False.</code></pre>
+
+<h3>윤년 계산기</h3>
+
+<p>0과 음수 연도는 거부합니다. 규칙은 <code>and</code>와 <code>or</code>로 묶고, 괄호로 윤년이 되는 두 가지 경우를 구분합니다. 입력한 연도에 대해 분명한 결과를 출력합니다.</p>
+
+<pre><code>year = int(input("Year: "))
+if year &lt;= 0:
+    print("Enter a positive year")
+else:
+    is_leap = (year % 400 == 0 or
+               (year % 4 == 0 and
+                year % 100 != 0))
+    if is_leap:
+        print(f"{year}: Leap year")
+    else:
+        print(f"{year}: Not a leap year")</code></pre>
+
+<h3>같은 규칙의 if/elif 사슬</h3>
+
+<p>도전 과제는 같은 규칙을 <code>if</code>/<code>elif</code>/<code>else</code>로 표현하는 것입니다. 양수 검사를 맨 앞에 두고, 400의 배수 검사를 100의 배수 검사보다, 100의 배수 검사를 4의 배수 검사보다 먼저 합니다. 결과를 불리언 식 버전과 비교해 봅니다.</p>
+
+<pre><code>year = 2000
+if year &lt;= 0:
+    print("Enter a positive year")
+elif year % 400 == 0:
+    print(f"{year}: Leap year")
+elif year % 100 == 0:
+    print(f"{year}: Not a leap year")
+elif year % 4 == 0:
+    print(f"{year}: Leap year")
+else:
+    print(f"{year}: Not a leap year")</code></pre>
+
+<p><a href="#ex=leap_year">leap_year</a> 예제에서 네 해의 추적, 답안의 여섯 가지 입력(2024, 2000, 2023, 1900, 0, -4), 그리고 <code>if</code>/<code>elif</code> 버전을 실행할 수 있습니다.</p>
+
+<h2>제출 전 디버깅</h2>
+
+<p>결함마다 그것을 드러내는 입력을 하나씩 고릅니다. 코드를 고치기 전에 왜 실패하는지 먼저 설명하고, 고친 뒤에는 정상 입력과 실패하던 입력을 모두 다시 실행합니다. 테스트 입력과 기대 결과는 파일의 주석으로 남깁니다.</p>
+
+<table>
+<thead><tr><th>결함</th><th>드러내는 테스트</th></tr></thead>
+<tbody>
+<tr><td>검사 전에 인덱싱</td><td><code>""</code></td></tr>
+<tr><td><code>strip()</code> 누락</td><td><code>"  "</code></td></tr>
+<tr><td>낮은 등급을 먼저 검사</td><td><code>95</code></td></tr>
+<tr><td><code>lower()</code> 누락</td><td><code>"ROCK"</code></td></tr>
+<tr><td><code>year % 4 == 0</code>만 검사</td><td><code>1900</code></td></tr>
+</tbody>
+</table>
+
+<p>고치는 방법은 각각 인덱싱 전에 검사하기, 텍스트 정규화하기, 등급 기준을 높은 것부터 정렬하기, 윤년 규칙을 빠짐없이 적용하기입니다. 각 예제 페이지에는 이런 결함을 재현하는 단계가 하나씩 들어 있습니다. 예를 들어 <a href="#ex=grades">grades</a>에서는 낮은 기준을 먼저 검사한 사슬이 95를 D로 판정하고, <a href="#ex=leap_year">leap_year</a>에서는 4의 배수만 검사하면 1900이 윤년으로 잘못 나옵니다.</p>
+
+<h2>테스트와 제출</h2>
+
+<p>파일마다 실행해 출력을 기대 결과와 비교합니다. 경계값과 잘못된 선택을 확인하고, 가위바위보는 9가지 조합을 모두 시험합니다.</p>
+
+<table>
+<thead><tr><th>프로그램</th><th>입력</th><th>기대 결과</th></tr></thead>
+<tbody>
+<tr><td>strings.py</td><td><code>"   "</code></td><td>No text entered</td></tr>
+<tr><td>strings.py</td><td><code>" A "</code></td><td>Length: 1</td></tr>
+<tr><td>grades.py</td><td>59 / 60</td><td>F / D</td></tr>
+<tr><td>grades.py</td><td>100 / 101</td><td>A / Invalid score</td></tr>
+<tr><td>leap_year.py</td><td>1900 / 2000</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>2023 / 2024</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>0</td><td>양수 연도 안내 메시지</td></tr>
+</tbody>
+</table>
+
+<p><code>strings.py</code>, <code>grades.py</code>, <code>rps.py</code>, <code>leap_year.py</code>를 제출합니다. 파일마다 테스트 입력과 기대 결과를 최소 세 개씩 주석으로 기록합니다. 이 실습실에서 완성한 파일은 <code>cp strings.py /mnt/host/</code>처럼 복사한 뒤 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>정리와 다음 장</h2>
+
+<ul>
+<li>연산자로 식과 비교를 만듭니다.</li>
+<li>문자열 인덱스는 0부터 시작하고, 슬라이스는 stop 인덱스를 포함하지 않습니다.</li>
+<li>문자열 메서드는 결과를 돌려줄 뿐, 문자열 자체는 바뀌지 않습니다.</li>
+<li><code>if</code>/<code>elif</code>/<code>else</code>는 처음 맞은 갈래를 고릅니다.</li>
+<li>경계값 테스트는 빠뜨린 경우를 드러내 줍니다.</li>
+</ul>
+
+<p>다음 장 '반복문'에서는 <code>for</code>와 <code>while</code> 반복문, <code>range()</code>, <code>break</code>와 <code>continue</code>를 배우고, 그다음 '함수' 장으로 이어집니다. 슬라이드의 예고에는 리스트·튜플·딕셔너리·집합도 있지만, 이 자료 구조는 뒤에서 따로 다룹니다. 미리 생각해 볼 질문은 "사용자가 그만두겠다고 할 때까지 가위바위보를 반복하려면 어떻게 해야 할까?"입니다.</p>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

@@ -51,3 +51,20 @@
     });
   });
 })();
+
+// The chapter menu in the top bar (<details class="toc">): close it on a
+// click outside, on Escape, and after choosing a chapter on the same page.
+(function () {
+  document.addEventListener("click", (ev) => {
+    document.querySelectorAll("details.toc[open]").forEach((d) => {
+      if (!d.contains(ev.target) || ev.target.closest(".toc-menu a")) d.open = false;
+    });
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Escape") return;
+    document.querySelectorAll("details.toc[open]").forEach((d) => {
+      d.open = false;
+      d.querySelector("summary").focus();
+    });
+  });
+})();

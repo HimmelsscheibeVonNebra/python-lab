@@ -1,0 +1,417 @@
+<p>From this lesson on, you work on a solo term project in which each student plans and develops one program independently. Today covers the project rules and grading, the criteria for choosing a topic, how to turn vague wishes into testable requirements, and your personal work plan. At the end of the lesson you submit three documents: a profile, a topic worksheet and proposal v0.</p>
+
+<p>This lesson is not about writing code, so there is no separate example to run. Instead, the example from "From Proposal to Design" that actually implements the "study-time logger" the slides keep using as an example is linked at <a href="study_logger_criteria.html">study_logger_criteria</a>. You can see for yourself how the data format and acceptance criteria written in a proposal are judged pass/fail from the program's results.</p>
+
+<h2>1. The solo term project</h2>
+
+<h3>The toolkit is complete</h3>
+
+<table>
+<thead><tr><th>You learned</th><th>You built</th></tr></thead>
+<tbody>
+<tr><td>Variables, types, I/O, operators, strings, if</td><td>BMI calculator</td></tr>
+<tr><td>Loops, functions, lists, dicts, sets</td><td>Grade manager, word counts</td></tr>
+<tr><td>Modules, exceptions, files, classes</td><td>Lotto, journal, charts</td></tr>
+<tr><td>OOP four principles, pandas, matplotlib</td><td>Bank accounts, CSV reports</td></tr>
+<tr><td>Review, Git basics (add, commit, push)</td><td>Practical exam</td></tr>
+</tbody>
+</table>
+
+<p>Nothing new is required to start the project. The project is where the pieces you have learned so far come together to solve one real problem.</p>
+
+<h3>What changes today</h3>
+
+<table>
+<thead><tr><th>Coursework so far</th><th>Solo term project</th></tr></thead>
+<tbody>
+<tr><td>Given TODOs</td><td>You choose the problem and scope</td></tr>
+<tr><td>One exercise file</td><td>Several files forming one program</td></tr>
+<tr><td>A known answer</td><td>You write the acceptance criteria</td></tr>
+<tr><td>Short individual exercises</td><td>An individual project maintained over several weeks</td></tr>
+<tr><td>Automatic checks</td><td>Evidence from planning, design, code, documentation and demo</td></tr>
+</tbody>
+</table>
+
+<p>Project rule: individual projects only. Each student owns and explains their own work.</p>
+
+<h3>The project roadmap</h3>
+
+<table>
+<thead><tr><th>Stage</th><th>Focus</th><th>Deliverable</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Planning</td><td>Personal profile, topic worksheet, proposal v0</td></tr>
+<tr><td>2</td><td>System design and Git workflow</td><td>Design document, your own repository and a feature branch</td></tr>
+<tr><td>3</td><td>Prototyping and MVP</td><td>Core scenario runs end to end</td></tr>
+<tr><td>4</td><td>Testing and debugging</td><td>Acceptance tests and bug fixes</td></tr>
+<tr><td>5</td><td>Data or UI extension</td><td>Selected extra features and integrated data</td></tr>
+<tr><td>6</td><td>Documentation and freeze</td><td>README, final cleanup, no new features</td></tr>
+<tr><td>7</td><td>Rehearsal</td><td>Slides and a timed demo</td></tr>
+<tr><td>8</td><td>Final presentation</td><td>Individual demo, code and explanations</td></tr>
+</tbody>
+</table>
+
+<p>Show visible progress every week.</p>
+
+<h3>How the project is graded</h3>
+
+<table>
+<thead><tr><th>Component</th><th>Weight</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>Planning and requirements</td><td>15%</td><td>Personal proposal and design document</td></tr>
+<tr><td>Design and Git workflow</td><td>20%</td><td>Structure, meaningful commits, branch history</td></tr>
+<tr><td>Implementation</td><td>30%</td><td>Running program and code quality</td></tr>
+<tr><td>Documentation</td><td>15%</td><td>README with reproducible setup and usage</td></tr>
+<tr><td>Presentation and demo</td><td>20%</td><td>Individual demo and answers to questions</td></tr>
+</tbody>
+</table>
+
+<p>The original project weights stay the same, and there is no teamwork score. Your commit history is the evidence that records your own development process.</p>
+
+<h3>Individual ownership and the definition of done</h3>
+
+<p>One student submits one project. You are responsible for all of the planning, implementation, data, tests, documentation and demo, and you record your progress in your own repository. Advice and peer feedback can refine your decisions, but the implementation is yours. A shared implementation or divided development work is not a solo project. You must be able to explain every function and design decision you submit.</p>
+
+<p>The project is done when it has:</p>
+
+<ol>
+<li>A program that runs in a fresh environment by following the repository's instructions</li>
+<li>A README explaining its purpose, setup, usage and limitations</li>
+<li>A reliable individual live demo at the final presentation</li>
+<li>Clear explanations of your implementation and design choices</li>
+</ol>
+
+<p>Features are frozen in the documentation stage and rehearsed before the final presentation.</p>
+
+<h2>2. Choosing a topic</h2>
+
+<h3>Three tests for a solo topic</h3>
+
+<ol>
+<li><strong>Care test</strong>: you or someone you know actually needs the program.</li>
+<li><strong>Python test</strong>: its core can be solved with the logic and data skills you have learned so far.</li>
+<li><strong>MVP deadline test</strong>: you can run a minimal version on your own by the end of the MVP stage.</li>
+</ol>
+
+<p>If one test fails, narrow the scope; if two fail, choose another topic. Your available time must include time for testing and documentation.</p>
+
+<h3>Small is beautiful: the MVP ladder</h3>
+
+<p>An MVP (minimum viable product) is the smallest program that does one useful thing end to end.</p>
+
+<table>
+<thead><tr><th>Level</th><th>Idea</th></tr></thead>
+<tbody>
+<tr><td>Too big</td><td>A fitness app with login, feed and recommendations</td></tr>
+<tr><td>Still big</td><td>A workout tracker with charts and goals</td></tr>
+<tr><td>MVP</td><td>Append sets to workout.csv and print a weekly summary chart</td></tr>
+<tr><td>Too small</td><td>A script that prints one number (no user, no decision)</td></tr>
+</tbody>
+</table>
+
+<p>Build the MVP first, then climb. Extras are work for the extension stage after the MVP.</p>
+
+<h3>Topic catalog</h3>
+
+<p><strong>Data projects</strong> (pandas, matplotlib, the "Data Analysis: pandas and matplotlib" chapter): a study-time logger that records study time per course and draws a weekly bar chart; a weather comparison that plots min/mean/max temperature lines from two cities' CSVs; a personal finance tracker that shows a category pie chart and monthly trend from expenses.csv; campus data such as cafeteria menus, library hours or exam-period demand. The data must already exist or be collectable by hand within a few days.</p>
+
+<p><strong>Tools and games</strong> (functions, classes, files, the chapters from "Loops" to "Object-Oriented Programming"): vocabulary flashcards with a CSV word list, quiz mode and wrong-answer review; a Wordle-style word game with one class per round; an inventory manager that adds, removes and searches items and saves them to a file; a password generator and strength checker; a quiz builder where teachers write questions, students play and scores are saved. A game needs a clear "one round" you can demo.</p>
+
+<p><strong>Everyday helpers</strong> (dictionaries, classes, exceptions): a timetable checker that warns about course, room and time conflicts; an expense splitter that calculates trip costs and each person's settlement amount; a recipe planner that makes a weekly menu and a CSV shopping list; a personal task planner with deadlines, priorities and an overdue list. Even with one developer, a program can have several users.</p>
+
+<h3>Red flags</h3>
+
+<table>
+<thead><tr><th>Warning</th><th>Risk</th><th>Response</th></tr></thead>
+<tbody>
+<tr><td>"An app" without a user or situation</td><td>Unclear scope and demo</td><td>Name a user and a moment of use</td></tr>
+<tr><td>Unavailable or restricted data</td><td>MVP may stall</td><td>Use public data or collect a small sample</td></tr>
+<tr><td>A new framework is essential</td><td>Too much unfamiliar work</td><td>Start with console, files and charts</td></tr>
+<tr><td>"AI will do the difficult parts"</td><td>You cannot explain the code</td><td>Explain and verify every part you submit</td></tr>
+<tr><td>Scope needs several developers</td><td>Too large for one student</td><td>Cut to one core scenario</td></tr>
+</tbody>
+</table>
+
+<p>Choose a topic you can implement, test and explain on your own.</p>
+
+<h2>3. Requirements analysis</h2>
+
+<h3>A requirement is testable</h3>
+
+<table>
+<thead><tr><th>Not a requirement</th><th>Requirement</th></tr></thead>
+<tbody>
+<tr><td>"The report is fast"</td><td>"The summary prints in under 1 second for 10,000 rows"</td></tr>
+<tr><td>"Easy to use"</td><td>"A new user can log an entry with one command and no manual"</td></tr>
+<tr><td>"Handles bad input"</td><td>"Entering a negative amount shows a warning and nothing is saved"</td></tr>
+</tbody>
+</table>
+
+<p>Functional requirements say what the program does; non-functional requirements say how well it does it (speed, safety, readability). If you cannot imagine a test for it, it is not a requirement yet.</p>
+
+<h3>User stories</h3>
+
+<p>The format is "<em>As a ___, I want ___, so that ___</em>."</p>
+
+<table>
+<thead><tr><th>Story</th><th>Quality</th></tr></thead>
+<tbody>
+<tr><td>As a student, I want to log study time by course so that I can review my week.</td><td>Clear user, action and reason</td></tr>
+<tr><td>As a user, I want features so that I can do things.</td><td>Too vague</td></tr>
+<tr><td>I want to use classes.</td><td>A technical choice, not a user need</td></tr>
+</tbody>
+</table>
+
+<p>Write 3–5 stories and connect each to numbered features.</p>
+
+<h3>From stories to features</h3>
+
+<table>
+<thead><tr><th>ID</th><th>Feature</th><th>Course skills</th></tr></thead>
+<tbody>
+<tr><td>F1</td><td>Enter date, course and positive minutes</td><td>Input, conditions, exceptions</td></tr>
+<tr><td>F2</td><td>Save and reload study.csv</td><td>Files, CSV, type conversion</td></tr>
+<tr><td>F3</td><td>Show weekly totals by course</td><td>Dictionaries and loops</td></tr>
+<tr><td>F4</td><td>Draw a weekly bar chart</td><td>matplotlib</td></tr>
+</tbody>
+</table>
+
+<p>Rejecting invalid minutes is part of F1's acceptance criteria. Predict which features are essential for the first working version.</p>
+
+<h3>MoSCoW prioritization</h3>
+
+<table>
+<thead><tr><th>Priority</th><th>Meaning</th><th>Study logger</th></tr></thead>
+<tbody>
+<tr><td>Must</td><td>Required for the core demo</td><td>F1 valid input, F2 persistence, F3 totals</td></tr>
+<tr><td>Should</td><td>Important but not essential</td><td>F4 chart</td></tr>
+<tr><td>Could</td><td>Add only if time remains</td><td>Course colors</td></tr>
+<tr><td>Won't</td><td>Explicitly outside this project</td><td>Login, mobile app, database</td></tr>
+</tbody>
+</table>
+
+<p>Build the MVP from the Must features and have it running by the end of the MVP stage. In a solo project, have at most 3 Must features, each with a testable result. Input validation and error handling belong inside the relevant feature.</p>
+
+<h3>The scope border</h3>
+
+<table>
+<thead><tr><th>In v1</th><th>Out of v1 (and where it went)</th></tr></thead>
+<tbody>
+<tr><td>Log, save, weekly totals</td><td>Login / Won't</td></tr>
+<tr><td>One chart, one CSV</td><td>Database / Won't</td></tr>
+<tr><td>Console interface</td><td>Web page / Won't in this project</td></tr>
+</tbody>
+</table>
+
+<p>The Out list is a decision record. Reviewers will ask what you cut and why. "Won't" is a plan, not a failure.</p>
+
+<h3>Data design: four questions</h3>
+
+<ol>
+<li>What data does the program read and write?</li>
+<li>Who creates it: the user, you, or an existing public source?</li>
+<li>What format and types: file names, columns and value rules?</li>
+<li>How much: start with a small sample you have checked yourself.</li>
+</ol>
+
+<pre><code>study.csv: date,course,minutes
+2026-10-24,python,90
+2026-10-25,stats,45</code></pre>
+
+<p>Specify the data format now, even if integration happens later. In the first step of <a href="study_logger_criteria.html">study_logger_criteria</a> you can see this sample file used as the data of a real program.</p>
+
+<h3>Acceptance criteria</h3>
+
+<p>Each Must feature needs at least one statement that decides pass or fail.</p>
+
+<table>
+<thead><tr><th>Feature</th><th>Acceptance criterion</th></tr></thead>
+<tbody>
+<tr><td>F1 log entry</td><td>Entering 2026-10-24, python, 90 appends one row to study.csv</td></tr>
+<tr><td>F1 bad input</td><td>Entering -30 minutes prints a warning and the file is unchanged</td></tr>
+<tr><td>F3 totals</td><td>For the sample week above, python 90 and stats 45 are printed</td></tr>
+</tbody>
+</table>
+
+<p>These lines become test cases in the testing stage almost word for word. In <a href="study_logger_criteria.html">study_logger_criteria</a> you can check in turn that entering -30 shows the <code>Not saved</code> warning and leaves the file's line count unchanged, that valid input adds one row, and that <code>test_logic.py</code>, which writes the same criteria as asserts, passes.</p>
+
+<h3>Requirements checklist</h3>
+
+<ul>
+<li>3–5 user stories naming a user, action and reason</li>
+<li>Every story connected to numbered features</li>
+<li>Every feature labeled Must / Should / Could / Won't</li>
+<li>At most 3 Must features for the solo MVP</li>
+<li>At least one acceptance criterion per Must feature</li>
+<li>Invalid-input behavior specified where relevant</li>
+<li>Named data files with columns and types</li>
+<li>Out-of-scope decisions written down</li>
+</ul>
+
+<h2>4. Planning your work</h2>
+
+<h3>The solo proposal</h3>
+
+<p>Use the solo template; aim for two pages of main text plus detailed appendices.</p>
+
+<table>
+<thead><tr><th>Part</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td>1. Problem and goal</td><td>Who needs what change?</td></tr>
+<tr><td>2. User and situation</td><td>One user and a moment of use</td></tr>
+<tr><td>3. Requirements</td><td>Stories, features, priorities and acceptance criteria</td></tr>
+<tr><td>4. Scope</td><td>Included and excluded features</td></tr>
+<tr><td>5. Data</td><td>Sources, files, columns and types</td></tr>
+<tr><td>6. Skills</td><td>Course concepts used by each feature</td></tr>
+<tr><td>7. Milestones</td><td>Personal weekly results and work blocks</td></tr>
+<tr><td>8. Risks</td><td>Three major risks and responses</td></tr>
+</tbody>
+</table>
+
+
+<h3>Personal milestones</h3>
+
+<table>
+<thead><tr><th>Stage</th><th>Completion evidence</th></tr></thead>
+<tbody>
+<tr><td>Design</td><td>Design document and your own repository with a feature branch</td></tr>
+<tr><td>MVP</td><td>All Must features run end to end in an MVP demo</td></tr>
+<tr><td>Testing</td><td>Acceptance tests pass; remaining bugs prioritized</td></tr>
+<tr><td>Extension</td><td>Selected extensions integrated without breaking the MVP</td></tr>
+<tr><td>Documentation</td><td>Features frozen and README complete</td></tr>
+<tr><td>Rehearsal</td><td>Timed rehearsal in the demo environment</td></tr>
+<tr><td>Final presentation</td><td>Individual final presentation</td></tr>
+</tbody>
+</table>
+
+<p>A milestone needs evidence you can show.</p>
+
+<h3>One developer, several responsibilities</h3>
+
+<table>
+<thead><tr><th>Work category</th><th>Your responsibility</th></tr></thead>
+<tbody>
+<tr><td>Planning</td><td>Scope, schedule and progress log</td></tr>
+<tr><td>Implementation</td><td>Code structure and working features</td></tr>
+<tr><td>Data and testing</td><td>Sample data, test cases and bug tracking</td></tr>
+<tr><td>Documentation and demo</td><td>README, slides and rehearsal</td></tr>
+</tbody>
+</table>
+
+<p>These are work categories for one person, not roles to divide among several people. Reserve time for tests and documentation as well as coding.</p>
+
+<h3>Solo-project risks and mitigation</h3>
+
+<table>
+<thead><tr><th>Risk</th><th>Early signal</th><th>Response</th></tr></thead>
+<tbody>
+<tr><td>Data too large or dirty</td><td>The sample will not load</td><td>Use a checked 100-row sample</td></tr>
+<tr><td>Personal time overload</td><td>One task slips repeatedly</td><td>Cut scope and keep only one next task</td></tr>
+<tr><td>Feature creep</td><td>New Must features appear late</td><td>Freeze the Must scope after the design stage</td></tr>
+<tr><td>Demo failure</td><td>It works only on your laptop</td><td>Rehearse in the demo environment</td></tr>
+</tbody>
+</table>
+
+<p>Record your own three largest risks and a fallback for each.</p>
+
+<h3>A weekly routine</h3>
+
+<p>Reserve a regular 30-minute progress review and write down completed / next / blocked. Choose one concrete next task and put its work block on your schedule. Make meaningful commits for code, data and documentation, and use Markdown, your own Git repository and the LMS submission channel. Record your weekly review time and coding times today.</p>
+
+<h3>Today's individual deliverables</h3>
+
+<ol>
+<li><code>project-profile.md</code>: identity, project title and weekly work schedule</li>
+<li><code>topic-worksheet.md</code>: candidate ideas, comparison and chosen scope</li>
+<li><code>proposal-template.md</code>: proposal v0, with all eight parts attempted</li>
+</ol>
+
+<p>Each submission has one author and one project owner. These documents are Markdown text files, so write them in an editor on your own PC. (You can also write them with nano in the web lab, but they are erased when the page reloads, so you must <code>cp</code> them to <code>/mnt/host/</code> and download them from the Download box.)</p>
+
+<h2>5. Lab: your topic (20 minutes)</h2>
+
+<h3>Set up your project profile (3 minutes)</h3>
+
+<p>In <code>project-profile.md</code>, write your name and student ID, a working title, your weekly progress-review time and coding blocks, and your current strengths and the skill you need to review. You will take on all development responsibilities yourself.</p>
+
+<h3>Individual brainstorming (5 minutes)</h3>
+
+<ol>
+<li>Write at least 6 problems from your own week.</li>
+<li>Generate ideas before judging them.</li>
+<li>Turn each idea into one user and one useful action.</li>
+<li>Keep all ideas in your own worksheet.</li>
+</ol>
+
+<h3>Compare ideas with a scorecard (5 minutes)</h3>
+
+<table>
+<thead><tr><th>Criterion</th><th>0</th><th>1</th><th>2</th></tr></thead>
+<tbody>
+<tr><td>User need</td><td>No clear user</td><td>Possible use</td><td>Clear recurring need</td></tr>
+<tr><td>Python fit</td><td>Mostly unfamiliar</td><td>Some new work</td><td>Uses learned skills</td></tr>
+<tr><td>MVP feasibility</td><td>Cannot finish alone</td><td>Scope uncertain</td><td>Runs within the MVP stage</td></tr>
+</tbody>
+</table>
+
+<p>Score three candidate topics from 0 to 2. If feasibility is 0, you cannot choose that topic, however high its total. For a tie, choose the one with the smaller scope and more accessible data.</p>
+
+<h3>Scope your chosen idea (7 minutes)</h3>
+
+<ul>
+<li>One-sentence goal: "For ___, my program helps ___ by ___."</li>
+<li>At most 3 Must features, one line each</li>
+<li>At least 2 out-of-scope items</li>
+<li>A named data source or a small sample you can create yourself</li>
+<li>A fallback: what will you cut if the MVP schedule is at risk?</li>
+</ul>
+
+<p>Report your chosen topic individually to the instructor.</p>
+
+<h2>6. Lab: solo proposal v0 (25 minutes)</h2>
+
+<h3>Draft the eight parts (18 minutes)</h3>
+
+<table>
+<thead><tr><th>Parts</th><th>Minutes</th></tr></thead>
+<tbody>
+<tr><td>1–2. Problem and user</td><td>3</td></tr>
+<tr><td>3–4. Features and scope</td><td>6</td></tr>
+<tr><td>5–6. Data and skills</td><td>4</td></tr>
+<tr><td>7. Milestones and work schedule</td><td>3</td></tr>
+<tr><td>8. Risks</td><td>2</td></tr>
+</tbody>
+</table>
+
+<p>Attempt every part, and give each unresolved decision a date for follow-up.</p>
+
+<h3>Peer feedback and one-minute pitch</h3>
+
+<p>For 5 minutes, exchange drafts with one classmate and check three things. Can the reader restate the goal in one sentence? Is each Must feature testable? Can one student finish the scope within the MVP stage? Give two strengths and one concern, and revise your own proposal after receiving feedback. This is review only: do not split the implementation or create a joint submission.</p>
+
+<p>Next, two volunteers each give a one-minute pitch: the user's problem, the Must features and one observable demo result. Listeners suggest one feature to cut and explain why. If time is short, send your pitch as a written paragraph.</p>
+
+<h3>Common mistakes</h3>
+
+<ul>
+<li>A technology name instead of a user goal.</li>
+<li>Scope that needs several developers.</li>
+<li>Data access postponed until implementation.</li>
+<li>No time reserved for tests or documentation.</li>
+<li>A proposal filled with vague descriptions.</li>
+</ul>
+
+<h2>7. Review</h2>
+
+<h3>Check questions</h3>
+
+<ol>
+<li>What makes a requirement testable? A clear pass/fail result.</li>
+<li>What goes into the MVP? Must features only, at most 3 for this solo plan.</li>
+<li>Why write Won't items? To record and defend scope decisions.</li>
+<li>What does data design answer? What, who, format and amount.</li>
+<li>Is joint development allowed? No. Each project is implemented individually.</li>
+</ol>
+
+<h3>Submit and prepare for the next stage</h3>
+
+<p>Submit your profile, topic worksheet and proposal v0 via the LMS. Before the design stage, reread your proposal and be ready to explain your scope decisions. The following lessons cover function decomposition, modules, data design and a personal Git workflow. Bring a laptop on which <code>git --version</code> runs (this web lab environment has no git).</p>

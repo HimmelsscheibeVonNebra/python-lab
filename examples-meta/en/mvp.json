@@ -1,0 +1,34 @@
+{
+  "title": "Korean Stock Market Analysis: From Scenario to a Web Report MVP",
+  "summary": "Follow a design chain from scenario (SC) to requirement (REQ), feature (FEAT), function (FUNC) and test (TEST) while running korea_market_mvp. It validates and analyzes a fictional classroom CSV to build docs/index.html; check how the program reacts differently to empty input, bad input and a missing file, and that the existing report survives a failure. Finally, practice refactoring that does not change behavior.",
+  "examples": {
+    "korea_market_mvp": {
+      "summary": "main.py parses the arguments and calls, in order, load_quotes (read and validate the CSV) → analyze (filter and sort) → summarize (summary) → render_html (HTML string) → write_html (atomic file replacement). logic.py and report.py never open files; all I/O is in storage.py.",
+      "notes": "The slides' cd 11week/examples/korea_market_mvp is ~/project/mvp/examples/korea_market_mvp in this lab. Do the Git branch and PR steps in the repository on your real PC.",
+      "steps": [
+        "All 12 tests, test_01 to test_12, are ok, and the last line is OK. The number in each test name matches TEST-01 to TEST-12 in the workbook. The file tests run only inside a TemporaryDirectory, so they never touch the classroom docs/index.html.",
+        "The input contract: the header date,code,name,market,previous_close,close,volume in that order, one date, five stocks. Some codes start with 0, like 005930. All of it is fictional classroom data.",
+        "SC-01; the default is --market ALL. Generated .../docs/index.html (5 stocks) means the report was replaced. The success message is printed only after write_html() has finished.",
+        "The summary is 종목 5개 · 상승 2 · 하락 2 · 보합 1 (5 stocks: 2 up, 2 down, 1 flat), with a simple sample mean of +0.40%. The code order in the table is 247540, 005930, 035420, 000660, 035900, by change in descending order, and the leading 0 of 005930 is kept.",
+        "Type /mnt/host/report.html into the Download box above and click Download to open the report in your own computer's browser (TEST-13, the browser check). Check the reference date, market, source, units (원, 주), signed changes and the fictional-data notice.",
+        "FEAT-02: keeping only KOSPI gives 3 stocks with a mean of +0.33%. It differs from ALL's +0.40% because the sample being averaged has changed. This mean is an equal-weight sample mean, not the KOSPI index return.",
+        "SC-02: a row with a previous close of 0 is rejected with Report not generated: CSV row 2: previous_close must be >= 1, and the exit code is 1. docs/index.html is still the KOSPI report from just before, and no temporary file is left behind (REQ-06).",
+        "A missing file is an error, not empty data. You get the [Errno 2] No such file or directory message and exit code 1, and the report does not change.",
+        "SC-03: a CSV with only a header is valid empty input. It succeeds with (0 stocks) (exit code 0), the mean is N/A, and the table contains the notice 표시할 종목이 없습니다 (no stocks to show). The key point is that the result differs from a missing file.",
+        "argparse rejects an unknown market as an invalid choice, with exit code 2. To sum up: 0 for success, 1 for data or file errors, 2 for CLI usage errors.",
+        "The smallest rule from the slides: rise, fall and flat are each checked separately. The calculation does not round; rounding happens only in the report, with f\"{change:+.2f}%\".",
+        "html.escape turns < and > in external text such as stock names into &lt; and &gt; so that they are not interpreted as HTML tags (TEST-08). Showing the sign together with the number, as in +2.00%, makes the direction clear even without color.",
+        "Switch back to the ALL report and download it again. The slides' approach of serving it with python3 -m http.server does not work here because there is no browser inside this virtual machine, so download the file and open it yourself instead."
+      ]
+    },
+    "tidy_lab": {
+      "summary": "Code that works but is hard to read. Apply renaming, constant extraction, pulling a duplicated line into a function, and guard clauses, but the output of the six checks must not change by a single character. Refactoring is a different kind of change from adding features or fixing bugs, and its evidence is the same check results before and after.",
+      "steps": [
+        "Six PASS lines appear. This is the baseline before refactoring. Rerun after every change and check that the same six lines appear.",
+        "The daily goal of 2000 ml is scattered through the code as a bare number (Move 2). Give it a name at the top, like DAILY_GOAL_ML = 2000, and keep it in one place.",
+        "The same line appears twice, in the if and in the else (Move 3). The two branches are identical, so if you extract one function that builds the line, the branch itself is no longer needed.",
+        "The first run creates a copy, my_tidy.py (same output, since nothing has been changed yet); after that the existing copy is left as it is. Make one change at a time with nano my_tidy.py, then rerun this command to compare its output with the original. same output is the evidence that the behavior is unchanged. Use names like entries, day, ml and totals instead of x, d, m and tmp (Move 1). Do not change the check() calls or the function names."
+      ]
+    }
+  }
+}

@@ -1,0 +1,425 @@
+<p>Here we follow object-oriented programming (OOP) from start to finish with a single bank account. Starting from code that handles an account with only variables and functions, we build a class that bundles related data and behavior into one object, express the initial state with <code>__init__</code> and <code>self</code>, and express state changes with methods. Then we apply the four principles of OOP, encapsulation, abstraction, inheritance and polymorphism, to the code one by one. The example files are numbered step by step (<a href="01_variables_and_functions.html">01</a> to <a href="08_polymorphism.html">08</a>), and in the lab you complete <a href="bank_account.html">bank_account</a> and the optional <a href="savings_account.html">savings_account</a>. All amounts in this lecture are integers in won.</p>
+
+<p>The slides assume you copy the examples into Colab and run them there, but in this web lab you run them directly with <code>python3 filename.py</code> in the terminal of each example page.</p>
+
+<h2>Four Principles of OOP</h2>
+
+<p>This table runs through the whole lecture. Look first at which question each principle answers and where it appears in the account example.</p>
+
+<table>
+<thead>
+<tr><th>Principle</th><th>Key question</th><th>Account example</th></tr>
+</thead>
+<tbody>
+<tr><td>Encapsulation</td><td>How is state organized and controlled?</td><td>Balance changes that go through checks</td></tr>
+<tr><td>Abstraction</td><td>Which operations does the caller need?</td><td><code>withdraw(amount)</code></td></tr>
+<tr><td>Inheritance</td><td>What does a related type reuse?</td><td><code>SavingsAccount(BankAccount)</code></td></tr>
+<tr><td>Polymorphism</td><td>How can one call produce different behavior?</td><td><code>account.account_type()</code></td></tr>
+</tbody>
+</table>
+
+<h2>01 · Classes and Objects</h2>
+
+<h3>An account as variables</h3>
+
+<p>Every account has an owner and a balance. Each additional account needs another pair of variables. Which values belong to the same account can only be told from the variable names. Run it in <a href="01_variables_and_functions.html">01_variables_and_functions</a>.</p>
+
+<pre><code>minsu_owner = "Minsu"
+minsu_balance = 10000
+jisu_owner = "Jisu"
+jisu_balance = 5000
+print(minsu_owner, minsu_balance)   # Minsu 10000
+print(jisu_owner, jisu_balance)     # Jisu 5000</code></pre>
+
+<h3>A function needs the right data</h3>
+
+<p>The function receives the balance explicitly, and the caller stores the returned value again. If you pass another account's balance by mistake, the function cannot tell. An object carries its own data together with the related behavior.</p>
+
+<pre><code>def deposit(balance, amount):
+    return balance + amount
+
+minsu_balance = 10000
+minsu_balance = deposit(minsu_balance, 3000)
+print(minsu_balance)   # 13000</code></pre>
+
+<h3>Objects have data and behavior</h3>
+
+<p>One object represents one account. A class defines a kind of object, and an instance is one object made from that class. An account object's data attributes are <code>owner</code> and <code>balance</code>, and its methods are <code>deposit(amount)</code> and <code>withdraw(amount)</code>.</p>
+
+<h3>The first class</h3>
+
+<p><code>class</code> starts a class definition, and the indented body belongs to the class. <code>pass</code> is an empty statement that does nothing; for now it just holds the place. Calling <code>BankAccount()</code> creates an instance.</p>
+
+<pre><code>class BankAccount:
+    pass
+
+account = BankAccount()
+print(type(account).__name__)   # BankAccount</code></pre>
+
+<h3>Attributes belong to an object</h3>
+
+<p>The dot selects an attribute. Assigning, as in <code>account.owner = ...</code>, stores data in this object, and reading <code>account.balance</code> gets the current value.</p>
+
+<pre><code>account = BankAccount()
+account.owner = "Minsu"
+account.balance = 10000
+print(account.owner, account.balance)   # Minsu 10000</code></pre>
+
+<h3>Two objects, separate balances</h3>
+
+<p>Each call to <code>BankAccount()</code> creates a new object. The same attribute name can hold a different value in each object, and changing Minsu's balance leaves Jisu's balance as it is. <a href="02_classes_and_objects.html">02_classes_and_objects</a> also shows at the end that <code>minsu is jisu</code> is <code>False</code>.</p>
+
+<pre><code>minsu = BankAccount()
+minsu.balance = 10000
+jisu = BankAccount()
+jisu.balance = 5000
+minsu.balance = minsu.balance + 3000
+print(minsu.balance, jisu.balance)   # 13000 5000</code></pre>
+
+<h3>Class, object and instance</h3>
+
+<p>A class defines one kind of object. Each account is a separate object. "Instance" is the word for the relationship between an object and its class: each account is an instance of <code>BankAccount</code>.</p>
+
+<h2>02 · Initialization and Methods</h2>
+
+<h3>Initialization with __init__</h3>
+
+<p>Python calls <code>__init__</code> when it creates a new instance. The arguments provide the initial values, and the attributes assigned to <code>self</code> stay on that instance.</p>
+
+<pre><code>class BankAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance</code></pre>
+
+<h3>Creating initialized accounts</h3>
+
+<p>The arguments match <code>owner</code> and <code>balance</code> in order. Python passes the new object as <code>self</code>, so you do not write it in the call. Each call initializes its own instance.</p>
+
+<pre><code>minsu = BankAccount("Minsu", 10000)
+jisu = BankAccount("Jisu", 5000)
+print(minsu.owner, minsu.balance)   # Minsu 10000
+print(jisu.owner, jisu.balance)     # Jisu 5000</code></pre>
+
+<h3>self identifies the current instance</h3>
+
+<p><code>self</code> is the conventional parameter name. <code>self.owner</code> is an attribute of the current object, and <code>owner</code> is the value passed in this call. <code>self.owner = owner</code> stores that value in the object. Check it in <a href="03_init_and_self.html">03_init_and_self</a>.</p>
+
+<pre><code>account = BankAccount("Minsu", 10000)
+print(account.owner)   # Minsu</code></pre>
+
+<h3>Class variables and instance variables</h3>
+
+<p>A class variable is defined in the class body outside any method, and every instance can read the shared value. An instance variable is usually defined on <code>self</code> in <code>__init__</code>, and each account has its own owner and balance. <a href="03b_class_and_instance_variables.html">03b_class_and_instance_variables</a> goes on to show that when the class variable changes, every account reads the new value, and that assigning the same name on one instance creates a new attribute on that instance only.</p>
+
+<pre><code>class BankAccount:
+    bank_name = "Python Bank"        # class variable
+
+    def __init__(self, owner, balance):
+        self.owner = owner           # instance variable
+        self.balance = balance
+
+minsu = BankAccount("Minsu", 10000)
+jisu = BankAccount("Jisu", 5000)
+print(minsu.bank_name, jisu.bank_name)   # Python Bank Python Bank
+print(minsu.balance, jisu.balance)       # 10000 5000</code></pre>
+
+<h3>Prediction: which balance changes?</h3>
+
+<p>Before running, predict the two lines of output and explain which object each dot refers to. Then create a third account of your own. The second step of the <a href="03_init_and_self.html">03_init_and_self</a> page runs this code (answer: 3000 and 7000).</p>
+
+<pre><code>a = BankAccount("A", 2000)
+b = BankAccount("B", 7000)
+a.balance = a.balance + 1000
+print(a.balance)
+print(b.balance)</code></pre>
+
+<h3>A method changes its object's state</h3>
+
+<p>A method is a function defined inside a class. <code>self</code> selects the account whose balance changes. This first version assumes the amount is positive.</p>
+
+<pre><code>def deposit(self, amount):
+    self.balance = self.balance + amount
+    return True</code></pre>
+
+<h3>Calling an instance method</h3>
+
+<p><code>minsu.deposit(3000)</code> calls the method on minsu, and Python passes minsu as <code>self</code>. The call changes <code>minsu.balance</code>. Because the object before the dot becomes <code>self</code>, only that account's balance changes, and other instances keep their own state.</p>
+
+<pre><code>minsu = BankAccount("Minsu", 10000)
+jisu = BankAccount("Jisu", 5000)
+accepted = minsu.deposit(3000)
+print(accepted, minsu.balance)   # True 13000
+print(jisu.balance)              # 5000</code></pre>
+
+<h3>Withdrawal is another method</h3>
+
+<p>The withdrawal method uses the same account state. For now it assumes the amount is positive and the balance is sufficient; checks for invalid requests are added in the next section.</p>
+
+<pre><code>def withdraw(self, amount):
+    self.balance = self.balance - amount
+    return True</code></pre>
+
+<h3>return and print have different jobs</h3>
+
+<p><code>return</code> gives a value back to the caller, and <code>print</code> shows a value on the screen. The method changes the balance before returning. Check it in <a href="04_methods.html">04_methods</a>.</p>
+
+<pre><code>account = BankAccount("Minsu", 10000)
+accepted = account.withdraw(4000)
+print(accepted)          # True
+print(account.balance)   # 6000</code></pre>
+
+<h2>03 · Encapsulation: State and the Rules for Changing It</h2>
+
+<h3>Direct changes can break a rule</h3>
+
+<p>An account's balance must not become negative. But a direct assignment can skip the withdrawal rule. We need a clear way to read and change the balance. In the second step of the <a href="04_methods.html">04_methods</a> page you can see both a <code>withdraw</code> without checks accepting a withdrawal larger than the balance and the direct assignment below.</p>
+
+<pre><code>account = BankAccount("Minsu", 10000)
+account.balance = -9999
+print(account.balance)   # -9999</code></pre>
+
+<h3>Encapsulation: state and rules together</h3>
+
+<p>Keep related data and methods in one class, and check changes through public methods. A rejected request does not change the state.</p>
+
+<h3>Encapsulation and the account interface</h3>
+
+<p>The underscore in <code>_balance</code> marks it as an internal attribute. <code>get_balance()</code> reads the current value, and <code>deposit()</code> and <code>withdraw()</code> control the valid changes.</p>
+
+<pre><code>class BankAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self._balance = balance
+
+    def get_balance(self):
+        return self._balance</code></pre>
+
+<h3>A deposit can be rejected</h3>
+
+<p>Zero and negative numbers are invalid amounts. A rejected call returns before changing the state, and a valid call changes the balance and then returns <code>True</code>.</p>
+
+<pre><code>def deposit(self, amount):
+    if amount &lt;= 0:
+        return False
+    self._balance = self._balance + amount
+    return True</code></pre>
+
+<h3>A withdrawal checks two conditions</h3>
+
+<p>The amount must be positive and must not exceed the balance. Withdrawing the whole balance is allowed.</p>
+
+<pre><code>def withdraw(self, amount):
+    if amount &lt;= 0 or amount &gt; self._balance:
+        return False
+    self._balance = self._balance - amount
+    return True</code></pre>
+
+<h3>Rejected operations preserve the balance</h3>
+
+<p>A failed call returns <code>False</code> and the balance stays the same. After a successful withdrawal of the full amount, 0 is left. <a href="05_encapsulation.html">05_encapsulation</a> runs the operations in the same order as the lab's table of expected results.</p>
+
+<pre><code>account = BankAccount("Jisu", 5000)
+print(account.deposit(-1000))    # False
+print(account.withdraw(6000))    # False
+print(account.get_balance())     # 5000
+print(account.withdraw(5000))    # True
+print(account.get_balance())     # 0</code></pre>
+
+<h3>An underscore is a convention</h3>
+
+<p>Python still allows access to <code>_balance</code>. The underscore only signals that it is internal, and people using the class should follow the public methods. Encapsulation depends on a clear interface and rules. In the second step of the <a href="05_encapsulation.html">05_encapsulation</a> page you can see <code>account._balance = -1</code> actually go through.</p>
+
+<table>
+<thead>
+<tr><th>Expression</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>account.get_balance()</code></td><td>Read the state</td></tr>
+<tr><td><code>account.deposit(1000)</code></td><td>Request a valid change</td></tr>
+<tr><td><code>account._balance = -1</code></td><td>Bypass the agreed interface</td></tr>
+</tbody>
+</table>
+
+<h2>04 · Abstraction: A Useful Interface for the Caller</h2>
+
+<p>Abstraction exposes the operations the caller needs and keeps the implementation details inside those operations. All the caller needs are the inputs and the result.</p>
+
+<h3>The caller uses the account interface</h3>
+
+<p>The caller requests a withdrawal, checks the result and reads the balance. It never changes <code>_balance</code> directly. Run it in <a href="07_abstraction.html">07_abstraction</a>.</p>
+
+<pre><code>account = BankAccount("Minsu", 10000)
+accepted = account.withdraw(4000)
+print("Accepted:", accepted)               # Accepted: True
+print("Balance:", account.get_balance())   # Balance: 6000</code></pre>
+
+<h3>Encapsulation and abstraction</h3>
+
+<table>
+<thead>
+<tr><th></th><th>Encapsulation</th><th>Abstraction</th></tr>
+</thead>
+<tbody>
+<tr><td>Focus</td><td>State and its rules</td><td>Useful operations</td></tr>
+<tr><td>Question</td><td>How can the state change?</td><td>What can the caller request?</td></tr>
+<tr><td>In this class</td><td>Check before changing <code>_balance</code></td><td><code>withdraw(amount)</code> returns a result</td></tr>
+</tbody>
+</table>
+
+<h2>05 · Inheritance: Shared Behavior for Related Account Types</h2>
+
+<p>A SavingsAccount is a kind of BankAccount. It inherits the common account operations and adds bonus data and a bonus operation.</p>
+
+<h3>Inheritance extends an existing class</h3>
+
+<p>Writing the parent class in parentheses inherits <code>deposit</code>, <code>withdraw</code> and <code>get_balance</code>. Even with a body of just <code>pass</code>, the parent's methods work as they are. Next we will add a fixed bonus amount.</p>
+
+<pre><code>class SavingsAccount(BankAccount):
+    pass
+
+savings = SavingsAccount("Minsu", 10000)
+print(savings.deposit(1000))    # True
+print(savings.get_balance())    # 11000</code></pre>
+
+<h3>super reuses the parent's initialization</h3>
+
+<p>The subclass takes one more argument (bonus). <code>super().__init__(owner, balance)</code> initializes <code>owner</code> and <code>_balance</code>, and <code>self.bonus</code> stores the new attribute.</p>
+
+<pre><code>class SavingsAccount(BankAccount):
+    def __init__(self, owner, balance, bonus):
+        super().__init__(owner, balance)
+        self.bonus = bonus</code></pre>
+
+<h3>A new method can reuse inherited behavior</h3>
+
+<p><code>add_bonus</code> calls the inherited <code>deposit</code>, so the existing checks still apply. Each call adds the fixed bonus once. In <a href="06_inheritance.html">06_inheritance</a> you can check the bonus, a deposit, a withdrawal and a rejected withdrawal in turn.</p>
+
+<pre><code>def add_bonus(self):
+    return self.deposit(self.bonus)</code></pre>
+
+<h2>06 · Polymorphism: The Same Call, Different Implementations</h2>
+
+<p>Both objects support <code>account_type()</code>, but each class provides its own implementation. The caller uses the same method name.</p>
+
+<h3>Overriding an inherited method</h3>
+
+<p>The parent provides a default label, and the child defines a method with the same name. Python picks the method that matches the class of the actual object. Only the methods are shown below; the full classes are in <a href="08_polymorphism.html">08_polymorphism</a>.</p>
+
+<pre><code>class BankAccount:
+    def account_type(self):
+        return "Standard"
+
+class SavingsAccount(BankAccount):
+    def account_type(self):
+        return "Savings"</code></pre>
+
+<h3>One loop works with both account types</h3>
+
+<p>Even when a list holds different account types, each call uses that object's implementation. There is no need to branch on the class name.</p>
+
+<pre><code>accounts = [BankAccount("Minsu", 10000),
+            SavingsAccount("Jisu", 5000, 500)]
+for account in accounts:
+    print(account.owner, account.account_type(),
+          account.get_balance())
+# Minsu Standard 10000
+# Jisu Savings 5000</code></pre>
+
+<h3>Four principles in one program</h3>
+
+<table>
+<thead>
+<tr><th>Principle</th><th>Where to look</th><th>What it gives</th></tr>
+</thead>
+<tbody>
+<tr><td>Encapsulation</td><td>deposit / withdraw with checks</td><td>Consistent state changes</td></tr>
+<tr><td>Abstraction</td><td>The caller's account interface</td><td>Fewer implementation details to manage</td></tr>
+<tr><td>Inheritance</td><td><code>SavingsAccount(BankAccount)</code></td><td>Shared and extended common behavior</td></tr>
+<tr><td>Polymorphism</td><td><code>account.account_type()</code> in a loop</td><td>Different implementations from one call</td></tr>
+</tbody>
+</table>
+
+<h2>07 · Lab and Wrap-Up</h2>
+
+<h3>Lab: two people's bank accounts</h3>
+
+<p>In <a href="bank_account.html">bank_account</a>, complete the four TODO methods in <code>bank_account.py</code>. Store <code>owner</code> and <code>_balance</code> on each instance, and reject amounts that are zero, negative or above the balance. Return <code>True</code> or <code>False</code>, and preserve the state when rejecting. The starter runs but deliberately returns wrong values, so on the first run all balances are 0 and every operation is <code>False</code>.</p>
+
+<table>
+<thead>
+<tr><th>Method</th><th>Responsibility</th></tr>
+</thead>
+<tbody>
+<tr><td><code>__init__</code></td><td>Store the starting state</td></tr>
+<tr><td><code>get_balance</code></td><td>Return the current balance</td></tr>
+<tr><td><code>deposit</code> / <code>withdraw</code></td><td>Check, then change</td></tr>
+</tbody>
+</table>
+
+<h3>Lab: expected results</h3>
+
+<table>
+<thead>
+<tr><th>Operation</th><th>Result</th><th>Minsu</th><th>Jisu</th></tr>
+</thead>
+<tbody>
+<tr><td>Create accounts</td><td>—</td><td>10000</td><td>5000</td></tr>
+<tr><td>Minsu deposits 3000</td><td>True</td><td>13000</td><td>5000</td></tr>
+<tr><td>Minsu withdraws 4000</td><td>True</td><td>9000</td><td>5000</td></tr>
+<tr><td>Minsu withdraws 10000</td><td>False</td><td>9000</td><td>5000</td></tr>
+<tr><td>Minsu deposits -1000</td><td>False</td><td>9000</td><td>5000</td></tr>
+<tr><td>Minsu withdraws 0</td><td>False</td><td>9000</td><td>5000</td></tr>
+<tr><td>Jisu withdraws 5000</td><td>True</td><td>9000</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>The starter's <code>__main__</code> block runs the operations in this order. Once you are done, its output should match, line for line, the output of <a href="05_encapsulation.html">05_encapsulation</a>, which performs the same operations. As the comment at the end of the starter suggests, also test the two extra cases of depositing 0 and withdrawing a negative amount, and explain why a rejected operation must not change the balance.</p>
+
+<h3>Optional extension: SavingsAccount</h3>
+
+<p><a href="savings_account.html">savings_account</a> reuses your finished <code>BankAccount</code> with <code>from bank_account import BankAccount</code>, so you have to finish <code>bank_account.py</code> in the same folder first. (For Colab, the instructions say to paste your finished class above and delete the import line, but in this web lab the two files are already in the same folder.) Initialize the shared state with <code>super().__init__</code>, store the bonus, and implement <code>add_bonus()</code>. Also check that a rejected withdrawal still preserves the state.</p>
+
+<pre><code>savings = SavingsAccount("Minsu", 10000, 500)
+print(savings.add_bonus())     # True
+print(savings.get_balance())   # 10500</code></pre>
+
+<h3>Common mistakes</h3>
+
+<table>
+<thead>
+<tr><th>Mistake</th><th>Fix</th></tr>
+</thead>
+<tbody>
+<tr><td>No <code>self</code> in a method</td><td>Write <code>self</code> as the first parameter</td></tr>
+<tr><td>Using a bare <code>balance</code> inside a method</td><td>Use the intended instance attribute</td></tr>
+<tr><td>Mixing <code>balance</code> and <code>_balance</code></td><td>Use <code>_balance</code> throughout the final class</td></tr>
+<tr><td>Changing the state before checking</td><td>Return <code>False</code> before changing the state</td></tr>
+<tr><td>Skipping <code>super().__init__</code></td><td>Initialize the shared attributes</td></tr>
+</tbody>
+</table>
+
+<h3>Exit questions</h3>
+
+<ul>
+<li>Which object does <code>self</code> refer to? The object that was before the dot when the method was called.</li>
+<li>How is encapsulation different from abstraction? Encapsulation focuses on state and the rules for changing it; abstraction focuses on the operations exposed to the caller.</li>
+<li>What does <code>SavingsAccount</code> inherit? <code>BankAccount</code>'s initialization and <code>deposit</code>, <code>withdraw</code> and <code>get_balance</code>.</li>
+<li>Why can <code>account_type()</code> return different labels? Because each class defines the method with the same name in its own way, and Python picks the method of the actual object.</li>
+<li>Does the underscore enforce privacy? No. It is only a convention.</li>
+</ul>
+
+<h3>Objects and OOP principles</h3>
+
+<p>Encapsulation organizes state and its rules, abstraction exposes useful operations, inheritance extends an existing type, and polymorphism lets one call use different behavior.</p>
+
+<table>
+<thead>
+<tr><th>Concept</th><th>Account example</th></tr>
+</thead>
+<tbody>
+<tr><td>Class</td><td><code>BankAccount</code></td></tr>
+<tr><td>Instance</td><td><code>minsu</code>, <code>jisu</code></td></tr>
+<tr><td>State</td><td><code>owner</code>, <code>_balance</code></td></tr>
+<tr><td>Behavior</td><td><code>deposit</code>, <code>withdraw</code></td></tr>
+</tbody>
+</table>

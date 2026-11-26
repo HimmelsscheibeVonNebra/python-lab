@@ -1,0 +1,115 @@
+{
+  "class": "pandas",
+  "title": "pandas: Series와 DataFrame",
+  "summary": "라벨이 붙은 열 Series와 표 DataFrame으로 한 주간의 주식 거래를 분석한다. 마스크로 거르고, sort_values로 정렬하고, idxmax·value_counts·mean으로 요약한다. pandas를 import하는 단계는 가상 머신에서 10–30초쯤 걸린다.",
+  "examples": [
+    {
+      "name": "first_stock",
+      "source": "data/pandas/starter/first_stock.py",
+      "also": [
+        "data/pandas/solutions/first_stock.py"
+      ],
+      "summary": "Practice 1. 요일(Mon–Fri)을 index로 가진 CODE의 종가 Series에서 평균, 최고가, 매수가 10000보다 높은 날의 수, 그리고 그런 날의 요일과 종가를 출력한다.",
+      "steps": [
+        {
+          "cmd": "python3 first_stock.py; echo \"exit=$?\"",
+          "note": "스타터는 Series를 만들기만 하므로 pandas를 불러오는 동안 기다린 뒤 아무것도 출력하지 않고 exit=0으로 끝난다."
+        },
+        {
+          "cmd": "python3 ../solutions/first_stock.py",
+          "note": "완성본: Mean: 10260.0, High: 10800, Above buy (10000): 3, 그리고 이긴 날 Tue 10200, Thu 10500, Fri 10800. closes[closes > 10000]이 마스크가 True인 날만 남긴다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport pandas as pd\ncloses = pd.Series([10000, 10200, 9800, 10500, 10800], index=[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"])\nprint(closes)\nprint(closes[\"Tue\"], closes.loc[\"Mon\"], closes.idxmax())\nprint((closes - 10000).tolist())\nEOF",
+          "note": "Series를 그대로 출력하면 왼쪽에 index(요일), 오른쪽에 값, 맨 아래에 dtype: int64가 보인다. 라벨로 읽기 closes[\"Tue\"]는 10200, .loc[\"Mon\"]은 10000, idxmax()는 가장 큰 값의 라벨 Fri다. closes - 10000은 반복문 없이 모든 날의 손익 [0, 200, -200, 500, 800]을 만든다."
+        }
+      ],
+      "expect": "Fri 10800",
+      "slow": true
+    },
+    {
+      "name": "positions",
+      "source": "data/pandas/starter/positions.py",
+      "also": [
+        "data/pandas/solutions/positions.py"
+      ],
+      "summary": "Practice 2. 네 종목의 DataFrame에 profit = (close - buy) * shares 열을 추가하고, 수익이 큰 순서로 정렬한 종목과 수익, 1위 종목, 수익이 난 종목 수를 출력한다.",
+      "steps": [
+        {
+          "cmd": "python3 positions.py; echo \"exit=$?\"",
+          "note": "스타터는 표만 만들고 출력이 없다."
+        },
+        {
+          "cmd": "python3 ../solutions/positions.py",
+          "note": "완성본: ['ROBO', 'MLBK', 'CODE', 'TEA']와 [25000, 15000, 8000, -8000]. sort_values(\"profit\", ascending=False)로 행 전체가 정렬 키와 함께 움직인다. idxmax로 찾은 행의 ticker가 Top: ROBO, 마스크의 True 개수가 Winners: 3이다."
+        }
+      ],
+      "expect": "Winners: 3",
+      "slow": true
+    },
+    {
+      "name": "my_portfolio",
+      "source": "data/pandas/starter/my_portfolio.py",
+      "also": [
+        "data/pandas/solutions/my_portfolio.py"
+      ],
+      "summary": "Lab 1. 다섯 종목의 금요일 저녁 포트폴리오 표에서 shape를 출력하고, value = shares * close 열을 추가해 평가액 목록, 가장 큰 보유 종목, 평균 평가액을 출력한다.",
+      "steps": [
+        {
+          "cmd": "python3 my_portfolio.py; echo \"exit=$?\"",
+          "note": "스타터는 출력이 없다."
+        },
+        {
+          "cmd": "python3 ../solutions/my_portfolio.py",
+          "note": "완성본: Shape: (5, 4)는 5행 4열이다(value를 추가하기 전에 출력했다). Value: [108000, 192000, 225000, 75000, 84000]은 곱셈 한 번으로 만든 열이고, Top holding: ROBO, Mean value: 136800.0(684000을 5로 나눈 값)이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport pandas as pd\ndf = pd.DataFrame({\"ticker\": [\"CODE\", \"TEA\", \"ROBO\"], \"shares\": [10, 40, 5], \"buy\": [10000, 5000, 40000], \"close\": [10800, 4800, 45000]})\nprint(df)\nprint(df.head(2))\nprint(df.columns.tolist())\nprint(df.iloc[-1][\"ticker\"])\nprint(df[\"close\"].describe())\nEOF",
+          "note": "슬라이드의 3종목 표를 출력해 본다. 맨 왼쪽 0, 1, 2가 기본 index다. head(2)는 앞 두 행, columns는 열 이름 목록, iloc[-1]은 마지막 행(ROBO)이다. describe()는 count, mean(20200.0), std, min, 사분위수, max(45000)를 한 번에 보여 준다."
+        }
+      ],
+      "expect": "Mean value: 136800.0",
+      "slow": true
+    },
+    {
+      "name": "trade_log",
+      "source": "data/pandas/starter/trade_log.py",
+      "also": [
+        "data/pandas/solutions/trade_log.py"
+      ],
+      "summary": "Lab 2. 열 건의 매매 일지에서 value_counts로 buy/sell 횟수를 세고, 총 거래 금액과 40000원 이상인 큰 거래의 종류를 출력한다.",
+      "steps": [
+        {
+          "cmd": "python3 trade_log.py; echo \"exit=$?\"",
+          "note": "스타터는 출력이 없다."
+        },
+        {
+          "cmd": "python3 ../solutions/trade_log.py",
+          "note": "완성본: value_counts는 많은 것부터 세므로 Actions: ['buy', 'sell'], Counts: [6, 4]. Traded: 340000은 amount 열의 합, Big trades는 amount >= 40000 마스크로 거른 네 건이 모두 buy임을 보여 준다."
+        }
+      ],
+      "expect": "Traded: 340000",
+      "slow": true
+    },
+    {
+      "name": "price_report",
+      "source": "data/pandas/starter/price_report.py",
+      "also": [
+        "data/pandas/solutions/price_report.py"
+      ],
+      "summary": "Lab 3(과제). FIT의 월–금 종가 다섯 개를 input()으로 읽어 요일을 index로 하는 Series를 만들고 평균, 최고가, 최고가인 요일, 평균보다 높은 날의 수를 출력한다.",
+      "steps": [
+        {
+          "cmd": "printf '4200\\n4350\\n4100\\n4400\\n4300\\n' | python3 price_report.py",
+          "note": "다섯 값을 미리 넣어 실행한다(직접 실행해 하나씩 입력해도 된다). 스타터는 읽기만 하므로 Close Mon: … Close Fri: 프롬프트만 이어서 나온다."
+        },
+        {
+          "cmd": "printf '4200\\n4350\\n4100\\n4400\\n4300\\n' | python3 ../solutions/price_report.py",
+          "note": "완성본: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3(4350, 4400, 4300). values와 days가 같은 순서라서 Series(values, index=days)가 요일과 값을 짝짓는다."
+        }
+      ],
+      "expect": "Best day: Thu 4400",
+      "slow": true
+    }
+  ]
+}

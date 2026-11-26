@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Modules and the Standard Library · Python Lab" data-title-ko="모듈과 표준 라이브러리 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modules and the Standard Library · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="modules/starter">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html" aria-current="page"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" aria-current="page" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 05 · 5 examples</span><span lang="ko">05장 · 예제 5개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../functions/index.html" title="Functions / 함수">← 04 <span lang="en">Functions</span><span lang="ko">함수</span></a><a class="next" href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON">06 <span lang="en">Files</span><span lang="ko">파일·예외</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></h1>
+    <p class="lead"><span lang="en">Use import to bring in math, datetime and random, and import a module you wrote yourself (number_tools) from another program. Practice with circle area and hypotenuse, a date countdown, lotto numbers and a number-guessing game.</span><span lang="ko">import로 math·datetime·random을 불러 쓰고, 직접 만든 모듈(number_tools)을 다른 프로그램에서 import한다. 원 넓이·빗변, 날짜 카운트다운, 로또 번호, 숫자 맞히기 게임을 실습한다.</span> <a href="#notes-modules"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="math_practice" aria-pressed="true">math_practice</button>
+          <button type="button" data-pick="date_check" aria-pressed="false">date_check</button>
+          <button type="button" data-pick="number_tools" aria-pressed="false">number_tools</button>
+          <button type="button" data-pick="lotto" aria-pressed="false">lotto</button>
+          <button type="button" data-pick="guessing" aria-pressed="false">guessing</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="math_practice" data-dir="modules/starter">
+        <h2>math_practice <span class="muted">~/modules/starter</span></h2>
+        <p><span lang="en">Practice 1. Read a radius and print the circle's area and circumference, then read two legs and print the hypotenuse. math.pi and math.hypot, loaded with import math, are reached with the dot (.).</span><span lang="ko">Practice 1. 반지름을 읽어 원의 넓이와 둘레를, 두 변을 읽어 빗변을 출력한다. import math로 불러온 math.pi와 math.hypot을 점(.)으로 꺼내 쓴다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n3\n4\n' | python3 math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n3\n4\n' | python3 math_practice.py">▶</button><code>printf '3\n3\n4\n' | python3 math_practice.py</code></div>
+          <p><span lang="en">Runs the program with the inputs 3, 3, 4 fed in ahead of time (you can also run python3 math_practice.py yourself and type them). The starter only has TODOs, so the prompts Radius: First leg: Second leg: come out run together on one line with no results. Piped input is not echoed to the screen, which is why the prompts look glued together.</span><span lang="ko">입력 3, 3, 4를 미리 넣어 실행한다(직접 python3 math_practice.py로 실행해 입력해도 된다). 스타터는 TODO만 있어서 프롬프트 Radius: First leg: Second leg: 만 한 줄로 이어 나오고 결과는 없다. 파이프로 넣은 입력은 화면에 다시 찍히지 않기 때문에 프롬프트가 붙어 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n3\n4\n' | python3 ../solutions/math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n3\n4\n' | python3 ../solutions/math_practice.py">▶</button><code>printf '3\n3\n4\n' | python3 ../solutions/math_practice.py</code></div>
+          <p><span lang="en">The finished version prints Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0. round(..., 2) keeps two decimal places.</span><span lang="ko">완성본은 Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0을 출력한다. round(..., 2)로 소수 둘째 자리까지 맞췄다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '1\n5\n12\n' | python3 ../solutions/math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '1\n5\n12\n' | python3 ../solutions/math_practice.py">▶</button><code>printf '1\n5\n12\n' | python3 ../solutions/math_practice.py</code></div>
+          <p><span lang="en">Second test: with radius 1 the area is 3.14 (equal to π) and the circumference is 6.28. The hypotenuse of 5 and 12 is 13.0.</span><span lang="ko">두 번째 테스트: 반지름 1이면 넓이는 π와 같은 3.14, 둘레는 6.28이다. 5와 12의 빗변은 13.0이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF</code></div>
+          <p><span lang="en">Checks the math functions from the slides in one go: 2 3 120 6 5.0. Floor, ceil, factorial, greatest common divisor and hypotenuse.</span><span lang="ko">슬라이드의 math 함수들을 한 번에 확인한다: 2 3 120 6 5.0. 내림·올림, 계승, 최대공약수, 빗변이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(sqrt(16))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(sqrt(16))'">▶</button><code>python3 -c 'print(sqrt(16))'</code></div>
+          <p><span lang="en">Using sqrt without importing it gives NameError: name 'sqrt' is not defined. Read the traceback from the last line.</span><span lang="ko">import 없이 sqrt를 쓰면 NameError: name 'sqrt' is not defined가 난다. Traceback은 마지막 줄부터 읽는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'">▶</button><code>python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'</code></div>
+          <p><span lang="en">from math import sqrt, pi brings the names in directly, so you can use them without a prefix: 4.0 and 3.141592653589793.</span><span lang="ko">from math import sqrt, pi로 이름을 직접 가져오면 접두사 없이 쓸 수 있다: 4.0과 3.141592653589793.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The NameError in the fifth step is on purpose. In the actual practice, fill in the TODOs with nano math_practice.py, then rerun the first step and compare its output with the finished version.</span><span lang="ko">다섯 번째 단계의 NameError는 일부러 낸 오류다. 실제 실습에서는 nano math_practice.py로 TODO를 채운 뒤 첫 단계를 다시 실행해 완성본과 같은 출력이 나오는지 비교한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="date_check" data-dir="modules/starter" hidden>
+        <h2>date_check <span class="muted">~/modules/starter</span></h2>
+        <p><span lang="en">Practice 2. Read a date in YYYY-MM-DD format, turn it into a date with datetime.strptime, and print its weekday name (strftime(&quot;%A&quot;)) and the number of days remaining from today (date.today()).</span><span lang="ko">Practice 2. YYYY-MM-DD 형식의 날짜를 읽어 datetime.strptime으로 날짜로 바꾸고, 요일 이름(strftime(&quot;%A&quot;))과 오늘(date.today())부터 남은 날 수를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 date_check.py">▶</button><code>printf '2026-12-25\n' | python3 date_check.py</code></div>
+          <p><span lang="en">The starter only reads the date and converts it, so it prints nothing apart from the prompt. The date is well formed, so there is no error either.</span><span lang="ko">스타터는 날짜를 읽고 변환까지만 하므로 프롬프트 외에는 아무것도 출력하지 않는다. 형식이 맞는 날짜라 오류도 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="date +%F" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F">▶</button><code>date +%F</code></div>
+          <p><span lang="en">This is today's date as the virtual machine sees it. The days remaining below are counted from this date.</span><span lang="ko">가상 머신이 생각하는 오늘 날짜다. 아래 남은 날 수는 이 날짜를 기준으로 계산된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 ../solutions/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 ../solutions/date_check.py">▶</button><code>printf '2026-12-25\n' | python3 ../solutions/date_check.py</code></div>
+          <p><span lang="en">Christmas 2026 is a Friday. The Days remaining value depends on today's date.</span><span lang="ko">2026년 성탄절은 Friday다. Days remaining 값은 오늘 날짜에 따라 달라진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="date +%F | python3 ../solutions/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F | python3 ../solutions/date_check.py">▶</button><code>date +%F | python3 ../solutions/date_check.py</code></div>
+          <p><span lang="en">Feeding in today's date gives Days remaining: 0.</span><span lang="ko">오늘 날짜를 그대로 넣으면 Days remaining: 0이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-01-01\n' | python3 ../solutions/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-01-01\n' | python3 ../solutions/date_check.py">▶</button><code>printf '2026-01-01\n' | python3 ../solutions/date_check.py</code></div>
+          <p><span lang="en">A date that has already passed gives a negative number of days remaining. 2026-01-01 is a Thursday.</span><span lang="ko">이미 지난 날짜는 남은 날 수가 음수로 나온다. 2026-01-01은 Thursday다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF</code></div>
+          <p><span lang="en">Date arithmetic from the slides: the difference of two dates is a timedelta whose .days is 47, and the date + 100 days is 2027-01-05.</span><span lang="ko">슬라이드의 날짜 계산: 두 날짜의 차는 timedelta이고 .days는 47, 날짜 + 100일은 2027-01-05다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="number_tools" data-dir="modules/starter" hidden>
+        <h2>number_tools <span class="muted">~/modules/starter</span></h2>
+        <p><span lang="en">Lab 1. number_tools.py is a module holding the functions average and count_above, and stats_report.py in the same folder calls them through import number_tools to print a score report. The if __name__ == &quot;__main__&quot;: block at the bottom of the module shows a demo only when the file is run directly.</span><span lang="ko">Lab 1. number_tools.py는 average와 count_above 함수를 담은 모듈이고, 같은 폴더의 stats_report.py가 import number_tools로 그 함수를 불러 점수 보고서를 출력한다. 모듈 맨 아래의 if __name__ == &quot;__main__&quot;: 블록은 직접 실행할 때만 데모를 보여 준다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 number_tools.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 number_tools.py">▶</button><code>python3 number_tools.py</code></div>
+          <p><span lang="en">When run directly, __name__ is &quot;__main__&quot;, so the demo runs. The starter's average is just pass and returns None, so it prints Demo average: None.</span><span lang="ko">직접 실행하면 __name__이 &quot;__main__&quot;이므로 데모가 돈다. 스타터의 average는 pass뿐이라 None을 돌려주어 Demo average: None이 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 stats_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 stats_report.py">▶</button><code>python3 stats_report.py</code></div>
+          <p><span lang="en">The starter report prints only Scores: [88, 92, 79, 93]. import number_tools passes silently: the demo does not run when the module is imported.</span><span lang="ko">스타터 보고서는 Scores: [88, 92, 79, 93]만 출력한다. import number_tools는 조용히 지나간다. 가져올 때는 데모가 실행되지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/number_tools.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/number_tools.py">▶</button><code>python3 ../solutions/number_tools.py</code></div>
+          <p><span lang="en">Running the finished module directly: Demo average: 5.0 (2+4+6+8 divided by 4).</span><span lang="ko">완성본 모듈의 직접 실행 결과: Demo average: 5.0 (2+4+6+8을 4로 나눈 값).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/stats_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/stats_report.py">▶</button><code>python3 ../solutions/stats_report.py</code></div>
+          <p><span lang="en">Finished report: Average: 88.0 (352 / 4), Above 85: 3 (88, 92, 93). The script's own folder comes first in the module search path, so the number_tools in the solutions folder is the one imported.</span><span lang="ko">완성본 보고서: Average: 88.0 (352 / 4), Above 85: 3 (88, 92, 93). 스크립트가 있는 폴더가 모듈 검색 경로의 첫 자리라서 solutions 폴더의 number_tools가 import된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import number_tools; print(number_tools.__name__)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import number_tools; print(number_tools.__name__)'">▶</button><code>python3 -c 'import number_tools; print(number_tools.__name__)'</code></div>
+          <p><span lang="en">Inside an imported module, __name__ is the file name minus .py: number_tools. That is why the demo line is not printed.</span><span lang="ko">import된 모듈 안에서 __name__은 파일 이름에서 .py를 뺀 number_tools다. 그래서 데모 줄은 출력되지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="(cd ../solutions &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')" title="Run in the terminal / 터미널에서 실행" aria-label="Run: (cd ../solutions &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')">▶</button><code>(cd ../solutions &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')</code></div>
+          <p><span lang="en">The average of an empty list divides by zero and raises ZeroDivisionError: division by zero (Lab 1 Checks). How to handle this error is covered in the next chapter, 'Files, Exceptions and JSON'. Because the cd happens inside the parentheses, the current folder does not change.</span><span lang="ko">빈 리스트의 평균은 0으로 나누게 되어 ZeroDivisionError: division by zero가 난다(Lab 1 Checks). 이 오류를 처리하는 방법은 다음 장 '파일·예외·JSON'에서 다룬다. 괄호 안에서 cd했으므로 현재 폴더는 바뀌지 않는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The ZeroDivisionError in the last step is shown on purpose. After filling in the two TODO functions, rerun the first two steps: you should get Demo average: 5.0, Average: 88.0, Above 85: 3, the same as the finished version.</span><span lang="ko">마지막 단계의 ZeroDivisionError는 일부러 보여 주는 오류다. 두 TODO 함수를 채운 뒤 첫 두 단계를 다시 실행하면 완성본과 같은 Demo average: 5.0, Average: 88.0, Above 85: 3이 나와야 한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="lotto" data-dir="modules/starter" hidden>
+        <h2>lotto <span class="muted">~/modules/starter</span></h2>
+        <p><span lang="en">Lab 2. Read the number of games (1–5); for each game draw 6 different numbers with random.sample(range(1, 46), 6), sort them and print them on one line. Input outside the range prints Invalid games.</span><span lang="ko">Lab 2. 게임 수(1–5)를 읽어 게임마다 random.sample(range(1, 46), 6)으로 서로 다른 번호 6개를 뽑고 정렬해 한 줄에 출력한다. 범위를 벗어난 입력은 Invalid games.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n' | python3 lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n' | python3 lotto.py">▶</button><code>printf '3\n' | python3 lotto.py</code></div>
+          <p><span lang="en">The starter's loop body is pass, so even with 3 as input not a single line of numbers is printed.</span><span lang="ko">스타터는 반복문 몸체가 pass라서 3을 넣어도 번호가 한 줄도 나오지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n' | python3 ../solutions/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n' | python3 ../solutions/lotto.py">▶</button><code>printf '3\n' | python3 ../solutions/lotto.py</code></div>
+          <p><span lang="en">The finished version prints three lines. Check that each line is sorted smallest first, has no duplicates and stays between 1 and 45. The numbers change on every run.</span><span lang="ko">완성본은 세 줄을 출력한다. 줄마다 숫자가 작은 것부터 정렬되어 있고, 중복이 없으며, 모두 1에서 45 사이인지 확인한다. 실행할 때마다 번호가 달라진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '1\n' | python3 ../solutions/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '1\n' | python3 ../solutions/lotto.py">▶</button><code>printf '1\n' | python3 ../solutions/lotto.py</code></div>
+          <p><span lang="en">Input 1 gives exactly one line. print(*numbers) unpacks the list and prints it separated by spaces, without brackets or commas.</span><span lang="ko">1을 넣으면 정확히 한 줄이다. print(*numbers)가 리스트를 풀어 대괄호와 쉼표 없이 공백으로 구분해 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '6\n' | python3 ../solutions/lotto.py
+printf '0\n' | python3 ../solutions/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '6\n' | python3 ../solutions/lotto.py
+printf '0\n' | python3 ../solutions/lotto.py">▶</button><code>printf '6\n' | python3 ../solutions/lotto.py
+printf '0\n' | python3 ../solutions/lotto.py</code></div>
+          <p><span lang="en">6 and 0 are both out of range, so only Invalid games is printed.</span><span lang="ko">6과 0은 모두 범위 밖이라 Invalid games만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF</code></div>
+          <p><span lang="en">With seed(42) the same sequence comes back: 82 15, and then 82 again. seed is useful for testing, but we do not use it for the lotto.</span><span lang="ko">seed(42)를 주면 같은 수열이 다시 나온다: 82 15, 그리고 다시 82. 테스트할 때는 seed가 유용하지만 로또에는 쓰지 않는다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="guessing" data-dir="modules/starter" hidden>
+        <h2>guessing <span class="muted">~/modules/starter</span></h2>
+        <p><span lang="en">Lab 3 (take-home). The computer picks a secret number from 1 to 100 once, answers each guess with Higher/Lower until it is guessed, and on success prints Correct! with the number of attempts and ends the loop with break.</span><span lang="ko">Lab 3(과제). 컴퓨터가 1–100 사이의 비밀 수를 한 번 고르고, 맞힐 때까지 추측마다 Higher/Lower를 알려 주며, 맞히면 시도 횟수와 함께 Correct!를 출력하고 break로 반복을 끝낸다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 3 | python3 guessing.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 3 | python3 guessing.py">▶</button><code>seq 1 3 | python3 guessing.py</code></div>
+          <p><span lang="en">The starter has neither the comparison nor break, so while True never ends. It uses up the three input lines and the fourth input() raises EOFError: EOF when reading a line. If you ran it yourself, you would have to stop it with Ctrl+C.</span><span lang="ko">스타터에는 비교도 break도 없어서 while True가 끝나지 않는다. 입력 세 줄을 다 쓰고 네 번째 input()에서 EOFError: EOF when reading a line이 난다. 직접 실행했다면 Ctrl+C로 멈춰야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 100 | python3 ../solutions/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 100 | python3 ../solutions/guessing.py | tail -n 3">▶</button><code>seq 1 100 | python3 ../solutions/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding 1 to 100 in order into the finished version prints Higher until it reaches the secret, then ends with Correct! Attempts: N. Here N is the secret itself. Only the last three lines are shown.</span><span lang="ko">완성본에 1부터 100까지 차례로 넣으면 비밀 수에 닿을 때까지 Higher가 이어지다가 Correct! Attempts: N으로 끝난다. 이 경우 N이 곧 비밀 수다. 마지막 세 줄만 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 100 -1 1 | python3 ../solutions/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 100 -1 1 | python3 ../solutions/guessing.py | tail -n 3">▶</button><code>seq 100 -1 1 | python3 ../solutions/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding the numbers backwards from 100 prints Lower this time. A new secret is chosen on every run.</span><span lang="ko">거꾸로 100부터 넣으면 이번에는 Lower가 이어진다. 비밀 수는 실행마다 새로 정해진다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The EOFError in the first step is an intended error showing that the starter never finishes. To play yourself, run python3 ../solutions/guessing.py, start at 50 and halve the range according to Higher/Lower (you can always win within 7 guesses). The starter's TODO is to split Higher, Lower and Correct! with if/elif/else and break on a correct guess. When you are done, check with seq 1 100 | python3 guessing.py | tail -n 3 that the last lines match the finished version.</span><span lang="ko">첫 단계의 EOFError는 스타터가 끝나지 않는다는 것을 보여 주는 의도된 오류다. 직접 플레이하려면 python3 ../solutions/guessing.py를 실행하고 50부터 시작해 Higher/Lower에 따라 범위를 반씩 줄여 본다(7번 안에 맞힐 수 있다). 스타터의 TODO는 if/elif/else로 Higher, Lower, Correct!를 나누고 맞힌 경우 break하는 것이다. 완성한 뒤 seq 1 100 | python3 guessing.py | tail -n 3으로 완성본과 같은 마지막 줄이 나오는지 확인한다.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="math_practice">
+    <details class="source" open data-path="/home/student/modules/starter/math_practice.py">
+      <summary>math_practice.py <span class="muted src-lines" data-lines="11"><span lang="en">11 lines</span><span lang="ko">11줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: circle statistics and a hypotenuse. Assume numeric input.</span>
+<span class="ln">Tests: 3 then 3, 4 -&gt; Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import math</span>
+<span class="ln"> </span>
+<span class="ln">radius = float(input(&quot;Radius: &quot;))</span>
+<span class="ln"># TODO: print the area and circumference, rounded to 2 decimals.</span>
+<span class="ln"> </span>
+<span class="ln">a = float(input(&quot;First leg: &quot;))</span>
+<span class="ln">b = float(input(&quot;Second leg: &quot;))</span>
+<span class="ln"># TODO: print the hypotenuse, rounded to 2 decimals.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/math_practice.py">
+      <summary>modules/solutions/math_practice.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: circle statistics and a hypotenuse.&quot;&quot;&quot;</span>
+<span class="ln">import math</span>
+<span class="ln"> </span>
+<span class="ln">radius = float(input(&quot;Radius: &quot;))</span>
+<span class="ln">print(&quot;Area:&quot;, round(math.pi * radius ** 2, 2))</span>
+<span class="ln">print(&quot;Circumference:&quot;, round(2 * math.pi * radius, 2))</span>
+<span class="ln"> </span>
+<span class="ln">a = float(input(&quot;First leg: &quot;))</span>
+<span class="ln">b = float(input(&quot;Second leg: &quot;))</span>
+<span class="ln">print(&quot;Hypotenuse:&quot;, round(math.hypot(a, b), 2))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="date_check" hidden>
+    <details class="source" open data-path="/home/student/modules/starter/date_check.py">
+      <summary>date_check.py <span class="muted src-lines" data-lines="9"><span lang="en">9 lines</span><span lang="ko">9줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: weekday and countdown for a target date.</span>
+<span class="ln">Tests: today -&gt; Days remaining: 0; a past date -&gt; a negative count.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date, datetime</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
+<span class="ln"># TODO: print the weekday name, e.g. Friday.</span>
+<span class="ln"># TODO: print &quot;Days remaining:&quot; and the day count from date.today().</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/date_check.py">
+      <summary>modules/solutions/date_check.py <span class="muted src-lines" data-lines="7"><span lang="en">7 lines</span><span lang="ko">7줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution: weekday and countdown for a target date.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date, datetime</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
+<span class="ln">print(target.strftime(&quot;%A&quot;))</span>
+<span class="ln">print(&quot;Days remaining:&quot;, (target - date.today()).days)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="number_tools" hidden>
+    <details class="source" open data-path="/home/student/modules/starter/number_tools.py">
+      <summary>number_tools.py <span class="muted src-lines" data-lines="20"><span lang="en">20 lines</span><span lang="ko">20줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 module: small statistics tools for lists of numbers.</span>
+<span class="ln"> </span>
+<span class="ln">Run directly to see the demo: python3 number_tools.py</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def average(numbers):</span>
+<span class="ln">    # TODO: return the mean of numbers.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def count_above(numbers, limit):</span>
+<span class="ln">    count = 0</span>
+<span class="ln">    # TODO: count the values greater than limit.</span>
+<span class="ln">    return count</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    demo = [2, 4, 6, 8]</span>
+<span class="ln">    print(&quot;Demo average:&quot;, average(demo))</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/starter/stats_report.py">
+      <summary>stats_report.py <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 report: import and use number_tools.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import number_tools</span>
+<span class="ln"> </span>
+<span class="ln">scores = [88, 92, 79, 93]</span>
+<span class="ln">print(&quot;Scores:&quot;, scores)</span>
+<span class="ln"># TODO: print the average, e.g. Average: 88.0</span>
+<span class="ln"># TODO: print how many scores are above 85, e.g. Above 85: 3</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/number_tools.py">
+      <summary>modules/solutions/number_tools.py <span class="muted src-lines" data-lines="18"><span lang="en">18 lines</span><span lang="ko">18줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 solution module: small statistics tools for lists of numbers.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def average(numbers):</span>
+<span class="ln">    return sum(numbers) / len(numbers)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def count_above(numbers, limit):</span>
+<span class="ln">    count = 0</span>
+<span class="ln">    for value in numbers:</span>
+<span class="ln">        if value &gt; limit:</span>
+<span class="ln">            count += 1</span>
+<span class="ln">    return count</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    demo = [2, 4, 6, 8]</span>
+<span class="ln">    print(&quot;Demo average:&quot;, average(demo))</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/stats_report.py">
+      <summary>modules/solutions/stats_report.py <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 report solution: import and use number_tools.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import number_tools</span>
+<span class="ln"> </span>
+<span class="ln">scores = [88, 92, 79, 93]</span>
+<span class="ln">print(&quot;Scores:&quot;, scores)</span>
+<span class="ln">print(&quot;Average:&quot;, number_tools.average(scores))</span>
+<span class="ln">print(&quot;Above 85:&quot;, number_tools.count_above(scores, 85))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="lotto" hidden>
+    <details class="source" open data-path="/home/student/modules/starter/lotto.py">
+      <summary>lotto.py <span class="muted src-lines" data-lines="13"><span lang="en">13 lines</span><span lang="ko">13줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: generate lotto games. Assume integer-formatted input.</span>
+<span class="ln">Tests: 1 -&gt; one line of 6 sorted unique numbers; 6 -&gt; Invalid games.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">games = int(input(&quot;Games (1-5): &quot;))</span>
+<span class="ln">if 1 &lt;= games &lt;= 5:</span>
+<span class="ln">    for game in range(1, games + 1):</span>
+<span class="ln">        # TODO: draw 6 different numbers from 1 to 45,</span>
+<span class="ln">        # sort them, and print them on one line.</span>
+<span class="ln">        pass</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid games&quot;)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/lotto.py">
+      <summary>modules/solutions/lotto.py <span class="muted src-lines" data-lines="11"><span lang="en">11 lines</span><span lang="ko">11줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 solution: generate lotto games.&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">games = int(input(&quot;Games (1-5): &quot;))</span>
+<span class="ln">if 1 &lt;= games &lt;= 5:</span>
+<span class="ln">    for game in range(1, games + 1):</span>
+<span class="ln">        numbers = random.sample(range(1, 46), 6)</span>
+<span class="ln">        numbers.sort()</span>
+<span class="ln">        print(*numbers)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid games&quot;)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="guessing" hidden>
+    <details class="source" open data-path="/home/student/modules/starter/guessing.py">
+      <summary>guessing.py <span class="muted src-lines" data-lines="12"><span lang="en">12 lines</span><span lang="ko">12줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: number guessing game. Assume integer-formatted input.</span>
+<span class="ln">Test: a finished game ends with Correct! Attempts: N.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    # TODO: print Higher or Lower, or print</span>
+<span class="ln">    # &quot;Correct! Attempts:&quot; with the count and stop the loop.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/modules/solutions/guessing.py">
+      <summary>modules/solutions/guessing.py <span class="muted src-lines" data-lines="15"><span lang="en">15 lines</span><span lang="ko">15줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution: number guessing game.&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    if guess &lt; secret:</span>
+<span class="ln">        print(&quot;Higher&quot;)</span>
+<span class="ln">    elif guess &gt; secret:</span>
+<span class="ln">        print(&quot;Lower&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;Correct! Attempts:&quot;, attempts)</span>
+<span class="ln">        break</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-modules">
+      <h2 class="notes-title"><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></h2>
+<div lang="en">
+<p>This chapter is about modules. When you want to use the same function in several programs, instead of copying the code you keep it in one file (a module) and load it with <code>import</code>. First we look at the different forms of <code>import</code>, what the dot (.) means, and the <code>NameError</code> you get when a name was never imported; then we use a module we wrote ourselves, <code>number_tools</code>, from another program. Next we apply the standard library's <code>math</code>, <code>datetime</code> and <code>random</code> to real tasks, and finally we get a first taste of computing on a whole array at once with the external package NumPy. The practice programs are <a href="#ex=math_practice">math_practice</a>, <a href="#ex=date_check">date_check</a>, <a href="#ex=number_tools">number_tools</a>, <a href="#ex=lotto">lotto</a> and <a href="#ex=guessing">guessing</a>.</p>
+
+<h2>Review: One Function, Two Programs</h2>
+
+<p><code>sum_to(n)</code>, which we wrote in the 'Functions' chapter, returns 1 + 2 + … + n. Imagine a second program that needs this function. Copying and pasting the code works for now, but when you find a bug you have to fix it in both places. This chapter's goal is to give reusable code a home of its own.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>Modules and import</h2>
+
+<h3>What Is a Module?</h3>
+
+<p>A module is a file containing Python definitions (functions, variables and so on). The file name minus <code>.py</code> is the module name. For example, <code>greetings.py</code> is the <code>greetings</code> module. Importing a module runs its top-level code once. In fact, every program you have written so far was already a module.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import and the Dot</h3>
+
+<p><code>import math</code> loads the <code>math</code> module. The dot reaches a name inside the module: <code>math.sqrt(2)</code> means "the sqrt inside the math module". Keeping the prefix makes it clear from the code alone where each name came from. Python remembers (caches) a module after its first import, so importing the same module again does not run it again.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>If you import only the names you need, you can use them without a prefix. You can list several names separated by commas, and you can also rename a name while importing it. Only the imported names become visible: writing <code>math.pi</code> after <code>from math import sqrt</code> fails because there is no name <code>math</code>.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>Import Styles Compared</h3>
+
+<table>
+<thead>
+<tr><th>Form</th><th>Use</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>Clearest origin, but a little more typing</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>Short; best when you use only a few names</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>A shorter alias; used for conventional aliases such as <code>np</code> and <code>pd</code></td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>Hides where names came from, so avoid it</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Reading the Traceback</h3>
+
+<p>Using a name you did not import raises a <code>NameError</code>. The traceback tells you the file and line that failed. Read the last line (the error type and message) first, fix the cause, and run again. In the example below the cause is that <code>math</code> was never imported. You can trigger the same error yourself in the steps of the <a href="#ex=math_practice">math_practice</a> page.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math Essentials</h3>
+
+<p>There are the constants <code>pi</code> and <code>e</code>, the square root <code>sqrt</code>, and <code>floor</code> and <code>ceil</code> for rounding down and up. <code>factorial(n)</code> and <code>gcd(a, b)</code> work on integers, and <code>hypot(a, b)</code> is the length of the hypotenuse (diagonal) of a right triangle.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: Circle &amp; Hypotenuse</h3>
+
+<p>Open <a href="#ex=math_practice">math_practice</a>. Read a radius and print the circle's area and circumference rounded to two decimals, then read the lengths of two legs and print the hypotenuse. Assume numeric input and use <code>math.pi</code> and <code>math.hypot</code> (5 minutes).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>In the web lab you can feed the input in ahead of time, as in <code>printf '3\n3\n4\n' | python3 math_practice.py</code>, or simply run <code>python3 math_practice.py</code> and type the input yourself.</p>
+
+<h3>The Standard Library: Batteries Included</h3>
+
+<p>Python ships with hundreds of tested modules, so there is nothing to install or download. This chapter covers <code>math</code>, <code>random</code> and <code>datetime</code>. The full list is at docs.python.org/3/library.</p>
+
+<table>
+<thead>
+<tr><th>Module</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>files and data exchange</td></tr>
+</tbody>
+</table>
+
+<h2>Your Own Modules</h2>
+
+<h3>Your First Module: number_tools.py</h3>
+
+<p>Reusable code lives in its own <code>.py</code> file. <code>average</code> returns the mean of a list of numbers, and <code>spread</code> returns the difference between the largest and smallest values. The module only defines tools; it does not talk to the user (input, print). Put this file in the same folder as the program that imports it.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>Importing Your Own File</h3>
+
+<p><code>stats_report.py</code> brings in the tools it needs with <code>import number_tools</code> and calls them as <code>number_tools.average(...)</code>. The two files must be in the same folder. After editing the module, run the program again to pick up the change.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>Run or Import: __name__ == "__main__"</h3>
+
+<p>When you run a file directly, its <code>__name__</code> is <code>"__main__"</code>; when another file imports it, <code>__name__</code> is the module name (<code>"number_tools"</code>). A condition (a guard) based on this difference separates the reusable tools from the demo code: imports stay silent, and the demo appears only on a direct run. On the <a href="#ex=number_tools">number_tools</a> page you can print <code>number_tools.__name__</code> yourself to check.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>Packages: Modules in Folders</h3>
+
+<p>A package is a folder of related modules. An <code>__init__.py</code> inside the folder marks it as a package. Dotted names navigate down: <code>package.module.function</code>. Packages come back when we deal with pip and external libraries.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>Midpoint Check</h3>
+
+<ul>
+<li>What does the dot in <code>math.sqrt</code> connect? A module and a name inside it.</li>
+<li>Why does a name you did not import raise <code>NameError</code>? Because that name was never defined in the current file.</li>
+<li>When does a module's top-level code run? Once, the first time it is imported.</li>
+</ul>
+
+<h2>datetime: Dates and Moments</h2>
+
+<h3>date and datetime</h3>
+
+<p>A <code>date</code> holds a year, month and day, and a <code>datetime</code> also holds hours, minutes and seconds. <code>today()</code> and <code>now()</code> report the current moment, and each part is read as an attribute such as <code>.year</code>, <code>.month</code>, <code>.day</code> or <code>.hour</code>. The web lab's virtual machine takes today's date from your computer's clock; you can check it with the <code>date</code> command in the terminal.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>Formatting Dates: strftime</h3>
+
+<p><code>strftime</code> turns a date into a string in the layout you want. <code>%Y</code>, <code>%m</code> and <code>%d</code> are the year, month and day, and <code>%A</code> is the full weekday name. You can build exactly the string a report needs.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>Date Arithmetic: timedelta</h3>
+
+<p>Subtracting two dates gives a <code>timedelta</code> in days, and <code>.days</code> extracts the whole number of days. Adding a <code>timedelta</code> to a date gives a future date. A negative number of days means the date has already passed.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: Days Until a Date</h3>
+
+<p>Open <a href="#ex=date_check">date_check</a>. Read a target date in YYYY-MM-DD format and print its weekday name and the number of days remaining. Test a past date, today and a future date (5 minutes). Hint: convert the string to a date with <code>strptime(text, "%Y-%m-%d")</code>, then subtract <code>date.today()</code>.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>The days remaining depend on the day you run it. The 89 on the slide is counted from 2026-09-27.</p>
+
+<h2>random: Random Numbers</h2>
+
+<h3>Floats and Integers</h3>
+
+<p><code>random()</code> returns a float from 0.0 up to, but not including, 1.0, and <code>uniform(a, b)</code> returns a float over a wider range. <code>randint(a, b)</code> picks an integer with both ends included. The results differ on every run.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>Pick, Shuffle, Sample</h3>
+
+<p><code>choice(seq)</code> picks one element. <code>shuffle(list)</code> mixes the list in place and returns <code>None</code>, so writing <code>names = random.shuffle(names)</code> loses the list. <code>sample(seq, k)</code> picks k different elements. All of these work on lists.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>Repeatability: seed</h3>
+
+<p>The same seed produces the same sequence, and different seeds give different results. Seeds are used for testing and for reproducing a run; games and lotteries rely on unseeded randomness that differs every time.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>Labs</h2>
+
+<h3>Lab 1: A number_tools Module</h3>
+
+<p>In <a href="#ex=number_tools">number_tools</a>, finish <code>average</code> and <code>count_above</code> in <code>number_tools.py</code>. <code>count_above(numbers, limit)</code> counts the values larger than <code>limit</code>. Then finish <code>stats_report.py</code> so it prints the report. Keep the <code>__main__</code> guard demo at the bottom of the module.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>Checks: the direct run (<code>python3 number_tools.py</code>) prints the demo, and the imported run (<code>stats_report.py</code>) uses both tools. Average 88.0 is 352 / 4, the 3 in Above 85 is 88, 92 and 93, and the demo's 5.0 is 2+4+6+8 divided by 4. <code>average([])</code> raises <code>ZeroDivisionError</code> on an empty list. Handling that error gracefully is covered in the next chapter, 'Files, Exceptions and JSON'.</p>
+
+<h3>Lab 2: Lotto Generator</h3>
+
+<p>In <a href="#ex=lotto">lotto</a>, read how many games to play (1–5); for each game draw 6 different numbers from 1 to 45 and print them on one line, sorted smallest first. Assume integer-formatted input and use <code>random.sample</code> once per game.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>Checks: input 1 prints exactly one line, and 5 prints five lines. Every line is sorted (each number is at least the previous one), has six different values, and stays between 1 and 45. 0 and 6 print only <code>Invalid games</code>. To print a list separated by spaces without brackets, unpack it when passing it, as in <code>print(*numbers)</code>.</p>
+
+<h3>Lab 3 (Take-Home): Guessing Game</h3>
+
+<p>In <a href="#ex=guessing">guessing</a>, the computer picks a secret number from 1 to 100 and answers each guess with <code>Higher</code>, <code>Lower</code> or <code>Correct!</code>. Count the attempts and print the count along with the correct guess.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>Here is how the game loop works. <code>randint(1, 100)</code> chooses the secret once, before the loop. The loop repeats until the guess matches, comparing with <code>if</code>/<code>elif</code>/<code>else</code> and counting attempts. A correct guess stops the loop. The slide's example fixes the guesses in a list to show just the flow; the real program reads guesses with <code>input()</code> and stops with <code>break</code>.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: Beyond the Standard Library</h2>
+
+<p>The standard library comes with Python, but NumPy is an external package for array computing. An array computes on a whole batch of numbers at once. pandas and matplotlib, covered in the 'Data Analysis: pandas and matplotlib' chapter, are built on top of NumPy. The slides have you type along in Colab (NumPy preinstalled) or on your own PC (<code>pip install numpy</code>). The web lab's virtual machine already includes NumPy, so you can run <code>python3</code> in the terminal of any page and type the code below as is. Note, however, that <code>import numpy</code> takes from a few seconds to a few tens of seconds in the virtual machine.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: Lists Become Arrays</h3>
+
+<p><code>np.array</code> turns a list into an ndarray. A nested list becomes a 2D array. In the example below, rows are stores and columns are products. The ingredients are lists you already know.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>Arrays by Recipe</h3>
+
+<p><code>arange(1, 10, 2)</code> makes a range that excludes the end; <code>zeros((2, 3))</code> and <code>ones((2, 2))</code> make arrays of a given shape filled with 0 or 1; <code>full((4,), 0.03)</code> makes an array repeating one value; and <code>linspace(0, 1, 5)</code> makes evenly spaced values including both ends.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>Random Arrays, Seeded</h3>
+
+<p><code>np.random</code> is similar to the <code>random</code> module. <code>randint(50, 151, size=5)</code> draws five integers, and as with <code>range</code> the end 151 is excluded. With <code>seed(42)</code> everyone gets the same result.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>Reading an Array: shape and dtype</h3>
+
+<p><code>shape</code> is (rows, columns); the <code>sales</code> above is (3, 4). <code>ndim</code> is the number of dimensions, <code>size</code> the number of elements, and <code>dtype</code> the single data type all elements share. When you receive new data, ask for its shape and dtype first.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>The default dtype of an integer array depends on the environment. On a 64-bit PC it is usually <code>int64</code>, but on this 32-bit virtual machine it comes out as <code>int32</code>.</p>
+
+<h3>One dtype per Array</h3>
+
+<p>An array stores only one data type. Mixing integers and floats gives float64, and mixing numbers and strings turns everything into strings. <code>astype(np.float64)</code> converts to floats.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>Indexing and Slicing</h3>
+
+<p>Indexes and slices work just like with lists. <code>prices[1:3]</code> starts at 1 and stops before 3. The difference is that a slice is a view onto the same memory: changing the view changes the original too. When you need a real copy, use <code>prices[1:3].copy()</code>.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2D Indexing: [row, column]</h3>
+
+<p>Write the row and column inside one pair of brackets, separated by a comma. <code>sales[1, 2]</code> is a single cell, and <code>sales[:, 1]</code> is one whole column. Both directions can be sliced: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>Choosing by Condition: Masks</h3>
+
+<p>A comparison returns a Boolean array, and using it as an index keeps only the elements that are True. To combine masks, use <code>&amp;</code> and <code>|</code>, not <code>and</code>/<code>or</code>, and put parentheses around each comparison.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>Fancy Indexing</h3>
+
+<p>Passing a list of positions picks elements in the order you want, and the same position may be repeated. The result is a new array, not a view. We use this later to pair names with rankings.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>Vectorized Math and Broadcasting</h3>
+
+<p>Operators are applied element by element. <code>prices * 2</code> doubles every value, whereas <code>* 2</code> on a list repeats the whole list. <code>np.sqrt</code> and <code>np.round</code> also apply to the whole array. NumPy computes by stretching a smaller shape to fit a larger one (broadcasting). A single number spreads over the whole array, so <code>prices * 0.9</code> discounts every product. The trailing dimensions must be equal or 1.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>Aggregation with axis</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code> and <code>min</code> fold an array into a single value. <code>axis=0</code> computes each column from top to bottom, and <code>axis=1</code> computes each row across. Check with the length of the result: 4 products, 3 stores.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, Stacking, Sorting</h3>
+
+<p><code>reshape(4, 3)</code> groups the same data into a new shape, for example splitting 12 months into four quarters. <code>-1</code> means "whatever is left", and <code>.T</code> swaps rows and columns. The number of elements (size) cannot change. <code>vstack</code> joins arrays as new rows and <code>hstack</code> as new columns (a new store is vstack, a new period is hstack). <code>sort</code> returns the sorted values and <code>argsort</code> the sorted positions, so together with fancy indexing you can line up names in order. <code>argsort(-x)</code> ranks from largest to smallest.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>Guided Tour: Annual Report</h3>
+
+<p>Reshape 12 months of sales (in units of ten thousand won) into four quarters, get the quarterly totals with <code>axis=1</code>, find the index of the best month with <code>argmax</code>, and find the top three months with <code>argsort(-monthly)[:3]</code>.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy in Five Lines</h3>
+
+<ul>
+<li>ndarray: many dimensions, one dtype.</li>
+<li>Create: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>Select: slices, masks, fancy indexing.</li>
+<li>Compute: vectorization, broadcasting, axis.</li>
+<li>Rearrange: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>A missing import is the first suspect for a <code>NameError</code>. When debugging, check the import lines at the top first.</li>
+<li><code>randint(1, 6)</code> includes 6, but <code>range(1, 6)</code> does not.</li>
+<li><code>shuffle(names)</code> shuffles in place and returns <code>None</code>.</li>
+<li><code>print(*numbers)</code> unpacks the list and prints the items separately.</li>
+<li>NumPy masks use <code>&amp;</code> and <code>|</code> with parentheses, not <code>and</code>/<code>or</code>.</li>
+</ul>
+
+<p>Before running, you should be able to say where each name came from.</p>
+
+<h2>Exit Quiz &amp; Submission</h2>
+
+<ol>
+<li><strong>What does the dot in <code>math.sqrt</code> connect?</strong> The module <code>math</code> and the function <code>sqrt</code> inside it.</li>
+<li><strong>Which error do you get when you use a name you did not import?</strong> <code>NameError</code>.</li>
+<li><strong>What does <code>shuffle</code> return?</strong> <code>None</code>. The list itself is shuffled.</li>
+<li><strong>How do you draw 6 different numbers from 1 to 45?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>What is <code>__name__</code> inside an imported module?</strong> The module name (for example, <code>"number_tools"</code>).</li>
+<li><strong>Does <code>sales.sum(axis=0)</code> fold rows or columns?</strong> It folds downward along the rows, leaving one total per column.</li>
+<li><strong>How do you rank sales from largest to smallest in NumPy?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>Files to complete: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>, <code>guessing.py</code>. Record at least three test cases in comments for each program. Files you changed in the web lab can be saved to your computer with <code>cp file /mnt/host/</code> followed by the page's Download box.</p>
+
+<h2>Next Chapter</h2>
+
+<p>The last slide previews exceptions as the next topic (why <code>int("abc")</code> raises a <code>ValueError</code>, and keeping a program from crashing with <code>try</code>/<code>except</code>). Exceptions are covered in the next chapter, 'Files, Exceptions and JSON'. To prepare, find one input that breaks a program you wrote earlier.</p>
+</div><div lang="ko">
+<p>이 장의 주제는 모듈입니다. 같은 함수를 여러 프로그램에서 쓰고 싶을 때 코드를 복사하는 대신 한 파일(모듈)에 담아 두고 <code>import</code>로 불러 쓰는 방법을 배웁니다. 먼저 <code>import</code>의 여러 형태와 점(.)의 의미, 이름을 불러오지 않았을 때 나는 <code>NameError</code>를 살펴보고, 직접 만든 모듈 <code>number_tools</code>를 다른 프로그램에서 가져다 씁니다. 그다음 표준 라이브러리의 <code>math</code>, <code>datetime</code>, <code>random</code>을 실제 과제에 적용하고, 마지막으로 외부 패키지인 NumPy로 배열 전체를 한 번에 계산하는 방법을 처음 맛봅니다. 실습 프로그램은 <a href="#ex=math_practice">math_practice</a>, <a href="#ex=date_check">date_check</a>, <a href="#ex=number_tools">number_tools</a>, <a href="#ex=lotto">lotto</a>, <a href="#ex=guessing">guessing</a>입니다.</p>
+
+<h2>복습: 함수 하나, 프로그램 둘</h2>
+
+<p>'함수' 장에서 만든 <code>sum_to(n)</code>은 1 + 2 + … + n을 돌려줍니다. 이 함수가 필요한 두 번째 프로그램이 생겼다고 해 봅시다. 코드를 복사해 붙이면 당장은 되지만, 버그를 발견하면 두 곳을 모두 고쳐야 합니다. 이 장의 목표는 다시 쓸 코드에 자기만의 집을 마련해 주는 것입니다.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>모듈과 import</h2>
+
+<h3>모듈이란</h3>
+
+<p>모듈은 Python 정의(함수, 변수 등)가 들어 있는 파일입니다. 파일 이름에서 <code>.py</code>를 뺀 것이 모듈 이름이 됩니다. 예를 들어 <code>greetings.py</code>는 <code>greetings</code> 모듈입니다. 모듈을 import하면 그 모듈의 맨 위 수준 코드가 한 번 실행됩니다. 사실 지금까지 작성한 모든 프로그램도 이미 모듈이었습니다.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import와 점(.)</h3>
+
+<p><code>import math</code>는 <code>math</code> 모듈을 불러옵니다. 모듈 안의 이름은 점으로 꺼냅니다. <code>math.sqrt(2)</code>는 "math 모듈 안의 sqrt"라는 뜻입니다. 접두사를 붙여 쓰면 각 이름이 어디에서 왔는지 코드만 보고도 알 수 있습니다. Python은 처음 import한 모듈을 기억해(캐시) 두므로, 같은 모듈을 다시 import해도 다시 실행하지 않습니다.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>필요한 이름만 골라 가져오면 접두사 없이 쓸 수 있습니다. 쉼표로 여러 이름을 나열할 수 있고, 가져오면서 이름을 바꿀 수도 있습니다. 이때는 가져온 이름만 보입니다. <code>from math import sqrt</code> 뒤에 <code>math.pi</code>를 쓰면 <code>math</code>라는 이름이 없어서 오류가 납니다.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>import 방식 비교</h3>
+
+<table>
+<thead>
+<tr><th>형태</th><th>사용</th><th>특징</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>출처가 가장 분명하지만 타이핑이 조금 많다</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>짧다. 이름 몇 개만 쓸 때 좋다</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>짧은 별칭. <code>np</code>, <code>pd</code>처럼 관례적인 별칭에 쓴다</td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>이름이 어디서 왔는지 감춰지므로 피한다</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Traceback 읽기</h3>
+
+<p>import하지 않은 이름을 쓰면 <code>NameError</code>가 납니다. Traceback은 실패한 파일과 줄 번호를 알려 줍니다. 읽을 때는 마지막 줄(오류 종류와 메시지)부터 보고, 원인을 고친 뒤 다시 실행합니다. 아래 예에서 원인은 <code>math</code>를 import하지 않은 것입니다. <a href="#ex=math_practice">math_practice</a> 페이지의 단계에서 같은 오류를 직접 내 볼 수 있습니다.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math의 핵심 함수</h3>
+
+<p>상수 <code>pi</code>와 <code>e</code>, 제곱근 <code>sqrt</code>, 내림 <code>floor</code>와 올림 <code>ceil</code>이 있습니다. <code>factorial(n)</code>과 <code>gcd(a, b)</code>는 정수에 쓰고, <code>hypot(a, b)</code>는 직각삼각형의 빗변(대각선) 길이입니다.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: 원과 빗변</h3>
+
+<p><a href="#ex=math_practice">math_practice</a>를 엽니다. 반지름을 읽어 원의 넓이와 둘레를 소수 둘째 자리로 반올림해 출력하고, 이어서 두 변의 길이를 읽어 빗변을 출력합니다. 입력은 숫자라고 가정하고 <code>math.pi</code>와 <code>math.hypot</code>을 사용합니다(5분).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>웹 실습에서는 <code>printf '3\n3\n4\n' | python3 math_practice.py</code>처럼 입력을 미리 넣어 실행할 수도 있고, 그냥 <code>python3 math_practice.py</code>로 실행해 직접 입력해도 됩니다.</p>
+
+<h3>표준 라이브러리: 배터리 포함</h3>
+
+<p>Python에는 검증된 모듈 수백 개가 함께 들어 있어 따로 설치하거나 내려받을 필요가 없습니다. 이 장에서는 <code>math</code>, <code>random</code>, <code>datetime</code>을 다룹니다. 전체 목록은 docs.python.org/3/library에 있습니다.</p>
+
+<table>
+<thead>
+<tr><th>모듈</th><th>예</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>파일과 데이터 교환</td></tr>
+</tbody>
+</table>
+
+<h2>나만의 모듈</h2>
+
+<h3>첫 모듈: number_tools.py</h3>
+
+<p>다시 쓸 코드는 별도의 <code>.py</code> 파일에 둡니다. <code>average</code>는 숫자 리스트의 평균을, <code>spread</code>는 최댓값과 최솟값의 차를 돌려줍니다. 모듈은 도구를 정의할 뿐 사용자와 대화(input, print)하지 않습니다. 이 파일을 import할 프로그램과 같은 폴더에 둡니다.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>내 파일 import하기</h3>
+
+<p><code>stats_report.py</code>는 필요한 도구를 <code>import number_tools</code>로 가져와 <code>number_tools.average(...)</code>처럼 부릅니다. 두 파일은 같은 폴더에 있어야 합니다. 모듈을 수정했다면 프로그램을 다시 실행해야 반영됩니다.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>실행할까, import할까: __name__ == "__main__"</h3>
+
+<p>파일을 직접 실행하면 그 파일의 <code>__name__</code>은 <code>"__main__"</code>이고, 다른 파일이 import하면 <code>__name__</code>은 모듈 이름(<code>"number_tools"</code>)이 됩니다. 이 차이를 이용한 조건문(가드)으로 다시 쓸 도구와 데모 코드를 나눕니다. import할 때는 조용하고, 직접 실행할 때만 데모가 보입니다. <a href="#ex=number_tools">number_tools</a> 페이지에서 <code>number_tools.__name__</code>을 직접 출력해 확인할 수 있습니다.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>패키지: 폴더 속의 모듈</h3>
+
+<p>패키지는 관련 모듈을 모은 폴더입니다. 폴더 안의 <code>__init__.py</code>가 그 폴더를 패키지로 표시합니다. 이름은 점으로 따라 내려갑니다: <code>package.module.function</code>. 패키지는 pip와 외부 라이브러리를 다룰 때 다시 나옵니다.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>중간 점검</h3>
+
+<ul>
+<li><code>math.sqrt</code>의 점은 무엇과 무엇을 잇는가? 모듈과 그 안의 이름입니다.</li>
+<li>import하지 않은 이름은 왜 <code>NameError</code>를 내는가? 그 이름이 현재 파일에 정의된 적이 없기 때문입니다.</li>
+<li>모듈의 맨 위 수준 코드는 언제 실행되는가? 처음 import될 때 한 번입니다.</li>
+</ul>
+
+<h2>datetime: 날짜와 시각</h2>
+
+<h3>date와 datetime</h3>
+
+<p><code>date</code>는 연·월·일을, <code>datetime</code>은 거기에 시·분·초까지 담습니다. <code>today()</code>와 <code>now()</code>는 현재 시점을 알려 주고, 각 부분은 <code>.year</code>, <code>.month</code>, <code>.day</code>, <code>.hour</code> 같은 속성으로 읽습니다. 웹 실습의 가상 머신은 내 컴퓨터의 시계를 따라 오늘 날짜를 정하며, 터미널에서 <code>date</code> 명령으로 확인할 수 있습니다.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>날짜 서식: strftime</h3>
+
+<p><code>strftime</code>은 날짜를 원하는 모양의 문자열로 바꿉니다. <code>%Y</code>, <code>%m</code>, <code>%d</code>는 연·월·일, <code>%A</code>는 요일의 전체 이름입니다. 보고서에 필요한 문자열을 정확히 만들 수 있습니다.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>날짜 계산: timedelta</h3>
+
+<p>두 날짜를 빼면 일 단위의 <code>timedelta</code>가 나오고, <code>.days</code>로 정수 일수를 꺼냅니다. 날짜에 <code>timedelta</code>를 더하면 미래의 날짜가 됩니다. 일수가 음수이면 그 날짜가 이미 지났다는 뜻입니다.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: 날짜까지 남은 날</h3>
+
+<p><a href="#ex=date_check">date_check</a>를 엽니다. 목표 날짜를 YYYY-MM-DD 형식으로 읽어 요일 이름과 남은 날 수를 출력합니다. 지난 날짜, 오늘, 미래 날짜를 모두 시험해 봅니다(5분). 힌트: <code>strptime(text, "%Y-%m-%d")</code>로 문자열을 날짜로 바꾼 뒤 <code>date.today()</code>를 뺍니다.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>남은 날 수는 실행하는 날에 따라 달라집니다. 슬라이드의 89는 2026-09-27 기준입니다.</p>
+
+<h2>random: 난수</h2>
+
+<h3>실수와 정수</h3>
+
+<p><code>random()</code>은 0.0 이상 1.0 미만의 실수를, <code>uniform(a, b)</code>는 더 넓은 범위의 실수를 돌려줍니다. <code>randint(a, b)</code>는 양 끝을 모두 포함하는 정수를 고릅니다. 결과는 실행할 때마다 다릅니다.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>고르기, 섞기, 뽑기</h3>
+
+<p><code>choice(seq)</code>는 원소 하나를 고릅니다. <code>shuffle(list)</code>는 리스트를 그 자리에서 섞고 <code>None</code>을 돌려줍니다. 그래서 <code>names = random.shuffle(names)</code>처럼 쓰면 리스트를 잃어버립니다. <code>sample(seq, k)</code>는 서로 다른 원소 k개를 뽑습니다. 모두 리스트 위에서 동작합니다.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>재현성: seed</h3>
+
+<p>같은 seed를 주면 같은 수열이 나오고, seed가 다르면 결과도 다릅니다. 테스트하거나 실행 결과를 재현할 때 쓰며, 게임이나 복권은 seed 없이 매번 다른 난수에 의존합니다.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>실습</h2>
+
+<h3>Lab 1: number_tools 모듈</h3>
+
+<p><a href="#ex=number_tools">number_tools</a>에서 <code>number_tools.py</code>의 <code>average</code>와 <code>count_above</code>를 완성합니다. <code>count_above(numbers, limit)</code>은 <code>limit</code>보다 큰 값의 개수를 셉니다. 그런 다음 <code>stats_report.py</code>를 완성해 보고서를 출력합니다. 모듈 아래의 <code>__main__</code> 가드 데모는 그대로 둡니다.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>확인할 점: 직접 실행(<code>python3 number_tools.py</code>)에서는 데모가 나오고, import된 실행(<code>stats_report.py</code>)에서는 두 도구를 모두 씁니다. Average 88.0은 352 / 4, Above 85의 3은 88, 92, 93이고, 데모의 5.0은 2+4+6+8을 4로 나눈 값입니다. <code>average([])</code>는 빈 리스트에서 <code>ZeroDivisionError</code>를 냅니다. 이 오류를 부드럽게 처리하는 방법은 다음 장 '파일·예외·JSON'에서 다룹니다.</p>
+
+<h3>Lab 2: 로또 번호 생성기</h3>
+
+<p><a href="#ex=lotto">lotto</a>에서 몇 게임을 할지(1–5)를 읽고, 게임마다 1부터 45 사이의 서로 다른 수 6개를 뽑아 작은 수부터 정렬해 한 줄에 출력합니다. 입력은 정수 형식이라고 가정하고 게임마다 <code>random.sample</code>을 한 번 씁니다.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>확인할 점: 입력 1이면 정확히 한 줄, 5이면 다섯 줄이 나옵니다. 모든 줄은 정렬되어 있고(각 수가 앞의 수 이상), 여섯 값이 모두 다르며, 1에서 45 사이입니다. 0과 6은 <code>Invalid games</code>만 출력합니다. 리스트를 대괄호 없이 공백으로 구분해 출력하려면 <code>print(*numbers)</code>처럼 리스트를 풀어 넘깁니다.</p>
+
+<h3>Lab 3(과제): 숫자 맞히기 게임</h3>
+
+<p><a href="#ex=guessing">guessing</a>에서 컴퓨터가 1부터 100 사이의 비밀 수를 고르고, 추측할 때마다 <code>Higher</code>, <code>Lower</code>, <code>Correct!</code>를 알려 줍니다. 시도 횟수를 세어 맞혔을 때 함께 출력합니다.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>게임 반복의 구조는 이렇습니다. <code>randint(1, 100)</code>은 반복 전에 비밀 수를 한 번만 고릅니다. 반복은 추측이 맞을 때까지 계속되고, <code>if</code>/<code>elif</code>/<code>else</code>로 비교하며 시도 횟수를 셉니다. 맞히면 반복을 멈춥니다. 슬라이드의 예는 추측을 리스트로 고정해 흐름만 보여 주고, 실제 프로그램은 <code>input()</code>으로 추측을 읽으며 <code>break</code>로 멈춥니다.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: 표준 라이브러리 너머</h2>
+
+<p>표준 라이브러리는 Python과 함께 오지만, NumPy는 배열 계산을 위한 외부 패키지입니다. 배열은 숫자 묶음 전체를 한 번에 계산합니다. '데이터 분석: pandas·matplotlib' 장에서 다룰 pandas와 matplotlib이 NumPy 위에 만들어져 있습니다. 슬라이드는 Colab(NumPy가 미리 설치됨)이나 내 PC(<code>pip install numpy</code>)에서 따라 치도록 되어 있습니다. 이 웹 실습의 가상 머신에는 NumPy가 이미 들어 있으므로 아무 페이지의 터미널에서 <code>python3</code>을 실행해 아래 코드를 그대로 입력해 볼 수 있습니다. 다만 <code>import numpy</code>는 가상 머신에서 몇 초에서 수십 초가 걸립니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: 리스트가 배열로</h3>
+
+<p><code>np.array</code>는 리스트를 ndarray로 바꿉니다. 중첩 리스트는 2차원 배열이 됩니다. 아래 예에서 행은 매장, 열은 상품입니다. 재료는 이미 알고 있는 리스트입니다.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>규칙으로 배열 만들기</h3>
+
+<p><code>arange(1, 10, 2)</code>는 끝을 제외한 범위를, <code>zeros((2, 3))</code>와 <code>ones((2, 2))</code>는 모양을 0이나 1로 채운 배열을, <code>full((4,), 0.03)</code>은 한 값을 반복한 배열을, <code>linspace(0, 1, 5)</code>는 양 끝을 포함해 고르게 나눈 값을 만듭니다.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>seed를 준 난수 배열</h3>
+
+<p><code>np.random</code>은 <code>random</code> 모듈과 비슷합니다. <code>randint(50, 151, size=5)</code>는 정수 다섯 개를 뽑는데, <code>range</code>처럼 끝 151은 제외됩니다. <code>seed(42)</code>로 모두가 같은 결과를 얻습니다.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>배열 읽기: shape와 dtype</h3>
+
+<p><code>shape</code>는 (행, 열)이고 위 <code>sales</code>는 (3, 4)입니다. <code>ndim</code>은 차원 수, <code>size</code>는 원소 개수, <code>dtype</code>은 모든 원소가 공유하는 하나의 자료형입니다. 새 데이터를 받으면 먼저 shape와 dtype을 물어봅니다.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>정수 배열의 기본 dtype은 환경에 따라 다릅니다. 64비트 PC에서는 보통 <code>int64</code>이지만, 32비트인 이 가상 머신에서는 <code>int32</code>로 나옵니다.</p>
+
+<h3>배열 하나에 dtype 하나</h3>
+
+<p>배열은 한 가지 자료형만 저장합니다. 정수와 실수를 섞으면 float64가 되고, 숫자와 문자열을 섞으면 모두 문자열이 됩니다. <code>astype(np.float64)</code>로 실수로 바꿀 수 있습니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>인덱싱과 슬라이싱</h3>
+
+<p>리스트와 똑같이 인덱스와 슬라이스를 씁니다. <code>prices[1:3]</code>은 1에서 시작해 3 앞에서 멈춥니다. 다른 점은 슬라이스가 같은 메모리를 보는 뷰(view)라는 것입니다. 뷰를 고치면 원본도 바뀝니다. 진짜 복사본이 필요하면 <code>prices[1:3].copy()</code>를 씁니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2차원 인덱싱: [행, 열]</h3>
+
+<p>대괄호 한 쌍 안에 쉼표로 행과 열을 씁니다. <code>sales[1, 2]</code>는 칸 하나, <code>sales[:, 1]</code>은 열 하나 전체입니다. 두 방향 모두 슬라이스할 수 있습니다: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>조건으로 고르기: 마스크</h3>
+
+<p>비교 연산은 불리언 배열을 돌려주고, 그것을 인덱스로 쓰면 True인 원소만 남습니다. 마스크를 결합할 때는 <code>and</code>/<code>or</code>가 아니라 <code>&amp;</code>와 <code>|</code>를 쓰고, 비교마다 괄호를 씌워야 합니다.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>팬시 인덱싱</h3>
+
+<p>위치의 리스트를 넘기면 원하는 순서로 고를 수 있고, 같은 위치를 반복해도 됩니다. 결과는 뷰가 아닌 새 배열입니다. 뒤에서 이름과 순위를 짝지을 때 씁니다.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>벡터화 연산과 브로드캐스팅</h3>
+
+<p>연산자는 원소별로 적용됩니다. <code>prices * 2</code>는 모든 값을 두 배로 만들지만, 리스트에 <code>* 2</code>를 하면 리스트 전체가 반복됩니다. <code>np.sqrt</code>, <code>np.round</code>도 배열 전체에 적용됩니다. NumPy는 작은 모양을 큰 모양에 맞게 늘려(브로드캐스팅) 계산합니다. 숫자 하나는 배열 전체에 퍼지므로 <code>prices * 0.9</code>는 모든 상품을 할인합니다. 끝쪽 차원이 같거나 1이어야 합니다.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>axis로 집계하기</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code>, <code>min</code>은 배열을 하나의 값으로 접습니다. <code>axis=0</code>은 각 열을 위에서 아래로, <code>axis=1</code>은 각 행을 가로로 계산합니다. 결과 길이로 확인합니다: 상품 4개, 매장 3개.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, 쌓기, 정렬</h3>
+
+<p><code>reshape(4, 3)</code>은 같은 데이터를 새 모양으로 묶습니다. 12개월을 네 분기로 나누는 식입니다. <code>-1</code>은 "남는 만큼"이라는 뜻이고, <code>.T</code>는 행과 열을 바꿉니다. 원소 개수(size)는 바뀔 수 없습니다. <code>vstack</code>은 배열을 새 행으로, <code>hstack</code>은 새 열로 이어 붙입니다(새 매장은 vstack, 새 기간은 hstack). <code>sort</code>는 정렬된 값을, <code>argsort</code>는 정렬된 위치를 돌려주므로 팬시 인덱싱과 함께 이름을 순서대로 늘어놓을 수 있습니다. <code>argsort(-x)</code>는 큰 것부터 순위를 매깁니다.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>따라 하기: 연간 보고서</h3>
+
+<p>12개월 매출(단위: 만 원)을 네 분기로 reshape하고, <code>axis=1</code>로 분기별 합계를 구하고, <code>argmax</code>로 최고 매출 달의 인덱스를, <code>argsort(-monthly)[:3]</code>로 상위 세 달을 찾습니다.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy 다섯 줄 요약</h3>
+
+<ul>
+<li>ndarray: 여러 차원, 하나의 dtype.</li>
+<li>만들기: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>고르기: 슬라이스, 마스크, 팬시 인덱싱.</li>
+<li>계산: 벡터화, 브로드캐스팅, axis.</li>
+<li>재배치: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li>import를 빠뜨린 것이 <code>NameError</code>의 첫 번째 용의자입니다. 디버깅할 때는 맨 위의 import 줄부터 봅니다.</li>
+<li><code>randint(1, 6)</code>은 6을 포함하지만 <code>range(1, 6)</code>은 포함하지 않습니다.</li>
+<li><code>shuffle(names)</code>는 그 자리에서 섞고 <code>None</code>을 돌려줍니다.</li>
+<li><code>print(*numbers)</code>는 리스트를 풀어 따로따로 출력합니다.</li>
+<li>NumPy 마스크는 괄호와 함께 <code>&amp;</code>, <code>|</code>를 씁니다. <code>and</code>/<code>or</code>는 쓰지 않습니다.</li>
+</ul>
+
+<p>실행 전에는 각 이름이 어디에서 왔는지 말할 수 있어야 합니다.</p>
+
+<h2>확인 퀴즈와 제출</h2>
+
+<ol>
+<li><strong><code>math.sqrt</code>의 점은 무엇을 잇는가?</strong> 모듈 <code>math</code>와 그 안의 함수 <code>sqrt</code>입니다.</li>
+<li><strong>import하지 않은 이름을 쓰면 어떤 오류가 나는가?</strong> <code>NameError</code>입니다.</li>
+<li><strong><code>shuffle</code>은 무엇을 돌려주는가?</strong> <code>None</code>입니다. 리스트 자체가 섞입니다.</li>
+<li><strong>1부터 45 사이의 서로 다른 수 6개는 어떻게 뽑는가?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>import된 모듈 안에서 <code>__name__</code>은?</strong> 모듈 이름입니다(예: <code>"number_tools"</code>).</li>
+<li><strong><code>sales.sum(axis=0)</code>은 행과 열 중 무엇을 접는가?</strong> 행 방향으로 내려가며 접어 열마다 합계 하나를 남깁니다.</li>
+<li><strong>NumPy에서 매출을 큰 것부터 순위 매기려면?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>완성할 파일: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>, <code>guessing.py</code>. 프로그램마다 테스트 사례를 세 개 이상 주석으로 기록합니다. 웹 실습에서 고친 파일은 <code>cp 파일 /mnt/host/</code> 후 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>다음 장</h2>
+
+<p>슬라이드 마지막 장은 다음 주제로 예외(<code>int("abc")</code>가 <code>ValueError</code>를 내는 이유, <code>try</code>/<code>except</code>로 프로그램이 멈추지 않게 하기)를 예고합니다. 예외는 다음 장 '파일·예외·JSON'에서 다룹니다. 준비로 앞에서 만든 프로그램을 망가뜨리는 입력을 하나 찾아 둡니다.</p>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

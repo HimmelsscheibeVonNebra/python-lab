@@ -1,0 +1,494 @@
+<p>This chapter is about modules. When you want to use the same function in several programs, instead of copying the code you keep it in one file (a module) and load it with <code>import</code>. First we look at the different forms of <code>import</code>, what the dot (.) means, and the <code>NameError</code> you get when a name was never imported; then we use a module we wrote ourselves, <code>number_tools</code>, from another program. Next we apply the standard library's <code>math</code>, <code>datetime</code> and <code>random</code> to real tasks, and finally we get a first taste of computing on a whole array at once with the external package NumPy. The practice programs are <a href="math_practice.html">math_practice</a>, <a href="date_check.html">date_check</a>, <a href="number_tools.html">number_tools</a>, <a href="lotto.html">lotto</a> and <a href="guessing.html">guessing</a>.</p>
+
+<h2>Review: One Function, Two Programs</h2>
+
+<p><code>sum_to(n)</code>, which we wrote in the 'Functions' chapter, returns 1 + 2 + … + n. Imagine a second program that needs this function. Copying and pasting the code works for now, but when you find a bug you have to fix it in both places. This chapter's goal is to give reusable code a home of its own.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>Modules and import</h2>
+
+<h3>What Is a Module?</h3>
+
+<p>A module is a file containing Python definitions (functions, variables and so on). The file name minus <code>.py</code> is the module name. For example, <code>greetings.py</code> is the <code>greetings</code> module. Importing a module runs its top-level code once. In fact, every program you have written so far was already a module.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import and the Dot</h3>
+
+<p><code>import math</code> loads the <code>math</code> module. The dot reaches a name inside the module: <code>math.sqrt(2)</code> means "the sqrt inside the math module". Keeping the prefix makes it clear from the code alone where each name came from. Python remembers (caches) a module after its first import, so importing the same module again does not run it again.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>If you import only the names you need, you can use them without a prefix. You can list several names separated by commas, and you can also rename a name while importing it. Only the imported names become visible: writing <code>math.pi</code> after <code>from math import sqrt</code> fails because there is no name <code>math</code>.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>Import Styles Compared</h3>
+
+<table>
+<thead>
+<tr><th>Form</th><th>Use</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>Clearest origin, but a little more typing</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>Short; best when you use only a few names</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>A shorter alias; used for conventional aliases such as <code>np</code> and <code>pd</code></td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>Hides where names came from, so avoid it</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Reading the Traceback</h3>
+
+<p>Using a name you did not import raises a <code>NameError</code>. The traceback tells you the file and line that failed. Read the last line (the error type and message) first, fix the cause, and run again. In the example below the cause is that <code>math</code> was never imported. You can trigger the same error yourself in the steps of the <a href="math_practice.html">math_practice</a> page.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math Essentials</h3>
+
+<p>There are the constants <code>pi</code> and <code>e</code>, the square root <code>sqrt</code>, and <code>floor</code> and <code>ceil</code> for rounding down and up. <code>factorial(n)</code> and <code>gcd(a, b)</code> work on integers, and <code>hypot(a, b)</code> is the length of the hypotenuse (diagonal) of a right triangle.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: Circle &amp; Hypotenuse</h3>
+
+<p>Open <a href="math_practice.html">math_practice</a>. Read a radius and print the circle's area and circumference rounded to two decimals, then read the lengths of two legs and print the hypotenuse. Assume numeric input and use <code>math.pi</code> and <code>math.hypot</code> (5 minutes).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>In the web lab you can feed the input in ahead of time, as in <code>printf '3\n3\n4\n' | python3 math_practice.py</code>, or simply run <code>python3 math_practice.py</code> and type the input yourself.</p>
+
+<h3>The Standard Library: Batteries Included</h3>
+
+<p>Python ships with hundreds of tested modules, so there is nothing to install or download. This chapter covers <code>math</code>, <code>random</code> and <code>datetime</code>. The full list is at docs.python.org/3/library.</p>
+
+<table>
+<thead>
+<tr><th>Module</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>files and data exchange</td></tr>
+</tbody>
+</table>
+
+<h2>Your Own Modules</h2>
+
+<h3>Your First Module: number_tools.py</h3>
+
+<p>Reusable code lives in its own <code>.py</code> file. <code>average</code> returns the mean of a list of numbers, and <code>spread</code> returns the difference between the largest and smallest values. The module only defines tools; it does not talk to the user (input, print). Put this file in the same folder as the program that imports it.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>Importing Your Own File</h3>
+
+<p><code>stats_report.py</code> brings in the tools it needs with <code>import number_tools</code> and calls them as <code>number_tools.average(...)</code>. The two files must be in the same folder. After editing the module, run the program again to pick up the change.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>Run or Import: __name__ == "__main__"</h3>
+
+<p>When you run a file directly, its <code>__name__</code> is <code>"__main__"</code>; when another file imports it, <code>__name__</code> is the module name (<code>"number_tools"</code>). A condition (a guard) based on this difference separates the reusable tools from the demo code: imports stay silent, and the demo appears only on a direct run. On the <a href="number_tools.html">number_tools</a> page you can print <code>number_tools.__name__</code> yourself to check.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>Packages: Modules in Folders</h3>
+
+<p>A package is a folder of related modules. An <code>__init__.py</code> inside the folder marks it as a package. Dotted names navigate down: <code>package.module.function</code>. Packages come back when we deal with pip and external libraries.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>Midpoint Check</h3>
+
+<ul>
+<li>What does the dot in <code>math.sqrt</code> connect? A module and a name inside it.</li>
+<li>Why does a name you did not import raise <code>NameError</code>? Because that name was never defined in the current file.</li>
+<li>When does a module's top-level code run? Once, the first time it is imported.</li>
+</ul>
+
+<h2>datetime: Dates and Moments</h2>
+
+<h3>date and datetime</h3>
+
+<p>A <code>date</code> holds a year, month and day, and a <code>datetime</code> also holds hours, minutes and seconds. <code>today()</code> and <code>now()</code> report the current moment, and each part is read as an attribute such as <code>.year</code>, <code>.month</code>, <code>.day</code> or <code>.hour</code>. The web lab's virtual machine takes today's date from your computer's clock; you can check it with the <code>date</code> command in the terminal.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>Formatting Dates: strftime</h3>
+
+<p><code>strftime</code> turns a date into a string in the layout you want. <code>%Y</code>, <code>%m</code> and <code>%d</code> are the year, month and day, and <code>%A</code> is the full weekday name. You can build exactly the string a report needs.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>Date Arithmetic: timedelta</h3>
+
+<p>Subtracting two dates gives a <code>timedelta</code> in days, and <code>.days</code> extracts the whole number of days. Adding a <code>timedelta</code> to a date gives a future date. A negative number of days means the date has already passed.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: Days Until a Date</h3>
+
+<p>Open <a href="date_check.html">date_check</a>. Read a target date in YYYY-MM-DD format and print its weekday name and the number of days remaining. Test a past date, today and a future date (5 minutes). Hint: convert the string to a date with <code>strptime(text, "%Y-%m-%d")</code>, then subtract <code>date.today()</code>.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>The days remaining depend on the day you run it. The 89 on the slide is counted from 2026-09-27.</p>
+
+<h2>random: Random Numbers</h2>
+
+<h3>Floats and Integers</h3>
+
+<p><code>random()</code> returns a float from 0.0 up to, but not including, 1.0, and <code>uniform(a, b)</code> returns a float over a wider range. <code>randint(a, b)</code> picks an integer with both ends included. The results differ on every run.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>Pick, Shuffle, Sample</h3>
+
+<p><code>choice(seq)</code> picks one element. <code>shuffle(list)</code> mixes the list in place and returns <code>None</code>, so writing <code>names = random.shuffle(names)</code> loses the list. <code>sample(seq, k)</code> picks k different elements. All of these work on lists.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>Repeatability: seed</h3>
+
+<p>The same seed produces the same sequence, and different seeds give different results. Seeds are used for testing and for reproducing a run; games and lotteries rely on unseeded randomness that differs every time.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>Labs</h2>
+
+<h3>Lab 1: A number_tools Module</h3>
+
+<p>In <a href="number_tools.html">number_tools</a>, finish <code>average</code> and <code>count_above</code> in <code>number_tools.py</code>. <code>count_above(numbers, limit)</code> counts the values larger than <code>limit</code>. Then finish <code>stats_report.py</code> so it prints the report. Keep the <code>__main__</code> guard demo at the bottom of the module.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>Checks: the direct run (<code>python3 number_tools.py</code>) prints the demo, and the imported run (<code>stats_report.py</code>) uses both tools. Average 88.0 is 352 / 4, the 3 in Above 85 is 88, 92 and 93, and the demo's 5.0 is 2+4+6+8 divided by 4. <code>average([])</code> raises <code>ZeroDivisionError</code> on an empty list. Handling that error gracefully is covered in the next chapter, 'Files, Exceptions and JSON'.</p>
+
+<h3>Lab 2: Lotto Generator</h3>
+
+<p>In <a href="lotto.html">lotto</a>, read how many games to play (1–5); for each game draw 6 different numbers from 1 to 45 and print them on one line, sorted smallest first. Assume integer-formatted input and use <code>random.sample</code> once per game.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>Checks: input 1 prints exactly one line, and 5 prints five lines. Every line is sorted (each number is at least the previous one), has six different values, and stays between 1 and 45. 0 and 6 print only <code>Invalid games</code>. To print a list separated by spaces without brackets, unpack it when passing it, as in <code>print(*numbers)</code>.</p>
+
+<h3>Lab 3 (Take-Home): Guessing Game</h3>
+
+<p>In <a href="guessing.html">guessing</a>, the computer picks a secret number from 1 to 100 and answers each guess with <code>Higher</code>, <code>Lower</code> or <code>Correct!</code>. Count the attempts and print the count along with the correct guess.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>Here is how the game loop works. <code>randint(1, 100)</code> chooses the secret once, before the loop. The loop repeats until the guess matches, comparing with <code>if</code>/<code>elif</code>/<code>else</code> and counting attempts. A correct guess stops the loop. The slide's example fixes the guesses in a list to show just the flow; the real program reads guesses with <code>input()</code> and stops with <code>break</code>.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: Beyond the Standard Library</h2>
+
+<p>The standard library comes with Python, but NumPy is an external package for array computing. An array computes on a whole batch of numbers at once. pandas and matplotlib, covered in the 'Data Analysis: pandas and matplotlib' chapter, are built on top of NumPy. The slides have you type along in Colab (NumPy preinstalled) or on your own PC (<code>pip install numpy</code>). The web lab's virtual machine already includes NumPy, so you can run <code>python3</code> in the terminal of any page and type the code below as is. Note, however, that <code>import numpy</code> takes from a few seconds to a few tens of seconds in the virtual machine.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: Lists Become Arrays</h3>
+
+<p><code>np.array</code> turns a list into an ndarray. A nested list becomes a 2D array. In the example below, rows are stores and columns are products. The ingredients are lists you already know.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>Arrays by Recipe</h3>
+
+<p><code>arange(1, 10, 2)</code> makes a range that excludes the end; <code>zeros((2, 3))</code> and <code>ones((2, 2))</code> make arrays of a given shape filled with 0 or 1; <code>full((4,), 0.03)</code> makes an array repeating one value; and <code>linspace(0, 1, 5)</code> makes evenly spaced values including both ends.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>Random Arrays, Seeded</h3>
+
+<p><code>np.random</code> is similar to the <code>random</code> module. <code>randint(50, 151, size=5)</code> draws five integers, and as with <code>range</code> the end 151 is excluded. With <code>seed(42)</code> everyone gets the same result.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>Reading an Array: shape and dtype</h3>
+
+<p><code>shape</code> is (rows, columns); the <code>sales</code> above is (3, 4). <code>ndim</code> is the number of dimensions, <code>size</code> the number of elements, and <code>dtype</code> the single data type all elements share. When you receive new data, ask for its shape and dtype first.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>The default dtype of an integer array depends on the environment. On a 64-bit PC it is usually <code>int64</code>, but on this 32-bit virtual machine it comes out as <code>int32</code>.</p>
+
+<h3>One dtype per Array</h3>
+
+<p>An array stores only one data type. Mixing integers and floats gives float64, and mixing numbers and strings turns everything into strings. <code>astype(np.float64)</code> converts to floats.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>Indexing and Slicing</h3>
+
+<p>Indexes and slices work just like with lists. <code>prices[1:3]</code> starts at 1 and stops before 3. The difference is that a slice is a view onto the same memory: changing the view changes the original too. When you need a real copy, use <code>prices[1:3].copy()</code>.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2D Indexing: [row, column]</h3>
+
+<p>Write the row and column inside one pair of brackets, separated by a comma. <code>sales[1, 2]</code> is a single cell, and <code>sales[:, 1]</code> is one whole column. Both directions can be sliced: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>Choosing by Condition: Masks</h3>
+
+<p>A comparison returns a Boolean array, and using it as an index keeps only the elements that are True. To combine masks, use <code>&amp;</code> and <code>|</code>, not <code>and</code>/<code>or</code>, and put parentheses around each comparison.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>Fancy Indexing</h3>
+
+<p>Passing a list of positions picks elements in the order you want, and the same position may be repeated. The result is a new array, not a view. We use this later to pair names with rankings.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>Vectorized Math and Broadcasting</h3>
+
+<p>Operators are applied element by element. <code>prices * 2</code> doubles every value, whereas <code>* 2</code> on a list repeats the whole list. <code>np.sqrt</code> and <code>np.round</code> also apply to the whole array. NumPy computes by stretching a smaller shape to fit a larger one (broadcasting). A single number spreads over the whole array, so <code>prices * 0.9</code> discounts every product. The trailing dimensions must be equal or 1.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>Aggregation with axis</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code> and <code>min</code> fold an array into a single value. <code>axis=0</code> computes each column from top to bottom, and <code>axis=1</code> computes each row across. Check with the length of the result: 4 products, 3 stores.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, Stacking, Sorting</h3>
+
+<p><code>reshape(4, 3)</code> groups the same data into a new shape, for example splitting 12 months into four quarters. <code>-1</code> means "whatever is left", and <code>.T</code> swaps rows and columns. The number of elements (size) cannot change. <code>vstack</code> joins arrays as new rows and <code>hstack</code> as new columns (a new store is vstack, a new period is hstack). <code>sort</code> returns the sorted values and <code>argsort</code> the sorted positions, so together with fancy indexing you can line up names in order. <code>argsort(-x)</code> ranks from largest to smallest.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>Guided Tour: Annual Report</h3>
+
+<p>Reshape 12 months of sales (in units of ten thousand won) into four quarters, get the quarterly totals with <code>axis=1</code>, find the index of the best month with <code>argmax</code>, and find the top three months with <code>argsort(-monthly)[:3]</code>.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy in Five Lines</h3>
+
+<ul>
+<li>ndarray: many dimensions, one dtype.</li>
+<li>Create: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>Select: slices, masks, fancy indexing.</li>
+<li>Compute: vectorization, broadcasting, axis.</li>
+<li>Rearrange: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>A missing import is the first suspect for a <code>NameError</code>. When debugging, check the import lines at the top first.</li>
+<li><code>randint(1, 6)</code> includes 6, but <code>range(1, 6)</code> does not.</li>
+<li><code>shuffle(names)</code> shuffles in place and returns <code>None</code>.</li>
+<li><code>print(*numbers)</code> unpacks the list and prints the items separately.</li>
+<li>NumPy masks use <code>&amp;</code> and <code>|</code> with parentheses, not <code>and</code>/<code>or</code>.</li>
+</ul>
+
+<p>Before running, you should be able to say where each name came from.</p>
+
+<h2>Exit Quiz &amp; Submission</h2>
+
+<ol>
+<li><strong>What does the dot in <code>math.sqrt</code> connect?</strong> The module <code>math</code> and the function <code>sqrt</code> inside it.</li>
+<li><strong>Which error do you get when you use a name you did not import?</strong> <code>NameError</code>.</li>
+<li><strong>What does <code>shuffle</code> return?</strong> <code>None</code>. The list itself is shuffled.</li>
+<li><strong>How do you draw 6 different numbers from 1 to 45?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>What is <code>__name__</code> inside an imported module?</strong> The module name (for example, <code>"number_tools"</code>).</li>
+<li><strong>Does <code>sales.sum(axis=0)</code> fold rows or columns?</strong> It folds downward along the rows, leaving one total per column.</li>
+<li><strong>How do you rank sales from largest to smallest in NumPy?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>Files to complete: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>, <code>guessing.py</code>. Record at least three test cases in comments for each program. Files you changed in the web lab can be saved to your computer with <code>cp file /mnt/host/</code> followed by the page's Download box.</p>
+
+<h2>Next Chapter</h2>
+
+<p>The last slide previews exceptions as the next topic (why <code>int("abc")</code> raises a <code>ValueError</code>, and keeping a program from crashing with <code>try</code>/<code>except</code>). Exceptions are covered in the next chapter, 'Files, Exceptions and JSON'. To prepare, find one input that breaks a program you wrote earlier.</p>

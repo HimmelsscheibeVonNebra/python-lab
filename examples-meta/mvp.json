@@ -1,0 +1,105 @@
+{
+  "class": "mvp",
+  "title": "한국 증권시장 분석: 시나리오에서 웹 보고서 MVP까지",
+  "summary": "시나리오(SC) → 요구사항(REQ) → 기능(FEAT) → 함수(FUNC) → 테스트(TEST)로 이어지는 설계를 따라 korea_market_mvp를 실행한다. 수업용 가상 CSV를 검증·분석해 docs/index.html을 만들고, 빈 입력·잘못된 입력·누락 파일에서 프로그램이 어떻게 다르게 반응하는지, 실패해도 기존 보고서가 남는지를 확인한다. 끝으로 동작을 바꾸지 않는 리팩터링을 연습한다.",
+  "examples": [
+    {
+      "name": "korea_market_mvp",
+      "source": "project/mvp/examples/korea_market_mvp/main.py",
+      "also": [
+        "project/mvp/examples/korea_market_mvp/logic.py",
+        "project/mvp/examples/korea_market_mvp/storage.py",
+        "project/mvp/examples/korea_market_mvp/report.py",
+        "project/mvp/examples/korea_market_mvp/test_market.py",
+        "project/mvp/examples/korea_market_mvp/data/prices.csv",
+        "project/mvp/examples/korea_market_mvp/data/empty.csv",
+        "project/mvp/examples/korea_market_mvp/data/invalid-zero.csv",
+        "project/mvp/examples/korea_market_mvp/README.md",
+        "project/mvp/examples/korea_market_mvp/project-spec.md",
+        "project/mvp/labs/slice-lab.md",
+        "project/mvp/labs/team-name_user-scenario.md"
+      ],
+      "summary": "main.py가 인자를 해석하고 load_quotes(CSV 읽기·검증) → analyze(필터·정렬) → summarize(요약) → render_html(HTML 문자열) → write_html(원자적 파일 교체) 순서로 호출한다. logic.py와 report.py는 파일을 열지 않고, 모든 입출력은 storage.py에 있다.",
+      "steps": [
+        {
+          "cmd": "python3 -m unittest -v",
+          "note": "test_01부터 test_12까지 12개 테스트가 모두 ok이고 마지막 줄이 OK다. 각 테스트 이름의 번호가 워크북의 TEST-01~12와 같다. 파일 테스트는 TemporaryDirectory 안에서만 일어나 수업용 docs/index.html을 건드리지 않는다."
+        },
+        {
+          "cmd": "cat data/prices.csv",
+          "note": "입력 계약: 헤더 date,code,name,market,previous_close,close,volume 순서, 날짜 하나, 종목 다섯 개. 005930처럼 앞자리가 0인 코드가 있다. 모두 수업용 가상 데이터다."
+        },
+        {
+          "cmd": "python3 main.py",
+          "note": "SC-01, 기본값은 --market ALL이다. Generated .../docs/index.html (5 stocks)가 나오면 보고서가 교체된 것이다. 성공 메시지는 write_html()이 끝난 뒤에만 출력된다."
+        },
+        {
+          "cmd": "grep -oE '종목 [0-9]+개[^<]*|<strong>[^<]*</strong>' docs/index.html\ngrep -oE '<td>[0-9]{6}</td>' docs/index.html",
+          "note": "요약은 종목 5개 · 상승 2 · 하락 2 · 보합 1, 표본 단순평균 +0.40%다. 표의 코드 순서는 247540, 005930, 035420, 000660, 035900으로 등락률 내림차순이며 005930의 앞자리 0이 그대로 남아 있다."
+        },
+        {
+          "cmd": "cp docs/index.html /mnt/host/report.html",
+          "note": "위쪽 받기 칸에 /mnt/host/report.html을 입력하고 받기를 누르면 내 컴퓨터의 브라우저로 보고서를 열 수 있다(TEST-13 브라우저 확인). 기준일·시장·출처·단위(원, 주)·부호가 붙은 등락률·가상 데이터 안내를 확인한다."
+        },
+        {
+          "cmd": "python3 main.py --market KOSPI\ngrep -oE '시장: [A-Z]+|<strong>[^<]*</strong>' docs/index.html",
+          "note": "FEAT-02: KOSPI만 남겨 3 stocks, 평균 +0.33%다. ALL의 +0.40%와 다른 이유는 평균을 내는 표본이 달라졌기 때문이다. 이 평균은 동일 가중 표본 평균이지 KOSPI 지수 수익률이 아니다."
+        },
+        {
+          "cmd": "python3 main.py --input data/invalid-zero.csv\necho \"exit=$?\"\ngrep -oE '시장: [A-Z]+' docs/index.html\nls docs",
+          "note": "SC-02: 전일종가 0인 행은 Report not generated: CSV row 2: previous_close must be >= 1로 거절되고 종료 코드는 1이다. docs/index.html은 여전히 바로 앞의 KOSPI 보고서이고, 임시 파일도 남지 않았다(REQ-06)."
+        },
+        {
+          "cmd": "python3 main.py --input data/nope.csv; echo \"exit=$?\"",
+          "note": "누락 파일은 빈 데이터가 아니라 오류다. [Errno 2] No such file or directory 메시지와 종료 코드 1이 나오고 보고서는 바뀌지 않는다."
+        },
+        {
+          "cmd": "python3 main.py --input data/empty.csv\necho \"exit=$?\"\ngrep -oE '<strong>[^<]*</strong>|표시할 종목이 없습니다' docs/index.html",
+          "note": "SC-03: 헤더만 있는 CSV는 정상적인 빈 입력이다. (0 stocks)로 성공(종료 코드 0)하고, 평균은 N/A, 표에는 표시할 종목이 없습니다 안내가 들어간다. 누락 파일과 결과가 다르다는 점이 핵심이다."
+        },
+        {
+          "cmd": "python3 main.py --market NASDAQ; echo \"exit=$?\"",
+          "note": "모르는 시장은 argparse가 invalid choice로 거절하고 종료 코드는 2다. 정리하면 성공 0, 데이터·파일 오류 1, CLI 사용 오류 2다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom logic import change_pct\nassert change_pct(70000, 71400) == 2.0\nassert change_pct(200000, 198000) == -1.0\nassert change_pct(100, 100) == 0.0\nprint(\"Daily change checks passed.\")\nEOF",
+          "note": "슬라이드의 가장 작은 규칙: 상승·하락·보합을 각각 별도 검사로 확인한다. 계산은 반올림하지 않고, 반올림은 보고서에서 f\"{change:+.2f}%\"로만 한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom html import escape\nprint(escape(\"<b>Example</b>\"))\nprint(f\"{2.0:+.2f}%\")\nEOF",
+          "note": "html.escape는 종목명 같은 외부 텍스트의 <, >를 &lt;, &gt;로 바꿔 HTML 태그로 해석되지 않게 한다(TEST-08). +2.00%처럼 부호를 숫자와 함께 보여 주면 색이 없어도 방향을 알 수 있다."
+        },
+        {
+          "cmd": "python3 main.py; cp docs/index.html /mnt/host/report.html",
+          "note": "ALL 보고서로 되돌려 다시 받아 둔다. 슬라이드의 python3 -m http.server로 띄우는 방식은 이 가상 머신 안에 브라우저가 없으므로, 받기로 내려받아 직접 여는 것으로 대신한다."
+        }
+      ],
+      "expect": "(3 stocks)",
+      "notes": "슬라이드의 cd 11week/examples/korea_market_mvp는 이 실습에서 ~/project/mvp/examples/korea_market_mvp다. Git 브랜치·PR 단계는 실제 PC의 저장소에서 한다."
+    },
+    {
+      "name": "tidy_lab",
+      "source": "project/mvp/labs/tidy_lab.py",
+      "summary": "동작은 맞지만 읽기 어려운 코드다. 이름 바꾸기, 상수 추출, 중복 줄을 함수로 빼기, guard clause를 적용하되 여섯 검사의 출력은 한 글자도 바뀌면 안 된다. 리팩터링은 기능 추가·버그 수정과 다른 종류의 변경이며, 증거는 전후의 같은 검사 결과다.",
+      "steps": [
+        {
+          "cmd": "python3 tidy_lab.py",
+          "note": "PASS가 여섯 줄 나온다. 리팩터링 전의 기준 결과다. 한 번 고칠 때마다 다시 실행해서 같은 여섯 줄이 나오는지 확인한다."
+        },
+        {
+          "cmd": "grep -n '2000' tidy_lab.py",
+          "note": "하루 목표량 2000 ml이 코드 여러 곳에 숫자로 흩어져 있다(Move 2). 상단에 DAILY_GOAL_ML = 2000처럼 이름을 붙여 한 곳에 둔다."
+        },
+        {
+          "cmd": "grep -n 'out.append' tidy_lab.py",
+          "note": "같은 줄이 if와 else에 두 번 있다(Move 3). 두 분기가 완전히 같으므로 한 줄을 만드는 함수 하나로 뽑아내면 분기 자체가 필요 없다."
+        },
+        {
+          "cmd": "[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py\npython3 tidy_lab.py > before.txt\npython3 my_tidy.py > after.txt\ndiff before.txt after.txt && echo same output",
+          "note": "처음 실행하면 복사본 my_tidy.py를 만들고(아직 고치지 않았으므로 same output), 이후에는 있는 복사본을 그대로 둔다. nano my_tidy.py로 한 가지씩 고친 뒤 이 명령을 다시 실행해 원본과 출력을 비교한다. same output이 나오면 동작이 그대로라는 증거다. x, d, m, tmp 대신 entries, day, ml, totals 같은 이름을 쓴다(Move 1). check() 호출과 함수 이름은 바꾸지 않는다."
+        }
+      ],
+      "expect": "PASS format_report([])"
+    }
+  ]
+}

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Loops · Python Lab" data-title-ko="반복문 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loops · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="loops/starter">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html" aria-current="page"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" aria-current="page" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 03 · 4 examples</span><span lang="ko">03장 · 예제 4개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문">← 02 <span lang="en">Conditionals</span><span lang="ko">조건문</span></a><a class="next" href="../functions/index.html" title="Functions / 함수">04 <span lang="en">Functions</span><span lang="ko">함수</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Loops</span><span lang="ko">반복문</span></h1>
+    <p class="lead"><span lang="en">Use for and range(), accumulating a total, while with break and continue, and nested loops to build an even-number sum, a sum of inputs until zero, multiplication tables and a star triangle.</span><span lang="ko">for와 range(), 누적 합, while과 break·continue, 중첩 반복문으로 짝수 합, 0까지 입력 합, 구구단, 별 삼각형을 만든다.</span> <a href="#notes-loops"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="even_sum" aria-pressed="true">even_sum</button>
+          <button type="button" data-pick="input_sum" aria-pressed="false">input_sum</button>
+          <button type="button" data-pick="multiplication" aria-pressed="false">multiplication</button>
+          <button type="button" data-pick="stars" aria-pressed="false">stars</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="even_sum" data-dir="loops/starter">
+        <h2>even_sum <span class="muted">~/loops/starter</span></h2>
+        <p><span lang="en">Practice 1: add only the even integers from 1 to 10 to total and print 30. Before that, check how for, range() and an accumulator variable behave using the examples from the slides.</span><span lang="ko">연습 1: 1부터 10까지의 정수 중 짝수만 total에 더해 30을 출력한다. 그 전에 for, range(), 누적 변수의 동작을 슬라이드 예제로 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for letter in &quot;ABC&quot;:
+    print(letter)
+print(&quot;Done&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for letter in &quot;ABC&quot;:
+    print(letter)
+print(&quot;Done&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for letter in &quot;ABC&quot;:
+    print(letter)
+print(&quot;Done&quot;)
+EOF</code></div>
+          <p><span lang="en">On each iteration the next character goes into letter. After A, B, C the loop ends and Done is printed once.</span><span lang="ko">반복마다 다음 글자가 letter에 들어간다. A, B, C 다음 반복이 끝나고 Done이 한 번 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for i in range(3): print(i, end=&quot; &quot;)
+print(&quot;| range(3)&quot;)
+for i in range(1, 4): print(i, end=&quot; &quot;)
+print(&quot;| range(1, 4)&quot;)
+for i in range(2, 7, 2): print(i, end=&quot; &quot;)
+print(&quot;| range(2, 7, 2)&quot;)
+for i in range(3, 0, -1): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0, -1)&quot;)
+for i in range(3, 0): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0)&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for i in range(3): print(i, end=&quot; &quot;)
+print(&quot;| range(3)&quot;)
+for i in range(1, 4): print(i, end=&quot; &quot;)
+print(&quot;| range(1, 4)&quot;)
+for i in range(2, 7, 2): print(i, end=&quot; &quot;)
+print(&quot;| range(2, 7, 2)&quot;)
+for i in range(3, 0, -1): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0, -1)&quot;)
+for i in range(3, 0): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0)&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for i in range(3): print(i, end=&quot; &quot;)
+print(&quot;| range(3)&quot;)
+for i in range(1, 4): print(i, end=&quot; &quot;)
+print(&quot;| range(1, 4)&quot;)
+for i in range(2, 7, 2): print(i, end=&quot; &quot;)
+print(&quot;| range(2, 7, 2)&quot;)
+for i in range(3, 0, -1): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0, -1)&quot;)
+for i in range(3, 0): print(i, end=&quot; &quot;)
+print(&quot;| range(3, 0)&quot;)
+EOF</code></div>
+          <p><span lang="en">The stop value is always left out: 0 1 2, 1 2 3, 2 4 6, 3 2 1. range(3, 0), whose direction is wrong, is empty and gives no values.</span><span lang="ko">stop 값은 언제나 빠진다: 0 1 2, 1 2 3, 2 4 6, 3 2 1. 방향이 맞지 않는 range(3, 0)은 비어 있어 아무 값도 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '">▶</button><code>python3 -u -c 'range(1, 5, 0)' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '</code></div>
+          <p><span lang="en">A step of 0 gives ValueError: range() arg 3 must not be zero.</span><span lang="ko">step이 0이면 ValueError: range() arg 3 must not be zero다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+total = 0
+for n in range(1, 6):
+    before = total
+    total += n
+    print(n, before, total)
+print(&quot;final:&quot;, total)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+total = 0
+for n in range(1, 6):
+    before = total
+    total += n
+    print(n, before, total)
+print(&quot;final:&quot;, total)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+total = 0
+for n in range(1, 6):
+    before = total
+    total += n
+    print(n, before, total)
+print(&quot;final:&quot;, total)
+EOF</code></div>
+          <p><span lang="en">An accumulator trace table: each line is n, total before adding and total after adding. Each iteration carries on from the previous total, giving 1, 3, 6, 10, 15.</span><span lang="ko">누적 추적표: 각 줄은 n, 더하기 전 total, 더한 뒤 total이다. 이전 total을 이어받아 1, 3, 6, 10, 15가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    total = 0
+    total += n
+print(&quot;final:&quot;, total)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    total = 0
+    total += n
+print(&quot;final:&quot;, total)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    total = 0
+    total += n
+print(&quot;final:&quot;, total)
+EOF</code></div>
+          <p><span lang="en">The question from the slides: if total = 0 is put inside the loop, it is reset every time and only the last value, 5, remains.</span><span lang="ko">슬라이드의 질문: total = 0을 반복문 안에 두면 매번 초기화돼 마지막 값 5만 남는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 even_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 even_sum.py">▶</button><code>python3 even_sum.py</code></div>
+          <p><span lang="en">The starter code has only pass, so it adds nothing and prints 0.</span><span lang="ko">시작 코드는 pass만 있어 아무것도 더하지 않고 0을 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/even_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/even_sum.py">▶</button><code>python3 ../solutions/even_sum.py</code></div>
+          <p><span lang="en">Adding only when n % 2 == 0 gives 2 + 4 + 6 + 8 + 10 = 30.</span><span lang="ko">if n % 2 == 0일 때만 더하면 2 + 4 + 6 + 8 + 10 = 30이다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="input_sum" data-dir="loops/starter" hidden>
+        <h2>input_sum <span class="muted">~/loops/starter</span></h2>
+        <p><span lang="en">Practice 2: read integers one at a time with while True, break when 0 is entered, and print the total. First check the execution order of while, break and continue.</span><span lang="ko">연습 2: while True로 정수를 하나씩 입력받아 0이 나오면 break하고 합계를 출력한다. while의 실행 순서, break, continue를 먼저 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print(&quot;Done&quot;, count)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print(&quot;Done&quot;, count)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print(&quot;Done&quot;, count)
+EOF</code></div>
+          <p><span lang="en">The condition is tested first and then the body runs. The loop exits when count becomes 4 and the condition is False, so you get Done 4. Without count += 1 it is an infinite loop.</span><span lang="ko">조건을 먼저 검사하고 본문을 실행한다. count가 4가 되어 조건이 False일 때 빠져나오므로 Done 4다. count += 1이 없으면 무한 반복이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat &gt; /tmp/echo_q.py &lt;&lt;'EOF'
+while True:
+    text = input(&quot;Message (q: quit): &quot;)
+    if text == &quot;q&quot;:
+        break
+    print(&quot;Input:&quot;, text)
+print(&quot;Done&quot;)
+EOF
+printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat &gt; /tmp/echo_q.py &lt;&lt;'EOF'
+while True:
+    text = input(&quot;Message (q: quit): &quot;)
+    if text == &quot;q&quot;:
+        break
+    print(&quot;Input:&quot;, text)
+print(&quot;Done&quot;)
+EOF
+printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py">▶</button><code>cat &gt; /tmp/echo_q.py &lt;&lt;'EOF'
+while True:
+    text = input(&quot;Message (q: quit): &quot;)
+    if text == &quot;q&quot;:
+        break
+    print(&quot;Input:&quot;, text)
+print(&quot;Done&quot;)
+EOF
+printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py</code></div>
+          <p><span lang="en">The break example is saved as /tmp/echo_q.py and given hello, hi and q. hello and hi are echoed back with Input:, and q ends the loop with no output, so Done is printed.</span><span lang="ko">break 예제를 /tmp/echo_q.py로 저장하고 hello, hi, q를 넣었다. hello와 hi는 Input:으로 되돌려 주고, q에서는 출력 없이 반복을 끝내 Done이 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+EOF</code></div>
+          <p><span lang="en">continue skips only the rest of the current iteration. Only 3 is left out, and 1, 2, 4, 5 are printed.</span><span lang="ko">continue는 이번 반복의 나머지만 건너뛴다. 3만 빠지고 1, 2, 4, 5가 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n5\n0\n' | python3 input_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n5\n0\n' | python3 input_sum.py">▶</button><code>printf '3\n5\n0\n' | python3 input_sum.py</code></div>
+          <p><span lang="en">The starter code does stop at 0, but there is no code that adds, so it prints Total: 0.</span><span lang="ko">시작 코드는 0에서 멈추긴 하지만 더하는 코드가 없어 Total: 0이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n5\n0\n' | python3 ../solutions/input_sum.py
+printf '0\n' | python3 ../solutions/input_sum.py
+printf -- '-2\n5\n0\n' | python3 ../solutions/input_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n5\n0\n' | python3 ../solutions/input_sum.py
+printf '0\n' | python3 ../solutions/input_sum.py
+printf -- '-2\n5\n0\n' | python3 ../solutions/input_sum.py">▶</button><code>printf '3\n5\n0\n' | python3 ../solutions/input_sum.py
+printf '0\n' | python3 ../solutions/input_sum.py
+printf -- '-2\n5\n0\n' | python3 ../solutions/input_sum.py</code></div>
+          <p><span lang="en">Three tests: 3, 5, 0 gives Total: 8; 0 right away gives Total: 0; -2, 5, 0 gives Total: 3. Check for 0 first, then add.</span><span lang="ko">세 테스트: 3, 5, 0은 Total: 8, 바로 0이면 Total: 0, -2, 5, 0은 Total: 3. 0인지 먼저 검사한 뒤 더한다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">You can also run python3 input_sum.py yourself, enter numbers one at a time and finish with 0. If you get stuck in an infinite loop by mistake, stop it with Ctrl+C (the Stop button in Colab).</span><span lang="ko">직접 python3 input_sum.py로 실행해 숫자를 하나씩 입력하고 0으로 끝내 봐도 된다. 실수로 무한 반복에 빠지면 Ctrl+C로 멈춘다(Colab에서는 Stop 버튼).</span></p>
+      </section>
+      <section class="ex-panel" data-ex="multiplication" data-dir="loops/starter" hidden>
+        <h2>multiplication <span class="muted">~/loops/starter</span></h2>
+        <p><span lang="en">Lab 3: read a table number from 2 to 9 and print its 9 equations (Invalid table if out of range), then use nested loops to print all 72 equations of the tables from 2 to 9.</span><span lang="ko">실습 3: 2~9 사이의 단을 입력받아 그 단의 9개 식을 출력하고(범위 밖이면 Invalid table), 이어서 중첩 반복문으로 2단부터 9단까지 72개 식을 모두 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+EOF</code></div>
+          <p><span lang="en">For each outer row, the inner col goes through all of 1, 2, 3. 2 × 3 = 6 pairs are printed.</span><span lang="ko">바깥 row 하나마다 안쪽 col이 1, 2, 3을 모두 돈다. 2 × 3 = 6쌍이 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 7 | python3 multiplication.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 7 | python3 multiplication.py">▶</button><code>echo 7 | python3 multiplication.py</code></div>
+          <p><span lang="en">Starter code: the part that prints one table is empty, and the inner part of the full tables is pass, so after All tables: there are only 8 empty lines (one print() per table).</span><span lang="ko">시작 코드: 단 하나 출력 부분이 비어 있고, 전체 구구단도 안쪽이 pass라 All tables: 뒤에 빈 줄 8개만 나온다(단마다 print() 한 번).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 7 | python3 ../solutions/multiplication.py | head -11" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 7 | python3 ../solutions/multiplication.py | head -11">▶</button><code>echo 7 | python3 ../solutions/multiplication.py | head -11</code></div>
+          <p><span lang="en">Solution: 9 equations from 7 x 1 = 7 to 7 x 9 = 63, followed by All tables: and 2 x 1 = 2.</span><span lang="ko">답안: 7 x 1 = 7부터 7 x 9 = 63까지 9개 식 다음에 All tables:와 2 x 1 = 2가 이어진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 7 | python3 ../solutions/multiplication.py | grep -c ' = '
+echo 1 | python3 ../solutions/multiplication.py | grep -c ' = '" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 7 | python3 ../solutions/multiplication.py | grep -c ' = '
+echo 1 | python3 ../solutions/multiplication.py | grep -c ' = '">▶</button><code>echo 7 | python3 ../solutions/multiplication.py | grep -c ' = '
+echo 1 | python3 ../solutions/multiplication.py | grep -c ' = '</code></div>
+          <p><span lang="en">Counts the equations. The valid 7 gives 9 + 72 = 81; the invalid 1 gives only the 72 of the full tables.</span><span lang="ko">식의 개수를 센다. 유효한 7은 9 + 72 = 81개, 잘못된 1은 전체 구구단 72개뿐이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for t in 1 10; do echo $t | python3 ../solutions/multiplication.py | head -1; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for t in 1 10; do echo $t | python3 ../solutions/multiplication.py | head -1; done">▶</button><code>for t in 1 10; do echo $t | python3 ../solutions/multiplication.py | head -1; done</code></div>
+          <p><span lang="en">1 and 10 give Invalid table. The full tables come after the input validation block, so that part always runs.</span><span lang="ko">1과 10은 Invalid table이다. 입력 검증 블록 다음에 전체 구구단이 있으므로 그 부분은 항상 실행된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 9 | python3 ../solutions/multiplication.py | grep -n '9 x 9 = 81'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 9 | python3 ../solutions/multiplication.py | grep -n '9 x 9 = 81'">▶</button><code>echo 9 | python3 ../solutions/multiplication.py | grep -n '9 x 9 = 81'</code></div>
+          <p><span lang="en">Boundary value 9: 9 x 9 = 81 appears twice, at the end of the single table (line 9) and at the end of the full tables (line 89). After line 89 comes the empty line that follows the 9 table.</span><span lang="ko">경계값 9: 9 x 9 = 81이 단 하나 출력의 마지막(9번 줄)과 전체 구구단의 마지막(89번 줄)에 두 번 나온다. 89번 줄 다음은 9단 뒤의 빈 줄이다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="stars" data-dir="loops/starter" hidden>
+        <h2>stars <span class="muted">~/loops/starter</span></h2>
+        <p><span lang="en">Lab 4: read a height from 1 to 10 and print a left-aligned triangle with nested loops. If it is out of range, print Invalid height.</span><span lang="ko">실습 4: 1~10 높이를 입력받아 중첩 반복문으로 왼쪽 정렬 삼각형을 출력한다. 범위 밖이면 Invalid height를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+for row in range(1, 4):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+for row in range(1, 4):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+for row in range(1, 4):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF</code></div>
+          <p><span lang="en">end=&quot;&quot; prints the stars on the same line, and the print() after the inner loop ends the line. *, **, ***.</span><span lang="ko">end=&quot;&quot;로 별을 같은 줄에 이어 찍고, 안쪽 반복이 끝난 뒤의 print()가 줄을 바꾼다. *, **, ***.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 stars.py; echo" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 stars.py; echo">▶</button><code>echo 4 | python3 stars.py; echo</code></div>
+          <p><span lang="en">The starter code prints only the prompt.</span><span lang="ko">시작 코드는 프롬프트만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 ../solutions/stars.py
+echo 1 | python3 ../solutions/stars.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 ../solutions/stars.py
+echo 1 | python3 ../solutions/stars.py">▶</button><code>echo 4 | python3 ../solutions/stars.py
+echo 1 | python3 ../solutions/stars.py</code></div>
+          <p><span lang="en">Height 4 gives four rows of 1, 2, 3 and 4 stars, and height 1 gives a single star.</span><span lang="ko">높이 4는 별 1, 2, 3, 4개짜리 네 줄, 높이 1은 별 하나다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="echo 4 | python3 ../solutions/stars.py | grep -o '[*]' | wc -l" title="Run in the terminal / 터미널에서 실행" aria-label="Run: echo 4 | python3 ../solutions/stars.py | grep -o '[*]' | wc -l">▶</button><code>echo 4 | python3 ../solutions/stars.py | grep -o '[*]' | wc -l</code></div>
+          <p><span lang="en">Height 4 has 1 + 2 + 3 + 4 = 10 stars in total.</span><span lang="ko">높이 4의 별은 모두 1 + 2 + 3 + 4 = 10개다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="for h in 0 11; do echo $h | python3 ../solutions/stars.py; done" title="Run in the terminal / 터미널에서 실행" aria-label="Run: for h in 0 11; do echo $h | python3 ../solutions/stars.py; done">▶</button><code>for h in 0 11; do echo $h | python3 ../solutions/stars.py; done</code></div>
+          <p><span lang="en">0 and 11 print only Invalid height.</span><span lang="ko">0과 11은 Invalid height만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height + 1):
+    for col in range(height):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height + 1):
+    for col in range(height):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height + 1):
+    for col in range(height):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF</code></div>
+          <p><span lang="en">A common mistake: writing the inner loop as range(height) gives a 3 × 3 square instead of a triangle.</span><span lang="ko">흔한 실수: 안쪽을 range(height)로 쓰면 삼각형이 아니라 3 × 3 사각형이 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+height = 3
+for row in range(1, height):
+    for col in range(row):
+        print(&quot;*&quot;, end=&quot;&quot;)
+    print()
+EOF</code></div>
+          <p><span lang="en">A common mistake: writing the outer loop as range(1, height) drops the last row, giving only two rows.</span><span lang="ko">흔한 실수: 바깥을 range(1, height)로 쓰면 마지막 줄이 빠져 두 줄만 나온다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The optional extension is to add, after an empty line, a triangle that shrinks: ****, ***, **, *. Think of range(height, 0, -1).</span><span lang="ko">선택 확장 과제는 빈 줄 뒤에 ****, ***, **, *로 줄어드는 삼각형을 추가하는 것이다. range(height, 0, -1)을 떠올려 보자.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="even_sum">
+    <details class="source" open data-path="/home/student/loops/starter/even_sum.py">
+      <summary>even_sum.py <span class="muted src-lines" data-lines="6"><span lang="en">6 lines</span><span lang="ko">6줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: sum even integers from 1 through 10. Expected output: 30.&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">for n in range(1, 11):</span>
+<span class="ln">    # TODO: add only even n to total.</span>
+<span class="ln">    pass</span>
+<span class="ln">print(total)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/loops/solutions/even_sum.py">
+      <summary>loops/solutions/even_sum.py <span class="muted src-lines" data-lines="6"><span lang="en">6 lines</span><span lang="ko">6줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: sum the even integers from 1 through 10.&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">for n in range(1, 11):</span>
+<span class="ln">    if n % 2 == 0:</span>
+<span class="ln">        total += n</span>
+<span class="ln">print(total)  # 30</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="input_sum" hidden>
+    <details class="source" open data-path="/home/student/loops/starter/input_sum.py">
+      <summary>input_sum.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: sum integers until 0. Assume integer-formatted input.</span>
+<span class="ln">Tests: 3,5,0 -&gt; Total: 8; 0 -&gt; Total: 0; -2,5,0 -&gt; Total: 3.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    number = int(input(&quot;Integer (0: stop): &quot;))</span>
+<span class="ln">    if number == 0:</span>
+<span class="ln">        break</span>
+<span class="ln">    # TODO: add number to total.</span>
+<span class="ln">print(&quot;Total:&quot;, total)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/loops/solutions/input_sum.py">
+      <summary>loops/solutions/input_sum.py <span class="muted src-lines" data-lines="8"><span lang="en">8 lines</span><span lang="ko">8줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution. Assume integer-formatted input.&quot;&quot;&quot;</span>
+<span class="ln">total = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    number = int(input(&quot;Integer (0: stop): &quot;))</span>
+<span class="ln">    if number == 0:</span>
+<span class="ln">        break</span>
+<span class="ln">    total += number</span>
+<span class="ln">print(&quot;Total:&quot;, total)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="multiplication" hidden>
+    <details class="source" open data-path="/home/student/loops/starter/multiplication.py">
+      <summary>multiplication.py <span class="muted src-lines" data-lines="13"><span lang="en">13 lines</span><span lang="ko">13줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: complete both parts. Assume integer-formatted input.</span>
+<span class="ln">Tests: 2 -&gt; 9 single-table equations; 9 -&gt; last equation 9 x 9 = 81;</span>
+<span class="ln">1 or 10 -&gt; Invalid table. The all-tables section always has 72 equations.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">table = int(input(&quot;Table (2-9): &quot;))</span>
+<span class="ln"># TODO: validate table, then print factors 1 through 9.</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;All tables:&quot;)</span>
+<span class="ln">for table in range(2, 10):</span>
+<span class="ln">    for factor in range(1, 10):</span>
+<span class="ln">        # TODO: print one equation.</span>
+<span class="ln">        pass</span>
+<span class="ln">    print()</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/loops/solutions/multiplication.py">
+      <summary>loops/solutions/multiplication.py <span class="muted src-lines" data-lines="16"><span lang="en">16 lines</span><span lang="ko">16줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution. Assume integer-formatted input.</span>
+<span class="ln">Tests: 2, 9 -&gt; 9 single-table equations each; 1, 10 -&gt; Invalid table.</span>
+<span class="ln">All cases also produce the 72-equation all-tables section.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">table = int(input(&quot;Table (2-9): &quot;))</span>
+<span class="ln">if 2 &lt;= table &lt;= 9:</span>
+<span class="ln">    for factor in range(1, 10):</span>
+<span class="ln">        print(f&quot;{table} x {factor} = {table * factor}&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid table&quot;)</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;All tables:&quot;)</span>
+<span class="ln">for table in range(2, 10):</span>
+<span class="ln">    for factor in range(1, 10):</span>
+<span class="ln">        print(f&quot;{table} x {factor} = {table * factor}&quot;)</span>
+<span class="ln">    print()</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="stars" hidden>
+    <details class="source" open data-path="/home/student/loops/starter/stars.py">
+      <summary>stars.py <span class="muted src-lines" data-lines="7"><span lang="en">7 lines</span><span lang="ko">7줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: growing triangle, with integer height from 1 to 10.</span>
+<span class="ln">Tests: 1 -&gt; one star; 4 -&gt; rows of 1, 2, 3, 4 stars;</span>
+<span class="ln">0 or 11 -&gt; Invalid height. Optional: add a shrinking triangle.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">height = int(input(&quot;Height (1-10): &quot;))</span>
+<span class="ln"># TODO: validate height and use nested loops to print the triangle.</span>
+<span class="ln"># Keep print() for the row ending outside the inner loop.</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/loops/solutions/stars.py">
+      <summary>loops/solutions/stars.py <span class="muted src-lines" data-lines="12"><span lang="en">12 lines</span><span lang="ko">12줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 core solution. Assume integer-formatted input.</span>
+<span class="ln">Tests: 1 -&gt; '*'; 4 -&gt; rows of 1, 2, 3, 4 stars;</span>
+<span class="ln">0, 11 -&gt; Invalid height. Optional shrinking triangle is in the guide.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">height = int(input(&quot;Height (1-10): &quot;))</span>
+<span class="ln">if 1 &lt;= height &lt;= 10:</span>
+<span class="ln">    for row in range(1, height + 1):</span>
+<span class="ln">        for col in range(row):</span>
+<span class="ln">            print(&quot;*&quot;, end=&quot;&quot;)</span>
+<span class="ln">        print()</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid height&quot;)</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-loops">
+      <h2 class="notes-title"><span lang="en">Loops</span><span lang="ko">반복문</span></h2>
+<div lang="en">
+<p>This chapter is about loops. We learn <code>for</code>, <code>range()</code> and <code>while</code> as ways to do the same task many times, and trace how an accumulator variable changes on each iteration and when a loop stops. After learning to use <code>break</code> and <code>continue</code> as intended, we use nested loops, a loop inside a loop, to make multiplication tables and star patterns.</p>
+
+<p>There are four examples: the even-number sum of Practice 1 (<a href="#ex=even_sum">even_sum</a>), the sum until zero of Practice 2 (<a href="#ex=input_sum">input_sum</a>), the multiplication tables of Lab 3 (<a href="#ex=multiplication">multiplication</a>), and the star triangle of Lab 4 (<a href="#ex=stars">stars</a>). Each example page also includes, as run steps, the slide examples taught before it.</p>
+
+<h2>Review: One Student's Result</h2>
+
+<p>An <code>if</code> statement selects which block runs. A score of 60 or more is a pass.</p>
+
+<pre><code>score = 75
+if score &gt;= 60:
+    print("Pass")
+else:
+    print("Fail")
+# Output: Pass</code></pre>
+
+<p>But what if there are 30 students? Instead of copying the same code 30 times, we repeat the same processing with a loop.</p>
+
+<h2>for: One Value at a Time</h2>
+
+<p>Place the sequence after the <code>in</code> that follows <code>for</code>. On each iteration, the next value goes into the variable. The colon and four-space indentation define the body of the loop. After the last value is processed, the loop ends and the code outside the indentation runs.</p>
+
+<pre><code>for letter in "ABC":
+    print(letter)
+print("Done")
+
+# Output
+# A
+# B
+# C
+# Done</code></pre>
+
+<h3>Integer Ranges with range()</h3>
+
+<p><code>range(stop)</code> starts at 0. <code>range(start, stop)</code> includes <code>start</code>. In either case, the <code>stop</code> value is always left out. A <code>range</code> represents a sequence of integers; it is not a list.</p>
+
+<pre><code>for i in range(3):
+    print(i)
+# 0, 1, 2 on separate lines
+
+for i in range(1, 4):
+    print(i)
+# 1, 2, 3 on separate lines</code></pre>
+
+<h3>Steps &amp; Reverse Ranges</h3>
+
+<p>The third argument is the step. A negative step counts backwards. If the direction does not match, the range is empty and the body never runs, and a step of 0 raises a <code>ValueError</code>.</p>
+
+<pre><code>for i in range(2, 7, 2):
+    print(i)
+# 2, 4, 6
+
+for i in range(3, 0, -1):
+    print(i)
+# 3, 2, 1
+
+for i in range(3, 0):
+    print(i)
+# No output</code></pre>
+
+<p>In the first steps of <a href="#ex=even_sum">even_sum</a> you can print five ranges, one per line, and also see the <code>ValueError</code> from <code>range(1, 5, 0)</code>.</p>
+
+<h2>Accumulating a Total</h2>
+
+<p>Initialize the variable <code>total</code>, which holds the sum, <strong>before</strong> the loop. <code>total += n</code> is the same as <code>total = total + n</code>. Print the final result <strong>after</strong> the loop ends.</p>
+
+<pre><code>total = 0
+for n in range(1, 6):
+    total += n
+print(total)
+# 15</code></pre>
+
+<p>The question on the slides is "What happens if <code>total = 0</code> is put inside the loop?" Then it goes back to 0 on every iteration, so only the 5 added in the last iteration remains. Run both cases in <a href="#ex=even_sum">even_sum</a>.</p>
+
+<h3>Tracing the Accumulator</h3>
+
+<p>Before running the code, predict each variable's value on each iteration and write it in a table. Each iteration carries on from the previous iteration's <code>total</code>.</p>
+
+<table>
+<thead><tr><th>Iteration</th><th>n</th><th>Before</th><th>After</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>2</td><td>2</td><td>1</td><td>3</td></tr>
+<tr><td>3</td><td>3</td><td>3</td><td>6</td></tr>
+<tr><td>4</td><td>4</td><td>6</td><td>10</td></tr>
+<tr><td>5</td><td>5</td><td>10</td><td>15</td></tr>
+</tbody>
+</table>
+
+<p>On the example page, this table is reproduced by code that prints <code>n</code> and the before and after values on each iteration.</p>
+
+<h2>Practice 1: Sum of Even Numbers</h2>
+
+<p>Go through the integers from 1 to 10 in order, pick out the even ones with <code>if</code> and <code>%</code>, and add them to <code>total</code>. The expected result is 30. Take 5 minutes to solve it.</p>
+
+<pre><code>total = 0
+for n in range(1, 11):
+    # Add your condition and update here.
+    pass
+print(total)</code></pre>
+
+<p><code>pass</code> is a placeholder statement that does nothing. It temporarily fills a place where the syntax requires a body. So if you run the starter code as it is, it adds nothing and prints 0. Adding only when <code>n % 2 == 0</code> gives 2 + 4 + 6 + 8 + 10 = 30 (<a href="#ex=even_sum">even_sum</a>).</p>
+
+<h2>while: Repeat While True</h2>
+
+<p><code>while</code> tests the condition before running the body. If the condition is false from the start, the body never runs. To end the loop, the body must change the value used in the condition.</p>
+
+<pre><code>count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print("Done", count)
+# 1
+# 2
+# 3
+# Done 4</code></pre>
+
+<h3>Execution Order &amp; Infinite Loops</h3>
+
+<p>It proceeds in this order: initialize, check the condition, run the body, check the condition again.</p>
+
+<table>
+<thead><tr><th>count</th><th>count &lt;= 3</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>True</td><td>Print 1</td></tr>
+<tr><td>2</td><td>True</td><td>Print 2</td></tr>
+<tr><td>3</td><td>True</td><td>Print 3</td></tr>
+<tr><td>4</td><td>False</td><td>Exit the loop</td></tr>
+</tbody>
+</table>
+
+<p>Without <code>count += 1</code>, the condition stays true and the loop never ends. Stop a running loop with <kbd>Ctrl</kbd>+<kbd>C</kbd> in a terminal, or with the Stop button in Colab. <kbd>Ctrl</kbd>+<kbd>C</kbd> also works in this lab's terminal.</p>
+
+<h2>break: Exit the Loop</h2>
+
+<p>Consider repeating input until the user asks to stop. <code>break</code> exits the nearest loop that encloses it. If the input is <code>q</code>, it skips the echo output and leaves the loop.</p>
+
+<pre><code>while True:
+    text = input("Message (q: quit): ")
+    if text == "q":
+        break
+    print("Input:", text)
+print("Done")</code></pre>
+
+<p>In <a href="#ex=input_sum">input_sum</a> this code is saved to a file, and you can see the result of entering hello, hi and q in turn.</p>
+
+<h2>continue: Skip This Iteration</h2>
+
+<p><code>continue</code> skips the remaining statements in the current iteration and moves on to the next iteration. When you use it in a <code>while</code> loop, be careful not to skip, by mistake, the update statement that makes the loop stop.</p>
+
+<pre><code>for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+
+# Output
+# 1
+# 2
+# 4
+# 5</code></pre>
+
+<h2>Choosing for or while</h2>
+
+<ul>
+<li>To process each character in a string: <code>for</code></li>
+<li>To repeat a fixed number of times: <code>for</code> with <code>range()</code></li>
+<li>To repeat while a condition holds: <code>while</code></li>
+<li>Both loops can contain <code>if</code> statements.</li>
+</ul>
+
+<p>Choose which loop to use in the following three cases and explain why. (1) Printing each character of a word, (2) reading messages until the user enters q, (3) printing the 7 times table from 1 to 9. The natural choices are, in order, <code>for</code> over a string, <code>while</code> because the end point is not known in advance, and <code>for</code> with <code>range()</code> because the count is fixed.</p>
+
+<h2>Practice 2: Sum Until Zero</h2>
+
+<p>Read one integer per iteration, stop when 0 is entered, and print the total. Check whether the value is the stop value before adding it. Assume the input is in integer format. Hints: <code>total = 0</code>, <code>while True</code>, <code>int(input())</code>, <code>break</code>.</p>
+
+<table>
+<thead><tr><th>Input sequence</th><th>Expected total</th></tr></thead>
+<tbody>
+<tr><td>3, 5, 0</td><td>8</td></tr>
+<tr><td>0</td><td>0</td></tr>
+<tr><td>-2, 5, 0</td><td>3</td></tr>
+</tbody>
+</table>
+
+<p>The starter code already includes the <code>break</code>, and only the line that adds is missing, so when run it does stop at 0, but the total is always <code>Total: 0</code>. In <a href="#ex=input_sum">input_sum</a>, run the three tests at once and compare them with the solution. You can also run <code>python3 input_sum.py</code> yourself and enter numbers one at a time.</p>
+
+<h2>Break &amp; Midpoint Check</h2>
+
+<p>After a 10-minute break, check the first half with the following questions.</p>
+
+<ol>
+<li><strong>What is the last value of <code>range(1, 5)</code>?</strong> It is 4. The stop is not included.</li>
+<li><strong>When does <code>while</code> test its condition?</strong> Before running the body, at the start of every iteration.</li>
+<li><strong>What is the difference between <code>break</code> and <code>continue</code>?</strong> <code>break</code> ends the whole loop, and <code>continue</code> skips only the current iteration.</li>
+</ol>
+
+<p>Next is how to repeat inside a loop.</p>
+
+<h2>Nested Loops</h2>
+
+<p>When the outer loop chooses a group, the inner loop goes through all of its own values from start to finish for each outer value. The example below prints six pairs. Indentation decides which statement belongs to which loop.</p>
+
+<pre><code>for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+# 1 1
+# 1 2
+# 1 3
+# 2 1
+# 2 2
+# 2 3</code></pre>
+
+<h3>Tracing Nested Loops</h3>
+
+<p>Finish the inner loop completely before advancing the outer loop one step. For each new <code>row</code>, <code>col</code> starts again from 1. With 2 rows and 3 columns, the body runs six times.</p>
+
+<table>
+<thead><tr><th>Outer row</th><th>Inner col values</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1, 2, 3</td></tr>
+<tr><td>2</td><td>1, 2, 3</td></tr>
+</tbody>
+</table>
+
+<p>After both loops finish, <code>row</code> is 2 and <code>col</code> is 3. A loop variable keeps the last value it received.</p>
+
+<h2>Lab 3: Multiplication Tables</h2>
+
+<h3>3A: One Multiplication Table</h3>
+
+<p><code>multiplication.py</code> reads one integer from 2 to 9. If it is valid, it prints the 9 equations multiplying it by 1 to 9 with f-strings; otherwise it prints <code>Invalid table</code> and skips the single-table part. Assume the input is in integer format.</p>
+
+<pre><code>Input: 7
+First line: 7 x 1 = 7
+Last line:  7 x 9 = 63
+Number of equations: 9
+
+Input: 1
+Invalid table</code></pre>
+
+<h3>3B: Tables from 2 to 9</h3>
+
+<p>After printing one table, extend the program to print all the tables as well. The outer loop chooses the table, and the inner loop chooses the factor. After each table, print one empty line. Put this part <strong>after</strong> the input validation block so that it always runs.</p>
+
+<pre><code>for table in range(2, 10):
+    for factor in range(1, 10):
+        # Print one equation here.
+        pass
+    print()</code></pre>
+
+<p>The starter code already has this skeleton, so if you run it as it is, after <code>All tables:</code> you see only the 8 empty lines printed once per table.</p>
+
+<h3>Lab 3 Checks</h3>
+
+<ul>
+<li>Test 2 and 9 as valid boundary inputs, and 1 and 10 as invalid inputs.</li>
+<li>The all-tables part must have 8 tables × 9 = 72 equations. The first is <code>2 x 1 = 2</code> and the last is <code>9 x 9 = 81</code>.</li>
+<li>A valid input adds 9 equations before this part; an invalid input adds nothing.</li>
+</ul>
+
+<p>Counting the equations by hand is hard, so <a href="#ex=multiplication">multiplication</a> counts them with <code>grep -c ' = '</code>. Entering 7 should give 81, and entering 1 should give 72.</p>
+
+<h2>Star Patterns: Rows &amp; Columns</h2>
+
+<p>Use one outer iteration for each row. Row 1 has 1 star, row 2 has 2, and so on. <code>print("*", end="")</code> continues on the same line without a line break, and the <code>print()</code> after the inner loop ends the current row.</p>
+
+<pre><code>for row in range(1, 4):
+    for col in range(row):
+        print("*", end="")
+    print()
+# *
+# **
+# ***</code></pre>
+
+<h2>Lab 4: A Growing Triangle</h2>
+
+<p><code>stars.py</code> reads an integer height from 1 to 10 and prints a left-aligned triangle with nested loops. If it is out of range, it prints <code>Invalid height</code>. The extension is to print a shrinking triangle after one empty line.</p>
+
+<pre><code>Input: 4
+*
+**
+***
+****
+
+Optional extension
+****
+***
+**
+*</code></pre>
+
+<p>The basic task must be built with nested loops. String repetition (<code>"*" * row</code>) is another way, but we will talk about it separately later.</p>
+
+<h3>Lab 4 Checks &amp; Common Mistakes</h3>
+
+<ul>
+<li>Height 1 produces exactly one row with one star.</li>
+<li>Height 4 gives four rows, 10 stars in total.</li>
+<li>Height 10 gives ten rows.</li>
+<li>Heights 0 and 11 print only the <code>Invalid height</code> message.</li>
+</ul>
+
+<p>There are three common mistakes. Writing the outer loop as <code>range(1, height)</code> drops the last row. Putting <code>print()</code> inside the inner loop prints one star per line. Writing the inner loop as <code>range(height)</code> gives a square instead of a triangle. In <a href="#ex=stars">stars</a> you can count the stars and reproduce two of these mistakes yourself.</p>
+
+<h2>Common Loop Mistakes</h2>
+
+<ul>
+<li><code>range(1, 10)</code> includes 1 through 9, not 10.</li>
+<li>Initialize the accumulator before the loop.</li>
+<li>Put the final summary output outside the loop.</li>
+<li>A <code>while</code> loop needs a statement that changes the condition, or a way to exit.</li>
+<li>Put the <code>print()</code> that ends a row after the inner loop.</li>
+</ul>
+
+<p>Before running, predict the first iteration, the last iteration and the final output. When debugging, temporarily print the loop variable and the accumulator.</p>
+
+<h2>Next Chapter: Functions</h2>
+
+<p>In the next chapter, 'Functions', we learn to give a reusable task a name with <code>def</code>, pass values through parameters, and get a result back to use where the function was called. We will also turn code that calculated with loops into reusable functions. To prepare, think about what the input and output of the even-number sum program are. Lists, tuples, dictionaries and sets are covered later.</p>
+</div><div lang="ko">
+<p>이 장에서는 반복문을 배웁니다. 같은 일을 여러 번 하는 방법으로 <code>for</code>와 <code>range()</code>, <code>while</code>을 익히고, 누적 변수(accumulator)가 반복마다 어떻게 변하는지, 반복문이 언제 멈추는지 추적합니다. <code>break</code>와 <code>continue</code>를 의도에 맞게 쓰는 법을 배운 뒤, 반복문 안에 반복문을 넣는 중첩 반복문으로 구구단과 별 무늬를 만듭니다.</p>
+
+<p>예제는 네 개입니다. 연습 1의 짝수 합(<a href="#ex=even_sum">even_sum</a>), 연습 2의 0까지 입력 합(<a href="#ex=input_sum">input_sum</a>), 실습 3의 구구단(<a href="#ex=multiplication">multiplication</a>), 실습 4의 별 삼각형(<a href="#ex=stars">stars</a>)입니다. 각 예제 페이지에는 그 앞에서 배우는 슬라이드 예제도 실행 단계로 들어 있습니다.</p>
+
+<h2>복습: 학생 한 명의 결과</h2>
+
+<p><code>if</code> 문은 실행할 블록을 고릅니다. 60점 이상이면 합격입니다.</p>
+
+<pre><code>score = 75
+if score &gt;= 60:
+    print("Pass")
+else:
+    print("Fail")
+# Output: Pass</code></pre>
+
+<p>그런데 학생이 30명이라면 어떻게 해야 할까요? 같은 코드를 30번 복사하는 대신, 반복문으로 같은 처리를 되풀이합니다.</p>
+
+<h2>for: 값을 하나씩</h2>
+
+<p><code>for</code> 다음의 <code>in</code> 뒤에 시퀀스를 둡니다. 반복할 때마다 다음 값이 변수에 들어갑니다. 콜론과 네 칸 들여쓰기가 반복문의 본문을 정합니다. 마지막 값까지 처리하면 반복이 끝나고, 들여쓰기 밖의 코드가 실행됩니다.</p>
+
+<pre><code>for letter in "ABC":
+    print(letter)
+print("Done")
+
+# Output
+# A
+# B
+# C
+# Done</code></pre>
+
+<h3>range()로 정수 범위 만들기</h3>
+
+<p><code>range(stop)</code>은 0부터 시작합니다. <code>range(start, stop)</code>은 <code>start</code>를 포함합니다. 어느 경우든 <code>stop</code> 값은 항상 빠집니다. <code>range</code>는 정수의 순서를 나타내는 것이지 리스트가 아닙니다.</p>
+
+<pre><code>for i in range(3):
+    print(i)
+# 0, 1, 2 on separate lines
+
+for i in range(1, 4):
+    print(i)
+# 1, 2, 3 on separate lines</code></pre>
+
+<h3>간격과 거꾸로 세기</h3>
+
+<p>세 번째 인자는 간격(step)입니다. 음수 간격을 주면 거꾸로 셉니다. 방향이 맞지 않으면 빈 범위가 되어 본문이 한 번도 실행되지 않고, 간격이 0이면 <code>ValueError</code>가 납니다.</p>
+
+<pre><code>for i in range(2, 7, 2):
+    print(i)
+# 2, 4, 6
+
+for i in range(3, 0, -1):
+    print(i)
+# 3, 2, 1
+
+for i in range(3, 0):
+    print(i)
+# No output</code></pre>
+
+<p><a href="#ex=even_sum">even_sum</a>의 앞쪽 단계에서 다섯 가지 범위를 한 줄씩 출력하고, <code>range(1, 5, 0)</code>의 <code>ValueError</code>도 확인할 수 있습니다.</p>
+
+<h2>누적 합 구하기</h2>
+
+<p>합계를 담을 변수 <code>total</code>은 반복문 <strong>앞에서</strong> 초기화합니다. <code>total += n</code>은 <code>total = total + n</code>과 같습니다. 최종 결과는 반복문이 끝난 <strong>뒤에</strong> 출력합니다.</p>
+
+<pre><code>total = 0
+for n in range(1, 6):
+    total += n
+print(total)
+# 15</code></pre>
+
+<p>슬라이드의 질문은 "<code>total = 0</code>을 반복문 안에 넣으면 어떻게 될까?"입니다. 그러면 반복할 때마다 0으로 되돌아가므로, 마지막 반복에서 더한 5만 남습니다. <a href="#ex=even_sum">even_sum</a>에서 두 경우를 모두 실행해 봅니다.</p>
+
+<h3>누적 변수 추적</h3>
+
+<p>코드를 실행하기 전에 반복마다 변수의 값을 예측해 표로 적어 봅니다. 각 반복은 이전 반복의 <code>total</code>을 이어받습니다.</p>
+
+<table>
+<thead><tr><th>반복</th><th>n</th><th>더하기 전</th><th>더한 뒤</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>2</td><td>2</td><td>1</td><td>3</td></tr>
+<tr><td>3</td><td>3</td><td>3</td><td>6</td></tr>
+<tr><td>4</td><td>4</td><td>6</td><td>10</td></tr>
+<tr><td>5</td><td>5</td><td>10</td><td>15</td></tr>
+</tbody>
+</table>
+
+<p>예제 페이지에서는 반복마다 <code>n</code>, 더하기 전, 더한 뒤 값을 출력하는 코드로 이 표를 그대로 만들어 봅니다.</p>
+
+<h2>연습 1: 짝수의 합</h2>
+
+<p>1부터 10까지의 정수를 차례로 보면서 <code>if</code>와 <code>%</code>로 짝수를 골라 <code>total</code>에 더합니다. 기대 결과는 30입니다. 5분 동안 풀어 봅니다.</p>
+
+<pre><code>total = 0
+for n in range(1, 11):
+    # Add your condition and update here.
+    pass
+print(total)</code></pre>
+
+<p><code>pass</code>는 아무 일도 하지 않는 자리 표시용 문장입니다. 문법상 본문이 필요한 자리를 임시로 채워 둡니다. 그래서 시작 코드를 그대로 실행하면 아무것도 더하지 않고 0이 출력됩니다. <code>n % 2 == 0</code>일 때만 더하면 2 + 4 + 6 + 8 + 10 = 30이 됩니다(<a href="#ex=even_sum">even_sum</a>).</p>
+
+<h2>while: 조건이 참인 동안 반복</h2>
+
+<p><code>while</code>은 본문을 실행하기 전에 조건을 검사합니다. 처음부터 조건이 거짓이면 본문은 한 번도 실행되지 않습니다. 반복을 끝내려면 조건에 쓰인 값을 본문에서 바꿔야 합니다.</p>
+
+<pre><code>count = 1
+while count &lt;= 3:
+    print(count)
+    count += 1
+print("Done", count)
+# 1
+# 2
+# 3
+# Done 4</code></pre>
+
+<h3>실행 순서와 무한 반복</h3>
+
+<p>초기화하고, 조건을 검사하고, 본문을 실행하고, 다시 조건을 검사하는 순서로 진행됩니다.</p>
+
+<table>
+<thead><tr><th>count</th><th>count &lt;= 3</th><th>동작</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>True</td><td>1 출력</td></tr>
+<tr><td>2</td><td>True</td><td>2 출력</td></tr>
+<tr><td>3</td><td>True</td><td>3 출력</td></tr>
+<tr><td>4</td><td>False</td><td>반복 종료</td></tr>
+</tbody>
+</table>
+
+<p><code>count += 1</code>이 없으면 조건이 계속 참이라 반복이 끝나지 않습니다. 터미널에서는 <kbd>Ctrl</kbd>+<kbd>C</kbd>로, Colab에서는 Stop 버튼으로 실행 중인 반복을 멈춥니다. 이 실습실의 터미널에서도 <kbd>Ctrl</kbd>+<kbd>C</kbd>가 동작합니다.</p>
+
+<h2>break: 반복문 빠져나가기</h2>
+
+<p>사용자가 끝내자고 할 때까지 입력을 반복하는 경우를 생각해 봅니다. <code>break</code>는 자신을 감싸는 가장 가까운 반복문을 빠져나갑니다. 입력이 <code>q</code>이면 되돌려 주는 출력을 건너뛰고 반복을 떠납니다.</p>
+
+<pre><code>while True:
+    text = input("Message (q: quit): ")
+    if text == "q":
+        break
+    print("Input:", text)
+print("Done")</code></pre>
+
+<p><a href="#ex=input_sum">input_sum</a>에서는 이 코드를 파일로 저장해 hello, hi, q를 차례로 입력한 결과를 볼 수 있습니다.</p>
+
+<h2>continue: 이번 반복만 건너뛰기</h2>
+
+<p><code>continue</code>는 현재 반복의 나머지 문장을 건너뛰고 다음 반복으로 넘어갑니다. <code>while</code> 반복문에서 쓸 때는 반복을 멈추게 하는 갱신문까지 실수로 건너뛰지 않도록 주의합니다.</p>
+
+<pre><code>for n in range(1, 6):
+    if n == 3:
+        continue
+    print(n)
+
+# Output
+# 1
+# 2
+# 4
+# 5</code></pre>
+
+<h2>for와 while 고르기</h2>
+
+<ul>
+<li>문자열의 문자를 하나씩 처리할 때: <code>for</code></li>
+<li>정해진 횟수만큼 반복할 때: <code>range()</code>와 함께 쓰는 <code>for</code></li>
+<li>조건이 유지되는 동안 반복할 때: <code>while</code></li>
+<li>두 반복문 모두 안에 <code>if</code> 문을 넣을 수 있습니다.</li>
+</ul>
+
+<p>다음 세 경우에 어떤 반복문을 쓸지 고르고 이유를 설명해 봅니다. (1) 단어의 각 문자 출력하기, (2) 사용자가 q를 입력할 때까지 메시지 읽기, (3) 7단을 1부터 9까지 출력하기. 차례로 문자열에 대한 <code>for</code>, 끝나는 시점을 미리 모르는 <code>while</code>, 횟수가 정해진 <code>range()</code>의 <code>for</code>가 자연스럽습니다.</p>
+
+<h2>연습 2: 0이 나올 때까지 더하기</h2>
+
+<p>반복마다 정수를 하나씩 읽어, 0이 나오면 멈추고 합계를 출력합니다. 더하기 전에 멈춤 값인지 먼저 검사합니다. 입력은 정수 형식이라고 가정합니다. 힌트는 <code>total = 0</code>, <code>while True</code>, <code>int(input())</code>, <code>break</code>입니다.</p>
+
+<table>
+<thead><tr><th>입력 순서</th><th>기대 합계</th></tr></thead>
+<tbody>
+<tr><td>3, 5, 0</td><td>8</td></tr>
+<tr><td>0</td><td>0</td></tr>
+<tr><td>-2, 5, 0</td><td>3</td></tr>
+</tbody>
+</table>
+
+<p>시작 코드에는 <code>break</code>까지 들어 있고 더하는 한 줄만 비어 있으므로, 실행하면 0에서 멈추긴 하지만 합계는 항상 <code>Total: 0</code>입니다. <a href="#ex=input_sum">input_sum</a>에서 세 테스트를 한 번에 실행해 답안과 비교합니다. 직접 <code>python3 input_sum.py</code>로 실행해 숫자를 하나씩 입력해 봐도 됩니다.</p>
+
+<h2>휴식과 중간 점검</h2>
+
+<p>10분 휴식 뒤 다음 질문으로 앞부분을 확인합니다.</p>
+
+<ol>
+<li><strong><code>range(1, 5)</code>의 마지막 값은?</strong> 4입니다. stop은 포함되지 않습니다.</li>
+<li><strong><code>while</code>은 언제 조건을 검사하는가?</strong> 본문을 실행하기 전, 매 반복의 시작에서 검사합니다.</li>
+<li><strong><code>break</code>와 <code>continue</code>의 차이는?</strong> <code>break</code>는 반복문 전체를 끝내고, <code>continue</code>는 이번 반복만 건너뜁니다.</li>
+</ol>
+
+<p>다음은 반복문 안에서 또 반복하는 방법입니다.</p>
+
+<h2>중첩 반복문</h2>
+
+<p>바깥 반복문이 묶음을 하나 고르면, 안쪽 반복문은 그 바깥 값마다 자기 값을 처음부터 끝까지 모두 돕니다. 아래 예는 여섯 쌍을 출력합니다. 들여쓰기가 어느 문장이 어느 반복문에 속하는지 결정합니다.</p>
+
+<pre><code>for row in range(1, 3):
+    for col in range(1, 4):
+        print(row, col)
+# 1 1
+# 1 2
+# 1 3
+# 2 1
+# 2 2
+# 2 3</code></pre>
+
+<h3>중첩 반복문 추적</h3>
+
+<p>바깥 반복을 한 단계 진행하기 전에 안쪽 반복을 끝까지 마칩니다. 새 <code>row</code>마다 <code>col</code>은 다시 1부터 시작합니다. 2행 3열이므로 본문은 여섯 번 실행됩니다.</p>
+
+<table>
+<thead><tr><th>바깥 row</th><th>안쪽 col 값</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1, 2, 3</td></tr>
+<tr><td>2</td><td>1, 2, 3</td></tr>
+</tbody>
+</table>
+
+<p>두 반복문이 모두 끝난 뒤 <code>row</code>는 2, <code>col</code>은 3입니다. 반복 변수는 마지막으로 받은 값을 유지합니다.</p>
+
+<h2>실습 3: 구구단</h2>
+
+<h3>3A: 한 단 출력하기</h3>
+
+<p><code>multiplication.py</code>는 2부터 9까지의 정수를 하나 입력받습니다. 유효하면 1부터 9까지 곱하는 식 9개를 f-string으로 출력하고, 그렇지 않으면 <code>Invalid table</code>을 출력하고 한 단 출력 부분을 건너뜁니다. 입력은 정수 형식이라고 가정합니다.</p>
+
+<pre><code>Input: 7
+First line: 7 x 1 = 7
+Last line:  7 x 9 = 63
+Number of equations: 9
+
+Input: 1
+Invalid table</code></pre>
+
+<h3>3B: 2단부터 9단까지</h3>
+
+<p>한 단을 출력한 다음, 이어서 모든 단을 출력하도록 확장합니다. 바깥 반복문이 단을, 안쪽 반복문이 곱하는 수를 고릅니다. 각 단이 끝나면 빈 줄을 하나 출력합니다. 이 부분은 입력 검증 블록 <strong>뒤에</strong> 두어 항상 실행되게 합니다.</p>
+
+<pre><code>for table in range(2, 10):
+    for factor in range(1, 10):
+        # Print one equation here.
+        pass
+    print()</code></pre>
+
+<p>시작 코드에는 이 뼈대가 이미 있어서, 그대로 실행하면 <code>All tables:</code> 뒤에 단마다 출력되는 빈 줄 8개만 보입니다.</p>
+
+<h3>실습 3 확인</h3>
+
+<ul>
+<li>유효한 경계값 2와 9, 잘못된 입력 1과 10을 테스트합니다.</li>
+<li>모든 단 부분은 8단 × 9개 = 72개의 식이어야 합니다. 첫 식은 <code>2 x 1 = 2</code>, 마지막 식은 <code>9 x 9 = 81</code>입니다.</li>
+<li>유효한 입력은 이 부분 앞에 식 9개를 더하고, 잘못된 입력은 아무것도 더하지 않습니다.</li>
+</ul>
+
+<p>식의 개수는 직접 세기 어려우므로 <a href="#ex=multiplication">multiplication</a>에서는 <code>grep -c ' = '</code>로 셉니다. 7을 넣으면 81개, 1을 넣으면 72개가 나와야 합니다.</p>
+
+<h2>별 무늬: 행과 열</h2>
+
+<p>한 행마다 바깥 반복을 한 번 합니다. 1행에는 별 1개, 2행에는 2개, 이런 식으로 늘어납니다. <code>print("*", end="")</code>는 줄을 바꾸지 않고 같은 줄에 이어서 출력하고, 안쪽 반복문이 끝난 뒤의 <code>print()</code>가 현재 행을 끝냅니다.</p>
+
+<pre><code>for row in range(1, 4):
+    for col in range(row):
+        print("*", end="")
+    print()
+# *
+# **
+# ***</code></pre>
+
+<h2>실습 4: 커지는 삼각형</h2>
+
+<p><code>stars.py</code>는 1부터 10까지의 정수 높이를 입력받아 중첩 반복문으로 왼쪽 정렬 삼각형을 출력합니다. 범위 밖이면 <code>Invalid height</code>를 출력합니다. 확장 과제는 빈 줄 하나 뒤에 줄어드는 삼각형을 출력하는 것입니다.</p>
+
+<pre><code>Input: 4
+*
+**
+***
+****
+
+Optional extension
+****
+***
+**
+*</code></pre>
+
+<p>기본 과제는 반드시 중첩 반복문으로 만듭니다. 문자열 반복(<code>"*" * row</code>)도 방법이지만 이것은 나중에 따로 이야기합니다.</p>
+
+<h3>실습 4 확인과 흔한 실수</h3>
+
+<ul>
+<li>높이 1은 별 하나짜리 한 행입니다.</li>
+<li>높이 4는 네 행, 모두 합쳐 별 10개입니다.</li>
+<li>높이 10은 열 행입니다.</li>
+<li>높이 0과 11은 <code>Invalid height</code> 메시지만 출력합니다.</li>
+</ul>
+
+<p>흔한 실수는 세 가지입니다. 바깥을 <code>range(1, height)</code>로 쓰면 마지막 행이 빠집니다. <code>print()</code>를 안쪽 반복문 안에 두면 별이 한 줄에 하나씩 찍힙니다. 안쪽을 <code>range(height)</code>로 쓰면 삼각형이 아니라 사각형이 됩니다. <a href="#ex=stars">stars</a>에서 별 개수 세기와 함께 두 가지 실수를 직접 재현해 볼 수 있습니다.</p>
+
+<h2>반복문에서 자주 하는 실수</h2>
+
+<ul>
+<li><code>range(1, 10)</code>은 1부터 9까지이며 10은 포함되지 않습니다.</li>
+<li>누적 변수는 반복문 앞에서 초기화합니다.</li>
+<li>최종 요약 출력은 반복문 밖에 둡니다.</li>
+<li><code>while</code> 반복문에는 조건을 바꾸는 문장이나 빠져나갈 방법이 있어야 합니다.</li>
+<li>행을 끝내는 <code>print()</code>는 안쪽 반복문 뒤에 둡니다.</li>
+</ul>
+
+<p>실행하기 전에는 첫 번째 반복, 마지막 반복, 최종 출력을 예측합니다. 디버깅할 때는 반복 변수와 누적 변수를 임시로 출력해 봅니다.</p>
+
+<h2>다음 장: 함수</h2>
+
+<p>다음 장 '함수'에서는 <code>def</code>로 재사용할 작업에 이름을 붙이고, 매개변수로 값을 넘기고, 결과를 돌려받아 호출한 쪽에서 쓰는 방법을 배웁니다. 반복문으로 계산하던 코드를 재사용할 수 있는 함수로 바꾸는 것도 해 봅니다. 준비로, 짝수 합 프로그램의 입력과 출력이 무엇인지 생각해 둡니다. 리스트, 튜플, 딕셔너리, 집합은 뒤에서 다룹니다.</p>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

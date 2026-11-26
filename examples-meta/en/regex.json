@@ -1,0 +1,79 @@
+{
+  "title": "Regular Expressions · Text Processing",
+  "summary": "Describe the shape of text with regular expressions to find it (search, findall), split it (split) and rewrite it (sub). Learn character classes, quantifiers, anchors and groups with a small test bench, then practise validating phone numbers, emails and dates (and the limits of doing so), analysing a web server log (Counter and an aligned report), and handling Korean text with Unicode ranges.",
+  "examples": {
+    "first_search": {
+      "summary": "Find the mobile numbers in a sentence twice: once with split and if statements, once with the regular expression r\"010-\\d{4}-\\d{4}\". See why patterns are written as raw strings, how re.search, match, fullmatch, findall and finditer differ, and the None you get when nothing matches.",
+      "notes": "The AttributeError in the fifth step is on purpose. That re.search can return None is the most common regex mistake, so always check with if m: before using the result.",
+      "steps": [
+        "in only says True or False. The split version has to remove brackets and commas, strip the full stop, and check the length and digits of all three pieces one by one before it finds the two numbers. The regex version just describes the shape in one line and gets the same result. Both 02-123-4567 and the order number 2026-1126-0001 are filtered out. The first number starts at character 4 and ends before character 17.",
+        "In an ordinary string \\n is one character (a newline), but r\"\\n\" is two: a backslash and n (1 2). Written as an ordinary string, C:\\temp\\new turns \\t into a tab and \\n into a newline and the path falls apart. Regexes are full of backslashes (\\d, \\b, ...), so always write patterns as r\"...\".",
+        "Leave out the r and Python 3.14 prints SyntaxWarning: \"\\d\" is an invalid escape sequence. It happens to work for now (['1', '22']), but as the warning says this will become an error. When you see it, put an r in front of the pattern.",
+        "search finds the first match anywhere in the string: span=(3, 6), match='010'. match only tries at the very start, so it fails on '주' and returns None. fullmatch needs the whole string to fit the pattern: \"2026\" matches, \"2026년\" gives None. For input validation, use fullmatch.",
+        "findall returns a list of the matched strings, ['3', '12', '7']. finditer hands out Match objects one at a time, so you also get each position (span). Convert with int() when you need numbers.",
+        "With no match, search returns None, and calling .group() on None raises AttributeError: 'NoneType' object has no attribute 'group'.",
+        "The fix: check with if m: first. A Match object counts as true and None as false."
+      ]
+    },
+    "try_pattern": {
+      "summary": "A small test bench: give it a pattern and a sentence on the command line and it wraps every match in [ ] and lists the positions. Experiment in turn with character classes (\\d \\w \\s [...] [^...]), quantifiers (? * + {m,n}), anchors (^ $ \\b), the dot and escaping, greedy and non-greedy matching, and |.",
+      "notes": "Always wrap the pattern and the sentence in single quotes, so the shell passes characters like \\, *, $, < and | to Python untouched. Try your own patterns too: guess the result first, then run it.",
+      "steps": [
+        "Without arguments it prints its usage. sys.argv[1] is the pattern and sys.argv[2] the sentence.",
+        "\\d is a single digit, so 1, 0, 1 and 2 match separately: four matches. Adding + (one or more) makes \\d+ take a run of digits as one piece: '101' and '2'.",
+        "Square brackets mean 'one character from this set'. [aeiou] catches only the vowels. A ^ right after the opening bracket negates the set, so [^a-z ] catches every character that is neither a lowercase letter nor a space: H , W 4 2 !.",
+        "\\w is a letter, digit or underscore. The underscore is included but the hyphen is not, so kebab and case split apart. Python's \\w is Unicode-aware, so 한글123 is one word. \\S (anything but whitespace) grabs everything between spaces, commas included.",
+        "? means the previous character is optional (zero or one), so color and colour match but colouur does not. {3,4} means 3 to 4 repetitions. 12 is too short, and from 12345 only the leading 1234 is taken: quantifiers grab as much as they can (4).",
+        "Anchors match positions, not characters. ^ is the start of the string, so only 42 matches; $ is the end, so only 49. \\b is a word boundary: the cat inside concat and cats is skipped, leaving the two cats that stand alone.",
+        ". is any character except a newline, which is why 3.14 also matches 3714. To find a real full stop, escape it as \\.. The same goes for ( ) [ ] { } * + ? ^ $ | and \\.",
+        "Greedy matching: .+ runs to the end and backs up only to the last >, so the whole sentence is one match. The non-greedy .+? stops at the nearest >, giving four matches: '<b>' '</b>' '<i>' '</i>'.",
+        "| means 'or'. On its own it also catches the cat and dog inside catalog and hotdog. Group it in brackets and surround it with \\b: the | now splits only inside the brackets, and just the standalone words cat and dog remain."
+      ]
+    },
+    "reformat": {
+      "summary": "Split the dates and phone numbers in schedule.txt into parts with groups. Use numbered groups (\\1 \\2 \\3), named groups (?P<name>...) and backreferences in re.sub to rewrite the dates as DD.MM.YYYY, and a function to hide the middle of each phone number as ****. Also experiment with how findall treats groups, re.split, and backreferences inside a pattern.",
+      "steps": [
+        "A three-line schedule. Every line has a YYYY-MM-DD date, and two lines have a mobile number.",
+        "group(0) is the whole match, groups() a tuple of what each pair of brackets caught: ('2026', '03', '02'). Being a tuple, it can be unpacked. Named groups come out with p[\"mid\"] or p.group(\"last\"), and groupdict() gives a dictionary. r\"\\3.\\2.\\1\" joins the third, second and first groups in reverse to make 02.03.2026. When you pass a function, it is called for every match and the string it returns takes the match's place: 010-****-5678.",
+        "A common trap: when the pattern has groups, findall returns the groups instead of the whole match. No groups gives strings, several give tuples, one gives just that group (['2026', '2026']). To group without capturing, use (?:...).",
+        "In the replacement string a named group is written \\g<name>: due 15/06/2026. Forget the r on the replacement and \\3 becomes character code 3, giving invisible characters: 'due \\x03.\\x02.\\x01'. re.subn returns the result together with the number of replacements (7).",
+        "str.split knows only one separator. re.split uses 'a comma, semicolon or slash with any spaces around it' as the separator and gives five clean pieces. Put a group in the separator pattern and the separators stay in the result too.",
+        "Inside a pattern, \\1 means 'exactly what the first group caught', so this finds a word written twice in a row (is is, test test). With re.IGNORECASE, The the counts as the same word too."
+      ]
+    },
+    "validate": {
+      "summary": "Read 'kind value' lines and decide whether each phone number, email address and date is valid. The patterns are compiled once and used with fullmatch; the email pattern is commented with re.VERBOSE. For dates the regex checks only the shape and datetime checks whether the day exists. Along the way, see where regex validation stops.",
+      "notes": "A regex checks the shape only. It cannot know whether the value is real: whether the number rings, whether mail reaches the address, whether the day is on the calendar. For email, sending a confirmation message is the only check that really works.",
+      "steps": [
+        "Feeds the sample file to standard input (lines starting with # are skipped). 01012345678 without dashes and 011-123-4567 pass; a two-digit middle or a five-digit end fails. 02-123-4567 is not a mobile number, so it is invalid. An email without @ or without a dotted domain (a@b) fails. Because \\w is Unicode, 홍길동@예시.한국 passes. The dates 2026-02-30 and 2026-13-01 have the right shape, but no such day exists. Only the line with Korean is out of line, because :<26 counts characters while each Hangul character takes two columns on screen.",
+        "You can also feed a few lines of your own with printf. me@site has no dot and is invalid; fax is not a registered kind, so it is unknown kind. The CHECKS dictionary maps each kind to its check function.",
+        "Validate with search and anything stuck before or after still passes. fullmatch demands the whole string. ^...$ looks similar, but $ also matches just before a final newline, so \"123\\n\" passes; fullmatch does not let it through.",
+        "re.compile parses the pattern once and keeps it as an object; giving a reused pattern a name also makes the code easier to read. Flags are given at compile time: with re.IGNORECASE (re.I), [a-z] also accepts capital letters.",
+        "Even a careful pattern that limits months to 01–12 and days to 01–31 lets 2026-02-31 and 2026-04-31 through. Fitting the days of each month and leap years into a regex would make it unreadable. Check the shape with a regex and the meaning with code such as datetime."
+      ]
+    },
+    "log_report": {
+      "summary": "Break the 40 lines of a web server access log (access.log) apart with one named-group pattern written with re.VERBOSE, and count paths, clients, status codes and hours with collections.Counter. Lines that do not fit are skipped and their line numbers recorded, and the top N are printed in aligned columns with format specs (:<16 :>5 :>7.1%).",
+      "steps": [
+        "One line per request: client IP, the time in square brackets, the method, path and protocol in quotes, the status code, and the response size in bytes (- when there is none). 40 lines in all.",
+        "First, try the pattern on a single line. [^\\]]+ is a run of anything but ']', and [^\"]* anything but a quote. Using a 'not the delimiter' class is more precise and faster than .*. The six groups come out as a tuple.",
+        "38 requests, 2 lines skipped because they do not fit (18 and 31), and 354,285 bytes in total (:, adds thousands separators). Counts per status code and per hour follow. In the Top 3 tables the path or IP is left-aligned with :<16, the hits right-aligned with :>5, and the share printed with :>7.1%. Finally the 8 errors (4xx/5xx) are listed with their line numbers.",
+        "The second argument changes N. most_common(5) returns five entries ordered by count. Entries with the same count (12 and 12) keep the order in which they were first counted.",
+        "Look at the two skipped lines. One is a note, not a request; in the other the status is 2OO (the letter O), not 200, so it does not fit (?P<status>\\d{3}). Counting broken lines instead of crashing on them is the basic rule of log analysis.",
+        "The shell's grep speaks regular expressions too: 404 appears on 6 lines and 4xx/5xx on 8, the same as report.py. grep -E uses extended regular expressions: [45] and {2} work the same, but there is no \\d, so write [0-9]. grep is handy for a quick look; Python is better for counting and tables.",
+        "Read the whole file as one string and ^ matches only at its very start, so just one IP comes back. With re.MULTILINE (re.M), ^ and $ match at every line, and all 39 lines that start with an IP are found (only the note line is missing)."
+      ]
+    },
+    "hangul": {
+      "summary": "From five product reviews, pick out complete Hangul words with the Unicode range [가-힣] and stray jamo such as ㅋㅋ and ㅠㅠ with [ㄱ-ㅎㅏ-ㅣ]. English words come out with IGNORECASE, star ratings with a group (and are averaged), and re.sub strips symbols and jamo to leave clean sentences. Also see \\w versus re.ASCII, and where stripping Korean particles with a regex goes wrong.",
+      "steps": [
+        "Reviews mixing Hangul, jamo (ㅋㅋㅋ, ㅠㅠ), English, digits and symbols (^^, !, brackets). Not every line has a '별점 N점' rating.",
+        "There are 33 complete Hangul words. '점' sneaks into the most common words because in '5점' the digit is not in [가-힣], so '점' is caught on its own. The jamo are ['ㅋㅋㅋ', 'ㅠㅠ', 'ㅠ']; thanks to IGNORECASE the English pattern catches both Good and GOOD, and lower() evens them out. The A of order number A-1023 is caught as an English word 'a' too. The rating group (\\d) pulls out [5, 3, 2, 5] for an average of 3.75. The cleaned sentences have no jamo or symbols, and A-1023 has become A1023.",
+        "Why [가-힣] works: the 11,172 precomposed Hangul syllables sit in one unbroken block of Unicode from U+AC00 (가) to U+D7A3 (힣). The single letters ㄱ–ㅎ and ㅏ–ㅣ live in another block (U+3131–U+3163), so they get their own range. Chinese characters fall into neither.",
+        "In Python 3 str patterns, \\w, \\d and \\b are Unicode-aware, so Hangul and ï are word characters. With re.ASCII only English letters, digits and the underscore remain: 파이썬3 shrinks to 3 and naïve_code breaks into na and ve_code.",
+        "An attempt to shorten '배송이' to '배송' with a non-greedy [가-힣]+? and an optional particle group. The first four work, but '나이' (age) is cut down to '나'. Whether the last syllable is a particle cannot be told from the shape alone; Korean morphological analysis needs a dedicated tool with a dictionary.",
+        "Counting only words of two or more syllables with {2,} drops one-syllable fragments like '점' and makes the ranking more useful: 별점 4, 배송이 2, 좋아요 2. '배송이' and '배송' are still counted as different words, the limit seen in the previous step."
+      ]
+    }
+  }
+}

@@ -1,0 +1,321 @@
+<p>In this lesson we build on the classes and objects you learned earlier to write a program in which several objects work together. The example is a bank account. You will meet the basic account <code>BankAccount</code>, <code>SavingsAccount</code>, which inherits from it and adds a bonus feature, and <code>AccountBook</code>, which collects and manages accounts. There are four goals. First, you should be able to trace how names relate to objects and explain when instance state changes. Second, make constructors and methods keep the balance valid at all times. Third, build an object that holds and uses other objects (composition). Fourth, compare inheritance and composition while looking at running code.</p>
+
+<p>The class runs 120 minutes in total: review 30 minutes, state rules 20 minutes, object collaboration 20 minutes, break 10 minutes, lab 30 minutes and review 10 minutes. The complete classes are in <code>oop/objects/examples/models.py</code>, and each part of the slides can be run as a numbered example file in the same folder.</p>
+
+<h2>1. State and object identity</h2>
+
+<h3>Recap: class, object and instance</h3>
+
+<p>In <code>a = BankAccount("Minsu", 1000)</code> and <code>b = BankAccount("Jisu", 500)</code>, <code>BankAccount</code> is the class that defines how an account behaves, and <code>a</code> and <code>b</code> refer to two separate account objects. Both objects are instances of <code>BankAccount</code>. An object is already an instance the moment it is created, so there is no extra step that turns an object into an instance.</p>
+
+<pre><code>class SimpleAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+account = SimpleAccount("Minsu", 1000)</code></pre>
+
+<p><code>__init__</code> initializes the newly created instance. <code>self</code> receives that instance, and <code>owner</code> and <code>balance</code> receive the other arguments. This minimal example has no validation; the main model we look at later adds it.</p>
+
+<p>Attributes store state, and methods describe operations on the object. After <code>account.deposit(200)</code>, <code>account.balance</code> becomes 1200.</p>
+
+<h3>Class variables and instance variables</h3>
+
+<pre><code>class LabelledAccount:
+    bank_name = "Python Bank"
+    def __init__(self, owner):
+        self.owner = owner
+
+a = LabelledAccount("Minsu")
+b = LabelledAccount("Jisu")
+LabelledAccount.bank_name = "Campus Bank"
+print(a.bank_name, b.bank_name)   # Campus Bank Campus Bank</code></pre>
+
+<p><code>bank_name</code> belongs to the class, while each instance has its own <code>owner</code>. If you change the class's value, every instance sees the new value. But if you assign through an instance, as in <code>a.bank_name = ...</code>, the class variable does not change; instead a new instance attribute with the same name is created on <code>a</code> only. You can check both cases in turn in <a href="week7_review.html">week7_review</a>.</p>
+
+<h3>Encapsulation and abstraction, inheritance and polymorphism</h3>
+
+<table>
+<thead><tr><th>Principle</th><th>Focus</th><th>Bank-account example</th></tr></thead>
+<tbody>
+<tr><td>Encapsulation</td><td>Related state and rules belong together</td><td><code>_balance</code> and the validated <code>deposit</code>/<code>withdraw</code></td></tr>
+<tr><td>Abstraction</td><td>Callers use only a stable public interface</td><td><code>withdraw(amount)</code> returns success or failure</td></tr>
+<tr><td>Inheritance</td><td>Reuse the behavior of an existing class</td><td><code>SavingsAccount</code> reuses <code>BankAccount</code> operations</td></tr>
+<tr><td>Polymorphism</td><td>The same call behaves differently depending on the object</td><td><code>account_type()</code> gives Standard or Savings</td></tr>
+</tbody>
+</table>
+
+<p>One method can support both encapsulation and abstraction. The underscore in <code>_balance</code> is only a convention meaning internal use, not an access lock, and abstraction does not require you to build an abstract base class.</p>
+
+<p>Recap questions: Is Minsu's account an object, an instance, or both? What does <code>__init__</code> initialize, and who receives <code>self</code>? Which of <code>bank_name</code> and <code>owner</code> differs per instance? Which principle keeps the balance-change rules with the balance? Which principle lets one caller use different account implementations? Answer with a partner first, then justify each answer with one line of code.</p>
+
+<h3>Calling a method and self</h3>
+
+<pre><code>a.deposit(200)
+BankAccount.deposit(a, 200)</code></pre>
+
+<p>Both forms pass <code>a</code> as <code>self</code>. To deposit only once, run only one of them. <code>self</code> is a conventional parameter name, not a Python keyword, and the method reads and changes the instance through <code>self</code>. The same <code>deposit</code> method only changes the object passed as <code>self</code>, so even after <code>a.deposit(200)</code>, <code>b</code>'s balance stays 500.</p>
+
+<h3>Assignment creates another reference</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+alias = a
+alias.withdraw(300)
+print(a.get_balance())   # 700
+print(alias is a)        # True</code></pre>
+
+<p>Assignment only binds another name to the existing object; it does not construct a second <code>BankAccount</code>. Conversely, calling the class twice with the same values creates two separate objects. Even if their attributes look the same, their identity differs, so <code>a is b</code> is False, and withdrawing from <code>a</code> leaves <code>b</code> at 1000.</p>
+
+<p>Predict: after <code>c = a</code> and <code>accounts = [a, b]</code>, what are <code>c.get_balance()</code> and <code>b.get_balance()</code> once you run <code>accounts[0].withdraw(200)</code>? What changes if you then replace <code>accounts[0]</code> with <code>b</code>? Running <a href="identity.html">identity</a> gives 800 and 500, and even after the list slot is replaced, <code>c</code> is still 800. The list slot now points to a different object; the object itself did not change.</p>
+
+<h2>2. Valid state and method contracts</h2>
+
+<h3>The balance invariant</h3>
+
+<p>An invariant is a rule that must hold right after construction and after every public operation. The account rules in this lesson are:</p>
+
+<ul>
+<li>The balance is a nonnegative integer in the smallest currency unit.</li>
+<li>Deposits and withdrawals accept positive integers only.</li>
+<li>A rejected operation changes nothing.</li>
+<li>The internal <code>_balance</code> changes only through the account's methods.</li>
+</ul>
+
+<p>Question to think about: if <code>amount</code> is negative and <code>balance -= amount</code> runs as is, which rule is broken?</p>
+
+<h3>Validate during initialization</h3>
+
+<pre><code>class BankAccount:
+    def __init__(self, owner, balance=0):
+        if not isinstance(owner, str) or not owner.strip():
+            raise ValueError("owner must be nonblank text")
+        if type(balance) is not int or balance &lt; 0:
+            raise ValueError("balance must be a nonnegative integer")
+        self.owner = owner.strip()
+        self._balance = balance</code></pre>
+
+<p>If invalid starting data comes in, an exception is raised before construction finishes, so an account with an invalid balance is never created at all. The caller can catch the exception, as below, and explain the error or ask for another value. If construction ends with an exception, the assignment <code>account = ...</code> does not happen either.</p>
+
+<pre><code>try:
+    account = BankAccount("Minsu", -100)
+except ValueError as error:
+    print(error)</code></pre>
+
+<p>There is a reason the code uses <code>type(balance) is not int</code> rather than <code>isinstance(balance, int)</code>. In Python, <code>bool</code> is a subclass of <code>int</code>, so <code>isinstance(True, int)</code> is True. This lesson's integer policy does not accept True as an amount, so the check requires exactly <code>int</code>. In <a href="validation.html">validation</a> you can see that a blank name, a negative balance and a True balance are all rejected, and that deposits of 0, -10, 1.5, "10" and True all return False.</p>
+
+<h3>Deposits and withdrawals that preserve the rules</h3>
+
+<pre><code>def deposit(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    self._balance += amount
+    return True
+
+def withdraw(self, amount):
+    if type(amount) is not int or amount &lt;= 0:
+        return False
+    if amount &gt; self._balance:
+        return False
+    self._balance -= amount
+    return True</code></pre>
+
+<p>False means "rejected and nothing changed"; True means "the balance changed by amount". The key is to validate before mutating state. A withdrawal has two kinds of failure, an invalid amount and insufficient funds, and both leave the balance unchanged. Withdrawing exactly the balance is allowed.</p>
+
+<h3>Trace state through a sequence</h3>
+
+<table>
+<thead><tr><th>Operation (starting from 1000)</th><th>Return</th><th>Balance afterward</th></tr></thead>
+<tbody>
+<tr><td><code>deposit(200)</code></td><td>True</td><td>1200</td></tr>
+<tr><td><code>withdraw(500)</code></td><td>True</td><td>700</td></tr>
+<tr><td><code>withdraw(900)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(-50)</code></td><td>False</td><td>700</td></tr>
+<tr><td><code>withdraw(700)</code></td><td>True</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>Always read the return value and the new state together. <a href="state_checks.html">state_checks</a> prints exactly this table.</p>
+
+<h3>Encapsulation and public access</h3>
+
+<pre><code>def get_balance(self):
+    return self._balance</code></pre>
+
+<p><code>get_balance</code> shows the result without changing the balance. The leading underscore is an internal-use convention, so Python does not prevent <code>account._balance = -100</code>. Team code should respect the documented public interface. In the second step of <a href="state_checks.html">state_checks</a> you can see -100 actually getting in.</p>
+
+<h3>Small checks for method contracts</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+assert a.withdraw(1200) is False
+assert a.get_balance() == 1000
+assert a.withdraw(1000) is True
+assert a.get_balance() == 0</code></pre>
+
+<p>Check both the success/failure return value and the resulting state. <code>assert</code> is for checks during development; validate user input with conditionals or exceptions.</p>
+
+<h2>3. Objects that collaborate</h2>
+
+<p>The key sentence of this section is "AccountBook has accounts; SavingsAccount is an account."</p>
+
+<h3>Composition: an AccountBook holds accounts</h3>
+
+<pre><code>class AccountBook:
+    def __init__(self):
+        self._accounts = []
+
+    def add_account(self, account):
+        if account in self._accounts:
+            return False
+        self._accounts.append(account)
+        return True</code></pre>
+
+<p>Each AccountBook instance gets its own list, and that list stores references to account objects. Adding the same account again returns False.</p>
+
+<h3>The shared mutable class-attribute trap</h3>
+
+<pre><code>class BadBook:
+    accounts = []
+
+first = BadBook()
+second = BadBook()
+first.accounts.append("Minsu")
+print(second.accounts)   # ["Minsu"]</code></pre>
+
+<p>If a list is a class attribute, every instance shares that one list. Mutable state that each book should have for itself must be created inside <code>__init__</code> as <code>self._accounts</code>. <a href="shared_state.html">shared_state</a> compares the two approaches.</p>
+
+<h3>Delegate to each account</h3>
+
+<pre><code>def total_balance(self):
+    total = 0
+    for account in self._accounts:
+        total += account.get_balance()
+    return total
+
+def report(self):
+    rows = []
+    for account in self._accounts:
+        rows.append((account.owner, account.account_type(),
+                     account.get_balance()))
+    return rows</code></pre>
+
+<p>AccountBook coordinates accounts through their public methods. It does not need to read <code>account._balance</code> directly. The total of an empty book is 0. <code>report</code> returns result data instead of printing, so the caller can decide whether to print it or save it. It must not return the mutable internal account list itself.</p>
+
+<h3>Changes remain visible through references</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+book = AccountBook()
+book.add_account(a)
+a.withdraw(300)
+print(book.total_balance())   # 700</code></pre>
+
+<p><code>book</code> and <code>a</code> refer to the same account object, and the book recalculates the total from the current account state every time. A separately created empty AccountBook still has total 0. In <a href="composition.html">composition</a> you can also see that the <code>report()</code> result (a list of tuples) taken before the withdrawal still says 1000, and only a fresh call shows 700.</p>
+
+<h3>Inheritance: a specialized account</h3>
+
+<pre><code>class SavingsAccount(BankAccount):
+    def __init__(self, owner, balance=0, bonus=100):
+        super().__init__(owner, balance)
+        if type(bonus) is not int or bonus &lt;= 0:
+            raise ValueError("bonus must be a positive integer")
+        self.bonus = bonus
+
+    def add_bonus(self):
+        return self.deposit(self.bonus)</code></pre>
+
+<p>The subclass reuses the base account's validation rules through <code>super().__init__</code> and adds one operation (<code>add_bonus</code>). <code>add_bonus</code> also calls the inherited <code>deposit</code>, so it keeps the same rules.</p>
+
+<h3>Overriding one public operation</h3>
+
+<pre><code>class BankAccount:
+    def account_type(self):
+        return "Standard"
+
+class SavingsAccount(BankAccount):
+    def account_type(self):
+        return "Savings"</code></pre>
+
+<p>A shared method name provides behavior that fits each type. SavingsAccount still supports all of <code>get_balance</code>, <code>deposit</code> and <code>withdraw</code>, so one piece of calling code can use the same operations on different accounts.</p>
+
+<pre><code>accounts = [BankAccount("Minsu", 700),
+            SavingsAccount("Jisu", 600, 100)]
+for account in accounts:
+    print(account.owner, account.account_type(), account.get_balance())
+# Minsu Standard 700
+# Jisu Savings 600</code></pre>
+
+<p>In <a href="inheritance.html">inheritance</a>, check that receiving the bonus twice gives 700, and look at the output of this loop.</p>
+
+<h3>Inheritance and composition</h3>
+
+<table>
+<thead><tr><th>Relationship</th><th>Example</th><th>Responsibility</th></tr></thead>
+<tbody>
+<tr><td>Is an account (is-a)</td><td>SavingsAccount inherits BankAccount</td><td>Preserve the account contract and extend behavior</td></tr>
+<tr><td>Has accounts (has-a)</td><td>AccountBook stores account references</td><td>Coordinate a collection of accounts</td></tr>
+</tbody>
+</table>
+
+<p>AccountBook should not inherit BankAccount just to reuse <code>get_balance</code>, because a book is not an account. Also, when no object state is needed, a dictionary and functions may be enough.</p>
+
+<h3>Checkpoint</h3>
+
+<pre><code>a = BankAccount("Minsu", 1000)
+b = SavingsAccount("Jisu", 500, 100)
+book = AccountBook()
+book.add_account(a)
+book.add_account(b)
+a.withdraw(300)
+b.add_bonus()
+print(book.total_balance())</code></pre>
+
+<p>The total is 700 + 600 = 1300. If you then call <code>a.withdraw(900)</code>, it is rejected for insufficient funds and the total stays the same. <a href="full_demo.html">full_demo</a> prints this whole process.</p>
+
+<h2>4. Lab: complete the account model</h2>
+
+<p>After a 10-minute break, the lab runs for 30 minutes. The slides give the paths <code>9week/examples/session1/accounts.py</code> and <code>9week/labs/session1/accounts.py</code>, but in this web lab they are <code>~/oop/objects/examples/</code> (the complete demo <code>07_full_demo.py</code> and <code>models.py</code>) and <code>~/oop/objects/starter/accounts.py</code> (the lab file). You need Python 3.10 or later; no external packages or data downloads are required. The demo runs as is, and the lab file raises <code>NotImplementedError</code> at a TODO. The lab page is <a href="accounts_lab.html">accounts_lab</a>.</p>
+
+<h3>Lab A: preserve the balance invariant (10 minutes)</h3>
+
+<ul>
+<li>Implement <code>BankAccount.withdraw(amount)</code>.</li>
+<li>Reject nonintegers, zero, negatives and overdrafts.</li>
+<li>Under this lesson's integer policy, reject True as an amount too.</li>
+<li>Rejected calls return False and keep the old balance.</li>
+<li>Accepted calls subtract the amount and return True.</li>
+<li>Also test a withdrawal equal to the balance.</li>
+</ul>
+
+<h3>Lab B: coordinate existing objects (8 minutes)</h3>
+
+<ul>
+<li>Implement <code>AccountBook.total_balance()</code> and <code>report()</code>.</li>
+<li>Read account data through <code>get_balance()</code> and <code>account_type()</code>.</li>
+<li>Empty book: total 0, report <code>[]</code>.</li>
+<li>The report keeps the order in which accounts were added.</li>
+<li>Separate books must be independent.</li>
+<li>Change an account after adding it, then recompute the total.</li>
+</ul>
+
+<h3>Lab C: check the full demo (7 minutes)</h3>
+
+<p>When you run your completed <code>accounts.py</code>, it should print:</p>
+
+<pre><code>Withdraw: True 700
+Rejected: False 700
+Bonus: True 600
+Minsu Standard 700
+Jisu Savings 600
+Total: 1300</code></pre>
+
+<p>Compare the output and add checks for failure cases. <code>check_student.py</code> in the same folder already collects such checks, and once the three TODOs are complete it prints <code>All student checks passed</code>. Edit in the terminal with <code>nano accounts.py</code>; to submit, run <code>cp accounts.py /mnt/host/</code> and download the file from the Download box on the page. Submit <code>accounts.py</code> and a short explanation of one state trace.</p>
+
+<h2>Review and what comes next</h2>
+
+<ol>
+<li>Why does <code>alias.withdraw</code> change what <code>a.get_balance()</code> returns?</li>
+<li>Why does an invalid withdrawal need a state check as well as the False return value?</li>
+<li>Why must each book create its own list in <code>__init__</code>?</li>
+<li>Which relationship uses inheritance, and which uses composition?</li>
+</ol>
+
+<p>In the next chapter, "Building a Project: Requirements, Design and Git", you start choosing the objects, data and function contracts for your own project. Be ready to submit your completed script and explain one design choice.</p>

@@ -1,0 +1,463 @@
+<p>This chapter is split into theory and practice. In the theory part we learn operators that calculate and compare values, how to extract and transform characters in a string, and <code>if</code> / <code>elif</code> / <code>else</code>, which chooses which code to run based on a condition. Throughout the slides you are asked again and again to "predict the result before running the code". Run each piece of code yourself on the example pages below and compare it with your prediction. Operators are collected in <a href="operators.html">operators</a>, strings in <a href="string_basics.html">string_basics</a>, and conditionals in <a href="conditionals.html">conditionals</a>. In the practice part that follows we use this material to build four programs: string processing, a grade classifier, rock-paper-scissors and a leap-year calculator.</p>
+
+<p>Most steps on the example pages run a one-line program with <code>python3 -c '...'</code>, or feed in a multi-line program with <code>printf '%s\n' 'first line' 'second line' ... | python3 -</code>. When you experiment on your own, you can also type <code>python3</code> and enter code line by line in interactive mode.</p>
+
+<h2>Review: Expression, Value &amp; Type</h2>
+
+<h3>An Expression Produces a Value</h3>
+
+<p>An expression is evaluated to produce a value. The type of that value determines which operations are allowed. Before running the code, predict both the value and its type, then check with <code>type()</code>.</p>
+
+<pre><code>print(8 + 2)              # 10
+print(type(8 + 2))        # int
+print(8 / 2)              # 4.0
+print(type(8 / 2))        # float
+print("8" + "2")          # 82
+print(type("8" + "2"))    # str</code></pre>
+
+<p>Confirm that the result of <code>/</code> is always a <code>float</code>, even when both operands are integers, and that <code>+</code> on strings is not addition but concatenation.</p>
+
+<h3>Review: Input, Types &amp; Output</h3>
+
+<p><code>input()</code> returns a string, even for numeric input. Numeric text must be converted with <code>int()</code> or <code>float()</code> before you can calculate with it. An expression combines values and operators.</p>
+
+<pre><code>a = "12"
+b = "3"
+print(a + b)                  # 123
+print(int(a) + int(b))        # 15
+
+price = 12.5
+quantity = 3
+total = price * quantity
+print(f"Total: {total:.2f}")  # Total: 37.50</code></pre>
+
+<h3>Tracing Input Conversion</h3>
+
+<p>Treat <code>raw</code> as text read from <code>input()</code>. <code>strip()</code> removes surrounding whitespace, and <code>int()</code> creates an integer from numeric text. Converting a value does not change the original <code>raw</code>. With <code>repr()</code>, the spaces are shown as they are inside the quotes.</p>
+
+<pre><code>raw = " 12 "
+clean = raw.strip()
+number = int(clean)
+print(repr(raw))      # ' 12 '
+print(repr(clean))    # '12'
+print(number + 3)     # 15
+print(clean + "3")    # 123</code></pre>
+
+<p>The last two lines give different results because <code>number</code> is an integer and so is added, while <code>clean</code> is a string and so is concatenated.</p>
+
+<h2>Arithmetic Operators</h2>
+
+<p><code>+</code> and <code>-</code> add and subtract, and <code>*</code> multiplies. <code>/</code> performs division, <code>//</code> is floor division, which rounds the quotient down to an integer, <code>%</code> gives the remainder, and <code>**</code> raises a power. Floor division rounds down, so <code>-7 // 3</code> is -3, not -2. Division or remainder by zero raises an error.</p>
+
+<pre><code>a, b = 7, 3
+print(a + b)     # 10
+print(a - b)     # 4
+print(a * b)     # 21
+print(a / b)     # 2.333...
+print(a // b)    # 2
+print(a % b)     # 1
+print(a ** b)    # 343
+
+minutes = 135
+print(minutes // 60)   # 2 hours
+print(minutes % 60)    # 15 minutes</code></pre>
+
+<h3>Exercise: Hours &amp; Student Groups</h3>
+
+<p>Convert 185 minutes into hours and minutes, and pack 29 students into groups of 4 to find the number of full groups and the number of students left. Both calculations use <code>//</code> and <code>%</code>. The expected answers are 3 hours 5 minutes, and 7 groups with 1 student left.</p>
+
+<pre><code>minutes = 185
+hours = minutes // 60
+left = minutes % 60
+print(hours, left)           # 3 5
+print(hours * 60 + left)     # 185
+
+students = 29
+groups = students // 4
+left = students % 4
+print(groups, left)          # 7 1
+print(groups * 4 + left)     # 29</code></pre>
+
+<p>The quotient counts complete units, and the remainder counts what is left over. Get into the habit of checking that <strong>quotient × divisor + remainder</strong> equals the original value. Repeat with 180 minutes and 28 students. You can run these calculations in <a href="operators.html">operators</a>.</p>
+
+<h2>Comparison Operators</h2>
+
+<p><code>==</code> tests equality and <code>!=</code> tests inequality. <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code> and <code>&gt;=</code> compare sizes. Comparisons return <code>True</code> or <code>False</code>. Be careful to distinguish <code>=</code>, which assigns, from <code>==</code>, which compares. Chaining comparisons lets you check a range at once.</p>
+
+<pre><code>score = 85
+print(score == 85)          # True
+print(score != 85)          # False
+print(score &gt;= 60)          # True
+print(score &lt; 60)           # False
+print(0 &lt;= score &lt;= 100)    # True
+
+print("85" == 85)           # False
+# Convert input before comparing.</code></pre>
+
+<p>The string <code>"85"</code> and the integer <code>85</code> are not equal. Values read from input must be converted before comparing.</p>
+
+<h3>Inclusive &amp; Exclusive Boundaries</h3>
+
+<p>A boundary that accepts the endpoint, like <code>&lt;=</code>, is called an inclusive boundary, and one that rejects the endpoint, like <code>&lt;</code>, is called an exclusive boundary. Compare the two results at 0 and 100.</p>
+
+<pre><code>score = 100
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 0
+print(0 &lt;= score &lt;= 100)    # True
+print(0 &lt; score &lt; 100)      # False
+score = 101
+print(0 &lt;= score &lt;= 100)    # False</code></pre>
+
+<p>When testing a score range, test just below, at and just above each endpoint. This principle carries over to the boundary tests of the grade classifier in the practice part.</p>
+
+<h2>Logical Operators</h2>
+
+<p><code>and</code> is true only when both conditions are true, <code>or</code> is true when at least one condition is true, and <code>not</code> reverses the truth value.</p>
+
+<pre><code>age = 20
+has_id = True
+print(age &gt;= 18 and has_id)   # True
+print(age &lt; 18 or has_id)     # True
+print(not has_id)             # False
+
+n = 0
+print(n != 0 and 10 / n &gt; 2)
+# False: 10 / n is never evaluated.</code></pre>
+
+<h3>Boolean Results &amp; Short-Circuiting</h3>
+
+<p>Summing up the four combinations: <code>and</code> is true only when both inputs are true, and <code>or</code> is false only when both inputs are false.</p>
+
+<pre><code>print(True and True)      # True
+print(True and False)     # False
+print(False and True)     # False
+print(False and False)    # False
+print(False or True)      # True
+print(False or False)     # False</code></pre>
+
+<p>Once the result is already decided, Python does not evaluate the remaining operand. This is called short-circuiting. In <code>A and B</code>, if <code>A</code> is false, <code>B</code> is skipped. Using this, the earlier condition acts as a "guard" that keeps the later expression safe. <code>n != 0 and 10 / n &gt; 2</code> above never divides by zero, and the code below never takes <code>text[0]</code> from an empty string, so neither raises an error.</p>
+
+<pre><code>text = ""
+print(text != "" and text[0] == "A")
+# False: text[0] is not evaluated.</code></pre>
+
+<h2>Precedence &amp; Assignment Updates</h2>
+
+<p><code>**</code> has the highest precedence, followed by <code>*</code> <code>/</code> <code>//</code> <code>%</code>, then <code>+</code> <code>-</code>. Below those come the comparison operators, then <code>not</code>, <code>and</code> and <code>or</code>, in that order. Use parentheses to make the intended grouping clear. <code>+=</code>, <code>-=</code> and <code>*=</code> update an existing variable.</p>
+
+<pre><code>print(2 + 3 * 4)        # 14
+print((2 + 3) * 4)      # 20
+print(-2 ** 2)          # -4
+print((-2) ** 2)        # 4
+
+score = 80
+score += 5
+print(score)            # 85
+
+# Which output do you expect?
+print(True or False and False)
+# True</code></pre>
+
+<p><code>-2 ** 2</code> is -4 because <code>**</code> is evaluated before the sign <code>-</code>, giving <code>-(2 ** 2)</code>. In the last expression <code>and</code> comes first, so it is <code>True or (False and False)</code>, that is, <code>True</code>.</p>
+
+<h3>Exercise: Parentheses &amp; Updates</h3>
+
+<p>Predict each result before looking at the comments. Multiplication happens before addition, and update statements run in written order. The last two lines show how parentheses change the result.</p>
+
+<pre><code>print(10 - 2 * 3)       # 4
+print((10 - 2) * 3)     # 24
+
+x = 5
+x += 3
+x *= 2
+print(x)                # 16
+
+print(True or False and False)
+# True
+print((True or False) and False)
+# False</code></pre>
+
+<p>You can run precedence and compound assignment in the second half of <a href="operators.html">operators</a>. The last step of that example runs a leap-year program that combines <code>%</code>, <code>==</code>, <code>and</code>, <code>or</code> and <code>not</code> in one expression. It is the solution to Lab 4.</p>
+
+<h2>Strings &amp; Indexing</h2>
+
+<p>A string is a sequence of characters. The first character has index 0, and negative indices count from the end. <code>len(text)</code> returns the number of characters. Using an index outside the string raises an <code>IndexError</code>.</p>
+
+<pre><code>text = "Python"
+#       012345
+print(len(text))    # 6
+print(text[0])      # P
+print(text[2])      # t
+print(text[-1])     # n
+print(text[-2])     # o
+# text[6] raises IndexError
+# ""[0] also raises IndexError</code></pre>
+
+<h3>Valid Indices &amp; Empty Strings</h3>
+
+<p>For a string of length n, the nonnegative valid indices are 0 through n − 1. In a non-empty string, <code>-1</code> refers to the last character. In a one-character string, the first and last characters are the same. An empty string has no valid index at all.</p>
+
+<pre><code>text = "Code"
+print(len(text))    # 4
+print(text[0])      # C
+print(text[3])      # e
+print(text[-1])     # e
+
+text = "A"
+print(text[0] == text[-1])   # True
+
+# "Code"[4] raises IndexError.
+# ""[0] raises IndexError.</code></pre>
+
+<p>In <a href="string_basics.html">string_basics</a> you can see that <code>text[6]</code> and <code>""[0]</code> really do raise <code>IndexError: string index out of range</code>. Preventing indexing into an empty string is the key point of the string processing lab.</p>
+
+<h2>String Slicing</h2>
+
+<p><code>text[start:stop]</code> is the substring that includes <code>start</code> and excludes <code>stop</code>. If <code>start</code> is omitted it starts from 0, and if <code>stop</code> is omitted it goes to the end. The third value is the step, and <code>[::-1]</code> reverses the string. A slice that goes past the end does not raise an error; it simply cuts as far as the string goes.</p>
+
+<p>Strings are immutable values. Changing a single character, as in <code>text[0] = "J"</code>, is not allowed, so you build a new string with the change and assign it again.</p>
+
+<pre><code>text = "Python"
+print(text[0:2])     # Py
+print(text[2:])      # thon
+print(text[:4])      # Pyth
+print(text[::2])     # Pto
+print(text[::-1])    # nohtyP
+print(text[:99])     # Python
+
+# text[0] = "J" is invalid.
+text = "J" + text[1:]
+print(text)          # Jython</code></pre>
+
+<h3>Exercise: Reading Slices</h3>
+
+<p>Write the selected indices on paper first. Remember that the <code>stop</code> index is left out. With a positive step, if <code>start</code> and <code>stop</code> are equal the result is an empty string, and with <code>repr()</code> the empty result shows as two quotation marks.</p>
+
+<pre><code>text = "PYTHON"
+print(text[1:4])          # YTH
+print(text[:3])           # PYT
+print(text[-3:])          # HON
+print(text[1::2])         # YHN
+print(text[::-1])         # NOHTYP
+print(repr(text[2:2]))    # ''
+print(text[:99])          # PYTHON</code></pre>
+
+<h2>String Methods &amp; Membership</h2>
+
+<p>String methods do not change the original string; they return a new result.</p>
+
+<ul>
+<li><code>strip()</code> removes whitespace from both ends.</li>
+<li><code>lower()</code> and <code>upper()</code> change the case.</li>
+<li><code>replace(old, new)</code> returns the replaced string.</li>
+<li><code>split()</code> splits a string into a list of strings.</li>
+<li><code>in</code> checks whether a substring is contained. It is case-sensitive.</li>
+</ul>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+print(clean)                          # Hello Python
+print(clean.lower())                  # hello python
+print(clean.upper())                  # HELLO PYTHON
+print(clean.replace("Python", "AI"))  # Hello AI
+print(clean.split())                  # ['Hello', 'Python']
+print("Python" in clean)              # True
+print("python" in clean)              # False</code></pre>
+
+<h3>A Text-Cleaning Pipeline</h3>
+
+<p>While you are learning, storing intermediate results in variables makes it easy to check each step. <code>strip()</code> affects only the two ends, while <code>replace()</code> can also change spaces inside the string. Each method returns a new string, so the original <code>raw</code> value stays as it was.</p>
+
+<pre><code>raw = "  Hello Python  "
+clean = raw.strip()
+lowered = clean.lower()
+slug = lowered.replace(" ", "-")
+print(repr(raw))
+# '  Hello Python  '
+print(clean)      # Hello Python
+print(lowered)    # hello python
+print(slug)       # hello-python</code></pre>
+
+<h2>Joining Text &amp; Formatting Values</h2>
+
+<p><code>+</code> joins strings and <code>*</code> repeats them. To join a number to a string with <code>+</code>, you must convert it with <code>str()</code>. An f-string puts an expression inside braces, and <code>.2f</code> shows two decimal places. Before comparing user input, normalize it, for example with <code>strip().lower()</code>.</p>
+
+<pre><code>name = "Mina"
+score = 87.5
+print("Hi, " + name)            # Hi, Mina
+print("-" * 5)                  # -----
+print("Score: " + str(score))
+print(f"{name}: {score:.2f}")   # Mina: 87.50
+
+answer = " YES "
+print(answer.strip().lower() == "yes")
+# True</code></pre>
+
+<h3>Worked Example: A Receipt</h3>
+
+<p>Keep prices numeric while calculating, and format them only when showing them on screen. A format such as <code>.2f</code> changes only the displayed text; it does not change the number stored in <code>total</code>.</p>
+
+<pre><code>item = "Notebook"
+price = 2.5
+quantity = 3
+total = price * quantity
+print(f"Item: {item}")
+print(f"Quantity: {quantity}")
+print(f"Total: {total:.2f}")
+print(total)    # 7.5, still numeric</code></pre>
+
+<p>All the examples from indexing to the receipt are in <a href="string_basics.html">string_basics</a>, in order. The last step runs the solution to Lab 1, which combines these tools.</p>
+
+<h2>Conditionals: if &amp; else</h2>
+
+<p><code>if</code> runs the indented block when the condition is true, and <code>else</code> runs when that condition is false. The <code>if</code> and <code>else</code> lines end with a colon (<code>:</code>), and each level of indentation is four spaces. The code after the block runs whichever branch was taken.</p>
+
+<pre><code>age = 17
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Check complete")
+# Output:
+# Under 18
+# Check complete</code></pre>
+
+<h3>Tracing a Branch</h3>
+
+<p>Evaluate the condition before reading the branches. Exactly one of the <code>if</code>/<code>else</code> blocks runs, and the final <code>print</code> outside the indentation always runs. Change <code>age</code> to 18 and trace it again (the first step of <a href="conditionals.html">conditionals</a> runs both 17 and 18).</p>
+
+<pre><code>age = 17
+print("Start")
+if age &gt;= 18:
+    print("Adult")
+else:
+    print("Under 18")
+print("Done")
+# Start
+# Under 18
+# Done</code></pre>
+
+<h2>Multiple Branches with elif</h2>
+
+<p><code>elif</code> checks another condition when all the earlier conditions were false. Only the first matching branch runs, and the final <code>else</code>, which is optional, handles every remaining case. Grade thresholds are checked from highest to lowest.</p>
+
+<pre><code>score = 85
+if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+elif score &gt;= 70:
+    grade = "C"
+elif score &gt;= 60:
+    grade = "D"
+else:
+    grade = "F"
+print(grade)    # B</code></pre>
+
+<h3>Separate if Statements &amp; elif</h3>
+
+<p>Separate <code>if</code> statements each evaluate their own condition, so several blocks can run. An <code>if</code>/<code>elif</code> chain stops at the first matching branch. Use a chain for mutually exclusive categories such as grades, and separate checks when you want to print several messages together.</p>
+
+<pre><code>score = 95
+if score &gt;= 90:
+    print("A")
+if score &gt;= 80:
+    print("B")
+# Both A and B are printed above.
+
+if score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+# Only A is printed by this chain.</code></pre>
+
+<h2>Validation &amp; Nested Conditions</h2>
+
+<p>Validate a value before using it. A nested <code>if</code> runs inside another branch. The code below uses a guard to prevent division by zero, and only when the division was done does it check again whether the result is negative.</p>
+
+<pre><code>a = float(input("First number: "))
+b = float(input("Second number: "))
+if b == 0:
+    print("Cannot divide by zero")
+else:
+    result = a / b
+    if result &lt; 0:
+        print("Negative result")
+    print(f"Result: {result:.2f}")</code></pre>
+
+<p>In this lab we assume that numeric input arrives in the required format. How to handle input that cannot be converted to a number, such as <code>"abc"</code> (exception handling), comes later. In <a href="conditionals.html">conditionals</a> this code is run with 7, 0 and with -6, 4.</p>
+
+<h3>Validation Before Classification</h3>
+
+<p>Reject values outside the allowed range first, and keep the normal decision inside the valid case. Test negative, zero and valid positive values.</p>
+
+<pre><code>tickets = -1
+if tickets &lt; 0:
+    print("Invalid quantity")
+else:
+    if tickets == 0:
+        print("No booking")
+    else:
+        print(f"Booked: {tickets}")
+# -1: Invalid quantity
+# 0: No booking
+# 2: Booked: 2</code></pre>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>To test equality, use <code>==</code>, not the assignment <code>=</code>.</li>
+<li>A missing colon or wrong indentation breaks the block.</li>
+<li>To compare as numbers, convert the string first.</li>
+<li><code>"False"</code> is a non-empty string, so <code>bool("False")</code> is <code>True</code>.</li>
+<li>When you use <code>or</code>, compare both cases explicitly.</li>
+</ul>
+
+<pre><code>choice = "paper"
+
+# Incorrect: "scissors" is truthy.
+if choice == "rock" or "scissors":
+    print("This always runs")
+
+# Correct:
+if (choice == "rock"
+        or choice == "scissors"):
+    print("Rock or scissors")</code></pre>
+
+<p>The incorrect code is read as <code>(choice == "rock") or "scissors"</code>. Even if the left side is false, the <code>"scissors"</code> on the right is a non-empty string and is treated as true, so the whole condition is always true.</p>
+
+<h3>Debugging Exercise: A Discount</h3>
+
+<p>A discount should apply only to student or senior customers, but the program below applies it to every customer. Explain which part of the condition is always true, fix the condition, and test it with all three kinds of customer.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if customer == "student" or "senior":
+    price *= 0.8
+print(price)    # 80.0: incorrect for adult
+
+# Expected after repair:
+# adult: 100
+# student: 80.0
+# senior: 80.0</code></pre>
+
+<p>The solution is to compare <code>customer</code> explicitly in both cases. Run the fixed code with adult, student and senior, and explain when the indented update statement runs.</p>
+
+<pre><code>customer = "adult"
+price = 100
+if (customer == "student"
+        or customer == "senior"):
+    price *= 0.8
+print(price)    # 100</code></pre>
+
+<p>In <a href="conditionals.html">conditionals</a> you can run the code before and after the fix side by side for the three customers. Before the fix, adult also gets 80.0; after the fix, it gets 100.</p>
+
+<h2>Exit Check</h2>
+
+<p>Before moving on to the practice, review slicing, Boolean expressions and the order of branches. Check yourself with these two questions.</p>
+
+<ol>
+<li><strong>What is <code>"Python"[1:4]</code>?</strong> It is <code>yth</code>. Indices 1, 2 and 3 are selected, and 4 is left out.</li>
+<li><strong>Why check <code>score &gt;= 90</code> before <code>score &gt;= 60</code>?</strong> Because the first matching branch runs. If 60 were checked first, even a score of 95 would get a D.</li>
+</ol>

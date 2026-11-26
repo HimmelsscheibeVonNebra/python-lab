@@ -1,0 +1,76 @@
+{
+  "class": "design",
+  "title": "제안서에서 설계로: 분해, 계약, 모듈",
+  "summary": "사용자 스토리를 기능으로, 기능을 함수로 나누고(동사 테스트), 각 함수의 계약(이름·인자·반환값·실패)을 docstring에 적고, main·logic·storage·report 네 모듈로 책임을 나눈다. 완성된 study_logger와 한 함수짜리 지출 기록기를 나누는 refactor_lab을 실행한다.",
+  "examples": [
+    {
+      "name": "study_logger",
+      "source": "project/design/examples/study_logger/main.py",
+      "also": [
+        "project/design/examples/study_logger/logic.py",
+        "project/design/examples/study_logger/storage.py",
+        "project/design/examples/study_logger/report.py",
+        "project/design/examples/study_logger/test_logic.py",
+        "project/design/examples/study_logger/data/study.csv"
+      ],
+      "summary": "공부 시간 기록기의 완성 예제. main.py는 묻고·호출하고·보여 주기만 하고, 규칙은 logic.py(입출력 없음), 파일은 storage.py, 화면용 문장은 report.py가 맡는다. test_logic.py는 제안서의 수용 기준을 assert로 적은 검사 파일이다.",
+      "steps": [
+        {
+          "cmd": "ls; cat data/study.csv",
+          "note": "슬라이드의 프로젝트 폴더 구조와 같다: 코드 파일은 맨 위에, 데이터는 data/에 있다. CSV는 date,course,minutes 헤더와 표본 2행이다."
+        },
+        {
+          "cmd": "printf '2026-10-26\\nPython \\n60\\n' | python3 main.py",
+          "note": "입력 세 줄(날짜, 과목, 분)을 printf로 넣었다. 직접 python3 main.py를 실행해 입력해도 된다. 'Python '처럼 대문자와 공백이 섞여도 make_record가 strip().lower()로 python이 되어 같은 과목으로 합산된다: python 150 min, stats 45 min. report.py가 큰 합계부터 정렬해 출력한다."
+        },
+        {
+          "cmd": "printf '2026-10-26\\nart\\n-30\\n' | python3 main.py\nprintf '2026-10-26\\nart\\nabc\\n' | python3 main.py\nwc -l data/study.csv",
+          "note": "logic은 ValueError를 일으키기만 하고, 사용자에게 보여 줄 문장(Not saved: ...)은 main이 정한다. -30은 우리가 쓴 메시지, abc는 int()가 낸 invalid literal 메시지다. 두 번 모두 저장되지 않아 파일은 헤더+3행, 4줄 그대로다."
+        },
+        {
+          "cmd": "python3 test_logic.py",
+          "note": "키보드도 파일도 없이 logic 함수만 검사한다. 1초도 걸리지 않으며 변경할 때마다 다시 돌릴 수 있다. All checks passed.가 나오면 수용 기준이 통과한 것이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom logic import parse_minutes\nprint(parse_minutes(\"45\"))\nprint(parse_minutes.__doc__.splitlines()[0])\nEOF",
+          "note": "docstring이 곧 계약이다. 첫 줄은 무엇을 돌려주는지를 말한다: Return text as a positive whole number of minutes."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom logic import make_record, weekly_totals\nfrom report import format_totals\nrows = [make_record(\"2026-10-24\", \"python\", \"90\"), make_record(\"2026-10-25\", \"Stats\", \"45\")]\nprint(rows[1])\nprint(\"\\n\".join(format_totals(weekly_totals(rows))))\nEOF",
+          "note": "슬라이드 '내 파일 import하기'의 예다. 같은 폴더의 logic.py, report.py를 모듈 이름으로 불러온다. 한 레코드는 고정된 키를 가진 dict({'date': ..., 'course': 'stats', 'minutes': 45}, minutes는 int), 전체 레코드는 dict의 list, 합계는 과목→분 dict다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport csv\nrows = list(csv.DictReader(open(\"data/study.csv\", newline=\"\")))\nprint(rows[0][\"course\"], repr(rows[0][\"minutes\"]))\nprint(rows[0][\"minutes\"] + rows[1][\"minutes\"])\nEOF",
+          "note": "csv.DictReader는 헤더를 키로 쓰지만 값은 모두 str이다. '90' + '45'는 135가 아니라 9045가 된다. 그래서 storage.load_records가 읽자마자 int()로 한 번 변환해 둔다."
+        },
+        {
+          "cmd": "mkdir -p /tmp/trap\necho 'x = 1' > /tmp/trap/csv.py\ncd /tmp/trap\npython3 - <<'EOF'\nimport csv\nprint(csv.__file__, hasattr(csv, \"DictReader\"))\nEOF\ncd -",
+          "note": "import 함정 1: 표준 라이브러리 이름으로 파일을 만들면 자기 파일이 진짜 모듈을 가린다. /tmp/trap/csv.py가 불려 와 DictReader가 없다(False). 프로젝트에서 이런 일이 생기면 AttributeError: module 'csv' has no attribute 'DictReader'가 난다. 파일 이름을 바꾸고 __pycache__를 지우면 해결된다."
+        }
+      ],
+      "expect": "All checks passed.",
+      "notes": "단계 2는 data/study.csv에 한 행(2026-10-26,python,60)을 추가한다. 처음 상태로 돌리려면 페이지를 새로 고친다. 이 폴더의 test_logic.py는 unittest가 아니라 assert를 나열한 스크립트이므로 python3 test_logic.py로 실행한다."
+    },
+    {
+      "name": "refactor_lab",
+      "source": "project/design/starter/refactor_lab.py",
+      "summary": "연습 2: 입력·검사·합산·출력을 한 함수에 몰아넣은 지출 기록기 all_in_one()을 읽고, 그 규칙을 입출력 없는 세 함수 parse_amount, category_totals, format_report로 옮긴다. 각 docstring이 계약이며, 여섯 검사가 모두 PASS가 될 때까지 고친다.",
+      "steps": [
+        {
+          "cmd": "python3 refactor_lab.py",
+          "note": "시작 상태에서는 TODO 함수가 임시 값(0, {}, [])만 돌려주므로 대부분 FAIL이다. FAIL 줄의 got과 expected를 비교하면 무엇을 고쳐야 할지 보인다. category_totals([])는 빈 dict를 돌려주는 임시 값이 우연히 맞아 PASS다."
+        },
+        {
+          "cmd": "printf 'Food,4500\\nbus,1500\\n food ,8000\\nbus,-200\\n\\n' | python3 -c 'from refactor_lab import all_in_one; all_in_one()'",
+          "note": "원래 한 덩어리 함수를 입력을 넣어 돌려 본다. -200은 Skipped, ' food '와 'Food'는 같은 food로 합쳐져 bus: 1500 won, food: 12500 won이 나온다. 이것이 format_report 검사의 기댓값과 같은 결과다. 이 합산 규칙을 시험하려면 매번 입력을 타이핑해야 한다는 것이 분해가 필요한 이유다."
+        },
+        {
+          "cmd": "grep -n 'TODO' refactor_lab.py",
+          "note": "완성할 곳은 TODO 1~3이다. 세 함수 안에서는 input()과 print()를 쓰지 않는다. nano refactor_lab.py로 고친 뒤 python3 refactor_lab.py를 다시 실행해 PASS가 여섯 줄 나오는지 확인한다."
+        }
+      ],
+      "expect": "FAIL parse_amount('4500')",
+      "notes": "이 실습에는 정답 파일이 없다. 힌트: 'food '와 'Food'는 같은 카테고리이므로 더하기 전에 strip()과 lower()를 한다. parse_amount는 study_logger의 logic.parse_minutes와 같은 모양의 계약이다."
+    }
+  ]
+}

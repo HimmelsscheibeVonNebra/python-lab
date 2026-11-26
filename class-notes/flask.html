@@ -1,0 +1,120 @@
+<p>'프로젝트 만들기' 장에서 만든 주가 MVP는 CSV를 읽고(<code>storage.py</code>), 검증·분석하고(<code>logic.py</code>), HTML 보고서를 파일로 쓰는(<code>report.py</code>) 명령행 프로그램이었습니다. 이 예제들은 같은 흐름을 Flask 웹 앱으로 옮깁니다. 파일로 보고서를 쓰는 대신, 브라우저의 요청이 올 때마다 데이터를 읽고 분석해 그 자리에서 HTML을 만들어 돌려줍니다. 먼저 라우트 두 개짜리 가장 작은 앱 <a href="flask_hello.html">flask_hello</a>로 서버를 띄우고 요청하는 방법을 익힌 뒤, 강의와 가장 가까운 <a href="sample2_korea.html">sample2_korea</a>, 통화와 종목 코드가 다른 <a href="sample1_us.html">sample1_us</a>, 데이터를 SQLite에 저장하는 <a href="sample4_sqlite.html">sample4_sqlite</a> 순서입니다. 모든 수치는 2026-11-05 기준 가상 수업 데이터이며 실시간 시세가 아닙니다.</p>
+
+<h2>가장 작은 Flask 앱</h2>
+
+<p>Flask 앱은 <code>Flask(__name__)</code>로 만든 <code>app</code> 객체에 "이 주소로 요청이 오면 이 함수를 실행하라"는 연결(라우트)을 붙인 것입니다. 함수가 돌려준 문자열이 그대로 응답 HTML이 됩니다.</p>
+
+<pre><code>from flask import Flask, request
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.get("/")
+def home():
+    return "&lt;h1&gt;Hello, Flask!&lt;/h1&gt;&lt;p&gt;Try /hello?name=Mina&lt;/p&gt;"
+
+@app.get("/hello")
+def hello():
+    name = request.args.get("name", "world")
+    return f"&lt;p&gt;Hello, {escape(name)}!&lt;/p&gt;"</code></pre>
+
+<ul>
+<li><code>@app.get("/hello")</code>: 주소 <code>/hello</code>로 오는 GET 요청을 <code>hello()</code>에 연결합니다.</li>
+<li><code>request.args.get("name", "world")</code>: 주소의 <code>?name=Mina</code> 부분(쿼리 문자열)에서 값을 읽고, 없으면 기본값을 씁니다.</li>
+<li><code>escape(name)</code>: 사용자가 보낸 값을 HTML에 넣기 전에 특수 문자를 바꿔, 입력한 태그가 실행되지 않게 합니다.</li>
+<li>연결되지 않은 주소에는 Flask가 404(Not Found)로 답합니다.</li>
+</ul>
+
+<p>아래의 주식 앱들도 같은 구조입니다. 다만 문자열을 직접 만드는 대신 템플릿 파일을 쓰고, 일을 여러 파일로 나눕니다.</p>
+
+<h2>프로젝트 구조</h2>
+
+<p>세 프로젝트는 모두 같은 네 부분으로 나뉩니다. 각 파일이 한 가지 일만 하므로, 화면을 바꾸거나 데이터 저장 방식을 바꿀 때 다른 파일은 그대로 둘 수 있습니다.</p>
+
+<table>
+<thead><tr><th>파일</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td><code>app.py</code></td><td>HTTP 요청을 받고, 오류를 상태 코드(400, 500)로 바꾸고, 템플릿을 렌더링한다</td></tr>
+<tr><td><code>storage.py</code></td><td>CSV를 읽는다. 파일 입출력은 여기에만 있다</td></tr>
+<tr><td><code>logic.py</code></td><td>한 행을 검증하고(<code>parse_row</code>), 시장으로 거르고 등락률 순으로 정렬하고(<code>analyze</code>), 요약한다(<code>summarize</code>). 입출력이 없는 순수 함수</td></tr>
+<tr><td><code>templates/index.html</code></td><td>Jinja 템플릿. 표와 요약을 그린다</td></tr>
+</tbody>
+</table>
+
+<p>sample4에는 SQLite를 다루는 <code>database.py</code>가 하나 더 있습니다.</p>
+
+<h2>라우트와 쿼리 문자열</h2>
+
+<p><code>@app.get('/')</code>는 주소 <code>/</code>로 오는 GET 요청을 <code>index()</code> 함수에 연결합니다. 시장 선택은 주소 뒤의 쿼리 문자열 <code>?market=KOSPI</code>로 전달되고, <code>request.args.get('market', 'ALL')</code>로 읽습니다. 값이 없으면 기본값 <code>ALL</code>입니다.</p>
+
+<pre><code>@app.get('/')
+def index():
+    market = request.args.get('market', 'ALL')
+    ...
+    try:
+        quotes = load_quotes(app.config['DATA_PATH'])
+        rows = analyze(quotes, market)
+        summary = summarize(rows)
+    except ValueError as exc:
+        error, status = str(exc), 400
+    except OSError:
+        error, status = '데이터 파일을 읽을 수 없습니다.', 500
+    return render_template('index.html', ...), status</code></pre>
+
+<p>오류 처리가 두 갈래로 나뉜다는 점이 중요합니다. 잘못된 시장 이름이나 잘못된 CSV 행처럼 <strong>입력</strong>이 문제면 <code>ValueError</code>가 나고 400(Bad Request)으로 응답합니다. 데이터 파일을 읽을 수 없는 것처럼 <strong>서버 쪽</strong>이 문제면 500으로 응답합니다. 어느 경우든 프로그램이 죽지 않고 오류 메시지를 담은 화면을 돌려줍니다.</p>
+
+<h2>계산 규칙</h2>
+
+<p>등락률은 (종가 − 전일 종가) / 전일 종가 × 100입니다. 계산값은 반올림하지 않고 유지하며, 화면에서만 소수 둘째 자리로 표시합니다. 평균은 선택된 종목들의 동일 가중 표본 평균이므로 시장 지수 수익률과는 다릅니다. 헤더만 있는 CSV는 유효한 빈 표본으로 보고 평균을 N/A로 표시하지만, 파일이 없으면 오류입니다.</p>
+
+<ul>
+<li>한국 주식(sample2, sample4): 가격은 정수 원, 거래량은 정수 주. <code>005930</code> 같은 코드는 앞의 0을 지키기 위해 문자열로 다룹니다. 평균은 ALL +0.40%, KOSPI +0.33%, KOSDAQ +0.50%입니다.</li>
+<li>미국 주식(sample1): 가격을 정수 <strong>센트</strong>로 저장하고 화면에서 USD로 바꿉니다(<code>scale=100</code>). 시장은 NASDAQ/NYSE, 코드는 대문자 티커입니다. ALL 평균은 +0.40%입니다.</li>
+</ul>
+
+<h2>Jinja 자동 escaping</h2>
+
+<p>Flask의 템플릿 엔진 Jinja는 <code>{{ row.name }}</code>처럼 값을 출력할 때 HTML 특수 문자를 자동으로 바꿉니다. 그래서 종목 이름에 <code>&lt;script&gt;</code> 같은 태그가 들어 있어도 실행되지 않고 글자 그대로 <code>&amp;lt;script&amp;gt;</code>로 출력됩니다. 데이터를 화면에 그대로 끼워 넣는 코드를 직접 짜지 않는 이유입니다.</p>
+
+<h2>SQLite에 저장하기 (sample4)</h2>
+
+<p>sample4는 화면을 CSV가 아니라 SQLite 데이터베이스에서 읽습니다. 데이터를 넣는 일은 웹 요청이 아니라 별도의 명령 <code>flask --app app init-db</code>가 맡습니다. 이 명령은 <code>@app.cli.command('init-db')</code>로 등록되어 있습니다.</p>
+
+<pre><code>flask --app app init-db
+python app.py</code></pre>
+
+<ul>
+<li><strong>검증이 먼저</strong>: <code>import_snapshot()</code>은 모든 행을 검증한 뒤에 기존 행을 지웁니다. 중복 코드 같은 잘못된 데이터는 DB에 손대기 전에 거부됩니다.</li>
+<li><strong>한 트랜잭션</strong>: 삭제와 삽입이 <code>with connection:</code> 안에서 한 번에 커밋되므로, 중간에 실패해도 직전 데이터가 그대로 남습니다.</li>
+<li><strong>읽기 전용 연결</strong>: <code>read_quotes()</code>는 <code>mode=ro</code>로 엽니다. DB 파일이 없을 때 빈 DB를 새로 만들어 버리지 않고 오류를 내므로, 화면은 "먼저 init-db를 실행하세요"라고 안내합니다.</li>
+<li>CSV를 고친 뒤에는 <code>init-db</code>로 다시 가져와야 화면에 반영됩니다.</li>
+</ul>
+
+<p><code>database.py</code>에는 <code>read_quotes()</code>가 두 번 정의되어 있습니다. Python에서는 나중 정의가 앞의 것을 덮어쓰므로 실제로 쓰이는 것은 두 번째(<code>mode=ro</code>) 정의입니다.</p>
+
+<h2>이 웹 실습에서 실행하기</h2>
+
+<p>실제 PC에서는 프로젝트마다 가상환경을 만들고 <code>pip install -r requirements.txt</code>로 Flask를 설치한 뒤 <code>python app.py</code>로 실행하고, 브라우저에서 <code>http://127.0.0.1:5002</code> 같은 주소를 엽니다. 이 웹 실습의 가상 머신에는 Flask가 이미 들어 있지만, 내 브라우저와 네트워크로 연결되어 있지 않아 브라우저로 서버에 접속할 수는 없습니다. 대신 실습용 도우미 명령 <code>web</code>을 씁니다. <code>web start</code>로 서버를 띄우면 터미널 아래에 <strong>앱 미리보기</strong> 창이 열립니다. 이 창이 브라우저 역할을 해서, 링크를 누르거나 폼에서 시장을 고르고 조회를 누르면 요청이 가상 머신 안의 서버로 전달되고 응답 화면이 다시 그려집니다. 창 위의 주소 칸에 <code>/?market=KOSPI</code> 같은 주소를 넣고 열기를 눌러도 됩니다. 서버를 끄면 창이 흐려집니다.</p>
+
+<p>미리보기 창은 공유 폴더 <code>/mnt/host/.web</code>를 통해 요청과 응답을 파일로 주고받으므로, 요청 하나에 0.2~1초쯤 걸립니다. 앱의 CSS와 그림은 응답에 함께 넣어 보여 주고, 앱 페이지의 JavaScript는 실행하지 않습니다.</p>
+
+<p><code>web start</code>는 안에서 <code>python3 app.py</code>를 그대로 실행합니다. 다만 터미널이 하나뿐이라 서버를 백그라운드로 돌리고, 미리보기 창과 이어 주는 중계 프로그램을 함께 띄웁니다. 서버가 켜진 동안 <code>nano app.py</code>로 코드를 고쳐 저장하면 앱이 저절로 다시 시작되고 미리보기 창이 새 코드로 다시 그려집니다. 고친 코드에 오류가 있으면 미리보기 창에 오류 메시지가 나오고, 고쳐 저장하면 다시 살아납니다. Flask 패키지는 처음 쓸 때 한 번에 내려받으므로 첫 <code>web start</code>는 조금 더 걸립니다.</p>
+
+<p>터미널에서 쓸 수 있는 명령은 다음과 같습니다.</p>
+
+<table>
+<thead><tr><th>명령</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td><code>web start</code></td><td>현재 디렉터리의 <code>app.py</code>를 서버로 띄우고 준비될 때까지 기다린다 (10초 정도). 준비되면 미리보기 창이 열린다</td></tr>
+<tr><td><code>web show /</code></td><td>주소를 미리보기 창에 띄운다</td></tr>
+<tr><td><code>web get /</code></td><td>주소로 요청을 보내고 상태 코드와 화면 내용을 글자로 보여 준다. 표는 한 행씩 <code>|</code>로 나눠 보인다</td></tr>
+<tr><td><code>web get '/?market=KOSPI'</code></td><td>쿼리 문자열이 있는 주소는 작은따옴표로 감싼다</td></tr>
+<tr><td><code>web html /</code></td><td>HTML 원문을 그대로 보여 준다</td></tr>
+<tr><td><code>web save 파일.html</code></td><td>화면을 CSS까지 담아 <code>/mnt/host</code>에 저장한다. 위 입력란에 이름을 적고 <strong>받기</strong>를 누르면 내 브라우저에서 열어 볼 수 있다</td></tr>
+<tr><td><code>web log</code></td><td>서버 로그 (요청마다 주소와 상태 코드)</td></tr>
+<tr><td><code>web restart</code></td><td>앱을 다시 시작한다. 보통은 필요 없다: 서버가 켜진 동안 <code>.py</code>·템플릿·CSS 파일을 고쳐 저장하면 저절로 다시 시작한다</td></tr>
+<tr><td><code>web stop</code></td><td>서버를 끈다</td></tr>
+</tbody>
+</table>
+
+<p>네이버 뉴스 API를 쓰는 sample3은 외부 네트워크가 필요하므로 이 실습에는 넣지 않았습니다.</p>

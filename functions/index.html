@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Functions · Python Lab" data-title-ko="함수 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Functions · Python Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23306998'/%3E%3Ctext x='5' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffd43b'%3E%3E_%3C/text%3E%3C/svg%3E">
+  <script src="../js/lang.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../vendor/xterm/xterm.css">
+  <script src="../vendor/xterm/xterm.js"></script>
+  <script src="../build/libv86.js"></script>
+</head>
+<body data-root="../" data-lab-dir="functions/starter">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html"><span class="logo" aria-hidden="true">&gt;_</span><span>Python Lab</span></a>
+      <details class="toc">
+        <summary><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span><span class="toc-caret" aria-hidden="true">▾</span></summary>
+        <ol class="toc-menu">
+          <li><a href="../basics/index.html"><span class="toc-num">01</span><span lang="en">Getting Started with Python</span><span lang="ko">파이썬 시작하기</span></a></li>
+          <li><a href="../conditionals/index.html"><span class="toc-num">02</span><span lang="en">Operators, Strings and Conditionals</span><span lang="ko">연산자·문자열·조건문</span></a></li>
+          <li><a href="../loops/index.html"><span class="toc-num">03</span><span lang="en">Loops</span><span lang="ko">반복문</span></a></li>
+          <li><a href="../functions/index.html" aria-current="page"><span class="toc-num">04</span><span lang="en">Functions</span><span lang="ko">함수</span></a></li>
+          <li><a href="../modules/index.html"><span class="toc-num">05</span><span lang="en">Modules and the Standard Library</span><span lang="ko">모듈과 표준 라이브러리</span></a></li>
+          <li><a href="../files/index.html"><span class="toc-num">06</span><span lang="en">Files, Exceptions and JSON</span><span lang="ko">파일·예외·JSON</span></a></li>
+          <li><a href="../regex/index.html"><span class="toc-num">07</span><span lang="en">Regular Expressions and Text Processing</span><span lang="ko">정규표현식·텍스트 처리</span></a></li>
+          <li><a href="../data/index.html"><span class="toc-num">08</span><span lang="en">Data Analysis: pandas and matplotlib</span><span lang="ko">데이터 분석: pandas·matplotlib</span></a></li>
+          <li><a href="../oop/index.html"><span class="toc-num">09</span><span lang="en">Object-Oriented Programming</span><span lang="ko">객체지향 프로그래밍</span></a></li>
+          <li><a href="../project/index.html"><span class="toc-num">10</span><span lang="en">Building a Project: Requirements, Design and Git</span><span lang="ko">프로젝트 만들기: 요구사항·설계·Git</span></a></li>
+          <li><a href="../testing/index.html"><span class="toc-num">11</span><span lang="en">Debugging and Testing</span><span lang="ko">디버깅과 테스트</span></a></li>
+          <li><a href="../database/index.html"><span class="toc-num">12</span><span lang="en">Databases with SQLite</span><span lang="ko">데이터베이스: SQLite</span></a></li>
+          <li><a href="../network/index.html"><span class="toc-num">13</span><span lang="en">Networking</span><span lang="ko">네트워크</span></a></li>
+          <li><a href="../web/index.html"><span class="toc-num">14</span><span lang="en">Web Apps with Flask</span><span lang="ko">웹 앱: Flask</span></a></li>
+          <li><a href="../concurrency/index.html"><span class="toc-num">15</span><span lang="en">Concurrency: Threads and asyncio</span><span lang="ko">동시성: 스레드와 asyncio</span></a></li>
+          <li class="toc-extra"><a href="../playground.html"><span class="toc-num">&gt;_</span><span lang="en">Playground</span><span lang="ko">자유 실습</span></a></li>
+        </ol>
+      </details>
+      <nav class="chapnav" aria-label="Chapters / 장">
+        <a href="../basics/index.html" title="Getting Started with Python / 파이썬 시작하기"><span lang="en">Basics</span><span lang="ko">기초</span></a>
+        <a href="../conditionals/index.html" title="Operators, Strings and Conditionals / 연산자·문자열·조건문"><span lang="en">Conditionals</span><span lang="ko">조건문</span></a>
+        <a href="../loops/index.html" title="Loops / 반복문"><span lang="en">Loops</span><span lang="ko">반복문</span></a>
+        <a href="../functions/index.html" aria-current="page" title="Functions / 함수"><span lang="en">Functions</span><span lang="ko">함수</span></a>
+        <a href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리"><span lang="en">Modules</span><span lang="ko">모듈</span></a>
+        <a href="../files/index.html" title="Files, Exceptions and JSON / 파일·예외·JSON"><span lang="en">Files</span><span lang="ko">파일·예외</span></a>
+        <a href="../regex/index.html" title="Regular Expressions and Text Processing / 정규표현식·텍스트 처리"><span lang="en">Regex</span><span lang="ko">정규식</span></a>
+        <a href="../data/index.html" title="Data Analysis: pandas and matplotlib / 데이터 분석: pandas·matplotlib"><span lang="en">Data</span><span lang="ko">데이터</span></a>
+        <a href="../oop/index.html" title="Object-Oriented Programming / 객체지향 프로그래밍"><span lang="en">OOP</span><span lang="ko">객체지향</span></a>
+        <a href="../project/index.html" title="Building a Project: Requirements, Design and Git / 프로젝트 만들기: 요구사항·설계·Git"><span lang="en">Project</span><span lang="ko">프로젝트</span></a>
+        <a href="../testing/index.html" title="Debugging and Testing / 디버깅과 테스트"><span lang="en">Testing</span><span lang="ko">테스트</span></a>
+        <a href="../database/index.html" title="Databases with SQLite / 데이터베이스: SQLite"><span lang="en">Database</span><span lang="ko">DB</span></a>
+        <a href="../network/index.html" title="Networking / 네트워크"><span lang="en">Network</span><span lang="ko">네트워크</span></a>
+        <a href="../web/index.html" title="Web Apps with Flask / 웹 앱: Flask"><span lang="en">Web</span><span lang="ko">웹</span></a>
+        <a href="../concurrency/index.html" title="Concurrency: Threads and asyncio / 동시성: 스레드와 asyncio"><span lang="en">Concurrency</span><span lang="ko">동시성</span></a>
+      </nav>
+      <div class="lang-switch" role="group" aria-label="Language / 언어">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+  <header class="page-head">
+    <div class="page-head-top">
+      <span class="eyebrow"><span lang="en">Chapter 04 · 4 examples</span><span lang="ko">04장 · 예제 4개</span></span>
+      <nav class="pager" aria-label="Previous and next chapter / 이전·다음 장"><a class="prev" href="../loops/index.html" title="Loops / 반복문">← 03 <span lang="en">Loops</span><span lang="ko">반복문</span></a><a class="next" href="../modules/index.html" title="Modules and the Standard Library / 모듈과 표준 라이브러리">05 <span lang="en">Modules</span><span lang="ko">모듈</span> →</a></nav>
+    </div>
+    <h1><span lang="en">Functions</span><span lang="ko">함수</span></h1>
+    <p class="lead"><span lang="en">Define and call functions with def, and learn parameters and arguments, the difference between return and print, default values and keyword arguments, and local variables, then complete four functions: is_even, power, sum_to and calculate.</span><span lang="ko">def로 함수를 정의하고 호출하며, 매개변수와 인자, return과 print의 차이, 기본값과 키워드 인자, 지역 변수를 익힌 뒤 is_even, power, sum_to, calculate 네 함수를 완성한다.</span> <a href="#notes-functions"><span lang="en">Lecture notes ↓</span><span lang="ko">강의 내용 ↓</span></a></p>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="term-window">
+        <div class="term-bar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span>student@python-lab</span></div>
+        <div class="terminal-wrap"><div id="terminal"></div></div>
+      </div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All example code is under <code>/home/student</code> (<code>ls ~</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 예제 코드는 모두 <code>/home/student</code>에 있습니다 (<code>ls ~</code>). 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <div class="ex-buttons">
+          <button type="button" data-pick="is_even" aria-pressed="true">is_even</button>
+          <button type="button" data-pick="power" aria-pressed="false">power</button>
+          <button type="button" data-pick="sum_to" aria-pressed="false">sum_to</button>
+          <button type="button" data-pick="calculator" aria-pressed="false">calculator</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="is_even" data-dir="functions/starter">
+        <h2>is_even <span class="muted">~/functions/starter</span></h2>
+        <p><span lang="en">Practice 1: complete is_even, which returns True/False depending on whether an integer is even. Before that, check definition and calling, and the difference between print and return, with the examples from the slides.</span><span lang="ko">연습 1: 정수가 짝수인지 True/False로 돌려주는 is_even을 완성한다. 그 전에 정의와 호출, print와 return의 차이를 슬라이드 예제로 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def greet():
+    print(&quot;Hello!&quot;)
+print(&quot;Before&quot;)
+greet()
+greet()
+print(&quot;After&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def greet():
+    print(&quot;Hello!&quot;)
+print(&quot;Before&quot;)
+greet()
+greet()
+print(&quot;After&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def greet():
+    print(&quot;Hello!&quot;)
+print(&quot;Before&quot;)
+greet()
+greet()
+print(&quot;After&quot;)
+EOF</code></div>
+          <p><span lang="en">def on its own prints nothing. The body runs each time the function is called, giving the order Before, Hello!, Hello!, After.</span><span lang="ko">def만으로는 아무것도 출력되지 않는다. 호출할 때마다 본문이 실행돼 Before, Hello!, Hello!, After 순서가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def cafe():
+    print(&quot;Americano&quot;)
+drink = cafe()
+print(drink)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def cafe():
+    print(&quot;Americano&quot;)
+drink = cafe()
+print(drink)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def cafe():
+    print(&quot;Americano&quot;)
+drink = cafe()
+print(drink)
+EOF</code></div>
+          <p><span lang="en">The cafe challenge: Americano is what the print inside the function displayed on screen, and drink holds None.</span><span lang="ko">카페 문제: Americano는 함수 안의 print가 화면에 보여 준 것이고, drink에는 None이 들어 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def cafe():
+    return &quot;Americano&quot;
+drink = cafe()
+print(drink)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def cafe():
+    return &quot;Americano&quot;
+drink = cafe()
+print(drink)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def cafe():
+    return &quot;Americano&quot;
+drink = cafe()
+print(drink)
+EOF</code></div>
+          <p><span lang="en">Replacing print with return sends the value back to the caller, so drink holds Americano, and it is printed only once.</span><span lang="ko">print를 return으로 바꾸면 값이 호출한 쪽으로 돌아와 drink에 Americano가 담기고, 출력은 한 번만 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def show_double(number):
+    print(number * 2)
+def double(number):
+    return number * 2
+shown = show_double(4)
+saved = double(4)
+print(shown)
+print(saved + 1)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def show_double(number):
+    print(number * 2)
+def double(number):
+    return number * 2
+shown = show_double(4)
+saved = double(4)
+print(shown)
+print(saved + 1)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def show_double(number):
+    print(number * 2)
+def double(number):
+    return number * 2
+shown = show_double(4)
+saved = double(4)
+print(shown)
+print(saved + 1)
+EOF</code></div>
+          <p><span lang="en">show_double(4) displays 8 but returns None. double(4) prints nothing but returns 8, so saved + 1 is 9.</span><span lang="ko">show_double(4)는 8을 보여 주지만 None을 돌려준다. double(4)는 아무것도 출력하지 않지만 8을 돌려줘 saved + 1이 9가 된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 is_even.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 is_even.py">▶</button><code>python3 is_even.py</code></div>
+          <p><span lang="en">The function in the starter code is only pass, so None is printed all four times.</span><span lang="ko">시작 코드의 함수는 pass뿐이라 네 번 모두 None이 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/is_even.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/is_even.py">▶</button><code>python3 ../solutions/is_even.py</code></div>
+          <p><span lang="en">Returning number % 2 == 0 gives True, False, True, True for 4, 7, 0, -2. The even test is correct for negative numbers and 0 too.</span><span lang="ko">number % 2 == 0을 return하면 4, 7, 0, -2에 대해 True, False, True, True다. 음수와 0도 짝수 판정이 맞다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="power" data-dir="functions/starter" hidden>
+        <h2>power <span class="muted">~/functions/starter</span></h2>
+        <p><span lang="en">Practice 2: complete power(base, exponent=2), which has the default value exponent=2. Also check positional and keyword arguments, and the error for a wrong number of arguments.</span><span lang="ko">연습 2: 기본값 exponent=2를 가진 power(base, exponent=2)를 완성한다. 위치 인자와 키워드 인자, 인자 개수 오류도 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+EOF</code></div>
+          <p><span lang="en">Positional arguments bind in order, and keyword arguments bind by name. All four calls give 60.</span><span lang="ko">위치 인자는 순서대로, 키워드 인자는 이름으로 짝지어진다. 네 호출 모두 60이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 power.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 power.py">▶</button><code>python3 power.py</code></div>
+          <p><span lang="en">The starter code prints None three times.</span><span lang="ko">시작 코드는 None을 세 번 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/power.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/power.py">▶</button><code>python3 ../solutions/power.py</code></div>
+          <p><span lang="en">power(3) uses the default 2 and gives 9, power(2, 3) gives 8, and power(5, exponent=0) gives 1.</span><span lang="ko">power(3)은 기본값 2를 써서 9, power(2, 3)은 8, power(5, exponent=0)은 1이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def power(base, exponent=2):
+    return base ** exponent
+print(power(-2, 3))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def power(base, exponent=2):
+    return base ** exponent
+print(power(-2, 3))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def power(base, exponent=2):
+    return base ** exponent
+print(power(-2, 3))
+EOF</code></div>
+          <p><span lang="en">The last row of the table on the slides: with a negative base, power(-2, 3) is -8.</span><span lang="ko">슬라이드 표의 마지막 줄: 음수 밑 power(-2, 3)은 -8이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+def total_price(price, quantity):
+    return price * quantity
+print(total_price)
+print(total_price(20))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+def total_price(price, quantity):
+    return price * quantity
+print(total_price)
+print(total_price(20))
+EOF">▶</button><code>python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+def total_price(price, quantity):
+    return price * quantity
+print(total_price)
+print(total_price(20))
+EOF</code></div>
+          <p><span lang="en">Two common mistakes: writing just the name without parentheses does not call the function and shows only &lt;function total_price at ...&gt;. Leaving out one argument gives TypeError: ... missing 1 required positional argument: 'quantity'.</span><span lang="ko">흔한 실수 두 가지: 괄호 없이 이름만 쓰면 호출되지 않고 &lt;function total_price at ...&gt;만 보인다. 인자를 하나 빠뜨리면 TypeError: ... missing 1 required positional argument: 'quantity'다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="sum_to" data-dir="functions/starter" hidden>
+        <h2>sum_to <span class="muted">~/functions/starter</span></h2>
+        <p><span lang="en">Lab 3: complete sum_to(n), which adds 1 through n with a loop and returns the result. For a negative number it returns None. First check local variables, and the problem of a return inside a loop ending the function early.</span><span lang="ko">실습 3: 반복문으로 1부터 n까지 더해 돌려주는 sum_to(n)을 완성한다. 음수면 None을 돌려준다. 지역 변수와, 반복문 안의 return이 함수를 일찍 끝내는 문제를 먼저 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+number = 10
+def add_one(number):
+    result = number + 1
+    return result
+print(add_one(3))
+print(number)
+print(result)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+number = 10
+def add_one(number):
+    result = number + 1
+    return result
+print(add_one(3))
+print(number)
+print(result)
+EOF">▶</button><code>python3 -u - &lt;&lt;'EOF' 2&gt;&amp;1 | grep -v -e '^Traceback' -e '^ '
+number = 10
+def add_one(number):
+    result = number + 1
+    return result
+print(add_one(3))
+print(number)
+print(result)
+EOF</code></div>
+          <p><span lang="en">Local variables: add_one(3) is 4, and the outer number stays 10. result inside the function cannot be used outside, giving NameError: name 'result' is not defined.</span><span lang="ko">지역 변수: add_one(3)은 4, 바깥 number는 그대로 10이다. 함수 안의 result는 밖에서 쓸 수 없어 NameError: name 'result' is not defined다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def serve():
+    for number in range(1, 4):
+        return f&quot;Coffee for {number}&quot;
+print(serve())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def serve():
+    for number in range(1, 4):
+        return f&quot;Coffee for {number}&quot;
+print(serve())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def serve():
+    for number in range(1, 4):
+        return f&quot;Coffee for {number}&quot;
+print(serve())
+EOF</code></div>
+          <p><span lang="en">The barista who leaves early: there are three customers, but the return in the first iteration ends the function, so only Coffee for 1 appears.</span><span lang="ko">일찍 퇴근하는 바리스타: 손님은 셋이지만 첫 반복의 return이 함수를 끝내 Coffee for 1 하나만 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total
+print(too_early(5))
+print(too_early(0))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total
+print(too_early(5))
+print(too_early(0))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total
+print(too_early(5))
+print(too_early(0))
+EOF</code></div>
+          <p><span lang="en">If return is indented inside the loop, too_early(5) is 1, not 15. With n = 0 the loop never runs and never reaches the return, so the result is None.</span><span lang="ko">return을 반복문 안에 들여 쓰면 too_early(5)가 15가 아니라 1이다. n = 0이면 반복이 한 번도 돌지 않아 return에 닿지 못하고 None이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 sum_to.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 sum_to.py">▶</button><code>python3 sum_to.py</code></div>
+          <p><span lang="en">sum_to in the starter code returns None, so the caller prints Invalid input.</span><span lang="ko">시작 코드의 sum_to는 None을 돌려주므로 호출한 쪽이 Invalid input을 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/sum_to.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/sum_to.py">▶</button><code>python3 ../solutions/sum_to.py</code></div>
+          <p><span lang="en">The solution prints Total: 15.</span><span lang="ko">답안은 Total: 15를 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -B - &lt;&lt;'EOF'
+from sum_to import sum_to
+print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -B - &lt;&lt;'EOF'
+from sum_to import sum_to
+print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))
+EOF">▶</button><code>python3 -B - &lt;&lt;'EOF'
+from sum_to import sum_to
+print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))
+EOF</code></div>
+          <p><span lang="en">Imports your own sum_to.py from the current folder and calls it several times (import is the topic of the next chapter, 'Modules and the Standard Library'; when the file is imported, its bottom part runs once and its output appears first). With the starter code, all results are None. After completing the function, run it again and compare with the solution's results below.</span><span lang="ko">현재 폴더의 내 sum_to.py를 불러와 여러 번 호출한다(import는 다음 장 '모듈과 표준 라이브러리'의 내용이다. 불러올 때 파일 아래쪽이 한 번 실행돼 그 출력이 먼저 나온다). 시작 코드에서는 모두 None이다. 함수를 완성한 뒤 다시 실행해 아래 답안 결과와 비교한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="(cd ../solutions &amp;&amp; python3 -B -c 'from sum_to import sum_to; print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))')" title="Run in the terminal / 터미널에서 실행" aria-label="Run: (cd ../solutions &amp;&amp; python3 -B -c 'from sum_to import sum_to; print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))')">▶</button><code>(cd ../solutions &amp;&amp; python3 -B -c 'from sum_to import sum_to; print(sum_to(1), sum_to(5), sum_to(0), sum_to(-1), sum_to(3), sum_to(5))')</code></div>
+          <p><span lang="en">The same calls run in the solutions folder. After Total: 15 comes 1 15 0 None 6 15: 0 and None are different, and the second sum_to(5) also starts with a new total and gives 15 again.</span><span lang="ko">같은 호출을 답안 폴더에서 실행했다. Total: 15 다음에 1 15 0 None 6 15: 0과 None은 다르고, 두 번째 sum_to(5)도 새 total로 시작해 다시 15다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="calculator" data-dir="functions/starter" hidden>
+        <h2>calculator <span class="muted">~/functions/starter</span></h2>
+        <p><span lang="en">Lab 4: complete calculate(a, b, operator) so that it returns the result of +, -, * or /, and returns None for division by zero or an unsupported operator. The function itself does no input or output.</span><span lang="ko">실습 4: calculate(a, b, operator)가 +, -, *, /의 결과를 돌려주고, 0으로 나누기나 지원하지 않는 연산자에는 None을 돌려주게 완성한다. 함수 안에서는 입력도 출력도 하지 않는다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+def add_fee(amount, fee=5):
+    return amount + fee
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+def add_fee(amount, fee=5):
+    return amount + fee
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+def total_price(price, quantity):
+    return price * quantity
+def add_fee(amount, fee=5):
+    return amount + fee
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)
+EOF</code></div>
+          <p><span lang="en">Combining small functions: the return value of total_price, 60, becomes the argument of add_fee, which adds the default fee of 5 to give 65.</span><span lang="ko">작은 함수 조합: total_price의 반환값 60이 add_fee의 인자가 되어 기본 수수료 5를 더한 65가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 calculator.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 calculator.py">▶</button><code>python3 calculator.py</code></div>
+          <p><span lang="en">calculate in the starter code returns None, so Invalid operation is printed.</span><span lang="ko">시작 코드의 calculate는 None을 돌려주므로 Invalid operation이 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../solutions/calculator.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../solutions/calculator.py">▶</button><code>python3 ../solutions/calculator.py</code></div>
+          <p><span lang="en">The solution prints Result: 10.</span><span lang="ko">답안은 Result: 10을 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -B - &lt;&lt;'EOF'
+from calculator import calculate as c
+print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;))
+print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -B - &lt;&lt;'EOF'
+from calculator import calculate as c
+print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;))
+print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))
+EOF">▶</button><code>python3 -B - &lt;&lt;'EOF'
+from calculator import calculate as c
+print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;))
+print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))
+EOF</code></div>
+          <p><span lang="en">Calls the whole check table from the slides using your own calculator.py in the current folder (import is the topic of the next chapter, 'Modules and the Standard Library'; when the file is imported, the output of its bottom part appears once first). With the starter code, all results are None.</span><span lang="ko">현재 폴더의 내 calculator.py로 슬라이드의 확인 표 전체를 호출한다(import는 다음 장 '모듈과 표준 라이브러리'의 내용이며, 불러올 때 파일 아래쪽 출력이 먼저 한 번 나온다). 시작 코드에서는 모두 None이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="(cd ../solutions &amp;&amp; python3 -B -c 'from calculator import calculate as c; print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;)); print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))')" title="Run in the terminal / 터미널에서 실행" aria-label="Run: (cd ../solutions &amp;&amp; python3 -B -c 'from calculator import calculate as c; print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;)); print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))')">▶</button><code>(cd ../solutions &amp;&amp; python3 -B -c 'from calculator import calculate as c; print(c(8, 2, &quot;+&quot;), c(8, 2, &quot;-&quot;), c(8, 2, &quot;*&quot;), c(8, 2, &quot;/&quot;), c(8, 0, &quot;/&quot;), c(8, 2, &quot;%&quot;)); print(c(2, 2, &quot;-&quot;), c(-3, 2, &quot;*&quot;), c(0, 5, &quot;/&quot;))')</code></div>
+          <p><span lang="en">The same calls in the solutions folder: after Result: 10 comes 10 6 16 4.0 None None, and then 0 -6 0.0. The division result is a float, and division by zero and % give None.</span><span lang="ko">답안 폴더에서 같은 호출: Result: 10 다음에 10 6 16 4.0 None None, 그리고 0 -6 0.0. 나눗셈 결과는 float이고, 0으로 나누기와 %는 None이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+result = 2 - 2
+print(&quot;not result:&quot;, not result)
+print(&quot;result is None:&quot;, result is None)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+result = 2 - 2
+print(&quot;not result:&quot;, not result)
+print(&quot;result is None:&quot;, result is None)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+result = 2 - 2
+print(&quot;not result:&quot;, not result)
+print(&quot;result is None:&quot;, result is None)
+EOF</code></div>
+          <p><span lang="en">Using not result on the correct result 0 gives True, so it would be mistaken for an error. result is None is False, so 0 is handled as a normal result.</span><span lang="ko">올바른 결과 0에 not result를 쓰면 True가 되어 오류로 착각한다. result is None은 False라 0을 정상 결과로 처리한다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">Optional task: on the caller's side, read a, b and the operator with input() and pass them to calculate(). Do not change the function name or the parameter names.</span><span lang="ko">선택 과제: 호출하는 쪽에서 input()으로 a, b, 연산자를 받아 calculate()에 넘겨 본다. 함수 이름과 매개변수 이름은 바꾸지 않는다.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="is_even">
+    <details class="source" open data-path="/home/student/functions/starter/is_even.py">
+      <summary>is_even.py <span class="muted src-lines" data-lines="11"><span lang="en">11 lines</span><span lang="ko">11줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: return a Boolean for an integer argument.</span>
+<span class="ln">Tests: 4 -&gt; True; 7 -&gt; False; 0 -&gt; True; -2 -&gt; True.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def is_even(number):</span>
+<span class="ln">    # TODO: return whether number is even. Do not print here.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln">print(is_even(4))</span>
+<span class="ln">print(is_even(7))</span>
+<span class="ln">print(is_even(0))</span>
+<span class="ln">print(is_even(-2))</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/functions/solutions/is_even.py">
+      <summary>functions/solutions/is_even.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution. Argument contract: an integer.</span>
+<span class="ln">Tests: 4 -&gt; True; 7 -&gt; False; 0 -&gt; True; -2 -&gt; True.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def is_even(number):</span>
+<span class="ln">    return number % 2 == 0</span>
+<span class="ln"> </span>
+<span class="ln">print(is_even(4))</span>
+<span class="ln">print(is_even(7))</span>
+<span class="ln">print(is_even(0))</span>
+<span class="ln">print(is_even(-2))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="power" hidden>
+    <details class="source" open data-path="/home/student/functions/starter/power.py">
+      <summary>power.py <span class="muted src-lines" data-lines="10"><span lang="en">10 lines</span><span lang="ko">10줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: numeric base, nonnegative integer exponent, default exponent 2.</span>
+<span class="ln">Tests: power(3) -&gt; 9; power(2,3) -&gt; 8; power(5,exponent=0) -&gt; 1.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def power(base, exponent=2):</span>
+<span class="ln">    # TODO: return base raised to exponent.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln">print(power(3))</span>
+<span class="ln">print(power(2, 3))</span>
+<span class="ln">print(power(5, exponent=0))</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/functions/solutions/power.py">
+      <summary>functions/solutions/power.py <span class="muted src-lines" data-lines="9"><span lang="en">9 lines</span><span lang="ko">9줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution. Numeric base and nonnegative integer exponent.</span>
+<span class="ln">Tests: power(3) -&gt; 9; power(2,3) -&gt; 8; power(5,exponent=0) -&gt; 1.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def power(base, exponent=2):</span>
+<span class="ln">    return base ** exponent</span>
+<span class="ln"> </span>
+<span class="ln">print(power(3))</span>
+<span class="ln">print(power(2, 3))</span>
+<span class="ln">print(power(5, exponent=0))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="sum_to" hidden>
+    <details class="source" open data-path="/home/student/functions/starter/sum_to.py">
+      <summary>sum_to.py <span class="muted src-lines" data-lines="13"><span lang="en">13 lines</span><span lang="ko">13줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: assume n is an integer. Use a loop, not sum() or a formula.</span>
+<span class="ln">Tests: 5 -&gt; 15; 0 -&gt; 0; -1 -&gt; None; 3 -&gt; 6.</span>
+<span class="ln">Return None for negative input. Print only in the caller.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def sum_to(n):</span>
+<span class="ln">    # TODO: validate n, accumulate and return the complete total.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln">result = sum_to(5)</span>
+<span class="ln">if result is None:</span>
+<span class="ln">    print(&quot;Invalid input&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Total:&quot;, result)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/functions/solutions/sum_to.py">
+      <summary>functions/solutions/sum_to.py <span class="muted src-lines" data-lines="16"><span lang="en">16 lines</span><span lang="ko">16줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution. Assume integer n. Negative n returns None.</span>
+<span class="ln">Tests: 1 -&gt; 1; 5 -&gt; 15; 0 -&gt; 0; -1 -&gt; None; 3 -&gt; 6.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def sum_to(n):</span>
+<span class="ln">    if n &lt; 0:</span>
+<span class="ln">        return None</span>
+<span class="ln">    total = 0</span>
+<span class="ln">    for value in range(1, n + 1):</span>
+<span class="ln">        total += value</span>
+<span class="ln">    return total</span>
+<span class="ln"> </span>
+<span class="ln">result = sum_to(5)</span>
+<span class="ln">if result is None:</span>
+<span class="ln">    print(&quot;Invalid input&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Total:&quot;, result)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="calculator" hidden>
+    <details class="source" open data-path="/home/student/functions/starter/calculator.py">
+      <summary>calculator.py <span class="muted src-lines" data-lines="14"><span lang="en">14 lines</span><span lang="ko">14줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4: numbers a, b and string operator. Support +, -, * and /.</span>
+<span class="ln">Return None for division by zero or an unsupported operator.</span>
+<span class="ln">Tests: (8,2,'+') -&gt; 10; (8,0,'/') -&gt; None; (2,2,'-') -&gt; 0.</span>
+<span class="ln">Do not print or read input inside calculate().</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def calculate(a, b, operator):</span>
+<span class="ln">    # TODO: return the numeric result or None.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln">result = calculate(8, 2, &quot;+&quot;)</span>
+<span class="ln">if result is None:</span>
+<span class="ln">    print(&quot;Invalid operation&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Result:&quot;, result)</span></code></pre>
+    </details>
+    <details class="source" data-path="/home/student/functions/solutions/calculator.py">
+      <summary>functions/solutions/calculator.py <span class="muted src-lines" data-lines="24"><span lang="en">24 lines</span><span lang="ko">24줄</span></span><span class="src-edited" hidden><span lang="en">edited in the terminal</span><span lang="ko">터미널에서 수정됨</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 4 solution. Assume numeric a, b and string operator.</span>
+<span class="ln">Tests: (8,2,'+') -&gt; 10; (8,2,'-') -&gt; 6; (8,2,'*') -&gt; 16;</span>
+<span class="ln">(8,2,'/') -&gt; 4.0; (8,0,'/') -&gt; None; (8,2,'%') -&gt; None;</span>
+<span class="ln">(2,2,'-') -&gt; 0; (-3,2,'*') -&gt; -6; (0,5,'/') -&gt; 0.0.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">def calculate(a, b, operator):</span>
+<span class="ln">    if operator == &quot;+&quot;:</span>
+<span class="ln">        return a + b</span>
+<span class="ln">    elif operator == &quot;-&quot;:</span>
+<span class="ln">        return a - b</span>
+<span class="ln">    elif operator == &quot;*&quot;:</span>
+<span class="ln">        return a * b</span>
+<span class="ln">    elif operator == &quot;/&quot;:</span>
+<span class="ln">        if b == 0:</span>
+<span class="ln">            return None</span>
+<span class="ln">        return a / b</span>
+<span class="ln">    else:</span>
+<span class="ln">        return None</span>
+<span class="ln"> </span>
+<span class="ln">result = calculate(8, 2, &quot;+&quot;)</span>
+<span class="ln">if result is None:</span>
+<span class="ln">    print(&quot;Invalid operation&quot;)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Result:&quot;, result)</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-functions">
+      <h2 class="notes-title"><span lang="en">Functions</span><span lang="ko">함수</span></h2>
+<div lang="en">
+<p>This chapter is about functions. We learn how to define and call a function, parameters and arguments, and return values, and we distinguish between <strong>printing</strong> a result and <strong>returning</strong> it. We explain local variables and try combining several small functions.</p>
+
+<p>There are four examples: the even-number predicate of Practice 1 (<a href="#ex=is_even">is_even</a>), the power function of Practice 2 (<a href="#ex=power">power</a>), the sum from 1 to n of Lab 3 (<a href="#ex=sum_to">sum_to</a>), and the calculator function of Lab 4 (<a href="#ex=calculator">calculator</a>). Each example page also includes, as run steps, the slide examples taught before it.</p>
+
+<h2>What Is a Function?</h2>
+
+<h3>Repeated Code, Different Inputs</h3>
+
+<p>The two calculations below follow the same rule; only the input values differ. A function gives such a calculation a reusable name, and the caller can pass different inputs each time it calls it.</p>
+
+<pre><code>price = 20
+quantity = 3
+print(price * quantity)   # 60
+
+price = 12
+quantity = 5
+print(price * quantity)   # 60</code></pre>
+
+<h3>Functions: A Name for a Task</h3>
+
+<p>A function is a named block of code that runs when it is called. The slides use a cafe analogy. <strong>Defining</strong> is writing down the recipe once, <strong>calling</strong> is placing an order so that it is made by that recipe, and <strong>reusing</strong> is ordering again with different input. The answer to the question "If you only write down the recipe, does coffee get made?" is "No." In the same way, a function does not run just because it is defined.</p>
+
+<h3>Function Inputs and Results</h3>
+
+<p>Arguments supply the input values, the function does the task, and <code>return</code> hands the result to the caller. For example, <code>total_price(20, 3)</code> returns 60. Some functions take no arguments. A function that does not explicitly return a value returns <code>None</code>.</p>
+
+<h2>Defining and Calling Functions</h2>
+
+<h3>Defining a Function</h3>
+
+<p><code>def</code> starts a function definition. Write the name of the task, and put the parameters inside the parentheses. The colon and indentation define the body. Defining a function does not run its body.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+# No output until the function is called.
+
+greet()
+# Hello!</code></pre>
+
+<h3>Calling a Function</h3>
+
+<p>Parentheses make a function call. Execution goes into the function body and, when the body finishes, comes back to where it was called. In this chapter's scripts, functions are defined before they are called. Each call runs the body again.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+
+print("Before")
+greet()
+greet()
+print("After")
+# Before
+# Hello!
+# Hello!
+# After</code></pre>
+
+<h3>Parameters &amp; Arguments</h3>
+
+<p>Parameters are the names written in the function definition, and arguments are the values the caller passes. On each call, the arguments are bound to the parameters. Inside the function, parameters behave like local variables.</p>
+
+<pre><code>def show_total(price, quantity):
+    print(price * quantity)
+
+show_total(20, 3)    # 60
+show_total(12, 5)    # 60
+# Parameters: price, quantity
+# Arguments in the first call: 20, 3</code></pre>
+
+<h3>Returning a Result</h3>
+
+<p><code>return</code> sends a value back to the caller. The returned result can be stored in a variable or used directly in an expression. <code>return</code> ends the current function call right there.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+amount = total_price(20, 3)
+print(amount)        # 60
+print(amount + 5)    # 65</code></pre>
+
+<h2>print() and return</h2>
+
+<h3>Cafe Challenge: Where Is My Coffee?</h3>
+
+<p>Before running it, vote on what <code>drink</code> will hold. Will it be <code>"Americano"</code> or <code>None</code>?</p>
+
+<pre><code>def cafe():
+    print("Americano")
+
+drink = cafe()
+print(drink)</code></pre>
+
+<p><code>Americano</code> appears on screen, but that is only the <code>print</code> inside the function displaying it like an announcement; <code>drink</code> holds <code>None</code>. In the words of the slides, "you can't drink an announcement." If you change the <code>print</code> inside <code>cafe()</code> to <code>return</code>, the value comes back to the caller and <code>drink</code> holds <code>"Americano"</code>. Run both versions in <a href="#ex=is_even">is_even</a>.</p>
+
+<h3>Displaying and Returning</h3>
+
+<p><code>print()</code> displays information on screen, and <code>return</code> gives a value to the caller. A function can also return a value without printing anything. If another calculation needs the result, choose <code>return</code>.</p>
+
+<pre><code>def show_double(number):
+    print(number * 2)
+
+def double(number):
+    return number * 2
+
+shown = show_double(4)   # Displays 8
+saved = double(4)        # No output
+print(shown)             # None
+print(saved + 1)         # 9</code></pre>
+
+<h3>Missing Return Values</h3>
+
+<p>A function that runs to its end without reaching a <code>return</code> returns <code>None</code>. A bare <code>return</code> with no value also gives <code>None</code>. Check that every execution path that should return a result has a <code>return</code>. <code>None</code> is a special value, not the string <code>"None"</code>.</p>
+
+<pre><code>def broken_double(number):
+    result = number * 2
+    # Missing: return result
+
+answer = broken_double(4)
+print(answer)    # None
+# answer + 1 would raise TypeError.</code></pre>
+
+<h2>Practice 1: An Even-Number Predicate</h2>
+
+<p>Complete <code>is_even(number)</code> in <code>is_even.py</code>. Assume <code>number</code> is an integer, and return <code>True</code> if it is even and <code>False</code> otherwise. Keep <code>input()</code> and <code>print()</code> outside the function. Test positive numbers, 0 and negative numbers.</p>
+
+<pre><code>def is_even(number):
+    # Return a Boolean result.
+    pass
+
+print(is_even(4))     # Expected: True
+print(is_even(7))     # Expected: False
+print(is_even(0))     # Expected: True
+print(is_even(-2))    # Expected: True</code></pre>
+
+<p>The function in the starter code is only <code>pass</code> and has no return value, so all four lines print <code>None</code>. It is a good example of how what a function returns shows up directly on screen (<a href="#ex=is_even">is_even</a>).</p>
+
+<h2>Ways to Pass Arguments</h2>
+
+<h3>Positional &amp; Keyword Arguments</h3>
+
+<p>Positional arguments bind in parameter order. Keyword arguments name the parameter directly, which makes the meaning of the call clear. In this chapter's functions, positional arguments come before keyword arguments.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+# Every call prints 60.</code></pre>
+
+<h3>Default Parameter Values</h3>
+
+<p>A default supplies a value when the caller omits the argument. If the caller explicitly gives another value, it overrides the default. Put parameters without defaults before parameters with defaults. This chapter's examples use only simple numeric defaults.</p>
+
+<pre><code>def power(base, exponent=2):
+    return base ** exponent
+
+print(power(3))               # 9
+print(power(2, 3))            # 8
+print(power(5, exponent=0))   # 1</code></pre>
+
+<h2>Practice 2: A Power Function</h2>
+
+<p>Complete <code>power(base, exponent=2)</code> in <code>power.py</code>. It returns <code>base</code> raised to the power <code>exponent</code>. Assume <code>base</code> is a number and <code>exponent</code> is an integer of 0 or more, and use <code>**</code> for the power. Check both a call that uses the default and calls that give it explicitly with positional and keyword arguments. Do not print inside the function.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Expected value</th></tr></thead>
+<tbody>
+<tr><td><code>power(3)</code></td><td>9</td></tr>
+<tr><td><code>power(2, 3)</code></td><td>8</td></tr>
+<tr><td><code>power(5, exponent=0)</code></td><td>1</td></tr>
+<tr><td><code>power(-2, 3)</code></td><td>-8</td></tr>
+</tbody>
+</table>
+
+<p>In <a href="#ex=power">power</a>, compare the starter code (three Nones) with the solution (9, 8, 1), and also run <code>power(-2, 3)</code> with a negative base.</p>
+
+<h2>Local Variables &amp; Scope</h2>
+
+<p>In this chapter's examples, a name assigned inside a function is a local variable. A local variable is separate from a variable of the same name outside. Pass results explicitly as return values; the functions we write here do not use global state.</p>
+
+<pre><code>number = 10
+
+def add_one(number):
+    result = number + 1
+    return result
+
+print(add_one(3))   # 4
+print(number)       # 10
+# print(result) would raise NameError.</code></pre>
+
+<p>The <code>number</code> inside the function received 3 as a parameter, but the outer <code>number</code> is still 10. The <code>result</code> created inside the function cannot be used outside once the call has ended. The first step of <a href="#ex=sum_to">sum_to</a> runs through to the last line and shows <code>NameError: name 'result' is not defined</code>.</p>
+
+<h2>Break &amp; Midpoint Check</h2>
+
+<ol>
+<li><strong>Does defining a function run its body?</strong> No. It runs only when called.</li>
+<li><strong>What is the difference between a parameter and an argument?</strong> A parameter is a name written in the definition; an argument is a value passed in the call.</li>
+<li><strong>What does a function without a <code>return</code> statement return?</strong> <code>None</code>.</li>
+<li><strong>After the call ends, can the caller use a local variable directly?</strong> No. Get the values you need back with <code>return</code>.</li>
+</ol>
+
+<p>Next is how to wrap a loop in a function.</p>
+
+<h2>A Loop Inside a Function</h2>
+
+<p>A function body can contain a loop. Initialize the accumulator afresh on each call, and put the <code>return</code> <strong>after</strong> the loop so that it returns the completed sum. This version assumes <code>n</code> is an integer of 0 or more.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(5))    # 15
+print(sum_to(3))    # 6
+print(sum_to(0))    # 0</code></pre>
+
+<h3>The Barista Who Leaves Early</h3>
+
+<p>Three customers are waiting for coffee. How many messages does the code below print? Vote for 0, 1 or 3, then trace the first iteration.</p>
+
+<pre><code>def serve():
+    for number in range(1, 4):
+        return f"Coffee for {number}"
+
+print(serve())</code></pre>
+
+<p>The answer is one, <code>Coffee for 1</code>, because <code>return</code> ends the current function call immediately. The slides then ask: what happens if you change the <code>return</code> inside the loop to <code>print</code> and the last line to <code>serve()</code>? Then the loop runs to the end and all three messages are printed.</p>
+
+<h3>return Ends the Whole Function</h3>
+
+<p><code>return</code> exits the function, ending any loop inside it as well. This differs from <code>break</code>, which exits only the nearest loop. Returning inside a loop can stop the accumulation too early.</p>
+
+<pre><code>def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total    # Wrong indentation
+
+print(too_early(5))     # 1, not 15
+print(too_early(0))     # None</code></pre>
+
+<p><code>too_early(0)</code> is <code>None</code> because the loop never runs, so the <code>return</code> is never reached. You can check both results in <a href="#ex=sum_to">sum_to</a>.</p>
+
+<h2>A Function's Input and Output Rules</h2>
+
+<p>Before coding, define the allowed inputs and the expected output. <code>sum_to</code> accepts integers of 0 or more, and if a negative number comes in it returns <code>None</code> as a signal of invalid input. We assume the caller passes an integer; handling type errors comes later.</p>
+
+<pre><code>def sum_to(n):
+    if n &lt; 0:
+        return None
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(-1))   # None
+print(sum_to(5))    # 15</code></pre>
+
+<h2>Lab 3: Sum from 1 to n</h2>
+
+<p>Complete <code>sum_to(n)</code> in <code>sum_to.py</code> using a loop. It returns the sum of the integers from 1 to n, returns 0 if n is 0, and returns <code>None</code> if n is negative. Do not use <code>sum()</code> or the arithmetic series formula. Only the caller prints. Check for the special value <code>None</code> with <code>is None</code>.</p>
+
+<pre><code>def sum_to(n):
+    # Validate, accumulate, then return.
+    pass
+
+result = sum_to(5)
+if result is None:
+    print("Invalid input")
+else:
+    print("Total:", result)</code></pre>
+
+<p>The starter code returns <code>None</code>, so the caller prints <code>Invalid input</code>. Once the function is complete, you should get <code>Total: 15</code>.</p>
+
+<h3>Lab 3 Checks</h3>
+
+<p>Test the boundary n = 0 and a negative input, and call the function several times. Each call must start with a new <code>total</code>. Do not confuse the correct result 0 with <code>None</code>.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Expected return value</th></tr></thead>
+<tbody>
+<tr><td><code>sum_to(1)</code></td><td>1</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>15</td></tr>
+<tr><td><code>sum_to(0)</code></td><td>0</td></tr>
+<tr><td><code>sum_to(-1)</code></td><td>None</td></tr>
+<tr><td><code>sum_to(3)</code></td><td>6</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>15 again</td></tr>
+</tbody>
+</table>
+
+<p>The bottom of the file has only one call, <code>sum_to(5)</code>, so to check the whole table, add the calls yourself or use the last two steps of <a href="#ex=sum_to">sum_to</a>. These steps import the function with <code>from sum_to import sum_to</code> and run the six calls in the table at once. The first of them imports your own file in the current folder, and the second imports the solution. <code>import</code> is a module feature we learn in the next chapter, 'Modules and the Standard Library'; when a file is imported, its bottom code runs once and that output appears first.</p>
+
+<h2>Combining Small Functions</h2>
+
+<p>A function's return value can become another function's argument. Keep each function's purpose clear. The example below calculates a price and then adds a fee.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+def add_fee(amount, fee=5):
+    return amount + fee
+
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)    # 65</code></pre>
+
+<h2>Lab 4: Calculator Function</h2>
+
+<h3>Calculator Function Requirements</h3>
+
+<p>Define <code>calculate(a, b, operator)</code>. It supports <code>"+"</code>, <code>"-"</code>, <code>"*"</code> and <code>"/"</code>; assume <code>a</code> and <code>b</code> are numbers and <code>operator</code> is a string. For an unsupported operator or division by zero, return <code>None</code>. For a valid operation, return the numeric result, even if it is 0.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Return value</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(8, 2, "+")</code></td><td>10</td></tr>
+<tr><td><code>calculate(8, 2, "-")</code></td><td>6</td></tr>
+<tr><td><code>calculate(8, 2, "*")</code></td><td>16</td></tr>
+<tr><td><code>calculate(8, 2, "/")</code></td><td>4.0</td></tr>
+<tr><td><code>calculate(8, 0, "/")</code></td><td>None</td></tr>
+<tr><td><code>calculate(8, 2, "%")</code></td><td>None</td></tr>
+</tbody>
+</table>
+
+<h3>Completing calculator.py</h3>
+
+<p>Complete <code>calculator.py</code> using <code>if</code>, <code>elif</code> and <code>return</code>. Keep input and output outside <code>calculate()</code>. Check for <code>None</code> before displaying a numeric result, and a correct result of 0 must be displayed normally.</p>
+
+<pre><code>def calculate(a, b, operator):
+    # Return a result or None.
+    pass
+
+result = calculate(8, 2, "+")
+if result is None:
+    print("Invalid operation")
+else:
+    print("Result:", result)</code></pre>
+
+<p>The optional task is to read <code>a</code>, <code>b</code> and the operator on the caller's side and call <code>calculate()</code>.</p>
+
+<h3>Lab 4 Checks</h3>
+
+<p>Check all four supported operations, and test division by zero and an unsupported operator. Also try negative numbers and a result of 0. The function must only return a value, not print.</p>
+
+<table>
+<thead><tr><th>Additional call</th><th>Return value</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(2, 2, "-")</code></td><td>0</td></tr>
+<tr><td><code>calculate(-3, 2, "*")</code></td><td>-6</td></tr>
+<tr><td><code>calculate(0, 5, "/")</code></td><td>0.0</td></tr>
+</tbody>
+</table>
+
+<p>Do not use <code>if not result</code> when checking the result, because it treats the correct result 0 as false. Use <code>if result is None</code> instead. In <a href="#ex=calculator">calculator</a> you can run the nine calls from both tables at once and see that <code>not result</code> and <code>result is None</code> judge 0 differently.</p>
+
+<h2>Common Function Mistakes</h2>
+
+<ul>
+<li>Writing a function name without parentheses does not call it.</li>
+<li>Passing too few required arguments raises a <code>TypeError</code>.</li>
+<li>Printing a value does not send it back to the caller.</li>
+<li>A <code>return</code> inside a loop can end the task too early.</li>
+<li>Local variables cannot be used directly outside the function.</li>
+</ul>
+
+<p>For each bug, look at the function definition, the call and the return value in turn. The first two mistakes are reproduced in the last step of <a href="#ex=power">power</a>. Without parentheses you see only <code>&lt;function total_price at ...&gt;</code>, and leaving out one argument gives a <code>missing 1 required positional argument</code> error.</p>
+
+<h2>Testing &amp; Submission</h2>
+
+<p>Submit <code>is_even.py</code>, <code>power.py</code>, <code>sum_to.py</code> and <code>calculator.py</code>.</p>
+
+<ul>
+<li>Keep the required function names and parameter names exactly as given.</li>
+<li>Functions return values; the caller does the displaying.</li>
+<li>Record inputs and expected return values as comments.</li>
+<li>Include boundary values and the invalid inputs the function's rules require.</li>
+<li>Check that repeated calls give independent results.</li>
+</ul>
+
+<p>These exercises do not need collections or exception handling. Completed files can be copied, as in <code>cp calculator.py /mnt/host/</code>, and then downloaded to your computer with the page's Download box.</p>
+
+<h2>Exit Quiz</h2>
+
+<ol>
+<li><strong>In <code>def power(base, exponent=2)</code>, which names are parameters?</strong> <code>base</code> and <code>exponent</code>.</li>
+<li><strong>What does <code>power(3)</code> return?</strong> 9, using the default 2.</li>
+<li><strong>What does a function without <code>return</code> produce?</strong> <code>None</code>.</li>
+<li><strong>Why is it important to put <code>return</code> after the loop in <code>sum_to()</code>?</strong> If it is inside the loop, the function ends on the first iteration and the sum is never completed.</li>
+<li><strong>Why does the calculator use <code>result is None</code> instead of <code>not result</code>?</strong> Because with <code>not result</code>, even the correct result 0 counts as true and is mistaken for an invalid operation.</li>
+</ol>
+
+<p>Finally, explain in your own words how the caller receives a value from a function.</p>
+
+<h2>Next Chapter: Modules</h2>
+
+<p>A module groups reusable code in a single Python file. You use a module's functions by bringing them in with <code>import</code>. In the next chapter, 'Modules and the Standard Library', we look at standard library modules such as <code>math</code> and <code>random</code>, and learn how to put your own functions in a module and reuse them from another file.</p>
+
+<pre><code>import math
+print(math.sqrt(25))    # 5.0</code></pre>
+</div><div lang="ko">
+<p>이 장에서는 함수를 배웁니다. 함수를 정의하고 호출하는 법, 매개변수와 인자, 반환값을 익히고, 결과를 <strong>출력하는 것</strong>과 <strong>돌려주는 것</strong>의 차이를 구별합니다. 지역 변수를 설명하고, 작은 함수 여러 개를 조합해 봅니다.</p>
+
+<p>예제는 네 개입니다. 연습 1의 짝수 판정 함수(<a href="#ex=is_even">is_even</a>), 연습 2의 거듭제곱 함수(<a href="#ex=power">power</a>), 실습 3의 1부터 n까지의 합(<a href="#ex=sum_to">sum_to</a>), 실습 4의 계산기 함수(<a href="#ex=calculator">calculator</a>)입니다. 각 예제 페이지에는 그 앞에서 배우는 슬라이드 예제도 실행 단계로 들어 있습니다.</p>
+
+<h2>함수란</h2>
+
+<h3>같은 계산, 다른 입력</h3>
+
+<p>아래 두 계산은 같은 규칙을 따르고 입력 값만 다릅니다. 함수는 이런 계산에 다시 쓸 수 있는 이름을 붙여 주며, 호출하는 쪽은 부를 때마다 다른 입력을 넘길 수 있습니다.</p>
+
+<pre><code>price = 20
+quantity = 3
+print(price * quantity)   # 60
+
+price = 12
+quantity = 5
+print(price * quantity)   # 60</code></pre>
+
+<h3>작업에 붙인 이름</h3>
+
+<p>함수는 호출할 때 실행되는, 이름이 붙은 코드 블록입니다. 슬라이드는 카페에 비유합니다. <strong>정의</strong>는 조리법을 한 번 적어 두는 것이고, <strong>호출</strong>은 주문해서 그 조리법대로 만들게 하는 것이며, <strong>재사용</strong>은 다른 입력으로 다시 주문하는 것입니다. "조리법을 적기만 하면 커피가 만들어질까?"라는 질문의 답은 "아니다"입니다. 함수도 정의만 해서는 실행되지 않습니다.</p>
+
+<h3>함수의 입력과 결과</h3>
+
+<p>인자(argument)가 입력 값을 주고, 함수가 작업을 하고, <code>return</code>이 결과를 호출한 쪽에 건네줍니다. 예를 들어 <code>total_price(20, 3)</code>은 60을 돌려줍니다. 인자를 받지 않는 함수도 있습니다. 반환값을 명시하지 않은 함수는 <code>None</code>을 돌려줍니다.</p>
+
+<h2>함수 정의와 호출</h2>
+
+<h3>함수 정의하기</h3>
+
+<p><code>def</code>로 함수 정의를 시작합니다. 작업의 이름을 쓰고, 괄호 안에 매개변수를 둡니다. 콜론과 들여쓰기가 본문을 정합니다. 함수를 정의해도 본문은 실행되지 않습니다.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+# No output until the function is called.
+
+greet()
+# Hello!</code></pre>
+
+<h3>함수 호출하기</h3>
+
+<p>괄호를 붙여야 함수가 호출됩니다. 실행 흐름은 함수 본문으로 들어갔다가 본문이 끝나면 호출한 곳으로 돌아옵니다. 이 장의 스크립트에서는 함수를 호출하기 전에 정의해 둡니다. 호출할 때마다 본문이 다시 실행됩니다.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+
+print("Before")
+greet()
+greet()
+print("After")
+# Before
+# Hello!
+# Hello!
+# After</code></pre>
+
+<h3>매개변수와 인자</h3>
+
+<p>매개변수(parameter)는 함수 정의에 적힌 이름이고, 인자(argument)는 호출하는 쪽이 넘기는 값입니다. 호출할 때마다 인자가 매개변수에 연결됩니다. 매개변수는 함수 안에서 지역 변수처럼 동작합니다.</p>
+
+<pre><code>def show_total(price, quantity):
+    print(price * quantity)
+
+show_total(20, 3)    # 60
+show_total(12, 5)    # 60
+# Parameters: price, quantity
+# Arguments in the first call: 20, 3</code></pre>
+
+<h3>결과 돌려주기</h3>
+
+<p><code>return</code>은 값을 호출한 쪽으로 돌려보냅니다. 돌려받은 결과는 변수에 저장하거나 식 안에서 바로 쓸 수 있습니다. <code>return</code>은 현재 함수 호출을 그 자리에서 끝냅니다.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+amount = total_price(20, 3)
+print(amount)        # 60
+print(amount + 5)    # 65</code></pre>
+
+<h2>print()와 return</h2>
+
+<h3>카페 문제: 내 커피는 어디에?</h3>
+
+<p>실행하기 전에 <code>drink</code>에 무엇이 들어 있을지 투표해 봅니다. <code>"Americano"</code>일까요, <code>None</code>일까요?</p>
+
+<pre><code>def cafe():
+    print("Americano")
+
+drink = cafe()
+print(drink)</code></pre>
+
+<p>화면에는 <code>Americano</code>가 나오지만 그것은 함수 안의 <code>print</code>가 안내 방송처럼 보여 준 것일 뿐이고, <code>drink</code>에는 <code>None</code>이 들어 있습니다. 슬라이드의 말로 하면 "안내 방송을 마실 수는 없다"입니다. <code>cafe()</code> 안의 <code>print</code>를 <code>return</code>으로 바꾸면 값이 호출한 쪽으로 돌아와 <code>drink</code>에 <code>"Americano"</code>가 담깁니다. <a href="#ex=is_even">is_even</a>에서 두 버전을 모두 실행해 봅니다.</p>
+
+<h3>보여 주기와 돌려주기</h3>
+
+<p><code>print()</code>는 정보를 화면에 보여 주고, <code>return</code>은 호출한 쪽에 값을 줍니다. 함수는 아무것도 출력하지 않고 값만 돌려줄 수도 있습니다. 다른 계산에 결과가 필요하면 <code>return</code>을 고릅니다.</p>
+
+<pre><code>def show_double(number):
+    print(number * 2)
+
+def double(number):
+    return number * 2
+
+shown = show_double(4)   # Displays 8
+saved = double(4)        # No output
+print(shown)             # None
+print(saved + 1)         # 9</code></pre>
+
+<h3>빠진 반환값</h3>
+
+<p>끝까지 실행되고 <code>return</code>을 만나지 못한 함수는 <code>None</code>을 돌려줍니다. 값 없이 <code>return</code>만 써도 <code>None</code>입니다. 결과를 돌려줘야 하는 모든 실행 경로에 <code>return</code>이 있는지 확인합니다. <code>None</code>은 특별한 값이지 문자열 <code>"None"</code>이 아닙니다.</p>
+
+<pre><code>def broken_double(number):
+    result = number * 2
+    # Missing: return result
+
+answer = broken_double(4)
+print(answer)    # None
+# answer + 1 would raise TypeError.</code></pre>
+
+<h2>연습 1: 짝수 판정 함수</h2>
+
+<p><code>is_even.py</code>의 <code>is_even(number)</code>를 완성합니다. <code>number</code>는 정수라고 가정하고, 짝수면 <code>True</code>, 아니면 <code>False</code>를 돌려줍니다. <code>input()</code>과 <code>print()</code>는 함수 밖에 둡니다. 양수, 0, 음수를 모두 테스트합니다.</p>
+
+<pre><code>def is_even(number):
+    # Return a Boolean result.
+    pass
+
+print(is_even(4))     # Expected: True
+print(is_even(7))     # Expected: False
+print(is_even(0))     # Expected: True
+print(is_even(-2))    # Expected: True</code></pre>
+
+<p>시작 코드의 함수는 <code>pass</code>뿐이라 반환값이 없으므로 네 줄 모두 <code>None</code>이 출력됩니다. 함수가 무엇을 돌려주는지가 바로 화면에 드러나는 좋은 예입니다(<a href="#ex=is_even">is_even</a>).</p>
+
+<h2>인자 넘기는 방법</h2>
+
+<h3>위치 인자와 키워드 인자</h3>
+
+<p>위치 인자는 매개변수 순서대로 연결됩니다. 키워드 인자는 매개변수 이름을 직접 밝히므로 호출의 의미를 분명하게 해 줍니다. 이 장의 함수에서는 위치 인자를 키워드 인자보다 앞에 씁니다.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+# Every call prints 60.</code></pre>
+
+<h3>매개변수의 기본값</h3>
+
+<p>기본값은 호출하는 쪽이 인자를 생략했을 때 대신 쓰는 값입니다. 호출하는 쪽에서 명시적으로 다른 값을 주면 기본값을 덮어씁니다. 기본값이 없는 매개변수를 기본값이 있는 매개변수보다 앞에 둡니다. 이 장의 예제에서는 간단한 숫자 기본값만 씁니다.</p>
+
+<pre><code>def power(base, exponent=2):
+    return base ** exponent
+
+print(power(3))               # 9
+print(power(2, 3))            # 8
+print(power(5, exponent=0))   # 1</code></pre>
+
+<h2>연습 2: 거듭제곱 함수</h2>
+
+<p><code>power.py</code>의 <code>power(base, exponent=2)</code>를 완성합니다. <code>base</code>를 <code>exponent</code>만큼 거듭제곱한 값을 돌려줍니다. <code>base</code>는 숫자, <code>exponent</code>는 0 이상의 정수라고 가정하고 거듭제곱에는 <code>**</code>를 씁니다. 기본값을 쓴 호출과, 위치 인자와 키워드 인자로 명시한 호출을 모두 확인합니다. 함수 안에서는 출력하지 않습니다.</p>
+
+<table>
+<thead><tr><th>호출</th><th>기대값</th></tr></thead>
+<tbody>
+<tr><td><code>power(3)</code></td><td>9</td></tr>
+<tr><td><code>power(2, 3)</code></td><td>8</td></tr>
+<tr><td><code>power(5, exponent=0)</code></td><td>1</td></tr>
+<tr><td><code>power(-2, 3)</code></td><td>-8</td></tr>
+</tbody>
+</table>
+
+<p><a href="#ex=power">power</a>에서 시작 코드(None 세 개)와 답안(9, 8, 1)을 비교하고, 음수 밑 <code>power(-2, 3)</code>도 실행해 봅니다.</p>
+
+<h2>지역 변수와 범위</h2>
+
+<p>이 장의 예제에서 함수 안에서 대입한 이름은 지역 변수입니다. 지역 변수는 바깥에 있는 같은 이름의 변수와 별개입니다. 결과는 반환값으로 명시적으로 전달하고, 여기서 만드는 함수에서는 전역 상태를 쓰지 않습니다.</p>
+
+<pre><code>number = 10
+
+def add_one(number):
+    result = number + 1
+    return result
+
+print(add_one(3))   # 4
+print(number)       # 10
+# print(result) would raise NameError.</code></pre>
+
+<p>함수 안의 <code>number</code>는 매개변수로 3을 받았지만 바깥의 <code>number</code>는 여전히 10입니다. 함수 안에서 만든 <code>result</code>는 호출이 끝나면 밖에서 쓸 수 없습니다. <a href="#ex=sum_to">sum_to</a>의 첫 단계가 마지막 줄까지 실행해 <code>NameError: name 'result' is not defined</code>를 보여 줍니다.</p>
+
+<h2>휴식과 중간 점검</h2>
+
+<ol>
+<li><strong>함수를 정의하면 본문이 실행되는가?</strong> 아니요. 호출해야 실행됩니다.</li>
+<li><strong>매개변수와 인자의 차이는?</strong> 매개변수는 정의에 적힌 이름, 인자는 호출할 때 넘기는 값입니다.</li>
+<li><strong><code>return</code> 문이 없는 함수는 무엇을 돌려주는가?</strong> <code>None</code>입니다.</li>
+<li><strong>호출이 끝난 뒤 호출한 쪽에서 지역 변수를 바로 쓸 수 있는가?</strong> 아니요. 필요한 값은 <code>return</code>으로 돌려받습니다.</li>
+</ol>
+
+<p>다음은 반복문을 함수로 감싸는 방법입니다.</p>
+
+<h2>반복문을 담은 함수</h2>
+
+<p>함수 본문에 반복문을 넣을 수 있습니다. 누적 변수는 호출할 때마다 새로 초기화하고, 완성된 합을 돌려주도록 <code>return</code>은 반복문 <strong>뒤에</strong> 둡니다. 이 버전은 <code>n</code>이 0 이상의 정수라고 가정합니다.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(5))    # 15
+print(sum_to(3))    # 6
+print(sum_to(0))    # 0</code></pre>
+
+<h3>일찍 퇴근하는 바리스타</h3>
+
+<p>손님 세 명이 커피를 기다리고 있습니다. 아래 코드는 메시지를 몇 개 출력할까요? 0개, 1개, 3개 중에 투표한 뒤 첫 번째 반복을 추적해 봅니다.</p>
+
+<pre><code>def serve():
+    for number in range(1, 4):
+        return f"Coffee for {number}"
+
+print(serve())</code></pre>
+
+<p>답은 하나, <code>Coffee for 1</code>입니다. <code>return</code>은 현재 함수 호출을 즉시 끝내기 때문입니다. 슬라이드는 이어서 묻습니다. 반복문 안의 <code>return</code>을 <code>print</code>로 바꾸고 마지막 줄을 <code>serve()</code>로 바꾸면 어떻게 될까요? 그러면 반복이 끝까지 돌아 세 메시지가 모두 출력됩니다.</p>
+
+<h3>return은 함수 전체를 끝낸다</h3>
+
+<p><code>return</code>은 함수를 빠져나가며, 그 안의 반복문도 함께 끝냅니다. <code>break</code>는 가장 가까운 반복문만 빠져나간다는 점과 다릅니다. 반복문 안에서 돌려주면 누적이 너무 일찍 멈출 수 있습니다.</p>
+
+<pre><code>def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total    # Wrong indentation
+
+print(too_early(5))     # 1, not 15
+print(too_early(0))     # None</code></pre>
+
+<p><code>too_early(0)</code>이 <code>None</code>인 이유는 반복이 한 번도 실행되지 않아 <code>return</code>에 닿지 못했기 때문입니다. 두 결과는 <a href="#ex=sum_to">sum_to</a>에서 확인할 수 있습니다.</p>
+
+<h2>함수의 입력과 출력 규칙</h2>
+
+<p>코딩하기 전에 허용하는 입력과 기대하는 출력을 정해 둡니다. <code>sum_to</code>는 0 이상의 정수를 받아들이고, 음수가 들어오면 잘못된 입력이라는 신호로 <code>None</code>을 돌려줍니다. 호출하는 쪽은 정수를 넘긴다고 가정하며, 자료형 오류 처리는 나중에 배웁니다.</p>
+
+<pre><code>def sum_to(n):
+    if n &lt; 0:
+        return None
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(-1))   # None
+print(sum_to(5))    # 15</code></pre>
+
+<h2>실습 3: 1부터 n까지의 합</h2>
+
+<p><code>sum_to.py</code>의 <code>sum_to(n)</code>을 반복문으로 완성합니다. 1부터 n까지 정수의 합을 돌려주고, n이 0이면 0을, 음수면 <code>None</code>을 돌려줍니다. <code>sum()</code>이나 등차수열 공식은 쓰지 않습니다. 출력은 호출하는 쪽에서만 합니다. 특별한 값 <code>None</code>인지는 <code>is None</code>으로 검사합니다.</p>
+
+<pre><code>def sum_to(n):
+    # Validate, accumulate, then return.
+    pass
+
+result = sum_to(5)
+if result is None:
+    print("Invalid input")
+else:
+    print("Total:", result)</code></pre>
+
+<p>시작 코드는 <code>None</code>을 돌려주므로 호출하는 쪽이 <code>Invalid input</code>을 출력합니다. 함수를 완성하면 <code>Total: 15</code>가 나와야 합니다.</p>
+
+<h3>실습 3 확인</h3>
+
+<p>경계값 n = 0과 음수 입력을 테스트하고, 함수를 여러 번 호출합니다. 호출할 때마다 새 <code>total</code>로 시작해야 합니다. 올바른 결과 0과 <code>None</code>을 혼동하지 않습니다.</p>
+
+<table>
+<thead><tr><th>호출</th><th>기대 반환값</th></tr></thead>
+<tbody>
+<tr><td><code>sum_to(1)</code></td><td>1</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>15</td></tr>
+<tr><td><code>sum_to(0)</code></td><td>0</td></tr>
+<tr><td><code>sum_to(-1)</code></td><td>None</td></tr>
+<tr><td><code>sum_to(3)</code></td><td>6</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>다시 15</td></tr>
+</tbody>
+</table>
+
+<p>파일 아래쪽의 호출은 <code>sum_to(5)</code> 하나뿐이므로, 표 전체를 확인하려면 호출을 직접 추가해 보거나 <a href="#ex=sum_to">sum_to</a>의 마지막 두 단계를 씁니다. 이 단계는 <code>from sum_to import sum_to</code>로 함수를 불러와 표의 여섯 호출을 한 번에 실행합니다. 첫 단계는 현재 폴더에 있는 내 파일을, 둘째 단계는 답안을 불러옵니다. <code>import</code>는 다음 장 '모듈과 표준 라이브러리'에서 배울 모듈 기능이며, 파일을 불러올 때 아래쪽 코드가 한 번 실행되어 그 출력이 먼저 나옵니다.</p>
+
+<h2>작은 함수 조합하기</h2>
+
+<p>한 함수의 반환값은 다른 함수의 인자가 될 수 있습니다. 함수마다 목적을 분명히 유지합니다. 아래 예는 가격을 계산한 뒤 수수료를 더합니다.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+def add_fee(amount, fee=5):
+    return amount + fee
+
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)    # 65</code></pre>
+
+<h2>실습 4: 계산기 함수</h2>
+
+<h3>요구 사항</h3>
+
+<p><code>calculate(a, b, operator)</code>를 정의합니다. <code>"+"</code>, <code>"-"</code>, <code>"*"</code>, <code>"/"</code>를 지원하고, <code>a</code>와 <code>b</code>는 숫자, <code>operator</code>는 문자열이라고 가정합니다. 지원하지 않는 연산자이거나 0으로 나누는 경우에는 <code>None</code>을 돌려줍니다. 올바른 연산에는 결과가 0이어도 숫자 결과를 돌려줍니다.</p>
+
+<table>
+<thead><tr><th>호출</th><th>반환값</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(8, 2, "+")</code></td><td>10</td></tr>
+<tr><td><code>calculate(8, 2, "-")</code></td><td>6</td></tr>
+<tr><td><code>calculate(8, 2, "*")</code></td><td>16</td></tr>
+<tr><td><code>calculate(8, 2, "/")</code></td><td>4.0</td></tr>
+<tr><td><code>calculate(8, 0, "/")</code></td><td>None</td></tr>
+<tr><td><code>calculate(8, 2, "%")</code></td><td>None</td></tr>
+</tbody>
+</table>
+
+<h3>calculator.py 완성하기</h3>
+
+<p><code>if</code>, <code>elif</code>, <code>return</code>으로 <code>calculator.py</code>를 완성합니다. 입력과 출력은 <code>calculate()</code> 밖에 둡니다. 숫자 결과를 표시하기 전에 <code>None</code>인지 먼저 검사하고, 올바른 결과 0은 정상적으로 표시되어야 합니다.</p>
+
+<pre><code>def calculate(a, b, operator):
+    # Return a result or None.
+    pass
+
+result = calculate(8, 2, "+")
+if result is None:
+    print("Invalid operation")
+else:
+    print("Result:", result)</code></pre>
+
+<p>선택 과제는 호출하는 쪽에서 <code>a</code>, <code>b</code>, 연산자를 입력받아 <code>calculate()</code>를 호출하는 것입니다.</p>
+
+<h3>실습 4 확인</h3>
+
+<p>지원하는 네 연산을 모두 확인하고, 0으로 나누기와 지원하지 않는 연산자를 테스트합니다. 음수와 결과가 0인 경우도 시험합니다. 함수는 출력하지 않고 값만 돌려줘야 합니다.</p>
+
+<table>
+<thead><tr><th>추가 호출</th><th>반환값</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(2, 2, "-")</code></td><td>0</td></tr>
+<tr><td><code>calculate(-3, 2, "*")</code></td><td>-6</td></tr>
+<tr><td><code>calculate(0, 5, "/")</code></td><td>0.0</td></tr>
+</tbody>
+</table>
+
+<p>결과를 검사할 때 <code>if not result</code>는 쓰지 않습니다. 올바른 결과 0을 거짓으로 취급하기 때문입니다. 대신 <code>if result is None</code>을 씁니다. <a href="#ex=calculator">calculator</a>에서 두 표의 아홉 호출을 한 번에 실행하고, <code>not result</code>와 <code>result is None</code>이 0에 대해 다르게 판단하는 것을 확인할 수 있습니다.</p>
+
+<h2>함수에서 자주 하는 실수</h2>
+
+<ul>
+<li>함수 이름만 쓰고 괄호를 붙이지 않으면 호출되지 않습니다.</li>
+<li>필수 인자를 너무 적게 넘기면 <code>TypeError</code>가 납니다.</li>
+<li>값을 출력한다고 그 값이 호출한 쪽에 돌아가지는 않습니다.</li>
+<li>반복문 안의 <code>return</code>은 작업을 너무 일찍 끝낼 수 있습니다.</li>
+<li>지역 변수는 함수 밖에서 바로 쓸 수 없습니다.</li>
+</ul>
+
+<p>버그마다 함수 정의, 호출, 반환값을 각각 찾아 봅니다. 앞의 두 실수는 <a href="#ex=power">power</a>의 마지막 단계에서 재현됩니다. 괄호 없이 쓰면 <code>&lt;function total_price at ...&gt;</code>만 보이고, 인자를 하나 빠뜨리면 <code>missing 1 required positional argument</code> 오류가 납니다.</p>
+
+<h2>테스트와 제출</h2>
+
+<p><code>is_even.py</code>, <code>power.py</code>, <code>sum_to.py</code>, <code>calculator.py</code>를 제출합니다.</p>
+
+<ul>
+<li>정해진 함수 이름과 매개변수 이름을 그대로 유지합니다.</li>
+<li>함수는 값을 돌려주고, 표시는 호출하는 쪽에서 합니다.</li>
+<li>입력과 기대 반환값을 주석으로 기록합니다.</li>
+<li>경계값과, 함수 규칙이 요구하는 잘못된 입력을 포함합니다.</li>
+<li>여러 번 호출해도 서로 독립적인 결과가 나오는지 확인합니다.</li>
+</ul>
+
+<p>이번 연습에는 컬렉션과 예외 처리가 필요하지 않습니다. 완성한 파일은 <code>cp calculator.py /mnt/host/</code>처럼 복사한 뒤 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>확인 퀴즈</h2>
+
+<ol>
+<li><strong><code>def power(base, exponent=2)</code>에서 매개변수는?</strong> <code>base</code>와 <code>exponent</code>입니다.</li>
+<li><strong><code>power(3)</code>은 무엇을 돌려주는가?</strong> 기본값 2를 써서 9입니다.</li>
+<li><strong><code>return</code>이 없는 함수는 무엇을 만드는가?</strong> <code>None</code>입니다.</li>
+<li><strong><code>sum_to()</code>에서 <code>return</code>을 반복문 뒤에 두는 것이 왜 중요한가?</strong> 반복문 안에 두면 첫 반복에서 함수가 끝나 합이 완성되지 않습니다.</li>
+<li><strong>계산기에서 <code>not result</code> 대신 <code>result is None</code>을 쓰는 이유는?</strong> 올바른 결과 0도 <code>not result</code>에서는 참이 되어 잘못된 연산으로 오해받기 때문입니다.</li>
+</ol>
+
+<p>마지막으로, 호출한 쪽이 함수로부터 어떻게 값을 받는지 자기 말로 설명해 봅니다.</p>
+
+<h2>다음 장: 모듈</h2>
+
+<p>모듈은 다시 쓸 코드를 파이썬 파일 하나로 묶은 것입니다. <code>import</code>로 모듈의 함수를 가져다 씁니다. 다음 장 '모듈과 표준 라이브러리'에서는 <code>math</code>, <code>random</code> 같은 표준 라이브러리 모듈을 살펴보고, 자기 함수를 모듈에 넣어 다른 파일에서 다시 쓰는 법을 배웁니다.</p>
+
+<pre><code>import math
+print(math.sqrt(25))    # 5.0</code></pre>
+</div>
+    </article>
+  </div>
+  <script src="../js/lab.js"></script>
+</body>
+</html>

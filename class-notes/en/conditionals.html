@@ -1,0 +1,346 @@
+<p>This is the practice part of the chapter. Using the operators, strings and conditionals from the theory part, we build four short programs: string processing (<a href="strings.html">strings</a>, 20 minutes), a grade classifier (<a href="grades.html">grades</a>, 25 minutes), rock-paper-scissors (<a href="rps.html">rps</a>, 40 minutes) and a leap-year calculator (<a href="leap_year.html">leap_year</a>, 25 minutes), in that order, and in the last 10 minutes we test and submit. Each example page opens in the starter folder, and the sample solution is shown below it as well. Edit the starter code with <code>nano</code> to complete it, then use the example steps to compare with the solution's output.</p>
+
+<h2>Keyboard Input with input()</h2>
+
+<p><code>input()</code> displays a prompt and waits for keyboard input. When you type a value and press <kbd>Enter</kbd>, the program continues. The returned value is always a string, even when you type a number, so labs that need an integer use <code>int(input(...))</code>. To try a different input, run the program again.</p>
+
+<pre><code>name = input("Name: ")
+print(f"Hello, {name}!")
+# Type Mina, then press Enter.
+# Output: Hello, Mina!
+
+score = int(input("Score: "))
+print(score + 1)
+# Type 85, then press Enter.
+# Output: 86
+# Enter integer-formatted text for score.</code></pre>
+
+<p>The example steps in this lab supply the input in advance and run automatically. For example, <code>echo 85 | python3 grades.py</code> is the same as typing 85 and pressing <kbd>Enter</kbd>. Because the input is not shown on screen, the output appears right after the prompt, as in <code>Score: B</code>. To type the input yourself, just run <code>python3 grades.py</code>.</p>
+
+<h2>f-Strings: Values Inside Text</h2>
+
+<p><code>print()</code> is a function that displays a value, and the <code>f</code> is not syntax that <code>print()</code> requires. Without the <code>f</code>, the braces and variable name are printed literally. With an <code>f</code> in front of the quotation mark, the current value of <code>name</code> is put in place of <code>{name}</code>. Python builds the string first, and then <code>print()</code> displays it. For simple output, you can also list the values separated by commas.</p>
+
+<pre><code>name = "Mina"
+score = 85
+print("Hello, Mina!")
+# Hello, Mina!
+print("Hello, {name}!")
+# Hello, {name}!
+print(f"Hello, {name}!")
+# Hello, Mina!
+print(f"Score: {score}")
+# Score: 85
+print("Score:", score)
+# Score: 85</code></pre>
+
+<h2>Lab Workflow: Input to Test</h2>
+
+<p>Before you start coding, write down the input, the transformation and the required output separately. Write the expected result for a small example first, and run the program each time you implement one requirement. Before submitting, also test boundary values and invalid input. The extra exercises are optional, within the lab time.</p>
+
+<pre><code># Example plan for strings.py
+# Input:   "  Python  "
+# Clean:   "Python"
+# Length:  6
+# Upper:   PYTHON
+# Reverse: nohtyP
+# First:   P
+# Empty input is a separate test case.
+# Write expected output before coding.</code></pre>
+
+<h2>Lab 1: String Manipulation</h2>
+
+<p><code>strings.py</code> reads one line, removes the leading and trailing spaces, and prints the length, the uppercase version and the reversed string. The first character is printed only when the text is not empty. Test with an ordinary word, input of spaces only, and a single character.</p>
+
+<pre><code>text = input("Text: ").strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+# Input: Python
+# Length: 6, Upper: PYTHON
+# Reverse: nohtyP, First: P</code></pre>
+
+<p>The starter code has only the line that reads the input; the rest is TODO. The output labels <code>Length:</code>, <code>Upper:</code>, <code>Reverse:</code> and <code>First:</code>, and <code>No text entered</code> for empty input, must match exactly.</p>
+
+<h3>Step-by-Step Trace</h3>
+
+<p>Trace each intermediate value for a word padded with spaces. Do the transformations on the cleaned <code>text</code>, and check explicitly that it is not empty before indexing. In the lab, use <code>input()</code> instead of the fixed <code>raw</code> value.</p>
+
+<pre><code>raw = "  Python  "
+text = raw.strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if len(text) &gt; 0:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")</code></pre>
+
+<h3>Empty Input &amp; Extension</h3>
+
+<p>Empty input and input of spaces only both become an empty string after <code>strip()</code>. Even in the empty case, the three lines for length, uppercase and reverse must be printed (<code>Length: 0</code>, and an empty <code>Upper:</code> and <code>Reverse:</code>), and you must make sure that indexing never runs on the empty string. Running <code>text[0]</code> without a check raises an <code>IndexError</code>.</p>
+
+<pre><code>text = "   ".strip()
+print(f"Length: {len(text)}")
+print(f"Upper: {text.upper()}")
+print(f"Reverse: {text[::-1]}")
+if text:
+    print(f"First: {text[0]}")
+else:
+    print("No text entered")
+
+word = "Level".lower()
+print(word == word[::-1])    # True</code></pre>
+
+<p>The optional extension is to print whether the cleaned, lowercased text equals its own reverse (whether it is a palindrome). In the <a href="strings.html">strings</a> example you can run all three inputs, the IndexError and the palindrome check.</p>
+
+<h2>Lab 2: Grade Classifier</h2>
+
+<p><code>grades.py</code> reads an integer score. It accepts only 0 to 100 (both ends included) and reports any other value with <code>Invalid score</code>. The grades are A: 90–100, B: 80–89, C: 70–79, D: 60–69, F: 0–59.</p>
+
+<pre><code>score = int(input("Score: "))
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+elif score &gt;= 90:
+    print("A")
+elif score &gt;= 80:
+    print("B")
+elif score &gt;= 70:
+    print("C")
+elif score &gt;= 60:
+    print("D")
+else:
+    print("F")</code></pre>
+
+<p>Because the range check is at the front of the chain, the <code>elif</code>s after it only see valid scores. Thresholds are checked from the highest. Test with 59, 60, 89, 90, 100 and 101.</p>
+
+<h3>Boundary Test Design</h3>
+
+<p>A test checks one input against an expected result. At each threshold, test the value just below it and the threshold itself, and also test the two endpoints and values out of range. If 89 comes out as A, check the comparison operators and the threshold values.</p>
+
+<pre><code># Input    Expected
+# -1       Invalid score
+# 0, 59    F
+# 60, 69   D
+# 70, 79   C
+# 80, 89   B
+# 90, 100  A
+# 101      Invalid score
+
+# Run grades.py once for each input.
+# Record actual output beside expected.</code></pre>
+
+<p>Running the program once for each input can be done all at once with a shell <code>for</code> loop. The second step of the <a href="grades.html">grades</a> example runs all 12 inputs from the table above and builds a table such as <code>59 -&gt; F</code>. Try your own file with the same command.</p>
+
+<h3>Optional Pass/Fail Output</h3>
+
+<p>A valid score of 60 or more also receives Pass, and below 60 Fail. An invalid score must not get Pass/Fail, so put the extra decision inside the valid-score branch. Test with 59, 60 and 101.</p>
+
+<pre><code>score = 59
+if not 0 &lt;= score &lt;= 100:
+    print("Invalid score")
+else:
+    # Keep grade classification here.
+    if score &gt;= 60:
+        print("Pass")
+    else:
+        print("Fail")
+# Test 59, 60 and 101.</code></pre>
+
+<h2>Lab 3: Rock-Paper-Scissors</h2>
+
+<h3>Rules</h3>
+
+<p><code>rps.py</code> plays one round against the computer. The input is cleaned with <code>strip().lower()</code>, and only rock, paper or scissors is accepted. If both are the same it is a tie; rock beats scissors, scissors beats paper, and paper beats rock. Invalid input is rejected, and for valid input both choices are printed. The computer's choice is picked from a list with <code>random.choice()</code>.</p>
+
+<pre><code>import random
+
+# choice() picks one item.
+computer = random.choice(
+    ["rock", "paper", "scissors"]
+)
+
+# First, test with fixed values:
+player = "rock"
+computer = "scissors"
+# Expected outcome: You win</code></pre>
+
+<h3>All Nine Valid Pairs</h3>
+
+<p>Three player choices and three computer choices give 9 pairs. Of these, 3 are ties, 3 are wins and 3 are losses. Read the table from the player's point of view, and use these expected results to check every branch.</p>
+
+<table>
+<thead><tr><th>Player</th><th>Computer</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>rock</td><td>rock</td><td>Tie</td></tr>
+<tr><td>rock</td><td>paper</td><td>You lose</td></tr>
+<tr><td>rock</td><td>scissors</td><td>You win</td></tr>
+<tr><td>paper</td><td>rock</td><td>You win</td></tr>
+<tr><td>paper</td><td>paper</td><td>Tie</td></tr>
+<tr><td>paper</td><td>scissors</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>rock</td><td>You lose</td></tr>
+<tr><td>scissors</td><td>paper</td><td>You win</td></tr>
+<tr><td>scissors</td><td>scissors</td><td>Tie</td></tr>
+</tbody>
+</table>
+
+<h3>Branching Example</h3>
+
+<p>Validate the player's choice before deciding the outcome. Check for a tie before win or loss, and list all three winning pairs. Everything else is a loss.</p>
+
+<pre><code>import random
+p = input("Your choice: ").strip().lower()
+options = ["rock", "paper", "scissors"]
+c = random.choice(options)
+if p not in ["rock", "paper", "scissors"]:
+    print("Invalid choice")
+else:
+    print(f"You: {p}, computer: {c}")
+    if p == c:
+        print("Tie")
+    elif ((p == "rock" and c == "scissors")
+          or (p == "scissors" and c == "paper")
+          or (p == "paper" and c == "rock")):
+        print("You win")
+    else:
+        print("You lose")</code></pre>
+
+<p>The output must be exactly one of <code>Tie</code>, <code>You win</code> and <code>You lose</code>.</p>
+
+<h3>Reproducible Testing</h3>
+
+<p>If the computer's choice is random, the same input gives a different result on each run, so the test cannot be repeated. So while testing, temporarily fix the computer's choice. Check that input with mixed spaces and case is cleaned up and that an invalid word and empty input are each rejected, and put <code>random.choice(options)</code> back before submitting.</p>
+
+<pre><code>computer = "scissors"
+player = " ROCK ".strip().lower()
+print(player, computer)
+# rock scissors: expected You win
+
+# With computer fixed to scissors:
+# rock     -&gt; You win
+# paper    -&gt; You lose
+# scissors -&gt; Tie
+# lizard   -&gt; Invalid choice
+# empty    -&gt; Invalid choice</code></pre>
+
+<p>The <a href="rps.html">rps</a> example does not edit the file directly; it uses <code>sed</code> to make a copy in <code>/tmp</code> in which <code>random.choice(options)</code> is replaced by a fixed value, and tests that. In the same way, you can print all 9 pairs as a table and compare it with the table above.</p>
+
+<h2>Lab 4: Leap-Year Calculator</h2>
+
+<h3>Leap-Year Rules</h3>
+
+<p><code>leap_year.py</code> reads a positive integer year and decides whether it is a leap year by the Gregorian calendar rules. If it is divisible by 400, it is a leap year. Otherwise, if it is divisible by 100, it is not a leap year. Otherwise, if it is divisible by 4, it is a leap year. Everything else is not a leap year. Divisibility is tested with the remainder operator <code>%</code>.</p>
+
+<pre><code># Divisibility uses remainder:
+print(2024 % 4 == 0)      # True
+print(1900 % 100 == 0)    # True
+print(2000 % 400 == 0)    # True
+
+# Expected classifications:
+# 2024: Leap year
+# 1900: Not a leap year
+# 2000: Leap year
+# 2023: Not a leap year</code></pre>
+
+<h3>Tracing the Leap-Year Rule</h3>
+
+<p>First find the results of the three divisibility tests. A year that is a multiple of 100 is a leap year only if it is also divisible by 400, and an ordinary multiple of 4 is a leap year. Explain why 1900 and 2000 give different results.</p>
+
+<pre><code>year = 1900
+by4 = year % 4 == 0
+by100 = year % 100 == 0
+by400 = year % 400 == 0
+print(by4, by100, by400)
+# True True False
+print(by400 or (by4 and not by100))
+# False
+
+# Repeat with 2000, 2024 and 2023.
+# Expected: True, True, False.</code></pre>
+
+<h3>Leap-Year Calculator</h3>
+
+<p>Reject 0 and negative years. Combine the rules with <code>and</code> and <code>or</code>, and use parentheses to separate the two cases that make a leap year. Print a clear result for the year entered.</p>
+
+<pre><code>year = int(input("Year: "))
+if year &lt;= 0:
+    print("Enter a positive year")
+else:
+    is_leap = (year % 400 == 0 or
+               (year % 4 == 0 and
+                year % 100 != 0))
+    if is_leap:
+        print(f"{year}: Leap year")
+    else:
+        print(f"{year}: Not a leap year")</code></pre>
+
+<h3>An Equivalent Branch Chain</h3>
+
+<p>The challenge is to express the same rule with <code>if</code>/<code>elif</code>/<code>else</code>. Keep the positive-year check first, check multiples of 400 before multiples of 100, and multiples of 100 before multiples of 4. Compare the results with the Boolean-expression version.</p>
+
+<pre><code>year = 2000
+if year &lt;= 0:
+    print("Enter a positive year")
+elif year % 400 == 0:
+    print(f"{year}: Leap year")
+elif year % 100 == 0:
+    print(f"{year}: Not a leap year")
+elif year % 4 == 0:
+    print(f"{year}: Leap year")
+else:
+    print(f"{year}: Not a leap year")</code></pre>
+
+<p>In the <a href="leap_year.html">leap_year</a> example you can run the trace for four years, the solution with six inputs (2024, 2000, 2023, 1900, 0, -4), and the <code>if</code>/<code>elif</code> version.</p>
+
+<h2>Debugging Review Before Submission</h2>
+
+<p>For each defect, choose one input that exposes it. Before changing the code, first explain why it fails, and after the fix, run both the normal input and the input that used to fail again. Leave the test inputs and expected results as comments in the file.</p>
+
+<table>
+<thead><tr><th>Defect</th><th>Exposing test</th></tr></thead>
+<tbody>
+<tr><td>Indexing before checking</td><td><code>""</code></td></tr>
+<tr><td>Missing <code>strip()</code></td><td><code>"  "</code></td></tr>
+<tr><td>Checking the low grade first</td><td><code>95</code></td></tr>
+<tr><td>Missing <code>lower()</code></td><td><code>"ROCK"</code></td></tr>
+<tr><td>Checking only <code>year % 4 == 0</code></td><td><code>1900</code></td></tr>
+</tbody>
+</table>
+
+<p>The fixes are, respectively: check before indexing, normalize the text, order the grade thresholds from highest, and apply the leap-year rule in full. Each example page contains a step that reproduces one of these defects. For example, in <a href="grades.html">grades</a> a chain that checks the low threshold first classifies 95 as D, and in <a href="leap_year.html">leap_year</a> checking only for multiples of 4 wrongly reports 1900 as a leap year.</p>
+
+<h2>Testing &amp; Submission</h2>
+
+<p>Run each file and compare the output with the expected results. Check the boundary values and invalid choices, and for rock-paper-scissors try all 9 pairs.</p>
+
+<table>
+<thead><tr><th>Program</th><th>Input</th><th>Expected result</th></tr></thead>
+<tbody>
+<tr><td>strings.py</td><td><code>"   "</code></td><td>No text entered</td></tr>
+<tr><td>strings.py</td><td><code>" A "</code></td><td>Length: 1</td></tr>
+<tr><td>grades.py</td><td>59 / 60</td><td>F / D</td></tr>
+<tr><td>grades.py</td><td>100 / 101</td><td>A / Invalid score</td></tr>
+<tr><td>leap_year.py</td><td>1900 / 2000</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>2023 / 2024</td><td>Not leap / Leap</td></tr>
+<tr><td>leap_year.py</td><td>0</td><td>Positive-year message</td></tr>
+</tbody>
+</table>
+
+<p>Submit <code>strings.py</code>, <code>grades.py</code>, <code>rps.py</code> and <code>leap_year.py</code>. In each file, record at least three test inputs and expected results as comments. Files you complete in this lab can be copied, as in <code>cp strings.py /mnt/host/</code>, and then downloaded to your computer with the page's Download box.</p>
+
+<h2>Summary &amp; Next Chapter</h2>
+
+<ul>
+<li>Operators build expressions and comparisons.</li>
+<li>String indices start at 0, and a slice does not include the stop index.</li>
+<li>String methods only return a result; the string itself does not change.</li>
+<li><code>if</code>/<code>elif</code>/<code>else</code> picks the first matching branch.</li>
+<li>Boundary tests reveal missing cases.</li>
+</ul>
+
+<p>In the next chapter, 'Loops', we learn the <code>for</code> and <code>while</code> loops, <code>range()</code>, and <code>break</code> and <code>continue</code>, and the 'Functions' chapter follows. The preview on the slides also mentions lists, tuples, dictionaries and sets, but these data structures are covered separately later. A question to think about in advance: "How could we repeat rock-paper-scissors until the user says they want to stop?"</p>

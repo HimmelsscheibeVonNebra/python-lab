@@ -1,0 +1,299 @@
+<p>이번 시간의 목표는 MVP의 신뢰성을 지키면서 기능 하나를 확장하는 것입니다. 결과물은 기능 하나와 그 동작을 확인하는 테스트이고, 실패해도 기존 보고서가 보존되는지 확인합니다. 작업은 개인 저장소나 예제 복사본에서 합니다. 전반에는 짧은 실험 활동(A~D)으로 입력 검증과 실패 처리를 확인하고, 후반에는 최소 거래량 필터를 예로 기능 계약, 실패 테스트, 구현, 시연, 코드 리뷰를 진행합니다. 실험은 <a href="korea_market_mvp.html">korea_market_mvp</a>와 <a href="playground.html">playground</a>에서 실행합니다.</p>
+
+<h2>출발점: 기존 테스트</h2>
+
+<p>'프로젝트 만들기' 장에서 만든 증권시장 MVP의 기존 테스트 12개가 통과하는지 먼저 확인합니다.</p>
+
+<pre><code>cd ~/project/mvp/examples/korea_market_mvp
+python3 -m unittest -v</code></pre>
+
+<p>이 실습에서 폴더는 <code>~/project/mvp/examples/korea_market_mvp</code>입니다. 통과하는 상태에서 시작해야, 새 기능을 넣은 뒤 무언가 깨졌을 때 그 원인이 내 변경이라고 판단할 수 있습니다.</p>
+
+<h2>활동 A: 실행 전 판정</h2>
+
+<p>활동 A는 5분입니다. 먼저 혼자서, 함수에 직접 전달할 값 0, 100, -1, True, "100", 1.5를 각각 허용할지 거절할지 이유와 함께 적습니다. 계약은 "최소 거래량은 bool을 제외한 0 이상의 int"입니다. 그다음 실행해 비교합니다.</p>
+
+<pre><code>python3 ~/testing/examples/validation_lab/playground.py verdict</code></pre>
+
+<p>짝과 판정이 달랐던 값 하나를 골라 함수 계약으로 결론을 설명합니다. <a href="playground.html">playground</a>의 첫 단계에서 0과 100만 ACCEPT, 나머지는 REJECT로 나옵니다.</p>
+
+<h2>CSV가 들어오는 경계</h2>
+
+<p>CSV 셀은 문자열로 들어옵니다. 열 구조와 필수 필드를 먼저 검사하고, 검증·변환한 값만 분석 함수로 넘깁니다.</p>
+
+<h3>종목 코드는 문자열</h3>
+
+<pre><code>int("005930")  # 5930</code></pre>
+
+<p>앞자리 0은 종목 코드의 일부입니다. 계산에 쓰는 가격과 거래량만 정수로 변환합니다.</p>
+
+<h3>변환 성공과 유효한 값</h3>
+
+<pre><code>int("-1")  # -1</code></pre>
+
+<p>변환에 성공해도 음수 거래량은 거절합니다. 가격은 0보다 커야 하고 거래량은 0 이상이어야 합니다.</p>
+
+<h3>행 규칙과 전체 규칙</h3>
+
+<table>
+<thead>
+<tr><th>검사 범위</th><th>규칙</th></tr>
+</thead>
+<tbody>
+<tr><td>행 하나</td><td>실제 날짜, 가격·거래량 범위</td></tr>
+<tr><td>전체 입력</td><td>날짜 하나, 중복 없는 종목 코드</td></tr>
+</tbody>
+</table>
+
+<p>공백을 정리하는지 여부도 입력 계약에 포함됩니다. MVP에서 행 규칙은 <code>parse_row</code>, 전체 규칙은 <code>analyze</code>가 맡습니다. <a href="korea_market_mvp.html">korea_market_mvp</a>에서 거래량 -1인 행이 parse_row에서, 필터로 빠질 행의 코드 중복이 analyze에서 거절되는 것을 확인합니다.</p>
+
+<h2>최소 거래량의 자료형 계약</h2>
+
+<p>0 이상의 int만 허용하고 bool·문자열·실수는 거절합니다. 함수를 직접 호출할 때의 값과, CLI에서 받은 문자열을 변환한 값은 구분합니다.</p>
+
+<pre><code>def validate_min_volume(value):
+    if type(value) is not int or value &lt; 0:
+        raise ValueError("min_volume must be a nonnegative integer")
+    return value</code></pre>
+
+<p><code>isinstance(True, int)</code>는 True이므로 bool은 따로 고려해야 합니다. 여기서는 <code>type(value) is not int</code>로 bool까지 거절합니다.</p>
+
+<h2>예외를 어디서 던지고 어디서 처리하는가</h2>
+
+<p>계산 규칙은 계약 위반에 ValueError를 던집니다. 저장 모듈은 파일·디코딩 실패를 호출자에게 그대로 전달합니다. CLI는 예상한 실패를 사용자 메시지와 종료 코드로 바꿉니다. 예외는 의미 있는 대응을 할 수 있는 곳에서 처리하고, 예상하지 못한 코드 오류는 개발 중에 드러나게 둡니다.</p>
+
+<h3>실패를 빈 결과로 바꾸는 코드</h3>
+
+<pre><code>try:
+    quotes = load_quotes(path)
+except Exception:
+    quotes = []</code></pre>
+
+<p>이렇게 쓰면 파일 누락과 코드 오류가 모두 정상적인 빈 입력처럼 보입니다.</p>
+
+<h3>실패와 정상 빈 결과</h3>
+
+<table>
+<thead>
+<tr><th>입력</th><th>기대 동작</th></tr>
+</thead>
+<tbody>
+<tr><td>누락된 CSV</td><td>실패, 기존 보고서 보존</td></tr>
+<tr><td>헤더만 있는 정상 CSV</td><td>성공, 빈 보고서 생성</td></tr>
+</tbody>
+</table>
+
+<p>완전히 빈 파일은 헤더만 있는 파일과 다릅니다.</p>
+
+<h3>기존 CLI의 처리 코드</h3>
+
+<pre><code>except (OSError, ValueError, UnicodeError) as error:
+    print(f"Report not generated: {error}")
+    return 1</code></pre>
+
+<p>CSV 행 번호처럼 원인을 조사하는 데 필요한 정보를 메시지에 담습니다.</p>
+
+<h3>종료 코드도 결과다</h3>
+
+<table>
+<thead>
+<tr><th>코드</th><th>의미</th></tr>
+</thead>
+<tbody>
+<tr><td>0</td><td>보고서 생성 성공</td></tr>
+<tr><td>1</td><td>예상한 데이터·파일 실패</td></tr>
+<tr><td>2</td><td>argparse 인자 오류</td></tr>
+</tbody>
+</table>
+
+<p>메시지뿐 아니라 출력 파일의 상태도 확인합니다.</p>
+
+<h2>활동 B: CSV 고장 실험</h2>
+
+<p>활동 B는 10분입니다. 실행하기 전에 정상 / 헤더만 있음 / 파일 누락 / 음수 거래량 각각의 반환 코드와 OLD 보고서 보존 여부를 예측합니다.</p>
+
+<pre><code>python3 ~/testing/examples/validation_lab/playground.py csv</code></pre>
+
+<p>그다음 <code>csv_experiment()</code>의 <code>cases</code>에 잘못된 날짜나 필수 열 누락 사례를 추가합니다. 한 번에 한 조건만 바꾸고 예상과 실제를 비교합니다. 그리고 두 질문에 답합니다. 정상 빈 결과는 왜 OLD를 교체할까? 입력 오류는 왜 OLD를 보존해야 할까? 활동지에 실행 증거와 이유를 각각 한 문장으로 적습니다. 사례를 추가하려면 <a href="playground.html">playground</a>에서 <code>nano playground.py</code>로 고친 뒤 다시 실행합니다.</p>
+
+<h2>보고서를 교체하기 전과 후</h2>
+
+<p>모든 입력을 읽고 검증한 다음, 새 HTML 전체를 출력 폴더의 임시 파일에 씁니다. 검증과 쓰기가 끝날 때까지 기존 보고서는 그대로 둡니다. 쓰기가 끝나면 <code>os.replace</code>로 목적 파일을 교체하고, 교체에 실패하면 임시 파일을 정리합니다. 이 방식은 처리할 수 있는 교체 전 실패에서 기존 결과를 보호하는 것이고, 전원이 끊기는 상황의 내구성까지 보장하지는 않습니다.</p>
+
+<h2>단위 테스트와 통합 테스트</h2>
+
+<pre><code>self.assertAlmostEqual(change_pct(100, 110), 10.0)</code></pre>
+
+<p>단위 테스트는 작은 함수 하나의 계약을 확인합니다. 실패하면 조사할 범위가 좁습니다.</p>
+
+<table>
+<thead>
+<tr><th>확인 방법</th><th>관찰할 결과</th></tr>
+</thead>
+<tbody>
+<tr><td>잘못된 CSV로 main 호출</td><td>실패 코드, 기존 HTML 보존</td></tr>
+<tr><td>보고서를 브라우저에서 열기</td><td>시장·라벨·빈 상태 표시</td></tr>
+</tbody>
+</table>
+
+<p>함수 테스트와 실제 사용자 흐름을 함께 확인합니다. 이 웹 실습에서 보고서를 브라우저로 보려면 <code>cp docs/index.html /mnt/host/report.html</code> 후 받기로 내려받습니다.</p>
+
+<h3>임시 폴더로 실험 격리</h3>
+
+<pre><code>from pathlib import Path
+from tempfile import TemporaryDirectory
+
+with TemporaryDirectory() as folder:
+    output = Path(folder) / "index.html"
+    output.write_text("OLD", encoding="utf-8")</code></pre>
+
+<p>제출할 보고서 대신 이 경로로 실패 실험을 합니다.</p>
+
+<h3>드문 저장 실패 재현하기</h3>
+
+<pre><code>with patch("storage.os.replace", side_effect=OSError("disk")):
+    write_html(output, "NEW")</code></pre>
+
+<p>테스트 대상이 참조하는 <code>storage.os.replace</code>를 패치합니다. CSV 파싱 실험에는 실제 임시 파일을 씁니다.</p>
+
+<h2>활동 C: 보고서 구출</h2>
+
+<p>활동 C는 8분입니다. 교체가 실패하면 OSError가 호출자에게 전달될지, 출력은 OLD와 NEW 중 무엇일지, 폴더에 임시 파일이 남을지 먼저 적습니다.</p>
+
+<pre><code>python3 ~/testing/examples/validation_lab/playground.py rescue</code></pre>
+
+<p>관찰한 세 가지를 assertion으로 바꿉니다. <code>assertRaises</code>로 예외 전달을, <code>assertEqual</code>로 OLD 보존과 남은 파일 목록을 검사합니다. 활동지에 있는 뼈대를 <code>test_rescue.py</code>로 <code>playground.py</code> 옆에 저장하고 완성해 실행합니다.</p>
+
+<pre><code>import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+from playground import write_html
+
+class RescueTests(unittest.TestCase):
+    def test_failed_replace(self):
+        with TemporaryDirectory() as folder:
+            output = Path(folder) / "index.html"
+            output.write_text("OLD", encoding="utf-8")
+            with patch("storage.os.replace", side_effect=OSError("disk")):
+                # TODO: assertRaises 안에서 write_html(output, "NEW") 호출
+                pass
+            # TODO: assertEqual로 OLD 보존과 남은 파일 목록 검사</code></pre>
+
+<p>세 검사를 모두 쓰고, 테스트가 실제로 실행됐는지(Ran 1 test) 확인합니다. 고급 과제는 복사본에서 <code>write_html</code>을 <code>Path(path).write_text(...)</code>로 바꾼 뒤 같은 테스트가 결함을 잡는지 확인하는 것입니다.</p>
+
+<p>이 실습 환경에서 <code>playground.py</code>는 증권시장 MVP를 <code>11week/…</code> 경로에서 찾도록 되어 있는데, 가상 머신의 폴더 이름은 <code>project/mvp</code>입니다. 그래서 <a href="playground.html">playground</a>의 단계는 <code>PYTHONPATH=$HOME/project/mvp/examples/korea_market_mvp</code>를 앞에 붙여 실행합니다. <code>test_rescue.py</code>를 실행할 때도 같은 PYTHONPATH를 붙입니다.</p>
+
+<h2>새 기능: 최소 거래량</h2>
+
+<p>사용자 목표는 일정 거래량 이상인 종목만 비교하는 것입니다.</p>
+
+<pre><code>analyze(quotes, market, min_volume=0)</code></pre>
+
+<p>기본값이 0이면 기존의 두 인자 호출과 결과가 그대로 유지됩니다. 중복 코드와 섞인 날짜는 전체 입력에서 먼저 거절합니다. 시장 조건과 최소 거래량 조건을 함께 적용하고, 등락률 내림차순·코드 오름차순 정렬과 원본 보존을 유지합니다.</p>
+
+<h3>수락 사례</h3>
+
+<table>
+<thead>
+<tr><th>거래량</th><th>기준 100에서</th></tr>
+</thead>
+<tbody>
+<tr><td>99</td><td>제외</td></tr>
+<tr><td>100</td><td>포함</td></tr>
+<tr><td>101</td><td>포함</td></tr>
+</tbody>
+</table>
+
+<p>기대 결과는 구현 코드가 아니라 계약에서 정합니다.</p>
+
+<table>
+<thead>
+<tr><th>입력</th><th>기대 결과</th></tr>
+</thead>
+<tbody>
+<tr><td>-1, True, "100", 1.5</td><td>각각 ValueError</td></tr>
+<tr><td>모든 종목 제외</td><td>[], 요약 count=0, mean=None</td></tr>
+<tr><td>필터로 숨겨질 중복</td><td>ValueError</td></tr>
+</tbody>
+</table>
+
+<h2>활동 D: 결함 후보와 최소 입력</h2>
+
+<p>활동 D는 8분입니다. 각 후보를 잡아내는 최소 입력을 만듭니다.</p>
+
+<ul>
+<li>A: <code>volume &gt; threshold</code>로 비교한다.</li>
+<li>B: <code>isinstance(value, int)</code>로만 자료형을 검사한다.</li>
+<li>C: 필터링한 뒤에 중복 코드를 검사한다.</li>
+</ul>
+
+<p>짝에게 후보 이름을 가리고 입력과 기대 결과만 보여 주면, 짝은 그 입력이 어떤 결함을 잡는지 설명합니다. 중복 사례는 같은 날짜·코드를 가진 두 행 중 하나만 기준 이상이 되게 만들어야 합니다. 경계값과 숨겨진 중복 사례는 프로젝트 테스트 계획(<code>project-review.md</code>)으로 옮깁니다. <a href="playground.html">playground</a>의 마지막 단계는 후보 A를 기준과 같은 값 100으로 잡아내는 모습입니다.</p>
+
+<h2>후반: 기능 계약에서 구현까지</h2>
+
+<p>휴식 동안 개인 프로젝트에서 확장할 기능 하나를 정합니다. 후반에는 계약과 실패 테스트부터 씁니다.</p>
+
+<h3>기능 계약 쓰기</h3>
+
+<p><code>labs/session2/project-review.md</code>를 열어 요구사항 ID와 바꿀 함수를 연결하고, 허용 입력과 정상·오류 결과를 짧게 적습니다. 리뷰 양식에는 TEST-13~18의 예시 계획(거래량 99/100/101, 기준 0, 잘못된 자료형, 모두 제외, 숨겨진 중복·섞인 날짜, 시장·거래량 동시 적용)이 있습니다.</p>
+
+<h3>구현 전 실패 증거</h3>
+
+<p>새 동작을 확인하는 테스트를 먼저 추가하고, 기존 코드에서 실행해 예상한 이유로 실패하는지 확인합니다. 입력, 기대 결과, 실제 실패를 기록합니다.</p>
+
+<h3>구현 (20분)</h3>
+
+<p>새 매개변수를 검증한 뒤 필터를 적용합니다. 전체 스냅숏 검증은 필터 앞에 둡니다. 원본 입력을 바꾸지 않습니다.</p>
+
+<h3>새 테스트와 회귀 테스트</h3>
+
+<p>새 사례와 기존 테스트 전체를 실행합니다. 기본값 0과 기존 두 인자 호출을 확인합니다. 실패하면 입력을 재현하고 원인을 좁힙니다.</p>
+
+<p>이 가상 머신에서 해 보려면 <code>cp -r ~/project/mvp/examples/korea_market_mvp ~/my_mvp</code>로 복사본을 만들고 <code>nano</code>로 <code>logic.py</code>와 <code>test_market.py</code>를 고친 뒤 <code>python3 -m unittest -v</code>를 실행합니다. 복사본은 재부팅하면 사라지므로 결과 파일은 <code>/mnt/host</code>로 복사해 받아 둡니다.</p>
+
+<h2>결과 시연</h2>
+
+<p>기존 main 진입점으로 정상 보고서와 빈 보고서를 만들고, 새 함수 동작을 보여 줄 테스트를 준비합니다. CLI 연결이 없다면 보고서와 함수 테스트를 각각 시연합니다. 함수 확장이 자동으로 CLI 보고서에 적용된다고 설명하지 않습니다.</p>
+
+<h3>활동 E: 90초 사용자 시연</h3>
+
+<ul>
+<li>30초: 사용자가 정상 보고서의 시장, 종목 수, 순위를 설명한다.</li>
+<li>30초: 빈 보고서의 안내가 충분한지 말한다.</li>
+<li>30초: 구현자가 기준과 같은 값을 포함하는 테스트를 실행한다.</li>
+</ul>
+
+<p>관찰한 문제 하나 또는 확인한 수락 기준 하나를 적고, <code>project-review.md</code>의 실제 시연 항목에 연결합니다. 최종 제출 테스트는 모두 통과시킵니다.</p>
+
+<h2>코드 리뷰</h2>
+
+<h3>반례 찾기 (15분)</h3>
+
+<p>diff를 계약과 테스트 계획에 대조하고, 경계값·오류·빈 결과에서 반례 하나를 찾습니다. 동료가 없으면 같은 질문으로 자기 diff를 검토합니다.</p>
+
+<h3>구체적인 의견</h3>
+
+<pre><code>입력: ______
+기대 결과 / 실제 결과: ______ / ______
+근거 함수 또는 테스트: ______</code></pre>
+
+<p>예외 전달, 기존 결과 보존, 이름과 책임 분리도 확인합니다. 동료는 변경을 직접 덮어쓰지 않고 구체적인 입력과 기대 결과로 의견을 남깁니다.</p>
+
+<h3>리뷰 반영과 재확인</h3>
+
+<p>의견에 따라 고치고 관련 테스트를 다시 실행합니다. 반영하지 않은 의견은 이유를 기록하고, 리뷰 의견과 변경 결과를 제출 양식에 남깁니다.</p>
+
+<h2>PR에 남길 증거와 제출</h2>
+
+<ul>
+<li>문제와 사용자에게 보이는 변화, 요구사항 ID.</li>
+<li>바꾼 함수, 정확한 검증 명령과 실제 결과.</li>
+<li>GitHub를 쓰기 어려우면 로컬 diff와 리뷰 기록을 제출한다.</li>
+</ul>
+
+<p>기능 코드, 테스트, 리뷰 기록, 추적 문서를 제출합니다. PR은 실제 PC의 저장소에서 엽니다. 퇴실 질문은 두 가지입니다. 내가 쓴 테스트가 잡는 구체적인 결함은 무엇인가? 필터로 숨겨질 중복 코드도 거절해야 하는 이유는 무엇인가?</p>
+
+<h2>확장 단계로 이어가기</h2>
+
+<p>기존 MVP가 계속 실행되는지 마지막으로 확인합니다. 확장 단계에서는 검증된 규칙 위에 데이터 처리나 UI를 확장합니다.</p>

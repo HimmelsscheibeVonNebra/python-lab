@@ -1,0 +1,174 @@
+{
+  "class": "modules",
+  "title": "모듈과 표준 라이브러리",
+  "summary": "import로 math·datetime·random을 불러 쓰고, 직접 만든 모듈(number_tools)을 다른 프로그램에서 import한다. 원 넓이·빗변, 날짜 카운트다운, 로또 번호, 숫자 맞히기 게임을 실습한다.",
+  "examples": [
+    {
+      "name": "math_practice",
+      "source": "modules/starter/math_practice.py",
+      "also": [
+        "modules/solutions/math_practice.py"
+      ],
+      "summary": "Practice 1. 반지름을 읽어 원의 넓이와 둘레를, 두 변을 읽어 빗변을 출력한다. import math로 불러온 math.pi와 math.hypot을 점(.)으로 꺼내 쓴다.",
+      "steps": [
+        {
+          "cmd": "printf '3\\n3\\n4\\n' | python3 math_practice.py",
+          "note": "입력 3, 3, 4를 미리 넣어 실행한다(직접 python3 math_practice.py로 실행해 입력해도 된다). 스타터는 TODO만 있어서 프롬프트 Radius: First leg: Second leg: 만 한 줄로 이어 나오고 결과는 없다. 파이프로 넣은 입력은 화면에 다시 찍히지 않기 때문에 프롬프트가 붙어 보인다."
+        },
+        {
+          "cmd": "printf '3\\n3\\n4\\n' | python3 ../solutions/math_practice.py",
+          "note": "완성본은 Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0을 출력한다. round(..., 2)로 소수 둘째 자리까지 맞췄다."
+        },
+        {
+          "cmd": "printf '1\\n5\\n12\\n' | python3 ../solutions/math_practice.py",
+          "note": "두 번째 테스트: 반지름 1이면 넓이는 π와 같은 3.14, 둘레는 6.28이다. 5와 12의 빗변은 13.0이다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport math\nprint(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))\nEOF",
+          "note": "슬라이드의 math 함수들을 한 번에 확인한다: 2 3 120 6 5.0. 내림·올림, 계승, 최대공약수, 빗변이다."
+        },
+        {
+          "cmd": "python3 -c 'print(sqrt(16))'",
+          "note": "import 없이 sqrt를 쓰면 NameError: name 'sqrt' is not defined가 난다. Traceback은 마지막 줄부터 읽는다."
+        },
+        {
+          "cmd": "python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'",
+          "note": "from math import sqrt, pi로 이름을 직접 가져오면 접두사 없이 쓸 수 있다: 4.0과 3.141592653589793."
+        }
+      ],
+      "expect": "Hypotenuse: 5.0",
+      "traceback": true,
+      "notes": "다섯 번째 단계의 NameError는 일부러 낸 오류다. 실제 실습에서는 nano math_practice.py로 TODO를 채운 뒤 첫 단계를 다시 실행해 완성본과 같은 출력이 나오는지 비교한다."
+    },
+    {
+      "name": "date_check",
+      "source": "modules/starter/date_check.py",
+      "also": [
+        "modules/solutions/date_check.py"
+      ],
+      "summary": "Practice 2. YYYY-MM-DD 형식의 날짜를 읽어 datetime.strptime으로 날짜로 바꾸고, 요일 이름(strftime(\"%A\"))과 오늘(date.today())부터 남은 날 수를 출력한다.",
+      "steps": [
+        {
+          "cmd": "printf '2026-12-25\\n' | python3 date_check.py",
+          "note": "스타터는 날짜를 읽고 변환까지만 하므로 프롬프트 외에는 아무것도 출력하지 않는다. 형식이 맞는 날짜라 오류도 없다."
+        },
+        {
+          "cmd": "date +%F",
+          "note": "가상 머신이 생각하는 오늘 날짜다. 아래 남은 날 수는 이 날짜를 기준으로 계산된다."
+        },
+        {
+          "cmd": "printf '2026-12-25\\n' | python3 ../solutions/date_check.py",
+          "note": "2026년 성탄절은 Friday다. Days remaining 값은 오늘 날짜에 따라 달라진다."
+        },
+        {
+          "cmd": "date +%F | python3 ../solutions/date_check.py",
+          "note": "오늘 날짜를 그대로 넣으면 Days remaining: 0이다."
+        },
+        {
+          "cmd": "printf '2026-01-01\\n' | python3 ../solutions/date_check.py",
+          "note": "이미 지난 날짜는 남은 날 수가 음수로 나온다. 2026-01-01은 Thursday다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nfrom datetime import date, timedelta\ntoday = date(2026, 9, 27)\nexam = date(2026, 11, 13)\nprint((exam - today).days)\nprint(today + timedelta(days=100))\nEOF",
+          "note": "슬라이드의 날짜 계산: 두 날짜의 차는 timedelta이고 .days는 47, 날짜 + 100일은 2027-01-05다."
+        }
+      ],
+      "expect": "Friday"
+    },
+    {
+      "name": "number_tools",
+      "source": "modules/starter/number_tools.py",
+      "also": [
+        "modules/starter/stats_report.py",
+        "modules/solutions/number_tools.py",
+        "modules/solutions/stats_report.py"
+      ],
+      "summary": "Lab 1. number_tools.py는 average와 count_above 함수를 담은 모듈이고, 같은 폴더의 stats_report.py가 import number_tools로 그 함수를 불러 점수 보고서를 출력한다. 모듈 맨 아래의 if __name__ == \"__main__\": 블록은 직접 실행할 때만 데모를 보여 준다.",
+      "steps": [
+        {
+          "cmd": "python3 number_tools.py",
+          "note": "직접 실행하면 __name__이 \"__main__\"이므로 데모가 돈다. 스타터의 average는 pass뿐이라 None을 돌려주어 Demo average: None이 나온다."
+        },
+        {
+          "cmd": "python3 stats_report.py",
+          "note": "스타터 보고서는 Scores: [88, 92, 79, 93]만 출력한다. import number_tools는 조용히 지나간다. 가져올 때는 데모가 실행되지 않는다."
+        },
+        {
+          "cmd": "python3 ../solutions/number_tools.py",
+          "note": "완성본 모듈의 직접 실행 결과: Demo average: 5.0 (2+4+6+8을 4로 나눈 값)."
+        },
+        {
+          "cmd": "python3 ../solutions/stats_report.py",
+          "note": "완성본 보고서: Average: 88.0 (352 / 4), Above 85: 3 (88, 92, 93). 스크립트가 있는 폴더가 모듈 검색 경로의 첫 자리라서 solutions 폴더의 number_tools가 import된다."
+        },
+        {
+          "cmd": "python3 -c 'import number_tools; print(number_tools.__name__)'",
+          "note": "import된 모듈 안에서 __name__은 파일 이름에서 .py를 뺀 number_tools다. 그래서 데모 줄은 출력되지 않는다."
+        },
+        {
+          "cmd": "(cd ../solutions && python3 -c 'import number_tools; print(number_tools.average([]))')",
+          "note": "빈 리스트의 평균은 0으로 나누게 되어 ZeroDivisionError: division by zero가 난다(Lab 1 Checks). 이 오류를 처리하는 방법은 다음 장 '파일·예외·JSON'에서 다룬다. 괄호 안에서 cd했으므로 현재 폴더는 바뀌지 않는다."
+        }
+      ],
+      "expect": "Above 85: 3",
+      "traceback": true,
+      "notes": "마지막 단계의 ZeroDivisionError는 일부러 보여 주는 오류다. 두 TODO 함수를 채운 뒤 첫 두 단계를 다시 실행하면 완성본과 같은 Demo average: 5.0, Average: 88.0, Above 85: 3이 나와야 한다."
+    },
+    {
+      "name": "lotto",
+      "source": "modules/starter/lotto.py",
+      "also": [
+        "modules/solutions/lotto.py"
+      ],
+      "summary": "Lab 2. 게임 수(1–5)를 읽어 게임마다 random.sample(range(1, 46), 6)으로 서로 다른 번호 6개를 뽑고 정렬해 한 줄에 출력한다. 범위를 벗어난 입력은 Invalid games.",
+      "steps": [
+        {
+          "cmd": "printf '3\\n' | python3 lotto.py",
+          "note": "스타터는 반복문 몸체가 pass라서 3을 넣어도 번호가 한 줄도 나오지 않는다."
+        },
+        {
+          "cmd": "printf '3\\n' | python3 ../solutions/lotto.py",
+          "note": "완성본은 세 줄을 출력한다. 줄마다 숫자가 작은 것부터 정렬되어 있고, 중복이 없으며, 모두 1에서 45 사이인지 확인한다. 실행할 때마다 번호가 달라진다."
+        },
+        {
+          "cmd": "printf '1\\n' | python3 ../solutions/lotto.py",
+          "note": "1을 넣으면 정확히 한 줄이다. print(*numbers)가 리스트를 풀어 대괄호와 쉼표 없이 공백으로 구분해 출력한다."
+        },
+        {
+          "cmd": "printf '6\\n' | python3 ../solutions/lotto.py\nprintf '0\\n' | python3 ../solutions/lotto.py",
+          "note": "6과 0은 모두 범위 밖이라 Invalid games만 출력한다."
+        },
+        {
+          "cmd": "python3 - <<'EOF'\nimport random\nrandom.seed(42)\nprint(random.randint(1, 100), random.randint(1, 100))\nrandom.seed(42)\nprint(random.randint(1, 100))\nEOF",
+          "note": "seed(42)를 주면 같은 수열이 다시 나온다: 82 15, 그리고 다시 82. 테스트할 때는 seed가 유용하지만 로또에는 쓰지 않는다."
+        }
+      ],
+      "expect": "Invalid games"
+    },
+    {
+      "name": "guessing",
+      "source": "modules/starter/guessing.py",
+      "also": [
+        "modules/solutions/guessing.py"
+      ],
+      "summary": "Lab 3(과제). 컴퓨터가 1–100 사이의 비밀 수를 한 번 고르고, 맞힐 때까지 추측마다 Higher/Lower를 알려 주며, 맞히면 시도 횟수와 함께 Correct!를 출력하고 break로 반복을 끝낸다.",
+      "steps": [
+        {
+          "cmd": "seq 1 3 | python3 guessing.py",
+          "note": "스타터에는 비교도 break도 없어서 while True가 끝나지 않는다. 입력 세 줄을 다 쓰고 네 번째 input()에서 EOFError: EOF when reading a line이 난다. 직접 실행했다면 Ctrl+C로 멈춰야 한다."
+        },
+        {
+          "cmd": "seq 1 100 | python3 ../solutions/guessing.py | tail -n 3",
+          "note": "완성본에 1부터 100까지 차례로 넣으면 비밀 수에 닿을 때까지 Higher가 이어지다가 Correct! Attempts: N으로 끝난다. 이 경우 N이 곧 비밀 수다. 마지막 세 줄만 보여 준다."
+        },
+        {
+          "cmd": "seq 100 -1 1 | python3 ../solutions/guessing.py | tail -n 3",
+          "note": "거꾸로 100부터 넣으면 이번에는 Lower가 이어진다. 비밀 수는 실행마다 새로 정해진다."
+        }
+      ],
+      "notes": "첫 단계의 EOFError는 스타터가 끝나지 않는다는 것을 보여 주는 의도된 오류다. 직접 플레이하려면 python3 ../solutions/guessing.py를 실행하고 50부터 시작해 Higher/Lower에 따라 범위를 반씩 줄여 본다(7번 안에 맞힐 수 있다). 스타터의 TODO는 if/elif/else로 Higher, Lower, Correct!를 나누고 맞힌 경우 break하는 것이다. 완성한 뒤 seq 1 100 | python3 guessing.py | tail -n 3으로 완성본과 같은 마지막 줄이 나오는지 확인한다.",
+      "expect": "Correct! Attempts:",
+      "traceback": true
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "title": "Validation, Feature Tests and Code Review",
+  "summary": "Starting from the 12 existing tests of the stock market MVP built in the \"Building a Project\" chapter, run experiments on validation at the CSV input boundary, the difference between a failure and a valid empty result, exit codes, and preserving the old report on failure. Compare predictions with observations in the three playground.py activities (verdict, csv, rescue), and design the contract and test cases for a new feature: a minimum-volume filter.",
+  "examples": {
+    "korea_market_mvp": {
+      "summary": "The starting point for this lesson. Before extending any feature, confirm that all existing tests pass, then use the MVP code to see for yourself that CSV cells arrive as strings, how successful conversion differs from a valid value, row rules versus whole-input rules, and what the exit codes mean.",
+      "notes": "The slides' cd 11week/examples/korea_market_mvp is ~/project/mvp/examples/korea_market_mvp in this lab. Extend the feature in your own repository on your real PC, or in a copy on this virtual machine (cp -r ~/project/mvp/examples/korea_market_mvp ~/my_mvp).",
+      "steps": [
+        "Ran 12 tests, OK. Starting from this state lets you tell whether anything that breaks after adding the new feature was broken by your change.",
+        "int(\"005930\") becomes 5930 and loses its leading zero, so stock codes stay strings. int(\"-1\") converts successfully, but a negative volume is not valid. isinstance(True, int) is True while type(True) is int is False, so rejecting bool separately requires a type check.",
+        "parse_row checks the rules for a single row. A volume of -1 is rejected with ValueError: volume must be a whole number, because \"-1\".isdigit() is False. This is an intended traceback.",
+        "analyze checks the whole-input rules (one date, no duplicate codes) before filtering. The second row is KOSDAQ and would be dropped by the KOSPI filter, but it has the same code, so ValueError: duplicate code in snapshot is raised. Rejecting duplicates even when the filter would hide them is part of the contract.",
+        "Exit codes are results too. A missing CSV is a failure (1), a valid header-only CSV is a success (0, 0 stocks), and an argparse argument error is 2. Look not only at the message (Report not generated / Generated / usage: … error) but also at the exit= value and the state of docs/index.html.",
+        "main.py turns the expected failures (OSError, ValueError, UnicodeError) into a user message and exit code 1. There is no code like except Exception: quotes = [] that turns a failure into an empty result. storage.py only re-raises ValueError with the row number attached; it does not swallow it.",
+        "When you are done checking, regenerate the normal ALL report (5 stocks)."
+      ]
+    },
+    "playground": {
+      "summary": "Import the stock market MVP without modifying it and run three experiments. verdict shows the type contract for the minimum volume; csv calls main() with four CSVs inside a temporary folder and shows the return code and whether the OLD report survives; rescue simulates an os.replace failure and shows whether the existing output survives. Predict the result of each activity before running it.",
+      "notes": "playground.py assumes the repository layout 12week/…, 11week/… and adds parents[3] / '11week/examples/korea_market_mvp' to sys.path. In this lab the folders are named project/mvp and testing, so that path does not exist. That is why each step uses PYTHONPATH to point to ~/project/mvp/examples/korea_market_mvp. For Activity C, create test_rescue.py next to playground.py with nano test_rescue.py and run it with PYTHONPATH=$HOME/project/mvp/examples/korea_market_mvp python3 -m unittest discover -s . -p 'test_rescue.py' -v.",
+      "steps": [
+        "Activity A. Only 0 and 100 are ACCEPT; -1, True, '100' and 1.5 are REJECT. True is rejected because of the type(value) is not int check; with isinstance alone, True (value 1) would have passed. Converting the string \"100\" received from the CLI to int is not the same as passing \"100\" directly to the function.",
+        "Activity B. valid: return=0, OLD preserved=False (replaced by the new report); header_only: also return=0, OLD preserved=False (replaced by a valid empty report); missing: return=1, OLD preserved=True; negative_volume: return=1 with a CSV row 2 message, OLD preserved=True. A valid empty result is a success, so the report is replaced; an error is a failure, so the old report is kept.",
+        "Activity C. exception propagated: simulated failure (the exception reaches the caller), output='OLD' (the existing output is preserved), files left=['index.html'] (the temporary file was cleaned up). These three observations become one assertRaises and two assertEquals in test_rescue.py.",
+        "Candidate A of Activity D. The contract includes values equal to the threshold, so volumes 99/100/101 with threshold 100 must give [100, 101]. The wrong implementation volume > threshold leaves only [101]. The value 100, equal to the threshold, is the minimal input that exposes this fault."
+      ]
+    }
+  }
+}

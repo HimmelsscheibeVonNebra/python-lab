@@ -4,11 +4,11 @@
 // v86 and connects its serial console to xterm.js.  The page tells us where
 // the site root is and which directory under /home/student to start in:
 //
-//   <body data-root="../../" data-lab-dir="week03/starter/session1">
+//   <body data-root="../" data-lab-dir="loops/starter">
 (function () {
   const root = document.body.dataset.root || "";
 
-  // Week pages hold several examples (scripts/gen-pages.mjs) that share this
+  // Chapter pages hold several examples (scripts/gen-pages.mjs) that share this
   // one machine: <section class="ex-panel" data-ex="id" data-dir="...">.
   // #ex=<id> picks the one to start with; choosing another runs cd.
   const panels = Array.from(document.querySelectorAll(".ex-panel"));
@@ -241,6 +241,108 @@
       });
     }
   });
+
+  // ---------------------------------------------------------------- live sources
+  //
+  // The "Source" listings come from the course repository.  When a file is
+  // edited in the terminal (nano, sed, cat > ...), lab-srcwatch in the guest
+  // (rootfs/overlay/usr/local/bin/lab-srcwatch) copies it to the shared 9p
+  // folder and the listing is redrawn here:
+  //   /host/.srcwatch     the paths of the listings in view   (we write)
+  //   /host/.src/index    "<N> <mtime>.<size>|missing <path>"  (guest writes)
+  //   /host/.src/f<N>     a copy of file N                    (guest writes)
+  const sourceEls = Array.from(document.querySelectorAll("details.source[data-path]"));
+  if (sourceEls.length) {
+    const textDecoder = new TextDecoder();
+    const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+    const escText = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // A listing as the page shows it: one line per <span class="ln">, " " for empty lines.
+    const keyOf = (text) => text.replace(/\n$/, "").split("\n").map((l) => l || " ").join("\n");
+    const originals = new Map(sourceEls.map((el) => {
+      const code = el.querySelector("pre.code code");
+      const lines = Array.from(code.querySelectorAll(".ln"), (ln) => ln.textContent);
+      return [el, { html: code.innerHTML, key: lines.join("\n"), count: lines.length }];
+    }));
+    const applied = new Map();     // path -> signature last drawn
+    let lastWatch = null;
+    let lastIndex = null;
+
+    const setCount = (el, n) => {
+      el.querySelector(".src-lines").innerHTML = `<span lang="en">${n} lines</span><span lang="ko">${n}줄</span>`;
+    };
+    function draw(el, text) {
+      const code = el.querySelector("pre.code code");
+      const badge = el.querySelector(".src-edited");
+      const orig = originals.get(el);
+      if (text !== null && keyOf(text) === orig.key) {
+        if (badge.hidden) return;  // unchanged
+        code.innerHTML = orig.html;
+        badge.hidden = true;
+        setCount(el, orig.count);
+      } else {
+        const lines = text === null
+          ? ["(deleted in the terminal / 터미널에서 지워짐)"]
+          : text.replace(/\n$/, "").split("\n");
+        code.innerHTML = lines.map((l) => `<span class="ln">${escText(l) || " "}</span>`).join("\n");
+        badge.hidden = false;
+        setCount(el, text === null ? 0 : lines.length);
+      }
+      el.classList.remove("flash");
+      void el.offsetWidth;         // restart the highlight animation
+      el.classList.add("flash");
+    }
+    function restoreAll() {
+      sourceEls.forEach((el) => {
+        const orig = originals.get(el);
+        el.querySelector("pre.code code").innerHTML = orig.html;
+        el.querySelector(".src-edited").hidden = true;
+        setCount(el, orig.count);
+      });
+      applied.clear();
+      lastWatch = null;
+      lastIndex = null;
+    }
+    document.getElementById("reset").addEventListener("click", restoreAll);
+
+    (async function watchSources() {
+      for (;;) {
+        await pause(1500);
+        if (!ready) continue;
+        // Watch the listings in view (the current example's).
+        const list = sourceEls.filter((el) => !el.closest("[hidden]")).map((el) => el.dataset.path).join("\n") + "\n";
+        if (list !== lastWatch) {
+          try {
+            await emulator.create_file("/host/.srcwatch", encoder.encode(list));
+            lastWatch = list;
+          } catch (e) {
+            continue;
+          }
+        }
+        let index;
+        try {
+          index = textDecoder.decode(await emulator.read_file("/host/.src/index"));
+        } catch (e) {
+          continue;                // not written yet
+        }
+        if (index === lastIndex) continue;
+        lastIndex = index;
+        for (const line of index.split("\n")) {
+          const m = line.match(/^(\d+) (\S+) (.+)$/);
+          if (!m || applied.get(m[3]) === m[2]) continue;
+          let text = null;
+          if (m[2] !== "missing") {
+            try {
+              text = textDecoder.decode(await emulator.read_file(`/host/.src/f${m[1]}`));
+            } catch (e) {
+              continue;
+            }
+          }
+          applied.set(m[3], m[2]);
+          sourceEls.filter((el) => el.dataset.path === m[3]).forEach((el) => draw(el, text));
+        }
+      }
+    })();
+  }
 
   // ---------------------------------------------------------------- app preview
   //

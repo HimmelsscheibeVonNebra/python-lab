@@ -1,0 +1,400 @@
+<p>This chapter is about functions. We learn how to define and call a function, parameters and arguments, and return values, and we distinguish between <strong>printing</strong> a result and <strong>returning</strong> it. We explain local variables and try combining several small functions.</p>
+
+<p>There are four examples: the even-number predicate of Practice 1 (<a href="is_even.html">is_even</a>), the power function of Practice 2 (<a href="power.html">power</a>), the sum from 1 to n of Lab 3 (<a href="sum_to.html">sum_to</a>), and the calculator function of Lab 4 (<a href="calculator.html">calculator</a>). Each example page also includes, as run steps, the slide examples taught before it.</p>
+
+<h2>What Is a Function?</h2>
+
+<h3>Repeated Code, Different Inputs</h3>
+
+<p>The two calculations below follow the same rule; only the input values differ. A function gives such a calculation a reusable name, and the caller can pass different inputs each time it calls it.</p>
+
+<pre><code>price = 20
+quantity = 3
+print(price * quantity)   # 60
+
+price = 12
+quantity = 5
+print(price * quantity)   # 60</code></pre>
+
+<h3>Functions: A Name for a Task</h3>
+
+<p>A function is a named block of code that runs when it is called. The slides use a cafe analogy. <strong>Defining</strong> is writing down the recipe once, <strong>calling</strong> is placing an order so that it is made by that recipe, and <strong>reusing</strong> is ordering again with different input. The answer to the question "If you only write down the recipe, does coffee get made?" is "No." In the same way, a function does not run just because it is defined.</p>
+
+<h3>Function Inputs and Results</h3>
+
+<p>Arguments supply the input values, the function does the task, and <code>return</code> hands the result to the caller. For example, <code>total_price(20, 3)</code> returns 60. Some functions take no arguments. A function that does not explicitly return a value returns <code>None</code>.</p>
+
+<h2>Defining and Calling Functions</h2>
+
+<h3>Defining a Function</h3>
+
+<p><code>def</code> starts a function definition. Write the name of the task, and put the parameters inside the parentheses. The colon and indentation define the body. Defining a function does not run its body.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+# No output until the function is called.
+
+greet()
+# Hello!</code></pre>
+
+<h3>Calling a Function</h3>
+
+<p>Parentheses make a function call. Execution goes into the function body and, when the body finishes, comes back to where it was called. In this chapter's scripts, functions are defined before they are called. Each call runs the body again.</p>
+
+<pre><code>def greet():
+    print("Hello!")
+
+print("Before")
+greet()
+greet()
+print("After")
+# Before
+# Hello!
+# Hello!
+# After</code></pre>
+
+<h3>Parameters &amp; Arguments</h3>
+
+<p>Parameters are the names written in the function definition, and arguments are the values the caller passes. On each call, the arguments are bound to the parameters. Inside the function, parameters behave like local variables.</p>
+
+<pre><code>def show_total(price, quantity):
+    print(price * quantity)
+
+show_total(20, 3)    # 60
+show_total(12, 5)    # 60
+# Parameters: price, quantity
+# Arguments in the first call: 20, 3</code></pre>
+
+<h3>Returning a Result</h3>
+
+<p><code>return</code> sends a value back to the caller. The returned result can be stored in a variable or used directly in an expression. <code>return</code> ends the current function call right there.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+amount = total_price(20, 3)
+print(amount)        # 60
+print(amount + 5)    # 65</code></pre>
+
+<h2>print() and return</h2>
+
+<h3>Cafe Challenge: Where Is My Coffee?</h3>
+
+<p>Before running it, vote on what <code>drink</code> will hold. Will it be <code>"Americano"</code> or <code>None</code>?</p>
+
+<pre><code>def cafe():
+    print("Americano")
+
+drink = cafe()
+print(drink)</code></pre>
+
+<p><code>Americano</code> appears on screen, but that is only the <code>print</code> inside the function displaying it like an announcement; <code>drink</code> holds <code>None</code>. In the words of the slides, "you can't drink an announcement." If you change the <code>print</code> inside <code>cafe()</code> to <code>return</code>, the value comes back to the caller and <code>drink</code> holds <code>"Americano"</code>. Run both versions in <a href="is_even.html">is_even</a>.</p>
+
+<h3>Displaying and Returning</h3>
+
+<p><code>print()</code> displays information on screen, and <code>return</code> gives a value to the caller. A function can also return a value without printing anything. If another calculation needs the result, choose <code>return</code>.</p>
+
+<pre><code>def show_double(number):
+    print(number * 2)
+
+def double(number):
+    return number * 2
+
+shown = show_double(4)   # Displays 8
+saved = double(4)        # No output
+print(shown)             # None
+print(saved + 1)         # 9</code></pre>
+
+<h3>Missing Return Values</h3>
+
+<p>A function that runs to its end without reaching a <code>return</code> returns <code>None</code>. A bare <code>return</code> with no value also gives <code>None</code>. Check that every execution path that should return a result has a <code>return</code>. <code>None</code> is a special value, not the string <code>"None"</code>.</p>
+
+<pre><code>def broken_double(number):
+    result = number * 2
+    # Missing: return result
+
+answer = broken_double(4)
+print(answer)    # None
+# answer + 1 would raise TypeError.</code></pre>
+
+<h2>Practice 1: An Even-Number Predicate</h2>
+
+<p>Complete <code>is_even(number)</code> in <code>is_even.py</code>. Assume <code>number</code> is an integer, and return <code>True</code> if it is even and <code>False</code> otherwise. Keep <code>input()</code> and <code>print()</code> outside the function. Test positive numbers, 0 and negative numbers.</p>
+
+<pre><code>def is_even(number):
+    # Return a Boolean result.
+    pass
+
+print(is_even(4))     # Expected: True
+print(is_even(7))     # Expected: False
+print(is_even(0))     # Expected: True
+print(is_even(-2))    # Expected: True</code></pre>
+
+<p>The function in the starter code is only <code>pass</code> and has no return value, so all four lines print <code>None</code>. It is a good example of how what a function returns shows up directly on screen (<a href="is_even.html">is_even</a>).</p>
+
+<h2>Ways to Pass Arguments</h2>
+
+<h3>Positional &amp; Keyword Arguments</h3>
+
+<p>Positional arguments bind in parameter order. Keyword arguments name the parameter directly, which makes the meaning of the call clear. In this chapter's functions, positional arguments come before keyword arguments.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+print(total_price(20, 3))
+print(total_price(price=20, quantity=3))
+print(total_price(quantity=3, price=20))
+print(total_price(20, quantity=3))
+# Every call prints 60.</code></pre>
+
+<h3>Default Parameter Values</h3>
+
+<p>A default supplies a value when the caller omits the argument. If the caller explicitly gives another value, it overrides the default. Put parameters without defaults before parameters with defaults. This chapter's examples use only simple numeric defaults.</p>
+
+<pre><code>def power(base, exponent=2):
+    return base ** exponent
+
+print(power(3))               # 9
+print(power(2, 3))            # 8
+print(power(5, exponent=0))   # 1</code></pre>
+
+<h2>Practice 2: A Power Function</h2>
+
+<p>Complete <code>power(base, exponent=2)</code> in <code>power.py</code>. It returns <code>base</code> raised to the power <code>exponent</code>. Assume <code>base</code> is a number and <code>exponent</code> is an integer of 0 or more, and use <code>**</code> for the power. Check both a call that uses the default and calls that give it explicitly with positional and keyword arguments. Do not print inside the function.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Expected value</th></tr></thead>
+<tbody>
+<tr><td><code>power(3)</code></td><td>9</td></tr>
+<tr><td><code>power(2, 3)</code></td><td>8</td></tr>
+<tr><td><code>power(5, exponent=0)</code></td><td>1</td></tr>
+<tr><td><code>power(-2, 3)</code></td><td>-8</td></tr>
+</tbody>
+</table>
+
+<p>In <a href="power.html">power</a>, compare the starter code (three Nones) with the solution (9, 8, 1), and also run <code>power(-2, 3)</code> with a negative base.</p>
+
+<h2>Local Variables &amp; Scope</h2>
+
+<p>In this chapter's examples, a name assigned inside a function is a local variable. A local variable is separate from a variable of the same name outside. Pass results explicitly as return values; the functions we write here do not use global state.</p>
+
+<pre><code>number = 10
+
+def add_one(number):
+    result = number + 1
+    return result
+
+print(add_one(3))   # 4
+print(number)       # 10
+# print(result) would raise NameError.</code></pre>
+
+<p>The <code>number</code> inside the function received 3 as a parameter, but the outer <code>number</code> is still 10. The <code>result</code> created inside the function cannot be used outside once the call has ended. The first step of <a href="sum_to.html">sum_to</a> runs through to the last line and shows <code>NameError: name 'result' is not defined</code>.</p>
+
+<h2>Break &amp; Midpoint Check</h2>
+
+<ol>
+<li><strong>Does defining a function run its body?</strong> No. It runs only when called.</li>
+<li><strong>What is the difference between a parameter and an argument?</strong> A parameter is a name written in the definition; an argument is a value passed in the call.</li>
+<li><strong>What does a function without a <code>return</code> statement return?</strong> <code>None</code>.</li>
+<li><strong>After the call ends, can the caller use a local variable directly?</strong> No. Get the values you need back with <code>return</code>.</li>
+</ol>
+
+<p>Next is how to wrap a loop in a function.</p>
+
+<h2>A Loop Inside a Function</h2>
+
+<p>A function body can contain a loop. Initialize the accumulator afresh on each call, and put the <code>return</code> <strong>after</strong> the loop so that it returns the completed sum. This version assumes <code>n</code> is an integer of 0 or more.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(5))    # 15
+print(sum_to(3))    # 6
+print(sum_to(0))    # 0</code></pre>
+
+<h3>The Barista Who Leaves Early</h3>
+
+<p>Three customers are waiting for coffee. How many messages does the code below print? Vote for 0, 1 or 3, then trace the first iteration.</p>
+
+<pre><code>def serve():
+    for number in range(1, 4):
+        return f"Coffee for {number}"
+
+print(serve())</code></pre>
+
+<p>The answer is one, <code>Coffee for 1</code>, because <code>return</code> ends the current function call immediately. The slides then ask: what happens if you change the <code>return</code> inside the loop to <code>print</code> and the last line to <code>serve()</code>? Then the loop runs to the end and all three messages are printed.</p>
+
+<h3>return Ends the Whole Function</h3>
+
+<p><code>return</code> exits the function, ending any loop inside it as well. This differs from <code>break</code>, which exits only the nearest loop. Returning inside a loop can stop the accumulation too early.</p>
+
+<pre><code>def too_early(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+        return total    # Wrong indentation
+
+print(too_early(5))     # 1, not 15
+print(too_early(0))     # None</code></pre>
+
+<p><code>too_early(0)</code> is <code>None</code> because the loop never runs, so the <code>return</code> is never reached. You can check both results in <a href="sum_to.html">sum_to</a>.</p>
+
+<h2>A Function's Input and Output Rules</h2>
+
+<p>Before coding, define the allowed inputs and the expected output. <code>sum_to</code> accepts integers of 0 or more, and if a negative number comes in it returns <code>None</code> as a signal of invalid input. We assume the caller passes an integer; handling type errors comes later.</p>
+
+<pre><code>def sum_to(n):
+    if n &lt; 0:
+        return None
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(-1))   # None
+print(sum_to(5))    # 15</code></pre>
+
+<h2>Lab 3: Sum from 1 to n</h2>
+
+<p>Complete <code>sum_to(n)</code> in <code>sum_to.py</code> using a loop. It returns the sum of the integers from 1 to n, returns 0 if n is 0, and returns <code>None</code> if n is negative. Do not use <code>sum()</code> or the arithmetic series formula. Only the caller prints. Check for the special value <code>None</code> with <code>is None</code>.</p>
+
+<pre><code>def sum_to(n):
+    # Validate, accumulate, then return.
+    pass
+
+result = sum_to(5)
+if result is None:
+    print("Invalid input")
+else:
+    print("Total:", result)</code></pre>
+
+<p>The starter code returns <code>None</code>, so the caller prints <code>Invalid input</code>. Once the function is complete, you should get <code>Total: 15</code>.</p>
+
+<h3>Lab 3 Checks</h3>
+
+<p>Test the boundary n = 0 and a negative input, and call the function several times. Each call must start with a new <code>total</code>. Do not confuse the correct result 0 with <code>None</code>.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Expected return value</th></tr></thead>
+<tbody>
+<tr><td><code>sum_to(1)</code></td><td>1</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>15</td></tr>
+<tr><td><code>sum_to(0)</code></td><td>0</td></tr>
+<tr><td><code>sum_to(-1)</code></td><td>None</td></tr>
+<tr><td><code>sum_to(3)</code></td><td>6</td></tr>
+<tr><td><code>sum_to(5)</code></td><td>15 again</td></tr>
+</tbody>
+</table>
+
+<p>The bottom of the file has only one call, <code>sum_to(5)</code>, so to check the whole table, add the calls yourself or use the last two steps of <a href="sum_to.html">sum_to</a>. These steps import the function with <code>from sum_to import sum_to</code> and run the six calls in the table at once. The first of them imports your own file in the current folder, and the second imports the solution. <code>import</code> is a module feature we learn in the next chapter, 'Modules and the Standard Library'; when a file is imported, its bottom code runs once and that output appears first.</p>
+
+<h2>Combining Small Functions</h2>
+
+<p>A function's return value can become another function's argument. Keep each function's purpose clear. The example below calculates a price and then adds a fee.</p>
+
+<pre><code>def total_price(price, quantity):
+    return price * quantity
+
+def add_fee(amount, fee=5):
+    return amount + fee
+
+subtotal = total_price(20, 3)
+final = add_fee(subtotal)
+print(final)    # 65</code></pre>
+
+<h2>Lab 4: Calculator Function</h2>
+
+<h3>Calculator Function Requirements</h3>
+
+<p>Define <code>calculate(a, b, operator)</code>. It supports <code>"+"</code>, <code>"-"</code>, <code>"*"</code> and <code>"/"</code>; assume <code>a</code> and <code>b</code> are numbers and <code>operator</code> is a string. For an unsupported operator or division by zero, return <code>None</code>. For a valid operation, return the numeric result, even if it is 0.</p>
+
+<table>
+<thead><tr><th>Call</th><th>Return value</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(8, 2, "+")</code></td><td>10</td></tr>
+<tr><td><code>calculate(8, 2, "-")</code></td><td>6</td></tr>
+<tr><td><code>calculate(8, 2, "*")</code></td><td>16</td></tr>
+<tr><td><code>calculate(8, 2, "/")</code></td><td>4.0</td></tr>
+<tr><td><code>calculate(8, 0, "/")</code></td><td>None</td></tr>
+<tr><td><code>calculate(8, 2, "%")</code></td><td>None</td></tr>
+</tbody>
+</table>
+
+<h3>Completing calculator.py</h3>
+
+<p>Complete <code>calculator.py</code> using <code>if</code>, <code>elif</code> and <code>return</code>. Keep input and output outside <code>calculate()</code>. Check for <code>None</code> before displaying a numeric result, and a correct result of 0 must be displayed normally.</p>
+
+<pre><code>def calculate(a, b, operator):
+    # Return a result or None.
+    pass
+
+result = calculate(8, 2, "+")
+if result is None:
+    print("Invalid operation")
+else:
+    print("Result:", result)</code></pre>
+
+<p>The optional task is to read <code>a</code>, <code>b</code> and the operator on the caller's side and call <code>calculate()</code>.</p>
+
+<h3>Lab 4 Checks</h3>
+
+<p>Check all four supported operations, and test division by zero and an unsupported operator. Also try negative numbers and a result of 0. The function must only return a value, not print.</p>
+
+<table>
+<thead><tr><th>Additional call</th><th>Return value</th></tr></thead>
+<tbody>
+<tr><td><code>calculate(2, 2, "-")</code></td><td>0</td></tr>
+<tr><td><code>calculate(-3, 2, "*")</code></td><td>-6</td></tr>
+<tr><td><code>calculate(0, 5, "/")</code></td><td>0.0</td></tr>
+</tbody>
+</table>
+
+<p>Do not use <code>if not result</code> when checking the result, because it treats the correct result 0 as false. Use <code>if result is None</code> instead. In <a href="calculator.html">calculator</a> you can run the nine calls from both tables at once and see that <code>not result</code> and <code>result is None</code> judge 0 differently.</p>
+
+<h2>Common Function Mistakes</h2>
+
+<ul>
+<li>Writing a function name without parentheses does not call it.</li>
+<li>Passing too few required arguments raises a <code>TypeError</code>.</li>
+<li>Printing a value does not send it back to the caller.</li>
+<li>A <code>return</code> inside a loop can end the task too early.</li>
+<li>Local variables cannot be used directly outside the function.</li>
+</ul>
+
+<p>For each bug, look at the function definition, the call and the return value in turn. The first two mistakes are reproduced in the last step of <a href="power.html">power</a>. Without parentheses you see only <code>&lt;function total_price at ...&gt;</code>, and leaving out one argument gives a <code>missing 1 required positional argument</code> error.</p>
+
+<h2>Testing &amp; Submission</h2>
+
+<p>Submit <code>is_even.py</code>, <code>power.py</code>, <code>sum_to.py</code> and <code>calculator.py</code>.</p>
+
+<ul>
+<li>Keep the required function names and parameter names exactly as given.</li>
+<li>Functions return values; the caller does the displaying.</li>
+<li>Record inputs and expected return values as comments.</li>
+<li>Include boundary values and the invalid inputs the function's rules require.</li>
+<li>Check that repeated calls give independent results.</li>
+</ul>
+
+<p>These exercises do not need collections or exception handling. Completed files can be copied, as in <code>cp calculator.py /mnt/host/</code>, and then downloaded to your computer with the page's Download box.</p>
+
+<h2>Exit Quiz</h2>
+
+<ol>
+<li><strong>In <code>def power(base, exponent=2)</code>, which names are parameters?</strong> <code>base</code> and <code>exponent</code>.</li>
+<li><strong>What does <code>power(3)</code> return?</strong> 9, using the default 2.</li>
+<li><strong>What does a function without <code>return</code> produce?</strong> <code>None</code>.</li>
+<li><strong>Why is it important to put <code>return</code> after the loop in <code>sum_to()</code>?</strong> If it is inside the loop, the function ends on the first iteration and the sum is never completed.</li>
+<li><strong>Why does the calculator use <code>result is None</code> instead of <code>not result</code>?</strong> Because with <code>not result</code>, even the correct result 0 counts as true and is mistaken for an invalid operation.</li>
+</ol>
+
+<p>Finally, explain in your own words how the caller receives a value from a function.</p>
+
+<h2>Next Chapter: Modules</h2>
+
+<p>A module groups reusable code in a single Python file. You use a module's functions by bringing them in with <code>import</code>. In the next chapter, 'Modules and the Standard Library', we look at standard library modules such as <code>math</code> and <code>random</code>, and learn how to put your own functions in a module and reuse them from another file.</p>
+
+<pre><code>import math
+print(math.sqrt(25))    # 5.0</code></pre>

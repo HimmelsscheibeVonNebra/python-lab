@@ -1,0 +1,62 @@
+{
+  "title": "Concurrency: Threads and asyncio",
+  "summary": "Make programs faster by overlapping the time they spend waiting (I/O). Practice threading.Thread with start and join, race conditions on shared values and Lock, producer/consumer with queue.Queue, ThreadPoolExecutor's map, submit and as_completed, asyncio's async/await and gather, and an asyncio echo server on 127.0.0.1. Also see why pure computation does not get faster on this one-core virtual machine.",
+  "examples": {
+    "threads": {
+      "summary": "Run three pretend downloads (each waits 1 second) one at a time, then in three threads, and compare the time taken. threading.Thread(target=..., args=...) creates a thread, start() sets it going and join() waits for it to finish. Time is measured with time.perf_counter().",
+      "steps": [
+        "sequential alternates start and done and takes about 3 s; threaded prints the three start lines first, then the three done lines, and takes about 1 s. While waiting, the CPU is idle, so the three waits overlap. The order of the lines in the threaded run can change from run to run.",
+        "A thread function's return value is thrown away, so the results go into a shared dictionary. Right after start() nobody has finished yet, so it is {}; only after every join() are all three results there. They finished in order of the shortest wait: y, z, x.",
+        "Without join(), the main thread does not wait and goes straight on. The two main lines come first and worker: done appears a second later. Python does not end the process until every non-daemon thread has finished, but wherever you need the results, wait with join() first.",
+        "A common mistake: target=download(name) calls the function right there and passes its return value, None, as the target. The downloads run one by one before any thread is created, so it takes about 3 s. Pass the function as target=download and its arguments separately as args=(name,)."
+      ]
+    },
+    "race_lock": {
+      "summary": "Four threads each deposit 1 into a single balance 1000 times. When another thread slips in between a read and a write, deposits disappear (a race condition). Holding a threading.Lock with a with statement lets only one thread read and write at a time, so the result is always right.",
+      "steps": [
+        "expected 4000, but got is far smaller (around 1000 on this virtual machine, and it can vary a little between runs). time.sleep(0) hands the turn to another thread between the read and the write, so all four threads read the same value and all write that value + 1: three deposits out of four vanish. There is no error message, which is exactly what makes race conditions dangerous.",
+        "Inside with lock:, other threads wait until one thread has finished its read and write. expected 4000, got 4000, correct, however many times you run it.",
+        "counter += 1 is one line but not one action. In bytecode it splits into LOAD_GLOBAL (read), BINARY_OP += (add) and STORE_GLOBAL (write). A thread switch can happen anywhere in between.",
+        "With plain counter += 1 and no sleep, you will usually get the right 400000 here, because Python with a GIL rarely switches threads at that point. But the language does not promise it: another version, a free-threaded build or several cores can get it wrong. A correct result does not make the code safe. Wrap code that changes a shared value in a Lock.",
+        "A Lock cannot be taken again even by the thread that already holds it. With timeout=1 you get again? False after one second; without a timeout it would wait forever (a deadlock). If the same thread needs to take it several times, use threading.RLock."
+      ]
+    },
+    "producer_consumer": {
+      "summary": "The producer/consumer pattern. A waiter thread (the producer) puts six orders into a queue.Queue and two cook threads (the consumers) take them out one at a time and cook each for 0.5 s. The queue handles the locking, so the threads never share a list directly. None is the \"no more orders\" signal.",
+      "steps": [
+        "The waiter pauses after placing five orders: once the two cooks have taken one each, the counter (a queue with maxsize=3) holds three, and put() waits until there is room. The cooks finish dishes in turn, and at the end you get the sorted list of dishes and 2 cooks: about 1.5 s (one cook would need 3.0 s). Which cook gets which dish can change from run to run.",
+        "With three cooks it takes about 1.0 s. Only the side that takes the work grew; the waiter's code is unchanged. It also puts COOKS stop signals (None), so all three cooks finish.",
+        "A queue hands items out in the order they went in (FIFO): first second. put_nowait() on a full queue raises queue.Full, and get() on an empty queue raises queue.Empty once the timeout passes. A get() without a timeout waits forever for something to arrive, which is why a program never ends if you forget to send the consumers a stop signal."
+      ]
+    },
+    "thread_pool": {
+      "summary": "concurrent.futures.ThreadPoolExecutor creates and joins the threads for you. map gives results in input order; submit with as_completed gives them in the order they finish. cpu_pool.py splits pure computation across a thread pool and a process pool (ProcessPoolExecutor) and shows that on this one-core virtual machine it does not get faster.",
+      "notes": "cpu_pool.py takes about 10 seconds. A file that uses ProcessPoolExecutor must have the if __name__ == \"__main__\": guard, because the worker processes import the file to find count_primes. For the same reason a process pool does not work in code fed through standard input with python3 -.",
+      "steps": [
+        "The three pages wait 1.5, 0.5 and 1.0 s. map returns them in input order (home, news, about); as_completed returns them in the order they finished (news, about, home). Both together take about 3 s; one by one it would be 6 s.",
+        "max_workers is how many threads work at once. With 1 it takes 3.0 s, the same as one by one; with 2 or 3 it takes 1.5 s. Even with two workers, the one that finishes the short news page picks up about, so everything is done within the longest wait, home's 1.5 s. Leaving the with block waits for all the work and cleans up the threads.",
+        "submit() immediately returns a Future (a receipt for a result that comes later). An exception raised inside a job is not shown where it happens; it is raised again when you call future.result(). That is why the result() call is wrapped in try: 1 -> 1, 2 -> 4, 3 -> error: bad input 3, 4 -> 16.",
+        "CPU cores: 1. Counting primes is pure computation with no waiting, so splitting it across threads takes about the same time (about the same as). The process pool is even slower (slower than) because starting processes and passing data between them costs time. The seconds vary a little between runs. On a PC with several cores and a big enough job, the processes would come out ahead."
+      ]
+    },
+    "asyncio_basics": {
+      "summary": "asyncio overlaps many waits on a single thread. A coroutine defined with async def pauses at each await while the event loop runs other coroutines. Awaiting one at a time takes 3 seconds; waiting for all of them together with asyncio.gather takes 1. Also see what happens when you forget await and when time.sleep blocks the loop.",
+      "steps": [
+        "one after another awaits in turn and takes about 3 s; gather waits for the three coroutines together, printing three start lines then three done lines, in about 1 s. gather's result list is in the order you passed the coroutines, not the order they finished. There is only one thread.",
+        "Just calling an async function does not run its body; it only creates a coroutine object. without await: coroutine, with await: hello. A coroutine that is never awaited shows up when the program ends as the warning RuntimeWarning: coroutine 'hello' was never awaited.",
+        "A common mistake: time.sleep(1) inside a coroutine has no await, so the whole event loop stops. Even under gather, bad takes about 3 s, while good, which uses asyncio.sleep, takes about 1 s. Inside a coroutine, use an awaitable function for every wait.",
+        "create_task() puts the coroutine on the event loop right away and main carries on. If it does not finish within asyncio.timeout(0.5), the awaited task is cancelled and TimeoutError is raised: gave up after 0.5 s, task cancelled: True. Put a time limit on waits that might never get an answer, such as network calls."
+      ]
+    },
+    "echo_server": {
+      "summary": "asyncio.start_server opens a TCP echo server on 127.0.0.1 that sends each line back in capitals. First the server and three clients run together under gather in one script; then the server runs as a background process and echo_client.py connects to it separately. The server stops by itself after two clients or 30 seconds.",
+      "steps": [
+        "Three clients connect almost at once (three connected lines), each sends two messages half a second apart and leaves. While one client is quiet, the server answers the others, all on one thread. The last three lines are the capitalized replies each client received. The port numbers are chosen by the operating system and change on every run.",
+        "This time only the server runs, in the background (&) on port 8765. server: listening on 127.0.0.1:8765 appears shortly. The prompt comes back at once and the server's output is mixed in with it.",
+        "Connect from another process: client got: HELLO, client got: WORLD. If the server is still starting, the client retries a few times half a second apart.",
+        "After the second client gets HOW ARE YOU, the server prints server: served 2 clients, bye and ends by itself. wait waits for the background server to finish.",
+        "The server is gone, so the connection is refused (ConnectionRefusedError). After a few retries the client prints client: no server on 127.0.0.1:8765."
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "From Exercises to a Solo Project: Topic Selection and Requirements Analysis",
+  "summary": "Covers the rules and grading of the solo term project, three tests for choosing a topic, testable requirements, user stories, MoSCoW prioritization, acceptance criteria, and writing proposal v0. This lesson has no code to run, so we use the study_logger (the example from \"From Proposal to Design\"), which implements the slides' example project (a study-time logger), to see how acceptance criteria are actually checked.",
+  "examples": {
+    "study_logger_criteria": {
+      "summary": "The slides' example topic, the 'study-time logger', as actually implemented in the design stage. In the planning stage, rather than the code structure, observe how the data format written in the proposal (study.csv: date,course,minutes) and the acceptance criteria (F1 log entry, F1 bad input, F3 totals) are checked as pass/fail.",
+      "notes": "The structure of this program (splitting into logic, storage and report; function contracts) is covered in detail in \"From Proposal to Design: Decomposition, Contracts, Modules\" in the same chapter. Here you only need to see that the requirements and acceptance criteria in a proposal must be 'statements you can judge pass/fail by running the program'. Step 4 adds a row to data/study.csv, so reload the page if you want to return to the original state.",
+      "steps": [
+        "The answers to the four data-design questions are right there: the file name study.csv, the columns date,course,minutes, the value rules (dates as YYYY-MM-DD, course names in lowercase, minutes as positive integers), and a small hand-checked sample of 2 rows.",
+        "Baseline: 3 lines including the header. Compare the line count before and after the bad input in the next step.",
+        "Acceptance criterion 'F1 bad input: entering -30 minutes prints a warning; file unchanged'. The warning Not saved: minutes must be positive appears and the line count is still 3. The F3 totals also stay python 90, stats 45. The input was fed in with printf, but you can also run python3 main.py and type it yourself.",
+        "Acceptance criterion 'F1 log entry: valid input appends one row to study.csv'. Saved. appears and one row, 2026-10-26,python,60, is added at the end of the file. The python total becomes 90 + 60 = 150.",
+        "This file writes the same acceptance criteria as asserts, with no keyboard input. It checks that the sample week's totals are python 90 and stats 45 and that -30, 0 and abc are rejected, then prints All checks passed. This is what the slide means when it says the acceptance-criterion lines written in the planning stage become tests in the testing stage almost word for word."
+      ]
+    }
+  }
+}

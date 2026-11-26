@@ -24,15 +24,15 @@
           "note": "int(\"005930\")은 5930이 되어 앞자리 0이 사라지므로 종목 코드는 문자열로 둔다. int(\"-1\")은 변환에 성공하지만 음수 거래량은 유효하지 않다. isinstance(True, int)는 True, type(True) is int는 False라서 bool을 따로 거절하려면 type 검사가 필요하다."
         },
         {
-          "cmd": "python3 -c 'from logic import parse_row; r = parse_row({\"date\": \"2026-11-05\", \"code\": \"005930\", \"name\": \"Sample\", \"market\": \"KOSPI\", \"previous_close\": \"100\", \"close\": \"110\", \"volume\": \"-1\"}); print(r)'",
+          "cmd": "python3 - <<'EOF'\nfrom logic import parse_row\nr = parse_row({\"date\": \"2026-11-05\", \"code\": \"005930\", \"name\": \"Sample\", \"market\": \"KOSPI\", \"previous_close\": \"100\", \"close\": \"110\", \"volume\": \"-1\"})\nprint(r)\nEOF",
           "note": "행 하나의 규칙은 parse_row가 검사한다. 거래량 -1은 ValueError: volume must be a whole number로 거절된다. \"-1\".isdigit()가 False이기 때문이다. 의도된 트레이스백이다."
         },
         {
-          "cmd": "python3 -c 'from logic import analyze; q = {\"date\": \"2026-11-05\", \"code\": \"005930\", \"name\": \"A\", \"market\": \"KOSPI\", \"previous_close\": 100, \"close\": 110, \"volume\": 1}; analyze([q, dict(q, market=\"KOSDAQ\")], \"KOSPI\")'",
+          "cmd": "python3 - <<'EOF'\nfrom logic import analyze\nq = {\"date\": \"2026-11-05\", \"code\": \"005930\", \"name\": \"A\", \"market\": \"KOSPI\", \"previous_close\": 100, \"close\": 110, \"volume\": 1}\nanalyze([q, dict(q, market=\"KOSDAQ\")], \"KOSPI\")\nEOF",
           "note": "전체 입력의 규칙(날짜 하나, 코드 중복 없음)은 analyze가 필터 전에 검사한다. 두 번째 행은 KOSDAQ이라 KOSPI 필터에서 빠질 행이지만 같은 코드이므로 ValueError: duplicate code in snapshot이 난다. 필터로 숨겨질 중복도 거절하는 것이 계약이다."
         },
         {
-          "cmd": "python3 main.py --input data/missing.csv; echo \"exit=$?\"; python3 main.py --input data/empty.csv; echo \"exit=$?\"; python3 main.py --market X; echo \"exit=$?\"",
+          "cmd": "python3 main.py --input data/missing.csv\necho \"exit=$?\"\npython3 main.py --input data/empty.csv\necho \"exit=$?\"\npython3 main.py --market X\necho \"exit=$?\"",
           "note": "종료 코드도 결과다. 누락 CSV는 실패(1), 헤더만 있는 정상 CSV는 성공(0, 0 stocks), argparse 인자 오류는 2다. 메시지(Report not generated / Generated / usage: … error)만이 아니라 exit= 값과 docs/index.html의 상태를 함께 본다."
         },
         {
@@ -70,7 +70,7 @@
           "note": "활동 C. exception propagated: simulated failure(예외는 호출자에게 전달됨), output='OLD'(기존 출력 보존), files left=['index.html'](임시 파일 정리됨). 이 세 관찰이 test_rescue.py에서 assertRaises 하나와 assertEqual 두 개가 된다."
         },
         {
-          "cmd": "python3 -c 'threshold = 100; print([v for v in (99, 100, 101) if v >= threshold], [v for v in (99, 100, 101) if v > threshold])'",
+          "cmd": "python3 - <<'EOF'\nthreshold = 100\nprint([v for v in (99, 100, 101) if v >= threshold], [v for v in (99, 100, 101) if v > threshold])\nEOF",
           "note": "활동 D의 후보 A. 계약은 기준 이상 포함이라 거래량 99/100/101, 기준 100이면 [100, 101]이어야 한다. volume > threshold로 잘못 구현하면 [101]만 남는다. 기준과 같은 값 100이 이 결함을 드러내는 최소 입력이다."
         }
       ],

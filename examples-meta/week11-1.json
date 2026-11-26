@@ -55,19 +55,19 @@
           "note": "요구사항의 검사를 assert로 옮긴 파일이다. parse_minutes(\"90\")이 90이고, \" Python \"이 python으로 정리되며, 빈 과목·-30·abc는 모두 거절되어야 All checks passed.가 나온다."
         },
         {
-          "cmd": "python3 -c 'from logic import make_record; rec = make_record(\"2026-11-10\", \" Python \", \"90\"); print(rec[\"course\"], repr(rec[\"minutes\"]))'",
+          "cmd": "python3 - <<'EOF'\nfrom logic import make_record\nrec = make_record(\"2026-11-10\", \" Python \", \"90\")\nprint(rec[\"course\"], repr(rec[\"minutes\"]))\nEOF",
           "note": "슬라이드의 make_record() 예제다. python 90이 나온다. 과목은 앞뒤 공백이 지워지고 소문자가 되며, minutes는 문자열 \"90\"이 아니라 정수 90이다(repr에 따옴표가 없다)."
         },
         {
-          "cmd": "printf '2026-11-10\\npython\\n90\\n' | python3 main.py; cat data/study.csv",
+          "cmd": "printf '2026-11-10\\npython\\n90\\n' | python3 main.py\ncat data/study.csv",
           "note": "REQ-01의 검사: 2026-11-10, python, 90을 입력하면 Saved.가 나오고 study.csv의 마지막에 2026-11-10,python,90 한 행이 새로 생긴다. 프롬프트 세 개가 한 줄에 붙어 보이는 것은 입력을 파이프로 넣었기 때문이다."
         },
         {
-          "cmd": "wc -l data/study.csv; printf '2026-11-10\\npython\\n-30\\n' | python3 main.py; wc -l data/study.csv",
+          "cmd": "wc -l data/study.csv\nprintf '2026-11-10\\npython\\n-30\\n' | python3 main.py\nwc -l data/study.csv",
           "note": "REQ-02의 검사: -30분은 Not saved: minutes must be positive, got -30으로 거절되고, 전후의 줄 수가 같다. 파일이 바뀌지 않았다는 것이 관찰 가능한 결과다."
         },
         {
-          "cmd": "printf '2026-11-10\\n   \\n30\\n' | python3 main.py; printf '2026-11-10\\npython\\nabc\\n' | python3 main.py",
+          "cmd": "printf '2026-11-10\\n   \\n30\\n' | python3 main.py\nprintf '2026-11-10\\npython\\nabc\\n' | python3 main.py",
           "note": "기능 명세(FEAT-01)의 오류 줄: 공백뿐인 과목은 course must not be empty, 숫자가 아닌 분은 int()의 ValueError 메시지로 Not saved가 된다. 두 경우 모두 main()이 ValueError를 잡아 아무것도 쓰지 않는다."
         },
         {

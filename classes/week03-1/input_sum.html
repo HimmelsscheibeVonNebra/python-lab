@@ -1,109 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="input_sum — Loops · Python Lab" data-title-ko="input_sum — 반복문 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>input_sum — Loops · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week03/index.html#ex=input_sum">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week03/index.html#ex=input_sum");</script>
 </head>
-<body data-root="../../" data-lab-dir="week03/starter/session1">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 3 · Session 1</span><span lang="ko">3주차 1차시</span></a><span class="sep">/</span><span>input_sum</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>input_sum</h1>
-    <p><span lang="en">Practice 2: read integers one at a time with while True, break when 0 is entered, and print the total. First check the execution order of while, break and continue.</span><span lang="ko">연습 2: while True로 정수를 하나씩 입력받아 0이 나오면 break하고 합계를 출력한다. while의 실행 순서, break, continue를 먼저 확인한다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week03/starter/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week03/starter/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'count = 1' 'while count &lt;= 3:' '    print(count)' '    count += 1' 'print(&quot;Done&quot;, count)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'count = 1' 'while count &lt;= 3:' '    print(count)' '    count += 1' 'print(&quot;Done&quot;, count)' | python3 -">▶</button><code>printf '%s\n' 'count = 1' 'while count &lt;= 3:' '    print(count)' '    count += 1' 'print(&quot;Done&quot;, count)' | python3 -</code></div>
-          <p><span lang="en">The condition is tested first and then the body runs. The loop exits when count becomes 4 and the condition is False, so you get Done 4. Without count += 1 it is an infinite loop.</span><span lang="ko">조건을 먼저 검사하고 본문을 실행한다. count가 4가 되어 조건이 False일 때 빠져나오므로 Done 4다. count += 1이 없으면 무한 반복이다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'while True:' '    text = input(&quot;Message (q: quit): &quot;)' '    if text == &quot;q&quot;:' '        break' '    print(&quot;Input:&quot;, text)' 'print(&quot;Done&quot;)' &gt; /tmp/echo_q.py; printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'while True:' '    text = input(&quot;Message (q: quit): &quot;)' '    if text == &quot;q&quot;:' '        break' '    print(&quot;Input:&quot;, text)' 'print(&quot;Done&quot;)' &gt; /tmp/echo_q.py; printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py">▶</button><code>printf '%s\n' 'while True:' '    text = input(&quot;Message (q: quit): &quot;)' '    if text == &quot;q&quot;:' '        break' '    print(&quot;Input:&quot;, text)' 'print(&quot;Done&quot;)' &gt; /tmp/echo_q.py; printf 'hello\nhi\nq\n' | python3 /tmp/echo_q.py</code></div>
-          <p><span lang="en">The break example is saved as /tmp/echo_q.py and given hello, hi and q. hello and hi are echoed back with Input:, and q ends the loop with no output, so Done is printed.</span><span lang="ko">break 예제를 /tmp/echo_q.py로 저장하고 hello, hi, q를 넣었다. hello와 hi는 Input:으로 되돌려 주고, q에서는 출력 없이 반복을 끝내 Done이 나온다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '%s\n' 'for n in range(1, 6):' '    if n == 3:' '        continue' '    print(n)' | python3 -" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '%s\n' 'for n in range(1, 6):' '    if n == 3:' '        continue' '    print(n)' | python3 -">▶</button><code>printf '%s\n' 'for n in range(1, 6):' '    if n == 3:' '        continue' '    print(n)' | python3 -</code></div>
-          <p><span lang="en">continue skips only the rest of the current iteration. Only 3 is left out, and 1, 2, 4, 5 are printed.</span><span lang="ko">continue는 이번 반복의 나머지만 건너뛴다. 3만 빠지고 1, 2, 4, 5가 출력된다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '3\n5\n0\n' | python3 input_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n5\n0\n' | python3 input_sum.py">▶</button><code>printf '3\n5\n0\n' | python3 input_sum.py</code></div>
-          <p><span lang="en">The starter code does stop at 0, but there is no code that adds, so it prints Total: 0.</span><span lang="ko">시작 코드는 0에서 멈추긴 하지만 더하는 코드가 없어 Total: 0이다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '3\n5\n0\n' | python3 ../../solutions/session1/input_sum.py; printf '0\n' | python3 ../../solutions/session1/input_sum.py; printf -- '-2\n5\n0\n' | python3 ../../solutions/session1/input_sum.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n5\n0\n' | python3 ../../solutions/session1/input_sum.py; printf '0\n' | python3 ../../solutions/session1/input_sum.py; printf -- '-2\n5\n0\n' | python3 ../../solutions/session1/input_sum.py">▶</button><code>printf '3\n5\n0\n' | python3 ../../solutions/session1/input_sum.py; printf '0\n' | python3 ../../solutions/session1/input_sum.py; printf -- '-2\n5\n0\n' | python3 ../../solutions/session1/input_sum.py</code></div>
-          <p><span lang="en">Three tests: 3, 5, 0 gives Total: 8; 0 right away gives Total: 0; -2, 5, 0 gives Total: 3. Check for 0 first, then add.</span><span lang="ko">세 테스트: 3, 5, 0은 Total: 8, 바로 0이면 Total: 0, -2, 5, 0은 Total: 3. 0인지 먼저 검사한 뒤 더한다.</span></p>
-        </li>
-      </ol>
-      <p class="callout"><span lang="en">You can also run python3 input_sum.py yourself, enter numbers one at a time and finish with 0. If you get stuck in an infinite loop by mistake, stop it with Ctrl+C (the Stop button in Colab).</span><span lang="ko">직접 python3 input_sum.py로 실행해 숫자를 하나씩 입력하고 0으로 끝내 봐도 된다. 실수로 무한 반복에 빠지면 Ctrl+C로 멈춘다(Colab에서는 Stop 버튼).</span></p>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>input_sum.py <span class="muted"><span lang="en">10 lines</span><span lang="ko">10줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: sum integers until 0. Assume integer-formatted input.</span>
-<span class="ln">Tests: 3,5,0 -&gt; Total: 8; 0 -&gt; Total: 0; -2,5,0 -&gt; Total: 3.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln">total = 0</span>
-<span class="ln">while True:</span>
-<span class="ln">    number = int(input(&quot;Integer (0: stop): &quot;))</span>
-<span class="ln">    if number == 0:</span>
-<span class="ln">        break</span>
-<span class="ln">    # TODO: add number to total.</span>
-<span class="ln">print(&quot;Total:&quot;, total)</span></code></pre>
-    </details>
-    <details class="source">
-      <summary>week03/solutions/session1/input_sum.py <span class="muted"><span lang="en">8 lines</span><span lang="ko">8줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution. Assume integer-formatted input.&quot;&quot;&quot;</span>
-<span class="ln">total = 0</span>
-<span class="ln">while True:</span>
-<span class="ln">    number = int(input(&quot;Integer (0: stop): &quot;))</span>
-<span class="ln">    if number == 0:</span>
-<span class="ln">        break</span>
-<span class="ln">    total += number</span>
-<span class="ln">print(&quot;Total:&quot;, total)</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="even_sum.html">← even_sum</a>
-    <a href="multiplication.html">multiplication →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week03/index.html#ex=input_sum">../week03/index.html#ex=input_sum</a></p></body>
 </html>

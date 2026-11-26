@@ -7,7 +7,29 @@
 //   <body data-root="../../" data-lab-dir="week03/starter/session1">
 (function () {
   const root = document.body.dataset.root || "";
-  const labDir = document.body.dataset.labDir || "";
+
+  // Week pages hold several examples (scripts/gen-pages.mjs) that share this
+  // one machine: <section class="ex-panel" data-ex="id" data-dir="...">.
+  // #ex=<id> picks the one to start with; choosing another runs cd.
+  const panels = Array.from(document.querySelectorAll(".ex-panel"));
+  const sourceSets = Array.from(document.querySelectorAll(".ex-sources"));
+  const pickButtons = Array.from(document.querySelectorAll("button[data-pick]"));
+  const hashExample = () => {
+    const m = location.hash.match(/[#&]ex=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  };
+  const panelOf = (id) => panels.find((p) => p.dataset.ex === id) || null;
+  let currentPanel = panelOf(hashExample()) || panels[0] || null;
+  function showPanel(panel) {
+    currentPanel = panel;
+    const id = panel.dataset.ex;
+    panels.forEach((p) => { p.hidden = p !== panel; });
+    sourceSets.forEach((s) => { s.hidden = s.dataset.ex !== id; });
+    pickButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.pick === id)));
+  }
+  if (currentPanel) showPanel(currentPanel);
+  // The directory the machine boots in (also after Reboot)
+  const labDir = currentPanel ? currentPanel.dataset.dir : document.body.dataset.labDir || "";
 
   const statusEl = document.getElementById("status");
   const BOOTING = { en: "Booting… (10–30 s)", ko: "부팅 중… (10~30초)" };
@@ -70,10 +92,19 @@
   let tail = "";
   let ready = false;
 
+  let recent = "";              // the last output, to see whether the shell waits at its prompt
+
   function markReady() {
     ready = true;
     runButtons.forEach((b) => { b.disabled = false; });
     setStatus({ en: "Ready — type in the terminal or press a ▶ button", ko: "준비됨 — 터미널에 입력하거나 ▶ 버튼을 누르세요" });
+    // An example chosen during the boot (or before Reboot) is somewhere else.
+    // The prompt follows the banner; wait for it (up to ~5 s).
+    if (currentPanel && currentPanel.dataset.dir !== labDir) {
+      let tries = 0;
+      const later = () => (atPrompt() || ++tries > 50 ? changeDir(currentPanel) : setTimeout(later, 100));
+      later();
+    }
   }
 
   emulator.add_listener("serial0-output-byte", (byte) => {
@@ -84,6 +115,7 @@
       });
     }
     pending.push(byte);
+    recent = (recent + String.fromCharCode(byte)).slice(-200);
 
     if (!ready) {
       // The login banner printed by lab.sh ends the boot.
@@ -98,6 +130,36 @@
     emulator.serial_send_bytes(0, encoder.encode(text));
   }
   term.onData(sendToGuest);
+
+  // ---------------------------------------------------------------- examples
+  const atPrompt = () => /student@python-lab:[^\n]*\$ $/.test(recent.replace(/\x1b\[[0-9;?]*[A-Za-z]/g, ""));
+  function changeDir(panel) {
+    const dir = "~/" + panel.dataset.dir;
+    if (!atPrompt()) {
+      setStatus({
+        en: `A program is still running — finish it (Ctrl+C, or exit() in the REPL), then run: cd ${dir}`,
+        ko: `실행 중인 프로그램이 있습니다 — 끝낸 뒤(Ctrl+C, REPL은 exit()) 직접 실행하세요: cd ${dir}`,
+      });
+      return;
+    }
+    // A Flask app of the previous example would keep the preview busy.
+    const preview = document.getElementById("preview");
+    const appRunning = preview && !preview.hidden && !preview.classList.contains("stopped");
+    sendToGuest((appRunning ? "web stop; " : "") + "cd " + dir + "\n");
+    setStatus({ en: `Now in ${dir}`, ko: `${dir}로 이동했습니다` });
+  }
+  function pick(id, fromHash) {
+    const panel = panelOf(id);
+    if (!panel || panel === currentPanel) return;
+    showPanel(panel);
+    if (!fromHash) history.replaceState(null, "", "#ex=" + encodeURIComponent(id));
+    if (ready) changeDir(panel);
+  }
+  pickButtons.forEach((b) => b.addEventListener("click", () => pick(b.dataset.pick, false)));
+  window.addEventListener("hashchange", () => {
+    const id = hashExample();
+    if (id) pick(id, true);
+  });
 
   runButtons.forEach((button) => {
     button.disabled = true;
@@ -221,7 +283,7 @@
     const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
     async function navigate(path, method = "GET", body = null, type = null) {
-      if (!server) return;
+      if (!server || server.state === "restarting") return;
       if (busy) {
         queued = [path, method, body, type];
         return;
@@ -320,12 +382,31 @@
         await sleep(1000);
         if (!ready) continue;
         const now = await readJson("/host/.web/server.json");
-        if (now && (!server || now.started !== server.started)) {
+        const prev = server;
+        if (now && now.state === "restarting") {
+          // A file changed (or "web restart"): the guest restarts the app.
+          if (!prev || prev.state !== "restarting") {
+            server = now;
+            preview.hidden = false;
+            preview.classList.add("stopped");
+            setInfo({ en: `${now.message} — restarting the app …`, ko: `${now.message} — 앱을 다시 시작하는 중 …` });
+          }
+        } else if (now && now.state === "error") {
+          // The app did not start (e.g. a SyntaxError): show its log.
+          if (!prev || prev.state !== "error" || prev.message !== now.message) {
+            server = now;
+            preview.hidden = false;
+            preview.classList.remove("stopped");
+            frame.srcdoc = `<pre style="white-space:pre-wrap;color:#b00020;margin:12px">${escHtml(now.message || "")}</pre>`;
+            setInfo({ en: "The app stopped with an error — fix the code and save; it restarts by itself.", ko: "앱이 오류로 멈췄습니다 — 코드를 고쳐 저장하면 저절로 다시 시작합니다." });
+          }
+        } else if (now && (!prev || now.started !== prev.started || prev.state !== "running")) {
           server = now;
           preview.hidden = false;
           preview.classList.remove("stopped");
           document.getElementById("preview-port").textContent = `127.0.0.1:${now.port}`;
-          navigate("/");
+          // Same app restarted after an edit: reload the page being viewed.
+          navigate(prev && prev.app === now.app ? current : "/");
         } else if (!now && server) {
           server = null;
           preview.classList.add("stopped");

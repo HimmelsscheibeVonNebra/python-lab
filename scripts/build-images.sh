@@ -78,6 +78,11 @@ docker run --rm \
 			find /tmp/9p-tree/py -name "*.opt-[12].pyc" -delete
 			find /tmp/9p-tree/py -path "*/tests/*" -delete
 			find /tmp/9p-tree/py -depth -type d -empty -delete
+			# Flask and its dependencies as one zip: one fetch instead of ~200
+			SP9=$(echo /tmp/9p-tree/py/usr/lib/python3.*/site-packages)
+			if [ -d "$SP9/flask" ]; then
+				python3 /src/scripts/make-flask-zip.py "$SP9" /tmp/9p-tree/py/flask.zip
+			fi
 		fi
 		python3 /src/scripts/v86/fs2json.py --zstd --out /src/images/9p/fs.json /tmp/9p-tree
 		python3 /src/scripts/v86/copy-to-sha256.py --zstd /tmp/9p-tree /src/images/9p/base > /dev/null
@@ -97,6 +102,12 @@ docker run --rm \
 		# Python finds the 9p packages through a .pth file (see lab.sh for
 		# their shared libraries).
 		echo "/opt/py/usr/lib/$(basename "$PY")/site-packages" > "$PY/site-packages/lab-9p.pth"
+		# ... and Flask through an import hook for /opt/py/flask.zip
+		if [ -e /tmp/9p-tree/py/flask.zip ]; then
+			cp /src/rootfs/site-packages/_lab_flask.py "$PY/site-packages/"
+			python3 -m py_compile "$PY/site-packages/_lab_flask.py" 2>/dev/null || true
+			echo "import _lab_flask" > "$PY/site-packages/lab-flask.pth"
+		fi
 
 		cp -R /src/rootfs/overlay/. "$R"/
 		# Course code: course/weekNN -> ~/weekNN, course/sample -> ~/sample

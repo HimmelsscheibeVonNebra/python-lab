@@ -56,11 +56,11 @@
           "note": "경계값 테스트 표다. 각 기준의 바로 아래 값과 기준 값, 두 끝값 0과 100, 범위 밖 -1과 101을 넣었다. 59는 F, 60은 D, 89는 B, 90은 A, 101은 Invalid score여야 한다."
         },
         {
-          "cmd": "printf '%s\\n' 'score = 95' 'if score >= 60:' '    print(\"D\")' 'elif score >= 90:' '    print(\"A\")' | python3 -",
+          "cmd": "python3 - <<'EOF'\nscore = 95\nif score >= 60:\n    print(\"D\")\nelif score >= 90:\n    print(\"A\")\nEOF",
           "note": "낮은 기준을 먼저 검사한 잘못된 사슬이다. 95가 D로 나온다. 높은 기준부터 검사해야 하는 이유다."
         },
         {
-          "cmd": "for s in 59 60 101; do printf '%s\\n' 'score = '$s'' 'if not 0 <= score <= 100:' '    print(score, \"Invalid score\")' 'else:' '    if score >= 60:' '        print(score, \"Pass\")' '    else:' '        print(score, \"Fail\")' | python3 -; done",
+          "cmd": "for s in 59 60 101; do\npython3 - <<EOF\nscore = $s\nif not 0 <= score <= 100:\n    print(score, \"Invalid score\")\nelse:\n    if score >= 60:\n        print(score, \"Pass\")\n    else:\n        print(score, \"Fail\")\nEOF\ndone",
           "note": "선택 과제 Pass/Fail: 판정을 유효 점수 분기 안에 넣었기 때문에 101에는 Pass/Fail이 붙지 않는다."
         }
       ],
@@ -84,7 +84,7 @@
           "note": "같은 rock을 세 번 넣어도 random.choice 때문에 컴퓨터 선택과 결과가 매번 달라질 수 있다. 그래서 이대로는 테스트를 반복할 수 없다."
         },
         {
-          "cmd": "sed 's/random.choice(options)/\"scissors\"/' ../solutions/rps.py > /tmp/rps_fixed.py; grep -n 'computer =' /tmp/rps_fixed.py",
+          "cmd": "sed 's/random.choice(options)/\"scissors\"/' ../solutions/rps.py > /tmp/rps_fixed.py\ngrep -n 'computer =' /tmp/rps_fixed.py",
           "note": "슬라이드의 재현 가능한 테스트: 컴퓨터 선택을 \"scissors\"로 고정한 사본을 /tmp에 만들었다. 원본 파일은 바꾸지 않는다."
         },
         {
@@ -96,7 +96,7 @@
           "note": "가능한 9가지 조합 전체를 표로 출력한다. 슬라이드의 표와 같이 Tie 3번, You win 3번, You lose 3번이어야 한다."
         },
         {
-          "cmd": "python3 -c 'options = [\"rock\", \"paper\", \"scissors\"]; print(\"ROCK\" in options, \"ROCK\".strip().lower() in options)'",
+          "cmd": "python3 - <<'EOF'\noptions = [\"rock\", \"paper\", \"scissors\"]\nprint(\"ROCK\" in options, \"ROCK\".strip().lower() in options)\nEOF",
           "note": "lower()를 빠뜨리면 ROCK이 잘못된 입력(False)으로 처리된다. 정규화한 뒤에는 True다."
         }
       ],
@@ -116,7 +116,7 @@
           "note": "시작 코드는 Year: 프롬프트만 출력한다."
         },
         {
-          "cmd": "for y in 1900 2000 2024 2023; do printf '%s\\n' 'year = '$y'' 'by4 = year % 4 == 0' 'by100 = year % 100 == 0' 'by400 = year % 400 == 0' 'print(year, by4, by100, by400, by400 or (by4 and not by100))' | python3 -; done",
+          "cmd": "for y in 1900 2000 2024 2023; do\npython3 - <<EOF\nyear = $y\nby4 = year % 4 == 0\nby100 = year % 100 == 0\nby400 = year % 400 == 0\nprint(year, by4, by100, by400, by400 or (by4 and not by100))\nEOF\ndone",
           "note": "나눗셈 검사 세 개를 먼저 계산해 본다. 1900은 True True False라 윤년이 아니고(False), 2000은 400의 배수라 윤년이다. 2024는 True, 2023은 False."
         },
         {
@@ -124,7 +124,7 @@
           "note": "답안 실행: 2024와 2000은 Leap year, 2023과 1900은 Not a leap year, 0과 -4는 Enter a positive year다."
         },
         {
-          "cmd": "for y in 1900 2000; do printf '%s\\n' 'year = '$y'' 'if year <= 0:' '    print(\"Enter a positive year\")' 'elif year % 400 == 0:' '    print(f\"{year}: Leap year\")' 'elif year % 100 == 0:' '    print(f\"{year}: Not a leap year\")' 'elif year % 4 == 0:' '    print(f\"{year}: Leap year\")' 'else:' '    print(f\"{year}: Not a leap year\")' | python3 -; done",
+          "cmd": "for y in 1900 2000; do\npython3 - <<EOF\nyear = $y\nif year <= 0:\n    print(\"Enter a positive year\")\nelif year % 400 == 0:\n    print(f\"{year}: Leap year\")\nelif year % 100 == 0:\n    print(f\"{year}: Not a leap year\")\nelif year % 4 == 0:\n    print(f\"{year}: Leap year\")\nelse:\n    print(f\"{year}: Not a leap year\")\nEOF\ndone",
           "note": "도전 과제의 if/elif 풀이다. 400 → 100 → 4 순서로 검사하면 불리언 식 풀이와 같은 결과가 나온다."
         },
         {

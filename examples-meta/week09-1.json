@@ -16,7 +16,7 @@
           "note": "Instance state 줄에서 a만 1200이 되고 b는 500 그대로다. Class variable 줄은 두 객체 모두 Campus Bank, Instance shadowing 줄은 first만 Minsu's Bank로 바뀐다. first.bank_name = ...이 클래스 변수를 바꾸지 않고 first에 인스턴스 속성을 새로 만들었기 때문이다."
         },
         {
-          "cmd": "python3 -c 'from models import BankAccount, SavingsAccount; a = BankAccount(\"Minsu\", 1000); print(type(a).__name__, isinstance(a, BankAccount), isinstance(SavingsAccount(\"Jisu\", 500), BankAccount))'",
+          "cmd": "python3 - <<'EOF'\nfrom models import BankAccount, SavingsAccount\na = BankAccount(\"Minsu\", 1000)\nprint(type(a).__name__, isinstance(a, BankAccount), isinstance(SavingsAccount(\"Jisu\", 500), BankAccount))\nEOF",
           "note": "Minsu의 계좌는 객체이면서 동시에 BankAccount의 인스턴스다(True). SavingsAccount 객체도 BankAccount의 인스턴스로 취급되는 것이 상속이다."
         }
       ],
@@ -35,11 +35,11 @@
           "note": "Separate accounts: 1200 500 — a에만 입금되었다. Shared reference: 900 True — alias로 300을 출금했는데 a의 잔액이 줄었고 alias is a가 True다. Slide 8: 800 500 — accounts[0]은 a(=c)와 같은 객체라 c의 잔액이 800이 된다. 마지막 줄에서 accounts[0]을 b로 바꿔도 c는 여전히 800이다. 리스트 칸이 다른 객체를 가리키게 되었을 뿐, 객체가 바뀐 것은 아니다."
         },
         {
-          "cmd": "python3 -c 'from models import BankAccount; a = BankAccount(\"Minsu\", 1000); b = BankAccount(\"Minsu\", 1000); a.withdraw(300); print(a is b, a.get_balance(), b.get_balance())'",
+          "cmd": "python3 - <<'EOF'\nfrom models import BankAccount\na = BankAccount(\"Minsu\", 1000)\nb = BankAccount(\"Minsu\", 1000)\na.withdraw(300)\nprint(a is b, a.get_balance(), b.get_balance())\nEOF",
           "note": "속성 값이 같아 보여도 클래스를 두 번 호출하면 별개의 객체다. a is b는 False이고 b의 잔액은 1000 그대로다."
         },
         {
-          "cmd": "python3 -c 'from models import BankAccount; a = BankAccount(\"Minsu\", 1000); a.deposit(200); BankAccount.deposit(a, 200); print(a.get_balance())'",
+          "cmd": "python3 - <<'EOF'\nfrom models import BankAccount\na = BankAccount(\"Minsu\", 1000)\na.deposit(200)\nBankAccount.deposit(a, 200)\nprint(a.get_balance())\nEOF",
           "note": "a.deposit(200)과 BankAccount.deposit(a, 200)은 둘 다 a를 self로 넘기는 같은 호출이다. 두 번 실행했으므로 1400이 된다. 실제 코드에서는 한 형태만 한 번 쓴다."
         }
       ],
@@ -85,7 +85,7 @@
           "note": "슬라이드의 추적 표와 같은 결과다: deposit 200 → True 1200, withdraw 500 → True 700, withdraw 900 → False 700(잔액 부족), withdraw -50 → False 700(잘못된 금액), withdraw 700 → True 0(잔액과 같은 금액은 허용). 거부된 호출은 잔액을 바꾸지 않는다. assert가 모두 통과해 State checks passed가 출력된다."
         },
         {
-          "cmd": "python3 -c 'from models import BankAccount; a = BankAccount(\"Minsu\", 1000); a._balance = -100; print(a.get_balance())'",
+          "cmd": "python3 - <<'EOF'\nfrom models import BankAccount\na = BankAccount(\"Minsu\", 1000)\na._balance = -100\nprint(a.get_balance())\nEOF",
           "note": "밑줄(_balance)은 내부용이라는 약속일 뿐 접근을 막지 않는다. 바깥에서 직접 대입하면 -100이라는 잘못된 상태가 그대로 들어간다. 그래서 공개 메서드(deposit, withdraw, get_balance)만 쓰자는 팀 규칙이 중요하다."
         }
       ],
@@ -134,7 +134,7 @@
           "note": "Withdraw: True 700, Rejected: False 700(거부된 출금은 잔액을 바꾸지 않음), Bonus: True 600, 보고서 두 줄, Total: 1300. 슬라이드의 체크포인트 질문(합계는?)의 답이 마지막 줄이다."
         },
         {
-          "cmd": "python3 -c 'import importlib.util as u; s = u.spec_from_file_location(\"demo\", \"07_full_demo.py\"); m = u.module_from_spec(s); s.loader.exec_module(m); print(\"imported, main not run\")'",
+          "cmd": "python3 - <<'EOF'\nimport importlib.util as u\ns = u.spec_from_file_location(\"demo\", \"07_full_demo.py\")\nm = u.module_from_spec(s)\ns.loader.exec_module(m)\nprint(\"imported, main not run\")\nEOF",
           "note": "파일 이름이 숫자로 시작해 일반 import 문으로는 불러올 수 없어서 importlib로 불러왔다. 모듈로 불러오면 if __name__ == \"__main__\": 블록이 실행되지 않으므로 데모 출력 없이 마지막 메시지만 나온다."
         }
       ],

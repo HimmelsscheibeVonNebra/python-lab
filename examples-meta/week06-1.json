@@ -20,11 +20,11 @@
           "note": "스타터는 파일을 열고 헤더만 읽은 뒤 닫는다. 출력이 없고 exit=0이다. with 블록이 끝나면 파일은 자동으로 닫힌다."
         },
         {
-          "cmd": "python3 -c 'f = open(\"trades.csv\"); print(repr(f.readline())); line = f.readline(); fields = line.strip().split(\",\"); print(fields); print(fields[1], fields[2], int(fields[3]) * int(fields[4])); f.close()'",
+          "cmd": "python3 - <<'EOF'\nf = open(\"trades.csv\")\nprint(repr(f.readline()))\nline = f.readline()\nfields = line.strip().split(\",\")\nprint(fields)\nprint(fields[1], fields[2], int(fields[3]) * int(fields[4]))\nf.close()\nEOF",
           "note": "readline()이 돌려준 헤더 끝에 \\n이 붙어 있는 것을 repr로 확인한다. strip()으로 떼고 split(\",\")으로 자르면 문자열 다섯 개의 리스트가 된다. 숫자도 '10'처럼 문자열이라 int()로 바꿔야 곱할 수 있다: TEA buy 50000."
         },
         {
-          "cmd": "python3 -c 'f = open(\"trades.csv\"); f.readline(); last = f.readline().split(\",\")[4]; print(repr(last), last == \"5000\"); f.close()'",
+          "cmd": "python3 - <<'EOF'\nf = open(\"trades.csv\")\nf.readline()\nlast = f.readline().split(\",\")[4]\nprint(repr(last), last == \"5000\")\nf.close()\nEOF",
           "note": "strip() 없이 자르면 마지막 필드가 '5000\\n'이라 \"5000\"과 같지 않다(False). 줄 끝 개행이 비교를 망치는 함정이다."
         },
         {
@@ -45,15 +45,15 @@
           "note": "스타터는 클래스와 데이터만 정의하므로 출력이 없고, 보고서 파일도 아직 만들어지지 않는다(No such file or directory)."
         },
         {
-          "cmd": "python3 -c 'from position_report import Position; p1 = Position(\"CODE\", 2, 10000); p2 = Position(\"TEA\", 10, 5000); print(p1.ticker, p2.shares); print(p1.ticker, p1.shares, p1.buy)'",
+          "cmd": "python3 - <<'EOF'\nfrom position_report import Position\np1 = Position(\"CODE\", 2, 10000)\np2 = Position(\"TEA\", 10, 5000)\nprint(p1.ticker, p2.shares)\nprint(p1.ticker, p1.shares, p1.buy)\nEOF",
           "note": "한 클래스에서 만든 두 객체가 각자의 속성을 가진다: CODE 10, 그리고 CODE 2 10000. 모듈을 import하면 맨 위 코드가 실행되지만 이 스타터에는 print가 없어 조용하다."
         },
         {
-          "cmd": "python3 -c 'from position_report import Position; print(hasattr(Position(\"TEA\", 40, 5000), \"profit\"))'",
+          "cmd": "python3 - <<'EOF'\nfrom position_report import Position\nprint(hasattr(Position(\"TEA\", 40, 5000), \"profit\"))\nEOF",
           "note": "아직 profit 메서드가 없으므로 False다. 메서드를 추가하면 True가 되고, Position(\"TEA\", 40, 5000).profit(4800)은 -8000을 돌려줘야 한다."
         },
         {
-          "cmd": "printf 'class P:\\n    def profit(close):\\n        return close\\nprint(P().profit(4800))\\n' > no_self.py; python3 no_self.py; rm no_self.py",
+          "cmd": "printf 'class P:\\n    def profit(close):\\n        return close\\nprint(P().profit(4800))\\n' > no_self.py\npython3 no_self.py\nrm no_self.py",
           "note": "def에서 self를 빼먹은 메서드를 호출하면 TypeError: P.profit() takes 1 positional argument but 2 were given이 난다. 호출할 때 Python이 객체 자신을 첫 인자로 넘기기 때문이다."
         }
       ],
@@ -71,11 +71,11 @@
           "note": "스타터는 matplotlib을 불러오고 리스트만 만든다. 출력도 PNG 파일도 없다(ls가 No such file or directory를 알린다). 처음 실행할 때는 Matplotlib is building the font cache라는 안내가 한 번 나올 수 있다. 이 가상 머신에는 화면이 없으므로 plt.show() 대신 plt.savefig()로 파일을 만들어야 한다."
         },
         {
-          "cmd": "python3 -c 'import matplotlib.pyplot as plt; days = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"]; plt.plot(days, [10000, 10200, 9800, 10500, 10800], marker=\"o\"); plt.title(\"CODE closing prices\"); plt.savefig(\"demo_line.png\"); plt.figure(); plt.bar([\"win\", \"loss\"], [3, 2]); plt.savefig(\"demo_bar.png\"); print(\"Saved demo_line.png and demo_bar.png\")'",
+          "cmd": "python3 - <<'EOF'\nimport matplotlib.pyplot as plt\ndays = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"]\nplt.plot(days, [10000, 10200, 9800, 10500, 10800], marker=\"o\")\nplt.title(\"CODE closing prices\")\nplt.savefig(\"demo_line.png\")\nplt.figure()\nplt.bar([\"win\", \"loss\"], [3, 2])\nplt.savefig(\"demo_bar.png\")\nprint(\"Saved demo_line.png and demo_bar.png\")\nEOF",
           "note": "슬라이드의 선 그래프와 막대 그래프를 따로 저장해 본다. 두 차트 사이의 plt.figure()가 없으면 막대가 선 위에 겹쳐 한 파일에 그려진다."
         },
         {
-          "cmd": "ls -l demo_line.png demo_bar.png; cp demo_line.png demo_bar.png /mnt/host/",
+          "cmd": "ls -l demo_line.png demo_bar.png\ncp demo_line.png demo_bar.png /mnt/host/",
           "note": "PNG 두 개가 만들어졌다. /mnt/host/로 복사한 뒤 페이지의 받기 상자에 demo_line.png를 입력하면 내 컴퓨터로 내려받아 열어 볼 수 있다."
         },
         {

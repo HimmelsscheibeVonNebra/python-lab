@@ -1,97 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="02_classes_and_objects — Object-Oriented Programming · Python Lab" data-title-ko="02_classes_and_objects — 객체 지향 프로그래밍 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>02_classes_and_objects — Object-Oriented Programming · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week07/index.html#ex=02_classes_and_objects">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week07/index.html#ex=02_classes_and_objects");</script>
 </head>
-<body data-root="../../" data-lab-dir="week07/examples/session1">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 7 · Session 1</span><span lang="ko">7주차 1차시</span></a><span class="sep">/</span><span>02_classes_and_objects</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>02_classes_and_objects</h1>
-    <p><span lang="en">Define a class BankAccount whose body is just pass, and make two objects with BankAccount(). Attaching owner and balance attributes to each object with the dot (.) lets attributes with the same name hold different values in each object.</span><span lang="ko">몸체가 pass뿐인 class BankAccount를 정의하고 BankAccount()로 객체 두 개를 만든다. 점(.)으로 각 객체에 owner와 balance 속성을 붙이면 같은 이름의 속성이 객체마다 다른 값을 가진다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week07/examples/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week07/examples/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 02_classes_and_objects.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 02_classes_and_objects.py">▶</button><code>python3 02_classes_and_objects.py</code></div>
-          <p><span lang="en">Minsu 13000, Jisu 5000. Changing minsu's balance leaves jisu unchanged. The final False is the result of minsu is jisu: calling the constructor twice creates two different objects.</span><span lang="ko">Minsu 13000, Jisu 5000. minsu의 잔액을 바꿔도 jisu는 그대로다. 마지막 False는 minsu is jisu의 결과로, 생성자를 두 번 부르면 서로 다른 두 객체가 생긴다는 뜻이다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from importlib import import_module; m = import_module(&quot;02_classes_and_objects&quot;); print(type(m.minsu).__name__, isinstance(m.jisu, m.BankAccount))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from importlib import import_module; m = import_module(&quot;02_classes_and_objects&quot;); print(type(m.minsu).__name__, isinstance(m.jisu, m.BankAccount))'">▶</button><code>python3 -c 'from importlib import import_module; m = import_module(&quot;02_classes_and_objects&quot;); print(type(m.minsu).__name__, isinstance(m.jisu, m.BankAccount))'</code></div>
-          <p><span lang="en">Importing first prints the file's three lines once more, followed by BankAccount True. The type name of minsu is BankAccount, and jisu is also an instance of BankAccount. Because the file name starts with a digit, import_module is used instead of an import statement.</span><span lang="ko">import하면서 파일의 세 줄이 먼저 한 번 더 나오고, 이어서 BankAccount True가 나온다. minsu의 타입 이름은 BankAccount이고, jisu도 BankAccount의 인스턴스다. 파일 이름이 숫자로 시작해 import 문 대신 import_module을 썼다.</span></p>
-        </li>
-      </ol>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>02_classes_and_objects.py <span class="muted"><span lang="en">22 lines</span><span lang="ko">22줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Step 2: one class, two objects, separate attributes.</span>
-<span class="ln"> </span>
-<span class="ln">pass is a placeholder that does nothing. Initialization comes next.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">class BankAccount:</span>
-<span class="ln">    pass</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">minsu = BankAccount()</span>
-<span class="ln">minsu.owner = &quot;Minsu&quot;</span>
-<span class="ln">minsu.balance = 10000</span>
-<span class="ln"> </span>
-<span class="ln">jisu = BankAccount()</span>
-<span class="ln">jisu.owner = &quot;Jisu&quot;</span>
-<span class="ln">jisu.balance = 5000</span>
-<span class="ln"> </span>
-<span class="ln">minsu.balance = minsu.balance + 3000</span>
-<span class="ln">print(minsu.owner, minsu.balance)</span>
-<span class="ln">print(jisu.owner, jisu.balance)</span>
-<span class="ln">print(minsu is jisu)  # Two constructor calls created two different objects.</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="01_variables_and_functions.html">← 01_variables_and_functions</a>
-    <a href="03_init_and_self.html">03_init_and_self →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week07/index.html#ex=02_classes_and_objects">../week07/index.html#ex=02_classes_and_objects</a></p></body>
 </html>

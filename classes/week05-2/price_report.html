@@ -1,108 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="price_report — pandas: Series and DataFrame · Python Lab" data-title-ko="price_report — pandas: Series와 DataFrame · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>price_report — pandas: Series and DataFrame · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week05/index.html#ex=price_report">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week05/index.html#ex=price_report");</script>
 </head>
-<body data-root="../../" data-lab-dir="week05/starter/session2">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 5 · Session 2</span><span lang="ko">5주차 2차시</span></a><span class="sep">/</span><span>price_report</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>price_report</h1>
-    <p><span lang="en">Lab 3 (take-home). Read FIT's five Mon–Fri closing prices with input(), build a Series indexed by weekday, and print the mean, the high, the day of the high, and the number of days above the mean.</span><span lang="ko">Lab 3(과제). FIT의 월–금 종가 다섯 개를 input()으로 읽어 요일을 index로 하는 Series를 만들고 평균, 최고가, 최고가인 요일, 평균보다 높은 날의 수를 출력한다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week05/starter/session2</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week05/starter/session2</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py">▶</button><code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py</code></div>
-          <p><span lang="en">Runs the program with the five values fed in ahead of time (you can also run it yourself and type them one by one). The starter only reads the input, so only the prompts Close Mon: … Close Fri: come out, run together.</span><span lang="ko">다섯 값을 미리 넣어 실행한다(직접 실행해 하나씩 입력해도 된다). 스타터는 읽기만 하므로 Close Mon: … Close Fri: 프롬프트만 이어서 나온다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py">▶</button><code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py</code></div>
-          <p><span lang="en">Finished version: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3 (4350, 4400, 4300). values and days are in the same order, so Series(values, index=days) pairs each weekday with its value.</span><span lang="ko">완성본: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3(4350, 4400, 4300). values와 days가 같은 순서라서 Series(values, index=days)가 요일과 값을 짝짓는다.</span></p>
-        </li>
-      </ol>
-      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>price_report.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 (take-home): FIT's week in review.</span>
-<span class="ln">Tests: 4200, 4350, 4100, 4400, 4300 -&gt;</span>
-<span class="ln">Mean: 4270.0, High: 4400, Best day: Thu 4400,</span>
-<span class="ln">Above mean: 3. Assume integer-formatted input.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln">import pandas as pd</span>
-<span class="ln"> </span>
-<span class="ln">days = [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]</span>
-<span class="ln">values = []</span>
-<span class="ln">for day in days:</span>
-<span class="ln">    values.append(int(input(&quot;Close &quot; + day + &quot;: &quot;)))</span>
-<span class="ln"># TODO: build a Series with days as the index,</span>
-<span class="ln"># then print the mean rounded to 1, the high,</span>
-<span class="ln"># the best day with its close, and the count of</span>
-<span class="ln"># days above the mean.</span></code></pre>
-    </details>
-    <details class="source">
-      <summary>week05/solutions/session2/price_report.py <span class="muted"><span lang="en">14 lines</span><span lang="ko">14줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution: FIT's week in review.&quot;&quot;&quot;</span>
-<span class="ln">import pandas as pd</span>
-<span class="ln"> </span>
-<span class="ln">days = [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]</span>
-<span class="ln">values = []</span>
-<span class="ln">for day in days:</span>
-<span class="ln">    values.append(int(input(&quot;Close &quot; + day + &quot;: &quot;)))</span>
-<span class="ln"> </span>
-<span class="ln">closes = pd.Series(values, index=days)</span>
-<span class="ln">print(&quot;Mean:&quot;, round(closes.mean(), 1))</span>
-<span class="ln">print(&quot;High:&quot;, closes.max())</span>
-<span class="ln">best = closes.idxmax()</span>
-<span class="ln">print(&quot;Best day:&quot;, best, closes[best])</span>
-<span class="ln">print(&quot;Above mean:&quot;, (closes &gt; closes.mean()).sum())</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="trade_log.html">← trade_log</a>
-    <span></span>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week05/index.html#ex=price_report">../week05/index.html#ex=price_report</a></p></body>
 </html>

@@ -1,0 +1,2650 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 11 · Python Lab" data-title-ko="11주차 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 11 · Python Lab</title>
+  <link rel="icon" href="data:,">
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week11/examples/study_logger_skeleton">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 11</span><span lang="ko">11주차</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Week 11</span><span lang="ko">11주차</span></h1>
+    <ul class="sessions">
+      <li><a href="#notes-week11-1"><strong><span lang="en">Session 1 · Writing the Project Documents: Requirement, Feature, Function, UML</span><span lang="ko">1차시 · 프로젝트 문서 쓰기: 요구사항·기능·함수·UML</span></strong></a> <span lang="en">Using the study logger as the example, learn how the four documents (requirements REQ, features FEAT, function contracts FUNC and UML) describe one program from different angles. Run a skeleton that has only contracts and a version with F1 implemented, and carry out each requirement's check yourself at the keyboard.</span><span lang="ko">공부 기록기(study logger)를 예로 요구사항(REQ), 기능(FEAT), 함수 계약(FUNC), UML 네 문서가 한 프로그램을 어떻게 다른 각도에서 설명하는지 익힌다. 계약만 있는 뼈대(skeleton)와 F1이 구현된 버전을 실행하며 각 요구사항의 검사(check)를 키보드로 직접 확인한다.</span></li>
+      <li><a href="#notes-week11-2"><strong><span lang="en">Session 2 · Korean Stock Market Analysis: From Scenario to a Web Report MVP</span><span lang="ko">2차시 · 한국 증권시장 분석: 시나리오에서 웹 보고서 MVP까지</span></strong></a> <span lang="en">Follow a design chain from scenario (SC) to requirement (REQ), feature (FEAT), function (FUNC) and test (TEST) while running korea_market_mvp. It validates and analyzes a fictional classroom CSV to build docs/index.html; check how the program reacts differently to empty input, bad input and a missing file, and that the existing report survives a failure. Finally, practice refactoring that does not change behavior.</span><span lang="ko">시나리오(SC) → 요구사항(REQ) → 기능(FEAT) → 함수(FUNC) → 테스트(TEST)로 이어지는 설계를 따라 korea_market_mvp를 실행한다. 수업용 가상 CSV를 검증·분석해 docs/index.html을 만들고, 빈 입력·잘못된 입력·누락 파일에서 프로그램이 어떻게 다르게 반응하는지, 실패해도 기존 보고서가 남는지를 확인한다. 끝으로 동작을 바꾸지 않는 리팩터링을 연습한다.</span></li>
+    </ul>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 수업 코드는 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <h3><span lang="en">Session 1 · Writing the Project Documents: Requirement, Feature, Function, UML</span><span lang="ko">1차시 · 프로젝트 문서 쓰기: 요구사항·기능·함수·UML</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="study_logger_skeleton" aria-pressed="true">study_logger_skeleton</button>
+          <button type="button" data-pick="study_logger_f1" aria-pressed="false">study_logger_f1</button>
+        </div>
+      </div>
+      <div class="ex-group">
+        <h3><span lang="en">Session 2 · Korean Stock Market Analysis: From Scenario to a Web Report MVP</span><span lang="ko">2차시 · 한국 증권시장 분석: 시나리오에서 웹 보고서 MVP까지</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="korea_market_mvp" aria-pressed="false">korea_market_mvp</button>
+          <button type="button" data-pick="tidy_lab" aria-pressed="false">tidy_lab</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="study_logger_skeleton" data-dir="week11/examples/study_logger_skeleton">
+        <h2>study_logger_skeleton <span class="muted">~/week11/examples/study_logger_skeleton</span></h2>
+        <p><span lang="en">A skeleton that turns the Week 10 design document into code. Every function has a name, parameters and a docstring (the contract), but its body is raise NotImplementedError or a TODO placeholder. See how the document's function table (FUNC) became files and functions as it is.</span><span lang="ko">10주차 설계 문서를 코드로 옮긴 뼈대다. 모든 함수에 이름·매개변수·docstring(계약)은 있지만 본문은 raise NotImplementedError나 TODO 자리 표시다. 문서의 함수 표(FUNC)가 그대로 파일과 함수가 된 모습을 확인한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="ls; cat data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: ls; cat data/study.csv">▶</button><code>ls; cat data/study.csv</code></div>
+          <p><span lang="en">There are four modules, main.py, logic.py, storage.py and report.py, plus data/study.csv. The CSV holds the header date,course,minutes and two rows: python 90 minutes and stats 45 minutes.</span><span lang="ko">main.py·logic.py·storage.py·report.py 네 모듈과 data/study.csv가 있다. CSV에는 헤더 date,course,minutes와 python 90분, stats 45분 두 행이 들어 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py">▶</button><code>python3 main.py</code></div>
+          <p><span lang="en">This prints Loaded 0 records and TODO: totals. It says 0 even though the file has two rows because load_records() is still a placeholder that returns an empty list. It runs, but it does not yet satisfy the requirements (REQ-03, REQ-04).</span><span lang="ko">Loaded 0 records와 TODO: totals가 나온다. 파일에 두 행이 있는데도 0인 이유는 load_records()가 아직 빈 리스트를 돌려주는 자리 표시이기 때문이다. 실행은 되지만 요구사항(REQ-03, REQ-04)은 아직 만족하지 못한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import logic; print(logic.make_record.__doc__)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import logic; print(logic.make_record.__doc__)'">▶</button><code>python3 -c 'import logic; print(logic.make_record.__doc__)'</code></div>
+          <p><span lang="en">The contract written in the function document (DOC 3) is there as the docstring. Read the shape of the return value {&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;: int}, the lower-casing, and the conditions that raise ValueError.</span><span lang="ko">함수 문서(DOC 3)에 쓴 계약이 docstring으로 들어 있다. 반환값의 모양 {&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;: int}, 소문자 변환, ValueError를 내는 조건을 읽어 본다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -nE 'def |raise NotImplementedError|TODO' *.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -nE 'def |raise NotImplementedError|TODO' *.py">▶</button><code>grep -nE 'def |raise NotImplementedError|TODO' *.py</code></div>
+          <p><span lang="en">All six functions from the function table (parse_minutes, make_record, weekly_totals, load_records, append_record, format_totals) and main() are present, and each body is marked with NotImplementedError or TODO. Every function name is a verb plus a noun.</span><span lang="ko">함수 표의 여섯 함수(parse_minutes, make_record, weekly_totals, load_records, append_record, format_totals)와 main()이 모두 있고, 각 본문이 NotImplementedError 또는 TODO로 표시되어 있다. 함수 이름은 모두 동사+명사다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'">▶</button><code>python3 -c 'from logic import parse_minutes; parse_minutes(&quot;90&quot;)'</code></div>
+          <p><span lang="en">Calling a function that has no body yet gives a NotImplementedError: parse_minutes traceback. At the skeleton stage this is normal. From the next session on, these lines are replaced one by one with real bodies.</span><span lang="ko">아직 본문이 없는 함수를 호출하면 NotImplementedError: parse_minutes 트레이스백이 난다. 뼈대 단계에서는 이것이 정상이다. 다음 차시부터 이 줄을 하나씩 실제 본문으로 바꾼다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="study_logger_f1" data-dir="week11/examples/study_logger_f1" hidden>
+        <h2>study_logger_f1 <span class="muted">~/week11/examples/study_logger_f1</span></h2>
+        <p><span lang="en">A version in which FEAT-01 &quot;Log one entry&quot; works end to end. main() asks for the date, course and minutes, logic.make_record() checks them, and storage.append_record() appends one row to data/study.csv. Type in the requirement document's checks REQ-01 and REQ-02 exactly as written.</span><span lang="ko">FEAT-01 &quot;한 건 기록하기&quot;가 끝까지 동작하는 버전이다. main()이 날짜·과목·분을 묻고, logic.make_record()가 검사한 뒤, storage.append_record()가 data/study.csv에 한 행을 덧붙인다. 요구사항 문서의 검사 REQ-01, REQ-02를 그대로 입력해 본다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 test_logic.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 test_logic.py">▶</button><code>python3 test_logic.py</code></div>
+          <p><span lang="en">This file turns the requirements' checks into asserts. All checks passed. appears only if parse_minutes(&quot;90&quot;) is 90, &quot; Python &quot; is cleaned up to python, and an empty course, -30 and abc are all rejected.</span><span lang="ko">요구사항의 검사를 assert로 옮긴 파일이다. parse_minutes(&quot;90&quot;)이 90이고, &quot; Python &quot;이 python으로 정리되며, 빈 과목·-30·abc는 모두 거절되어야 All checks passed.가 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from logic import make_record
+rec = make_record(&quot;2026-11-10&quot;, &quot; Python &quot;, &quot;90&quot;)
+print(rec[&quot;course&quot;], repr(rec[&quot;minutes&quot;]))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from logic import make_record
+rec = make_record(&quot;2026-11-10&quot;, &quot; Python &quot;, &quot;90&quot;)
+print(rec[&quot;course&quot;], repr(rec[&quot;minutes&quot;]))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from logic import make_record
+rec = make_record(&quot;2026-11-10&quot;, &quot; Python &quot;, &quot;90&quot;)
+print(rec[&quot;course&quot;], repr(rec[&quot;minutes&quot;]))
+EOF</code></div>
+          <p><span lang="en">The make_record() example from the slide. It prints python 90. The course has its leading and trailing spaces removed and is lower-cased, and minutes is the integer 90, not the string &quot;90&quot; (repr shows no quotes).</span><span lang="ko">슬라이드의 make_record() 예제다. python 90이 나온다. 과목은 앞뒤 공백이 지워지고 소문자가 되며, minutes는 문자열 &quot;90&quot;이 아니라 정수 90이다(repr에 따옴표가 없다).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-11-10\npython\n90\n' | python3 main.py
+cat data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-11-10\npython\n90\n' | python3 main.py
+cat data/study.csv">▶</button><code>printf '2026-11-10\npython\n90\n' | python3 main.py
+cat data/study.csv</code></div>
+          <p><span lang="en">The check for REQ-01: entering 2026-11-10, python, 90 prints Saved. and adds one new row, 2026-11-10,python,90, at the end of study.csv. The three prompts appear run together on one line because the input was piped in.</span><span lang="ko">REQ-01의 검사: 2026-11-10, python, 90을 입력하면 Saved.가 나오고 study.csv의 마지막에 2026-11-10,python,90 한 행이 새로 생긴다. 프롬프트 세 개가 한 줄에 붙어 보이는 것은 입력을 파이프로 넣었기 때문이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="wc -l data/study.csv
+printf '2026-11-10\npython\n-30\n' | python3 main.py
+wc -l data/study.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: wc -l data/study.csv
+printf '2026-11-10\npython\n-30\n' | python3 main.py
+wc -l data/study.csv">▶</button><code>wc -l data/study.csv
+printf '2026-11-10\npython\n-30\n' | python3 main.py
+wc -l data/study.csv</code></div>
+          <p><span lang="en">The check for REQ-02: -30 minutes is rejected with Not saved: minutes must be positive, got -30, and the line counts before and after are the same. The file being unchanged is the observable result.</span><span lang="ko">REQ-02의 검사: -30분은 Not saved: minutes must be positive, got -30으로 거절되고, 전후의 줄 수가 같다. 파일이 바뀌지 않았다는 것이 관찰 가능한 결과다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-11-10\n   \n30\n' | python3 main.py
+printf '2026-11-10\npython\nabc\n' | python3 main.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-11-10\n   \n30\n' | python3 main.py
+printf '2026-11-10\npython\nabc\n' | python3 main.py">▶</button><code>printf '2026-11-10\n   \n30\n' | python3 main.py
+printf '2026-11-10\npython\nabc\n' | python3 main.py</code></div>
+          <p><span lang="en">The error lines of the feature sheet (FEAT-01): a course made only of spaces gives course must not be empty, and non-numeric minutes give int()'s ValueError message, both as Not saved. In both cases main() catches the ValueError and writes nothing.</span><span lang="ko">기능 명세(FEAT-01)의 오류 줄: 공백뿐인 과목은 course must not be empty, 숫자가 아닌 분은 int()의 ValueError 메시지로 Not saved가 된다. 두 경우 모두 main()이 ValueError를 잡아 아무것도 쓰지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -nE 'TODO|NotImplementedError' *.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -nE 'TODO|NotImplementedError' *.py">▶</button><code>grep -nE 'TODO|NotImplementedError' *.py</code></div>
+          <p><span lang="en">The F1 path (make_record, parse_minutes, append_record) has no TODOs. load_records() (F2) and weekly_totals() and format_totals() (F3) are still left, so REQ-03 weekly totals and REQ-04 keeping records between runs cannot be checked with this version.</span><span lang="ko">F1 경로(make_record, parse_minutes, append_record)에는 TODO가 없다. load_records()(F2), weekly_totals()·format_totals()(F3)는 아직 남아 있으므로 REQ-03 주간 합계와 REQ-04 재실행 후 유지는 이 버전으로 확인할 수 없다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="korea_market_mvp" data-dir="week11/examples/korea_market_mvp" hidden>
+        <h2>korea_market_mvp <span class="muted">~/week11/examples/korea_market_mvp</span></h2>
+        <p><span lang="en">main.py parses the arguments and calls, in order, load_quotes (read and validate the CSV) → analyze (filter and sort) → summarize (summary) → render_html (HTML string) → write_html (atomic file replacement). logic.py and report.py never open files; all I/O is in storage.py.</span><span lang="ko">main.py가 인자를 해석하고 load_quotes(CSV 읽기·검증) → analyze(필터·정렬) → summarize(요약) → render_html(HTML 문자열) → write_html(원자적 파일 교체) 순서로 호출한다. logic.py와 report.py는 파일을 열지 않고, 모든 입출력은 storage.py에 있다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -m unittest -v" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -m unittest -v">▶</button><code>python3 -m unittest -v</code></div>
+          <p><span lang="en">All 12 tests, test_01 to test_12, are ok, and the last line is OK. The number in each test name matches TEST-01 to TEST-12 in the workbook. The file tests run only inside a TemporaryDirectory, so they never touch the classroom docs/index.html.</span><span lang="ko">test_01부터 test_12까지 12개 테스트가 모두 ok이고 마지막 줄이 OK다. 각 테스트 이름의 번호가 워크북의 TEST-01~12와 같다. 파일 테스트는 TemporaryDirectory 안에서만 일어나 수업용 docs/index.html을 건드리지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cat data/prices.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cat data/prices.csv">▶</button><code>cat data/prices.csv</code></div>
+          <p><span lang="en">The input contract: the header date,code,name,market,previous_close,close,volume in that order, one date, five stocks. Some codes start with 0, like 005930. All of it is fictional classroom data.</span><span lang="ko">입력 계약: 헤더 date,code,name,market,previous_close,close,volume 순서, 날짜 하나, 종목 다섯 개. 005930처럼 앞자리가 0인 코드가 있다. 모두 수업용 가상 데이터다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py">▶</button><code>python3 main.py</code></div>
+          <p><span lang="en">SC-01; the default is --market ALL. Generated .../docs/index.html (5 stocks) means the report was replaced. The success message is printed only after write_html() has finished.</span><span lang="ko">SC-01, 기본값은 --market ALL이다. Generated .../docs/index.html (5 stocks)가 나오면 보고서가 교체된 것이다. 성공 메시지는 write_html()이 끝난 뒤에만 출력된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -oE '종목 [0-9]+개[^&lt;]*|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html
+grep -oE '&lt;td&gt;[0-9]{6}&lt;/td&gt;' docs/index.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -oE '종목 [0-9]+개[^&lt;]*|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html
+grep -oE '&lt;td&gt;[0-9]{6}&lt;/td&gt;' docs/index.html">▶</button><code>grep -oE '종목 [0-9]+개[^&lt;]*|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html
+grep -oE '&lt;td&gt;[0-9]{6}&lt;/td&gt;' docs/index.html</code></div>
+          <p><span lang="en">The summary is 종목 5개 · 상승 2 · 하락 2 · 보합 1 (5 stocks: 2 up, 2 down, 1 flat), with a simple sample mean of +0.40%. The code order in the table is 247540, 005930, 035420, 000660, 035900, by change in descending order, and the leading 0 of 005930 is kept.</span><span lang="ko">요약은 종목 5개 · 상승 2 · 하락 2 · 보합 1, 표본 단순평균 +0.40%다. 표의 코드 순서는 247540, 005930, 035420, 000660, 035900으로 등락률 내림차순이며 005930의 앞자리 0이 그대로 남아 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="cp docs/index.html /mnt/host/report.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: cp docs/index.html /mnt/host/report.html">▶</button><code>cp docs/index.html /mnt/host/report.html</code></div>
+          <p><span lang="en">Type /mnt/host/report.html into the Download box above and click Download to open the report in your own computer's browser (TEST-13, the browser check). Check the reference date, market, source, units (원, 주), signed changes and the fictional-data notice.</span><span lang="ko">위쪽 받기 칸에 /mnt/host/report.html을 입력하고 받기를 누르면 내 컴퓨터의 브라우저로 보고서를 열 수 있다(TEST-13 브라우저 확인). 기준일·시장·출처·단위(원, 주)·부호가 붙은 등락률·가상 데이터 안내를 확인한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --market KOSPI
+grep -oE '시장: [A-Z]+|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --market KOSPI
+grep -oE '시장: [A-Z]+|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html">▶</button><code>python3 main.py --market KOSPI
+grep -oE '시장: [A-Z]+|&lt;strong&gt;[^&lt;]*&lt;/strong&gt;' docs/index.html</code></div>
+          <p><span lang="en">FEAT-02: keeping only KOSPI gives 3 stocks with a mean of +0.33%. It differs from ALL's +0.40% because the sample being averaged has changed. This mean is an equal-weight sample mean, not the KOSPI index return.</span><span lang="ko">FEAT-02: KOSPI만 남겨 3 stocks, 평균 +0.33%다. ALL의 +0.40%와 다른 이유는 평균을 내는 표본이 달라졌기 때문이다. 이 평균은 동일 가중 표본 평균이지 KOSPI 지수 수익률이 아니다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --input data/invalid-zero.csv
+echo &quot;exit=$?&quot;
+grep -oE '시장: [A-Z]+' docs/index.html
+ls docs" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --input data/invalid-zero.csv
+echo &quot;exit=$?&quot;
+grep -oE '시장: [A-Z]+' docs/index.html
+ls docs">▶</button><code>python3 main.py --input data/invalid-zero.csv
+echo &quot;exit=$?&quot;
+grep -oE '시장: [A-Z]+' docs/index.html
+ls docs</code></div>
+          <p><span lang="en">SC-02: a row with a previous close of 0 is rejected with Report not generated: CSV row 2: previous_close must be &gt;= 1, and the exit code is 1. docs/index.html is still the KOSPI report from just before, and no temporary file is left behind (REQ-06).</span><span lang="ko">SC-02: 전일종가 0인 행은 Report not generated: CSV row 2: previous_close must be &gt;= 1로 거절되고 종료 코드는 1이다. docs/index.html은 여전히 바로 앞의 KOSPI 보고서이고, 임시 파일도 남지 않았다(REQ-06).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --input data/nope.csv; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --input data/nope.csv; echo &quot;exit=$?&quot;">▶</button><code>python3 main.py --input data/nope.csv; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">A missing file is an error, not empty data. You get the [Errno 2] No such file or directory message and exit code 1, and the report does not change.</span><span lang="ko">누락 파일은 빈 데이터가 아니라 오류다. [Errno 2] No such file or directory 메시지와 종료 코드 1이 나오고 보고서는 바뀌지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --input data/empty.csv
+echo &quot;exit=$?&quot;
+grep -oE '&lt;strong&gt;[^&lt;]*&lt;/strong&gt;|표시할 종목이 없습니다' docs/index.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --input data/empty.csv
+echo &quot;exit=$?&quot;
+grep -oE '&lt;strong&gt;[^&lt;]*&lt;/strong&gt;|표시할 종목이 없습니다' docs/index.html">▶</button><code>python3 main.py --input data/empty.csv
+echo &quot;exit=$?&quot;
+grep -oE '&lt;strong&gt;[^&lt;]*&lt;/strong&gt;|표시할 종목이 없습니다' docs/index.html</code></div>
+          <p><span lang="en">SC-03: a CSV with only a header is valid empty input. It succeeds with (0 stocks) (exit code 0), the mean is N/A, and the table contains the notice 표시할 종목이 없습니다 (no stocks to show). The key point is that the result differs from a missing file.</span><span lang="ko">SC-03: 헤더만 있는 CSV는 정상적인 빈 입력이다. (0 stocks)로 성공(종료 코드 0)하고, 평균은 N/A, 표에는 표시할 종목이 없습니다 안내가 들어간다. 누락 파일과 결과가 다르다는 점이 핵심이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py --market NASDAQ; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py --market NASDAQ; echo &quot;exit=$?&quot;">▶</button><code>python3 main.py --market NASDAQ; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">argparse rejects an unknown market as an invalid choice, with exit code 2. To sum up: 0 for success, 1 for data or file errors, 2 for CLI usage errors.</span><span lang="ko">모르는 시장은 argparse가 invalid choice로 거절하고 종료 코드는 2다. 정리하면 성공 0, 데이터·파일 오류 1, CLI 사용 오류 2다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from logic import change_pct
+assert change_pct(70000, 71400) == 2.0
+assert change_pct(200000, 198000) == -1.0
+assert change_pct(100, 100) == 0.0
+print(&quot;Daily change checks passed.&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from logic import change_pct
+assert change_pct(70000, 71400) == 2.0
+assert change_pct(200000, 198000) == -1.0
+assert change_pct(100, 100) == 0.0
+print(&quot;Daily change checks passed.&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from logic import change_pct
+assert change_pct(70000, 71400) == 2.0
+assert change_pct(200000, 198000) == -1.0
+assert change_pct(100, 100) == 0.0
+print(&quot;Daily change checks passed.&quot;)
+EOF</code></div>
+          <p><span lang="en">The smallest rule from the slides: rise, fall and flat are each checked separately. The calculation does not round; rounding happens only in the report, with f&quot;{change:+.2f}%&quot;.</span><span lang="ko">슬라이드의 가장 작은 규칙: 상승·하락·보합을 각각 별도 검사로 확인한다. 계산은 반올림하지 않고, 반올림은 보고서에서 f&quot;{change:+.2f}%&quot;로만 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from html import escape
+print(escape(&quot;&lt;b&gt;Example&lt;/b&gt;&quot;))
+print(f&quot;{2.0:+.2f}%&quot;)
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from html import escape
+print(escape(&quot;&lt;b&gt;Example&lt;/b&gt;&quot;))
+print(f&quot;{2.0:+.2f}%&quot;)
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from html import escape
+print(escape(&quot;&lt;b&gt;Example&lt;/b&gt;&quot;))
+print(f&quot;{2.0:+.2f}%&quot;)
+EOF</code></div>
+          <p><span lang="en">html.escape turns &lt; and &gt; in external text such as stock names into &amp;lt; and &amp;gt; so that they are not interpreted as HTML tags (TEST-08). Showing the sign together with the number, as in +2.00%, makes the direction clear even without color.</span><span lang="ko">html.escape는 종목명 같은 외부 텍스트의 &lt;, &gt;를 &amp;lt;, &amp;gt;로 바꿔 HTML 태그로 해석되지 않게 한다(TEST-08). +2.00%처럼 부호를 숫자와 함께 보여 주면 색이 없어도 방향을 알 수 있다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 main.py; cp docs/index.html /mnt/host/report.html" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 main.py; cp docs/index.html /mnt/host/report.html">▶</button><code>python3 main.py; cp docs/index.html /mnt/host/report.html</code></div>
+          <p><span lang="en">Switch back to the ALL report and download it again. The slides' approach of serving it with python3 -m http.server does not work here because there is no browser inside this virtual machine, so download the file and open it yourself instead.</span><span lang="ko">ALL 보고서로 되돌려 다시 받아 둔다. 슬라이드의 python3 -m http.server로 띄우는 방식은 이 가상 머신 안에 브라우저가 없으므로, 받기로 내려받아 직접 여는 것으로 대신한다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The slides' cd 11week/examples/korea_market_mvp is ~/week11/examples/korea_market_mvp in this lab. Do the Git branch and PR steps in the repository on your real PC.</span><span lang="ko">슬라이드의 cd 11week/examples/korea_market_mvp는 이 실습에서 ~/week11/examples/korea_market_mvp다. Git 브랜치·PR 단계는 실제 PC의 저장소에서 한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="tidy_lab" data-dir="week11/labs/session2" hidden>
+        <h2>tidy_lab <span class="muted">~/week11/labs/session2</span></h2>
+        <p><span lang="en">Code that works but is hard to read. Apply renaming, constant extraction, pulling a duplicated line into a function, and guard clauses, but the output of the six checks must not change by a single character. Refactoring is a different kind of change from adding features or fixing bugs, and its evidence is the same check results before and after.</span><span lang="ko">동작은 맞지만 읽기 어려운 코드다. 이름 바꾸기, 상수 추출, 중복 줄을 함수로 빼기, guard clause를 적용하되 여섯 검사의 출력은 한 글자도 바뀌면 안 된다. 리팩터링은 기능 추가·버그 수정과 다른 종류의 변경이며, 증거는 전후의 같은 검사 결과다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 tidy_lab.py">▶</button><code>python3 tidy_lab.py</code></div>
+          <p><span lang="en">Six PASS lines appear. This is the baseline before refactoring. Rerun after every change and check that the same six lines appear.</span><span lang="ko">PASS가 여섯 줄 나온다. 리팩터링 전의 기준 결과다. 한 번 고칠 때마다 다시 실행해서 같은 여섯 줄이 나오는지 확인한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -n '2000' tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -n '2000' tidy_lab.py">▶</button><code>grep -n '2000' tidy_lab.py</code></div>
+          <p><span lang="en">The daily goal of 2000 ml is scattered through the code as a bare number (Move 2). Give it a name at the top, like DAILY_GOAL_ML = 2000, and keep it in one place.</span><span lang="ko">하루 목표량 2000 ml이 코드 여러 곳에 숫자로 흩어져 있다(Move 2). 상단에 DAILY_GOAL_ML = 2000처럼 이름을 붙여 한 곳에 둔다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="grep -n 'out.append' tidy_lab.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: grep -n 'out.append' tidy_lab.py">▶</button><code>grep -n 'out.append' tidy_lab.py</code></div>
+          <p><span lang="en">The same line appears twice, in the if and in the else (Move 3). The two branches are identical, so if you extract one function that builds the line, the branch itself is no longer needed.</span><span lang="ko">같은 줄이 if와 else에 두 번 있다(Move 3). 두 분기가 완전히 같으므로 한 줄을 만드는 함수 하나로 뽑아내면 분기 자체가 필요 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py
+python3 tidy_lab.py &gt; before.txt
+python3 my_tidy.py &gt; after.txt
+diff before.txt after.txt &amp;&amp; echo same output" title="Run in the terminal / 터미널에서 실행" aria-label="Run: [ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py
+python3 tidy_lab.py &gt; before.txt
+python3 my_tidy.py &gt; after.txt
+diff before.txt after.txt &amp;&amp; echo same output">▶</button><code>[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py
+python3 tidy_lab.py &gt; before.txt
+python3 my_tidy.py &gt; after.txt
+diff before.txt after.txt &amp;&amp; echo same output</code></div>
+          <p><span lang="en">The first run creates a copy, my_tidy.py (same output, since nothing has been changed yet); after that the existing copy is left as it is. Make one change at a time with nano my_tidy.py, then rerun this command to compare its output with the original. same output is the evidence that the behavior is unchanged. Use names like entries, day, ml and totals instead of x, d, m and tmp (Move 1). Do not change the check() calls or the function names.</span><span lang="ko">처음 실행하면 복사본 my_tidy.py를 만들고(아직 고치지 않았으므로 same output), 이후에는 있는 복사본을 그대로 둔다. nano my_tidy.py로 한 가지씩 고친 뒤 이 명령을 다시 실행해 원본과 출력을 비교한다. same output이 나오면 동작이 그대로라는 증거다. x, d, m, tmp 대신 entries, day, ml, totals 같은 이름을 쓴다(Move 1). check() 호출과 함수 이름은 바꾸지 않는다.</span></p>
+        </li>
+      </ol>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="study_logger_skeleton">
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">19 lines</span><span lang="ko">19줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Entry point: python3 main.py</span>
+<span class="ln"> </span>
+<span class="ln">Week 10 skeleton: loads records and prints a placeholder summary.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">from report import format_totals</span>
+<span class="ln">from storage import load_records</span>
+<span class="ln"> </span>
+<span class="ln">DATA = &quot;data/study.csv&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    records = load_records(DATA)</span>
+<span class="ln">    print(f&quot;Loaded {len(records)} records&quot;)</span>
+<span class="ln">    for line in format_totals({}):</span>
+<span class="ln">        print(line)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">29 lines</span><span lang="ko">29줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Rules of the study logger. No input(), print() or open() in this file.</span>
+<span class="ln"> </span>
+<span class="ln">Week 10 left the contracts. Week 11 fills the bodies, one function at a time.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_minutes(text):</span>
+<span class="ln">    &quot;&quot;&quot;Return text as a positive whole number of minutes.</span>
+<span class="ln"> </span>
+<span class="ln">    Raises ValueError if text is not a whole number or is not above 0.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;parse_minutes&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def make_record(date, course, minutes_text):</span>
+<span class="ln">    &quot;&quot;&quot;Return one record: {&quot;date&quot;: str, &quot;course&quot;: str, &quot;minutes&quot;: int}.</span>
+<span class="ln"> </span>
+<span class="ln">    The course is stored in lower case. Raises ValueError for an empty</span>
+<span class="ln">    course or invalid minutes.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;make_record&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def weekly_totals(records):</span>
+<span class="ln">    &quot;&quot;&quot;Return {course: total minutes} for a list of records.</span>
+<span class="ln"> </span>
+<span class="ln">    An empty list returns {}. The input list is not changed.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;weekly_totals&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Reading and writing data/study.csv. The only module that touches the disk.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_records(path):</span>
+<span class="ln">    &quot;&quot;&quot;Return every row of the CSV file as a record dict.</span>
+<span class="ln"> </span>
+<span class="ln">    minutes is converted to int. A missing file returns [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    # TODO (week 11, F2): implement with csv.DictReader.</span>
+<span class="ln">    return []</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def append_record(path, record):</span>
+<span class="ln">    &quot;&quot;&quot;Append one record to the CSV file, writing the header if the file is new.&quot;&quot;&quot;</span>
+<span class="ln">    raise NotImplementedError(&quot;append_record&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Turning results into text for the screen.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_totals(totals):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per course, largest total first: &quot;python   90 min&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    # TODO (week 11, F3): implement this contract.</span>
+<span class="ln">    return [&quot;TODO: totals&quot;]</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/study.csv <span class="muted"><span lang="en">3 lines</span><span lang="ko">3줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,course,minutes</span>
+<span class="ln">2026-10-24,python,90</span>
+<span class="ln">2026-10-25,stats,45</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="study_logger_f1" hidden>
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">25 lines</span><span lang="ko">25줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Study logger, F1 slice: log one study session.</span>
+<span class="ln"> </span>
+<span class="ln">F2 (reload the file) and F3 (weekly totals) arrive in session 2.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">from logic import make_record</span>
+<span class="ln">from storage import append_record</span>
+<span class="ln"> </span>
+<span class="ln">DATA = &quot;data/study.csv&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main():</span>
+<span class="ln">    date = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">    course = input(&quot;Course: &quot;)</span>
+<span class="ln">    minutes = input(&quot;Minutes: &quot;)</span>
+<span class="ln">    try:</span>
+<span class="ln">        record = make_record(date, course, minutes)</span>
+<span class="ln">    except ValueError as error:</span>
+<span class="ln">        print(&quot;Not saved:&quot;, error)</span>
+<span class="ln">    else:</span>
+<span class="ln">        append_record(DATA, record)</span>
+<span class="ln">        print(&quot;Saved.&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">34 lines</span><span lang="ko">34줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Rules of the study logger. No input(), print() or open() in this file.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_minutes(text):</span>
+<span class="ln">    &quot;&quot;&quot;Return text as a positive whole number of minutes.</span>
+<span class="ln"> </span>
+<span class="ln">    Raises ValueError if text is not a whole number or is not above 0.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    minutes = int(text)</span>
+<span class="ln">    if minutes &lt;= 0:</span>
+<span class="ln">        raise ValueError(f&quot;minutes must be positive, got {minutes}&quot;)</span>
+<span class="ln">    return minutes</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def make_record(date, course, minutes_text):</span>
+<span class="ln">    &quot;&quot;&quot;Return one record: {&quot;date&quot;: str, &quot;course&quot;: str, &quot;minutes&quot;: int}.</span>
+<span class="ln"> </span>
+<span class="ln">    The course is stored in lower case. Raises ValueError for an empty</span>
+<span class="ln">    course or invalid minutes.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    course = course.strip().lower()</span>
+<span class="ln">    if not course:</span>
+<span class="ln">        raise ValueError(&quot;course must not be empty&quot;)</span>
+<span class="ln">    return {&quot;date&quot;: date.strip(), &quot;course&quot;: course,</span>
+<span class="ln">            &quot;minutes&quot;: parse_minutes(minutes_text)}</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def weekly_totals(records):</span>
+<span class="ln">    &quot;&quot;&quot;Return {course: total minutes} for a list of records.</span>
+<span class="ln"> </span>
+<span class="ln">    An empty list returns {}. The input list is not changed.</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    # TODO (next session, F3): implement this contract.</span>
+<span class="ln">    raise NotImplementedError(&quot;weekly_totals&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">25 lines</span><span lang="ko">25줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Reading and writing data/study.csv. The only module that touches the disk.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;course&quot;, &quot;minutes&quot;]</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_records(path):</span>
+<span class="ln">    &quot;&quot;&quot;Return every row of the CSV file as a record dict.</span>
+<span class="ln"> </span>
+<span class="ln">    minutes is converted to int. A missing file returns [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    # TODO (next session, F2): implement with csv.DictReader.</span>
+<span class="ln">    return []</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def append_record(path, record):</span>
+<span class="ln">    &quot;&quot;&quot;Append one record to the CSV file, writing the header if the file is new.&quot;&quot;&quot;</span>
+<span class="ln">    path = Path(path)</span>
+<span class="ln">    is_new = not path.exists()</span>
+<span class="ln">    with open(path, &quot;a&quot;, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:</span>
+<span class="ln">        writer = csv.DictWriter(f, fieldnames=FIELDS)</span>
+<span class="ln">        if is_new:</span>
+<span class="ln">            writer.writeheader()</span>
+<span class="ln">        writer.writerow(record)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Turning results into text for the screen.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_totals(totals):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per course, largest total first: &quot;python   90 min&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    # TODO (week 11, F3): implement this contract.</span>
+<span class="ln">    return [&quot;TODO: totals&quot;]</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>test_logic.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Acceptance criteria for F1, written as checks. Grows with every logic function.&quot;&quot;&quot;</span>
+<span class="ln">from logic import make_record, parse_minutes</span>
+<span class="ln"> </span>
+<span class="ln">assert parse_minutes(&quot;90&quot;) == 90</span>
+<span class="ln">rec = make_record(&quot;2026-11-10&quot;, &quot; Python &quot;, &quot;30&quot;)</span>
+<span class="ln">assert rec == {&quot;date&quot;: &quot;2026-11-10&quot;, &quot;course&quot;: &quot;python&quot;, &quot;minutes&quot;: 30}</span>
+<span class="ln">for bad in [(&quot;2026-11-10&quot;, &quot;&quot;, &quot;30&quot;), (&quot;2026-11-10&quot;, &quot;python&quot;, &quot;-30&quot;),</span>
+<span class="ln">            (&quot;2026-11-10&quot;, &quot;python&quot;, &quot;abc&quot;)]:</span>
+<span class="ln">    try:</span>
+<span class="ln">        make_record(*bad)</span>
+<span class="ln">    except ValueError:</span>
+<span class="ln">        pass</span>
+<span class="ln">    else:</span>
+<span class="ln">        raise AssertionError(f&quot;{bad} was accepted&quot;)</span>
+<span class="ln">print(&quot;All checks passed.&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/study.csv <span class="muted"><span lang="en">3 lines</span><span lang="ko">3줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,course,minutes</span>
+<span class="ln">2026-10-24,python,90</span>
+<span class="ln">2026-10-25,stats,45</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="korea_market_mvp" hidden>
+    <details class="source" open>
+      <summary>main.py <span class="muted"><span lang="en">33 lines</span><span lang="ko">33줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Generate a static page from a single-date Korean stock classroom snapshot.&quot;&quot;&quot;</span>
+<span class="ln">import argparse</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">from logic import MARKETS, analyze, summarize</span>
+<span class="ln">from storage import load_quotes, write_html</span>
+<span class="ln">from report import render_html</span>
+<span class="ln"> </span>
+<span class="ln">BASE = Path(__file__).resolve().parent</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def main(argv=None):</span>
+<span class="ln">    &quot;&quot;&quot;Return 0 after successful generation, 1 on data/file errors; CLI errors use 2.&quot;&quot;&quot;</span>
+<span class="ln">    parser = argparse.ArgumentParser(description=__doc__)</span>
+<span class="ln">    parser.add_argument(&quot;--input&quot;, type=Path, default=BASE / &quot;data/prices.csv&quot;)</span>
+<span class="ln">    parser.add_argument(&quot;--output&quot;, type=Path, default=BASE / &quot;docs/index.html&quot;)</span>
+<span class="ln">    parser.add_argument(&quot;--market&quot;, choices=MARKETS, default=&quot;ALL&quot;)</span>
+<span class="ln">    args = parser.parse_args(argv)</span>
+<span class="ln">    try:</span>
+<span class="ln">        quotes = load_quotes(args.input)</span>
+<span class="ln">        rows = analyze(quotes, args.market)</span>
+<span class="ln">        summary = summarize(rows)</span>
+<span class="ln">        day = quotes[0][&quot;date&quot;] if quotes else &quot;데이터 없음&quot;</span>
+<span class="ln">        html = render_html(rows, summary, args.market, day)</span>
+<span class="ln">        write_html(args.output, html)</span>
+<span class="ln">    except (OSError, ValueError, UnicodeError) as error:</span>
+<span class="ln">        print(f&quot;Report not generated: {error}&quot;)</span>
+<span class="ln">        return 1</span>
+<span class="ln">    print(f&quot;Generated {args.output} ({len(rows)} stocks)&quot;)</span>
+<span class="ln">    return 0</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    raise SystemExit(main())</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>logic.py <span class="muted"><span lang="en">65 lines</span><span lang="ko">65줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure rules for a single-date classroom snapshot; prices are integer KRW.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date</span>
+<span class="ln"> </span>
+<span class="ln">FIELDS = [&quot;date&quot;, &quot;code&quot;, &quot;name&quot;, &quot;market&quot;, &quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;]</span>
+<span class="ln">MARKETS = (&quot;ALL&quot;, &quot;KOSPI&quot;, &quot;KOSDAQ&quot;)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def parse_row(row):</span>
+<span class="ln">    &quot;&quot;&quot;Return a typed quote; raise ValueError for any invalid field. No I/O.&quot;&quot;&quot;</span>
+<span class="ln">    if set(row) != set(FIELDS) or any(not isinstance(v, str) for v in row.values()):</span>
+<span class="ln">        raise ValueError(&quot;each row needs exactly seven fields&quot;)</span>
+<span class="ln">    quote = {key: value.strip() for key, value in row.items()}</span>
+<span class="ln">    day = quote[&quot;date&quot;]</span>
+<span class="ln">    if date.fromisoformat(day).isoformat() != day:</span>
+<span class="ln">        raise ValueError(&quot;date must be YYYY-MM-DD&quot;)</span>
+<span class="ln">    code = quote[&quot;code&quot;]</span>
+<span class="ln">    if len(code) != 6 or not code.isascii() or not code.isdigit():</span>
+<span class="ln">        raise ValueError(&quot;code must be six ASCII digits&quot;)</span>
+<span class="ln">    if not quote[&quot;name&quot;] or quote[&quot;market&quot;] not in MARKETS[1:]:</span>
+<span class="ln">        raise ValueError(&quot;name and KOSPI/KOSDAQ market are required&quot;)</span>
+<span class="ln">    for field in (&quot;previous_close&quot;, &quot;close&quot;, &quot;volume&quot;):</span>
+<span class="ln">        text = quote[field]</span>
+<span class="ln">        if not text.isascii() or not text.isdigit():</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be a whole number&quot;)</span>
+<span class="ln">        quote[field] = int(text)</span>
+<span class="ln">        minimum = 0 if field == &quot;volume&quot; else 1</span>
+<span class="ln">        if quote[field] &lt; minimum:</span>
+<span class="ln">            raise ValueError(f&quot;{field} must be &gt;= {minimum}&quot;)</span>
+<span class="ln">    return quote</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def change_pct(previous_close, close):</span>
+<span class="ln">    &quot;&quot;&quot;Return unrounded daily percent change; both prices must be positive.&quot;&quot;&quot;</span>
+<span class="ln">    if previous_close &lt;= 0 or close &lt;= 0:</span>
+<span class="ln">        raise ValueError(&quot;prices must be positive&quot;)</span>
+<span class="ln">    return (close - previous_close) / previous_close * 100</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def analyze(quotes, market):</span>
+<span class="ln">    &quot;&quot;&quot;Validate snapshot identity; filter and sort by change desc, then code asc.</span>
+<span class="ln"> </span>
+<span class="ln">    Return fresh quote dicts with change_pct. Empty input/selection returns [].</span>
+<span class="ln">    Mixed dates, duplicate codes or an unknown market raise ValueError.</span>
+<span class="ln">    quotes must already contain typed, validated values from parse_row().</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    if market not in MARKETS:</span>
+<span class="ln">        raise ValueError(&quot;market must be ALL, KOSPI or KOSDAQ&quot;)</span>
+<span class="ln">    if len({q[&quot;date&quot;] for q in quotes}) &gt; 1:</span>
+<span class="ln">        raise ValueError(&quot;snapshot must contain one date&quot;)</span>
+<span class="ln">    codes = [q[&quot;code&quot;] for q in quotes]</span>
+<span class="ln">    if len(set(codes)) != len(codes):</span>
+<span class="ln">        raise ValueError(&quot;duplicate code in snapshot&quot;)</span>
+<span class="ln">    rows = [dict(q, change_pct=change_pct(q[&quot;previous_close&quot;], q[&quot;close&quot;]))</span>
+<span class="ln">            for q in quotes if market == &quot;ALL&quot; or q[&quot;market&quot;] == market]</span>
+<span class="ln">    return sorted(rows, key=lambda q: (-q[&quot;change_pct&quot;], q[&quot;code&quot;]))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def summarize(rows):</span>
+<span class="ln">    &quot;&quot;&quot;Return sample count, up/down/flat counts and equal-weight mean (or None).&quot;&quot;&quot;</span>
+<span class="ln">    count = len(rows)</span>
+<span class="ln">    return {&quot;count&quot;: count,</span>
+<span class="ln">            &quot;up&quot;: sum(q[&quot;change_pct&quot;] &gt; 0 for q in rows),</span>
+<span class="ln">            &quot;down&quot;: sum(q[&quot;change_pct&quot;] &lt; 0 for q in rows),</span>
+<span class="ln">            &quot;flat&quot;: sum(q[&quot;change_pct&quot;] == 0 for q in rows),</span>
+<span class="ln">            &quot;mean&quot;: sum(q[&quot;change_pct&quot;] for q in rows) / count if count else None}</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>storage.py <span class="muted"><span lang="en">40 lines</span><span lang="ko">40줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;CSV input and atomic HTML output; all file I/O lives here.&quot;&quot;&quot;</span>
+<span class="ln">import csv</span>
+<span class="ln">import os</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">import tempfile</span>
+<span class="ln">from logic import FIELDS, parse_row</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def load_quotes(path):</span>
+<span class="ln">    &quot;&quot;&quot;Read UTF-8(-BOM) CSV; reject malformed header/rows with ValueError.</span>
+<span class="ln"> </span>
+<span class="ln">    Missing or unreadable files raise OSError. Header-only files return [].</span>
+<span class="ln">    &quot;&quot;&quot;</span>
+<span class="ln">    with open(path, encoding=&quot;utf-8-sig&quot;, newline=&quot;&quot;) as stream:</span>
+<span class="ln">        reader = csv.DictReader(stream)</span>
+<span class="ln">        if reader.fieldnames != FIELDS:</span>
+<span class="ln">            raise ValueError(&quot;CSV header must be &quot; + &quot;,&quot;.join(FIELDS))</span>
+<span class="ln">        quotes = []</span>
+<span class="ln">        for number, row in enumerate(reader, start=2):</span>
+<span class="ln">            try:</span>
+<span class="ln">                quotes.append(parse_row(row))</span>
+<span class="ln">            except ValueError as error:</span>
+<span class="ln">                raise ValueError(f&quot;CSV row {number}: {error}&quot;) from error</span>
+<span class="ln">    return quotes</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def write_html(path, html):</span>
+<span class="ln">    &quot;&quot;&quot;Replace output only after a complete UTF-8 write; raise OSError on failure.&quot;&quot;&quot;</span>
+<span class="ln">    path = Path(path)</span>
+<span class="ln">    path.parent.mkdir(parents=True, exist_ok=True)</span>
+<span class="ln">    temporary = None</span>
+<span class="ln">    try:</span>
+<span class="ln">        with tempfile.NamedTemporaryFile(mode=&quot;w&quot;, encoding=&quot;utf-8&quot;,</span>
+<span class="ln">                                         dir=path.parent, delete=False) as stream:</span>
+<span class="ln">            temporary = Path(stream.name)</span>
+<span class="ln">            stream.write(html)</span>
+<span class="ln">        os.replace(temporary, path)</span>
+<span class="ln">    finally:</span>
+<span class="ln">        if temporary is not None and temporary.exists():</span>
+<span class="ln">            temporary.unlink()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>report.py <span class="muted"><span lang="en">44 lines</span><span lang="ko">44줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Pure HTML formatting. Escape all external text before interpolation.&quot;&quot;&quot;</span>
+<span class="ln">from html import escape</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def render_html(rows, summary, market, snapshot_date):</span>
+<span class="ln">    &quot;&quot;&quot;Return a complete HTML page; round percentages only when displaying.&quot;&quot;&quot;</span>
+<span class="ln">    body = []</span>
+<span class="ln">    for q in rows:</span>
+<span class="ln">        change = q[&quot;change_pct&quot;]</span>
+<span class="ln">        direction = &quot;up&quot; if change &gt; 0 else &quot;down&quot; if change &lt; 0 else &quot;flat&quot;</span>
+<span class="ln">        body.append(f'&lt;tr&gt;&lt;td&gt;{escape(q[&quot;code&quot;])}&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{escape(q[&quot;name&quot;])}&lt;/td&gt;&lt;td&gt;{escape(q[&quot;market&quot;])}&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{q[&quot;close&quot;]:,}&lt;/td&gt;&lt;td class=&quot;{direction}&quot;&gt;{change:+.2f}%&lt;/td&gt;'</span>
+<span class="ln">                    f'&lt;td&gt;{q[&quot;volume&quot;]:,}&lt;/td&gt;&lt;/tr&gt;')</span>
+<span class="ln">    mean = &quot;N/A&quot; if summary[&quot;mean&quot;] is None else f'{summary[&quot;mean&quot;]:+.2f}%'</span>
+<span class="ln">    table_body = &quot;&quot;.join(body) or '&lt;tr&gt;&lt;td colspan=&quot;6&quot;&gt;표시할 종목이 없습니다.&lt;/td&gt;&lt;/tr&gt;'</span>
+<span class="ln">    return f'''&lt;!doctype html&gt;</span>
+<span class="ln">&lt;html lang=&quot;ko&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;</span>
+<span class="ln">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;</span>
+<span class="ln">&lt;title&gt;한국 주식시장 분석 실습&lt;/title&gt;</span>
+<span class="ln">&lt;style&gt;</span>
+<span class="ln">body {{font-family:system-ui,sans-serif;background:#f3f5f9;color:#17243c;margin:0}}</span>
+<span class="ln">main {{max-width:1040px;margin:48px auto;padding:24px}}</span>
+<span class="ln">h1 {{font-size:2rem}} .meta {{color:#53627b}} .summary {{background:#17243c;color:white;padding:24px;border-radius:12px}}</span>
+<span class="ln">.scroll {{overflow-x:auto}} table {{border-collapse:collapse;width:100%;background:white;margin-top:24px}}</span>
+<span class="ln">caption {{text-align:left;padding:12px 0;font-weight:bold}}</span>
+<span class="ln">th,td {{padding:14px;text-align:right;border-bottom:1px solid #dde3ec;white-space:nowrap}}</span>
+<span class="ln">th:nth-child(-n+3),td:nth-child(-n+3) {{text-align:left}}</span>
+<span class="ln">.up {{color:#b12a38}} .down {{color:#245bbb}} .flat {{color:#53627b}}</span>
+<span class="ln">footer {{margin-top:24px;color:#53627b;line-height:1.6}}</span>
+<span class="ln">&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;main&gt;</span>
+<span class="ln">&lt;p class=&quot;meta&quot;&gt;PYTHON / WEEK 11 / CLASSROOM DATA&lt;/p&gt;</span>
+<span class="ln">&lt;h1&gt;한국 주식시장 분석&lt;/h1&gt;</span>
+<span class="ln">&lt;p&gt;기준일: {escape(snapshot_date)} · 시장: {escape(market)} · 출처: 수업용 가상 CSV&lt;/p&gt;</span>
+<span class="ln">&lt;section class=&quot;summary&quot; aria-label=&quot;표본 요약&quot;&gt;</span>
+<span class="ln">종목 {summary[&quot;count&quot;]}개 · 상승 {summary[&quot;up&quot;]} · 하락 {summary[&quot;down&quot;]} · 보합 {summary[&quot;flat&quot;]}</span>
+<span class="ln">&lt;p&gt;표본 단순평균 등락률 &lt;strong&gt;{mean}&lt;/strong&gt;&lt;/p&gt;&lt;/section&gt;</span>
+<span class="ln">&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;&lt;caption&gt;일간 등락률 내림차순 / 동률은 종목코드 오름차순&lt;/caption&gt;</span>
+<span class="ln">&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;코드&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;종목&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;시장&lt;/th&gt;</span>
+<span class="ln">&lt;th scope=&quot;col&quot;&gt;종가 (원)&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;등락률&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;거래량 (주)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</span>
+<span class="ln">&lt;tbody&gt;{table_body}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</span>
+<span class="ln">&lt;footer&gt;교육용 가상 데이터입니다. 실제 시세 또는 현재 상장 종목 목록이 아닙니다.&lt;br&gt;</span>
+<span class="ln">표본의 단순평균이며 KOSPI/KOSDAQ 지수 수익률이 아닙니다. 투자 판단용 정보가 아닙니다.&lt;/footer&gt;</span>
+<span class="ln">&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;'''</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>test_market.py <span class="muted"><span lang="en">118 lines</span><span lang="ko">118줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;REQ-linked checks: python3 -m unittest -v.&quot;&quot;&quot;</span>
+<span class="ln">import contextlib</span>
+<span class="ln">import io</span>
+<span class="ln">from pathlib import Path</span>
+<span class="ln">import tempfile</span>
+<span class="ln">import unittest</span>
+<span class="ln">from unittest.mock import patch</span>
+<span class="ln"> </span>
+<span class="ln">from logic import analyze, change_pct, parse_row, summarize</span>
+<span class="ln">from main import BASE, main</span>
+<span class="ln">from report import render_html</span>
+<span class="ln">from storage import load_quotes, write_html</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">class MarketTests(unittest.TestCase):</span>
+<span class="ln">    def setUp(self):</span>
+<span class="ln">        self.quotes = load_quotes(BASE / 'data/prices.csv')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_01_schema_and_leading_zero(self):</span>
+<span class="ln">        self.assertEqual(self.quotes[0]['code'], '005930')</span>
+<span class="ln">        self.assertEqual(self.quotes[0]['close'], 71400)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_02_changes(self):</span>
+<span class="ln">        for previous, close, expected in [(70000, 71400, 2), (200000, 198000, -1), (100, 100, 0)]:</span>
+<span class="ln">            self.assertAlmostEqual(change_pct(previous, close), expected)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_03_reject_invalid_fields(self):</span>
+<span class="ln">        row = {k: str(v) for k, v in self.quotes[0].items()}</span>
+<span class="ln">        for field, bad in [('previous_close', '0'), ('close', '-1'), ('volume', '-1'),</span>
+<span class="ln">                           ('close', 'NaN'), ('volume', '1.5'), ('code', '5930'),</span>
+<span class="ln">                           ('date', '2026-02-30'), ('name', ''), ('market', 'OTHER')]:</span>
+<span class="ln">            with self.subTest(field=field, bad=bad), self.assertRaises(ValueError):</span>
+<span class="ln">                parse_row(dict(row, **{field: bad}))</span>
+<span class="ln"> </span>
+<span class="ln">    def test_04_filter_and_sort(self):</span>
+<span class="ln">        rows = analyze(self.quotes, 'KOSPI')</span>
+<span class="ln">        self.assertEqual([q['code'] for q in rows], ['005930', '035420', '000660'])</span>
+<span class="ln">        self.assertNotIn('change_pct', self.quotes[0])</span>
+<span class="ln">        tied = [dict(self.quotes[0], code='000002'), dict(self.quotes[0], code='000001')]</span>
+<span class="ln">        self.assertEqual(analyze(tied, 'ALL')[0]['code'], '000001')</span>
+<span class="ln">        with self.assertRaises(ValueError):</span>
+<span class="ln">            analyze(self.quotes, 'OTHER')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_05_sample_summary(self):</span>
+<span class="ln">        summary = summarize(analyze(self.quotes, 'ALL'))</span>
+<span class="ln">        self.assertEqual((summary['count'], summary['up'], summary['down'], summary['flat']), (5, 2, 2, 1))</span>
+<span class="ln">        self.assertAlmostEqual(summary['mean'], 0.4)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_06_empty_data(self):</span>
+<span class="ln">        for rows in [analyze([], 'ALL'), analyze(self.quotes[:1], 'KOSDAQ')]:</span>
+<span class="ln">            summary = summarize(rows)</span>
+<span class="ln">            self.assertIsNone(summary['mean'])</span>
+<span class="ln">            html = render_html(rows, summary, 'KOSDAQ', '데이터 없음')</span>
+<span class="ln">            self.assertIn('표시할 종목이 없습니다', html)</span>
+<span class="ln">            self.assertIn('N/A', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_07_snapshot_identity(self):</span>
+<span class="ln">        for rows in [self.quotes + [self.quotes[0]],</span>
+<span class="ln">                     [self.quotes[0], dict(self.quotes[1], date='2026-11-04')]]:</span>
+<span class="ln">            with self.assertRaises(ValueError):</span>
+<span class="ln">                analyze(rows, 'ALL')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_08_html_escape(self):</span>
+<span class="ln">        rows = analyze([dict(self.quotes[0], name='&lt;script&gt;alert(1)&lt;/script&gt;')], 'ALL')</span>
+<span class="ln">        html = render_html(rows, summarize(rows), 'ALL', '2026-11-05')</span>
+<span class="ln">        self.assertNotIn('&lt;script&gt;', html)</span>
+<span class="ln">        self.assertIn('&amp;lt;script&amp;gt;', html)</span>
+<span class="ln">        self.assertIn('+2.00%', html)</span>
+<span class="ln">        self.assertIn('71,400', html)</span>
+<span class="ln">        self.assertIn('005930', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_09_missing_and_bad_csv_preserve_report(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            root = Path(folder)</span>
+<span class="ln">            output = root / 'index.html'</span>
+<span class="ln">            output.write_text('OLD', encoding='utf-8')</span>
+<span class="ln">            bad = root / 'bad.csv'</span>
+<span class="ln">            bad.write_text('wrong,header\n1,2\n', encoding='utf-8')</span>
+<span class="ln">            for source in [root / 'missing.csv', bad]:</span>
+<span class="ln">                with contextlib.redirect_stdout(io.StringIO()):</span>
+<span class="ln">                    self.assertEqual(main(['--input', str(source), '--output', str(output)]), 1)</span>
+<span class="ln">                self.assertEqual(output.read_text(), 'OLD')</span>
+<span class="ln"> </span>
+<span class="ln">    def test_10_atomic_write_failure(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            output = Path(folder) / 'index.html'</span>
+<span class="ln">            output.write_text('OLD')</span>
+<span class="ln">            with patch('storage.os.replace', side_effect=OSError('simulated failure')):</span>
+<span class="ln">                with self.assertRaises(OSError):</span>
+<span class="ln">                    write_html(output, 'NEW')</span>
+<span class="ln">            self.assertEqual(output.read_text(), 'OLD')</span>
+<span class="ln">            self.assertEqual(list(Path(folder).iterdir()), [output])</span>
+<span class="ln"> </span>
+<span class="ln">    def test_11_end_to_end(self):</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            output = Path(folder) / 'docs/index.html'</span>
+<span class="ln">            with contextlib.redirect_stdout(io.StringIO()):</span>
+<span class="ln">                self.assertEqual(main(['--market', 'KOSPI', '--output', str(output)]), 0)</span>
+<span class="ln">            html = output.read_text(encoding='utf-8')</span>
+<span class="ln">            self.assertIn('삼성전자', html)</span>
+<span class="ln">            self.assertNotIn('에코프로비엠', html)</span>
+<span class="ln">            self.assertIn('종목 3개', html)</span>
+<span class="ln"> </span>
+<span class="ln">    def test_12_csv_boundaries(self):</span>
+<span class="ln">        header = 'date,code,name,market,previous_close,close,volume\n'</span>
+<span class="ln">        with tempfile.TemporaryDirectory() as folder:</span>
+<span class="ln">            source = Path(folder) / 'prices.csv'</span>
+<span class="ln">            source.write_text('\ufeff' + header, encoding='utf-8')</span>
+<span class="ln">            self.assertEqual(load_quotes(source), [])</span>
+<span class="ln">            for tail in ['2026-11-05,005930,삼성전자,KOSPI,70000,71400\n',</span>
+<span class="ln">                         '2026-11-05,005930,삼성전자,KOSPI,70000,71400,0,extra\n']:</span>
+<span class="ln">                source.write_text(header + tail, encoding='utf-8')</span>
+<span class="ln">                with self.assertRaises(ValueError):</span>
+<span class="ln">                    load_quotes(source)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == '__main__':</span>
+<span class="ln">    unittest.main()</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/prices.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/empty.csv <span class="muted"><span lang="en">1 lines</span><span lang="ko">1줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>data/invalid-zero.csv <span class="muted"><span lang="en">6 lines</span><span lang="ko">6줄</span></span></summary>
+      <pre class="code"><code><span class="ln">date,code,name,market,previous_close,close,volume</span>
+<span class="ln">2026-11-05,005930,삼성전자,KOSPI,0,71400,1000000</span>
+<span class="ln">2026-11-05,000660,SK하이닉스,KOSPI,200000,198000,500000</span>
+<span class="ln">2026-11-05,035420,NAVER,KOSPI,200000,200000,300000</span>
+<span class="ln">2026-11-05,247540,에코프로비엠,KOSDAQ,100000,103000,200000</span>
+<span class="ln">2026-11-05,035900,JYP Ent.,KOSDAQ,50000,49000,100000</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>README.md <span class="muted"><span lang="en">48 lines</span><span lang="ko">48줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 한국 증권시장 분석 → 웹 보고서 MVP</span>
+<span class="ln"> </span>
+<span class="ln">Python 3.9 이상과 표준 라이브러리만 사용합니다. 네트워크·API 키·패키지 설치가 필요 없습니다. 모든 가격과 거래량은 **수업용 가상 데이터**이며, 종목명·코드는 설명용 표기입니다. 현재 상장 목록이나 실제 거래일 시세를 의미하지 않습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 실행</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd 11week/examples/korea_market_mvp</span>
+<span class="ln">python3 -m unittest -v</span>
+<span class="ln">python3 main.py</span>
+<span class="ln">python3 -m http.server 8000 --directory docs --bind 127.0.0.1</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">브라우저에서 http://localhost:8000 을 엽니다. 서버는 Ctrl+C로 종료합니다. `docs/index.html`을 직접 열어도 됩니다. 기본 입력·출력 경로는 main.py 위치를 기준으로 하므로 다른 작업 폴더에서도 실행할 수 있습니다.</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">python3 main.py --market KOSPI</span>
+<span class="ln">python3 main.py --market KOSDAQ --output docs/kosdaq.html</span>
+<span class="ln">python3 main.py --input data/prices.csv --market ALL</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">`--market`은 **생성 시점의 필터**입니다. 화면에서 클릭하는 동적 필터는 확장 기능입니다. ALL 보고서를 다시 만들려면 `python3 main.py`를 실행합니다. 기본 출력은 `docs/index.html`입니다. 지정한 상대 경로는 현재 작업 폴더 기준입니다. GitHub Pages에는 생성된 docs 폴더를 배포할 수 있지만 이 실습에서 자동으로 게시하지는 않습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 결과 확인</span>
+<span class="ln"> </span>
+<span class="ln">ALL: 등락률 순서 247540 (+3%), 005930 (+2%), 035420 (0%), 000660 (-1%), 035900 (-2%). 표본 5개, 상승 2·하락 2·보합 1, 단순평균 +0.40%입니다. KOSPI: 005930, 035420, 000660; 3개, 평균 +0.33%입니다. 이 평균은 표본 종목의 동일 가중 평균으로, KOSPI/KOSDAQ 지수 등락률이 아닙니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 파일 역할</span>
+<span class="ln"> </span>
+<span class="ln">- `main.py`: CLI 인자, 호출 순서, 오류 메시지와 종료 코드.</span>
+<span class="ln">- `storage.py`: CSV 읽기와 HTML 파일 교체.</span>
+<span class="ln">- `logic.py`: 행 검증, 등락률·필터·정렬·요약. I/O 없음.</span>
+<span class="ln">- `report.py`: 외부 텍스트를 escape하여 HTML 문자열 반환. I/O 없음.</span>
+<span class="ln">- `test_market.py`: 정상·경계·실패·통합 테스트 12개.</span>
+<span class="ln">- `project-spec.md`: 시나리오, 요구사항, feature, function, test, UML 전체 예제.</span>
+<span class="ln"> </span>
+<span class="ln">입력은 UTF-8 CSV이며 BOM도 허용합니다. 헤더는 `date,code,name,market,previous_close,close,volume` 순서입니다. 한 기준일만 허용하고 종목코드는 중복할 수 없습니다. 종목코드는 선행 0을 보존하는 6자리 문자열, 종가·전일종가는 양의 정수 원, 거래량은 0 이상의 정수 주입니다. 두 종가는 동일한 가격 기준으로 준비되었다고 가정하며 기업행동 조정은 범위 밖입니다.</span>
+<span class="ln"> </span>
+<span class="ln">누락 파일, 잘못된 헤더·행, 날짜 혼합·중복 코드는 오류로 종료하며 기존 보고서를 유지합니다. 헤더만 있는 CSV는 빈 보고서를 만듭니다. 새 HTML은 임시 파일에 완전히 쓴 후 교체합니다. `Report not generated: ...`가 표시되면 브라우저의 기존 보고서는 이전 결과이므로 기준일을 확인합니다. 프로세스 종료 코드는 성공 0, 데이터/파일 오류 1, CLI 사용 오류 2입니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 첨부 문서와 오류 실습 데이터</span>
+<span class="ln"> </span>
+<span class="ln">- [team-name_spec.xlsx](../../labs/session2/team-name_spec.xlsx): 시트별 요구사항·기능·함수·테스트 작성 예시.</span>
+<span class="ln">- [team-name_user-scenario.md](../../labs/session2/team-name_user-scenario.md): SC-01~03, 아키텍처와 1인 책임 분담.</span>
+<span class="ln">- `data/invalid-zero.csv`: 전일종가 0인 행을 거부하는 SC-02 입력.</span>
+<span class="ln">- `data/empty.csv`: 정상 헤더만 있는 SC-03 입력.</span>
+<span class="ln"> </span>
+<span class="ln">워크북의 TEST-01~12는 자동 테스트 실행 결과이며 TEST-13은 브라우저 수동 확인 전까지 Not run이다. 본인 제출물에는 이름·학번과 재실행 결과를 기록한다.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>project-spec.md <span class="muted"><span lang="en">185 lines</span><span lang="ko">185줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 한국 증권시장 분석 웹페이지: 설계에서 MVP까지</span>
+<span class="ln"> </span>
+<span class="ln">## 0. 첨부 양식으로 보는 같은 설계</span>
+<span class="ln"> </span>
+<span class="ln">- [사용자 시나리오 작성 예시](../../labs/session2/team-name_user-scenario.md): SC-01 정상 분석, SC-02 잘못된 입력, SC-03 빈 데이터, 아키텍처와 1인 역할 분담.</span>
+<span class="ln">- [명세 워크북 작성 예시](../../labs/session2/team-name_spec.xlsx): Instructions / Requirement / Feature / Function / Test의 원래 구조를 유지해 작성.</span>
+<span class="ln">- 아래 설명은 두 첨부 문서와 같은 프로젝트다. SC → REQ → FEAT → FUNC → TEST를 연결하며 UML은 함수명과 호출 순서를 보여준다.</span>
+<span class="ln">- 워크북은 요구사항 8개(Must 6 + 미구현 확장 2), 기능 3개, 함수 8개, 테스트 13개(자동 12 + 수동 1)를 담는다. 항목 수와 구현 완료 건수는 다르다.</span>
+<span class="ln"> </span>
+<span class="ln">| Scenario | 내용 | 관련 REQ |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| SC-01 | ALL/KOSPI 표본 분석과 보고서 열람 | REQ-01~05; REQ-07/08은 후속 아이디어 |</span>
+<span class="ln">| SC-02 | 전일종가 0 거부, 기존 HTML 보존 | REQ-02/06 |</span>
+<span class="ln">| SC-03 | 정상 헤더만 있는 CSV의 빈 보고서 | REQ-01/04/05 |</span>
+<span class="ln"> </span>
+<span class="ln">## 1. 시나리오와 범위</span>
+<span class="ln"> </span>
+<span class="ln">학생 민지는 장 마감 후 KOSPI·KOSDAQ 종목 일부의 변화를 비교하고 싶다. CSV 파일을 준비하고 `python3 main.py --market ALL`을 실행한다. 프로그램은 전일종가 대비 등락률을 계산하고 등락률 내림차순 표와 표본 요약을 `docs/index.html`에 만든다. 민지는 브라우저에서 기준일·시장·종목별 종가·등락률·거래량을 확인한다. KOSDAQ만 보고 싶으면 `--market KOSDAQ`으로 다시 생성한다.</span>
+<span class="ln"> </span>
+<span class="ln">오류 시나리오: 전일종가가 0인 행을 전달하면 행 번호가 포함된 오류를 출력한다. 종료 코드 1이며 기존 HTML은 바뀌지 않는다. 빈 CSV(정상 헤더만 있음)는 종목 0개, 평균 N/A, 빈 상태 안내를 표시한다. 입력 파일을 찾지 못하면 빈 데이터로 가장하지 않고 오류로 종료한다.</span>
+<span class="ln"> </span>
+<span class="ln">이 프로젝트는 단일 날짜의 **수업용 가상 표본**을 분석한다. 전 종목 시장 분석, 실시간 데이터 수집, 지수 계산, 투자 추천은 범위에 포함하지 않는다. 화면과 CSV 기준일을 연결하고 출처·가상 데이터 표시를 유지한다. 기간 수익률, 이동평균, 로그인, 차트, 클릭 필터, API 연동은 Should/Could로 남긴다.</span>
+<span class="ln"> </span>
+<span class="ln">## 2. 요구사항 (Requirement)</span>
+<span class="ln"> </span>
+<span class="ln">| ID | 조건 | 우선순위 | 수락 기준 |</span>
+<span class="ln">|---|---|---|---|</span>
+<span class="ln">| REQ-01 | CSV에서 단일 날짜의 종목을 정확히 읽고 코드를 문자열로 보존한다 | Must | TEST-01/12: 005930 유지, 한글/BOM 처리, 헤더 검증 |</span>
+<span class="ln">| REQ-02 | 잘못된 가격·거래량·코드·날짜·시장, 중복코드·날짜 혼합을 거부한다 | Must | TEST-03/07/09: 실패, 기존 HTML 불변 |</span>
+<span class="ln">| REQ-03 | 일간 등락률을 계산하고 ALL/KOSPI/KOSDAQ 필터와 결정적 정렬을 제공한다 | Must | TEST-02/04: 70000→71400은 +2%, 동률은 코드 오름차순 |</span>
+<span class="ln">| REQ-04 | 표본 수, 상승·하락·보합, 단순평균을 계산한다 | Must | TEST-05/06: 5, 2/2/1, +0.40%; 빈 평균은 N/A |</span>
+<span class="ln">| REQ-05 | 한글 HTML에 기준일·시장·출처·단위·표·빈 상태를 보여준다 | Must | TEST-08/11/13 + 브라우저 확인: 코드, 종가 원, 거래량 주, 부호와 소수 2자리 |</span>
+<span class="ln">| REQ-06 | 입력/출력 오류를 알리고 실패 시 기존 보고서를 보존한다 | Must | TEST-09/10: 오류 종료, 이전 파일 유지, 임시 파일 정리 |</span>
+<span class="ln">| REQ-07 | 화면에서 시장을 클릭해 전환한다 | Should | 후속 작업; MVP는 CLI 재생성 |</span>
+<span class="ln">| REQ-08 | 실제 API·기간 분석·차트를 추가한다 | Could | 데이터 출처·호출 제한·가격 조정 규칙을 먼저 설계 |</span>
+<span class="ln"> </span>
+<span class="ln">수락 예시는 가상 CSV에 고정된다. 공개된 실제 시세와 비교하는 테스트가 아니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 3. Feature 명세</span>
+<span class="ln"> </span>
+<span class="ln">### FEAT-01: 검증된 스냅샷 불러오기 (REQ-01/02/06)</span>
+<span class="ln"> </span>
+<span class="ln">- 사용자: CSV를 준비한 학생. 명령: `python3 main.py --input data/prices.csv`.</span>
+<span class="ln">- 정상: 파일 열기 → 헤더 검증 → 각 행 검증/타입 변환 → 한 날짜·중복코드 확인.</span>
+<span class="ln">- 결과: 코드가 문자열인 종목 목록. 이 결과는 FEAT-02로 전달된다.</span>
+<span class="ln">- 오류: 파일 없음/권한/인코딩/행 형식 오류는 `Report not generated: &lt;reason&gt;`. 기존 보고서 유지. 행 오류에는 CSV 행 번호 포함.</span>
+<span class="ln"> </span>
+<span class="ln">### FEAT-02: 시장별 분석 (REQ-02/03/04)</span>
+<span class="ln"> </span>
+<span class="ln">- 명령: `python3 main.py --market KOSPI`. 허용: ALL(기본), KOSPI, KOSDAQ.</span>
+<span class="ln">- 계산: `(close - previous_close) / previous_close * 100`. 계산·정렬 중에는 반올림하지 않는다.</span>
+<span class="ln">- 정상: 입력 전체의 날짜·중복을 검증 → 시장 필터 → 등락률 내림차순/코드 오름차순 → 표본 요약.</span>
+<span class="ln">- 결과: KOSPI 표본 3개, 순서 005930→035420→000660, 평균 +0.33% 표시.</span>
+<span class="ln">- 예외: 알 수 없는 시장은 argparse 사용 오류(종료 2). 선택 결과가 비면 0개·N/A.</span>
+<span class="ln"> </span>
+<span class="ln">### FEAT-03: 웹 보고서 생성·열람 (REQ-05/06)</span>
+<span class="ln"> </span>
+<span class="ln">- 명령: `python3 main.py --output docs/index.html`; 브라우저로 생성 파일을 연다.</span>
+<span class="ln">- 정상: HTML 문자열 생성 → 임시 파일 쓰기 → 최종 파일 교체 → Generated 메시지.</span>
+<span class="ln">- 결과: 표와 요약, 기준일·출처·가상 데이터 표시. 상승/하락 색상과 함께 +/− 부호를 사용한다.</span>
+<span class="ln">- 오류: 출력 실패 시 `Report not generated: ...`, 종료 1. 기존 출력 보존.</span>
+<span class="ln">- 외부 텍스트는 HTML escape한다. 네트워크 접속 없이 동작한다.</span>
+<span class="ln"> </span>
+<span class="ln">FEAT-01 PR → FEAT-02 PR → FEAT-03 PR 순서로 구현한다. 각 PR은 간단한 화면 출력 또는 임시 HTML까지 이어지는 실행 가능한 슬라이스로 제출한다. FEAT-01 단계의 분석/HTML fake는 명확히 표시하고 마지막 PR 전에 모두 교체한다.</span>
+<span class="ln"> </span>
+<span class="ln">## 4. Function 계약</span>
+<span class="ln"> </span>
+<span class="ln">| 함수 / 모듈 | 입력 → 결과 | 실패·부작용 / 호출자 |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| FUNC-01 `parse_row(row)` / logic | 7개 문자열 필드 dict → 정수 가격·거래량을 가진 새 dict | ValueError; 순수 / load_quotes |</span>
+<span class="ln">| FUNC-02 `load_quotes(path)` / storage | CSV 경로 → 검증한 quote 목록; 헤더만 있으면 [] | OSError, ValueError, UnicodeError; 읽기 / main |</span>
+<span class="ln">| FUNC-03 `change_pct(previous_close, close)` / logic | 양의 가격 → 반올림 전 float % | 0 이하 ValueError; 순수 / analyze |</span>
+<span class="ln">| FUNC-04 `analyze(quotes, market)` / logic | parse_row를 통과한 목록, 시장 → change_pct를 더한 새 정렬 목록 | 시장/중복/날짜 혼합 ValueError; 순수 / main |</span>
+<span class="ln">| FUNC-05 `summarize(rows)` / logic | 분석 목록 → count/up/down/flat/mean dict | 빈 mean은 None; 순수 / main |</span>
+<span class="ln">| FUNC-06 `render_html(rows, summary, market, snapshot_date)` / report | 검증된 분석 결과 → 완전한 HTML str | 텍스트 escape, 화면에서만 반올림; 순수 / main |</span>
+<span class="ln">| FUNC-07 `write_html(path, html)` / storage | 경로, HTML str → None | OSError; 폴더 생성·임시 쓰기·원자적 교체 / main |</span>
+<span class="ln">| FUNC-08 `main(argv=None)` / main | CLI 인자 → 종료 코드 0 또는 1 | argparse는 사용 오류 2; 출력·조립 |</span>
+<span class="ln"> </span>
+<span class="ln">Quote: `{date: str, code: str, name: str, market: str, previous_close: int, close: int, volume: int}`. 분석 행은 `change_pct: float` 추가. Summary는 정수 count/up/down/flat와 float 또는 None인 mean. 가격 단위는 원, 거래량은 주다. parse_row만 문자열을 숫자로 바꾼다. main과 storage가 I/O를 맡고 logic/report는 문자열·자료구조만 다룬다.</span>
+<span class="ln"> </span>
+<span class="ln">## 5. Test 명세와 추적</span>
+<span class="ln"> </span>
+<span class="ln">실행: 예제 폴더에서 `python3 -m unittest -v`. 파일 I/O 테스트는 TemporaryDirectory를 사용해 실제 배포 결과를 건드리지 않는다.</span>
+<span class="ln"> </span>
+<span class="ln">| TEST | 입력·상황 | 기대 결과 | REQ | 구현 메서드 |</span>
+<span class="ln">|---|---|---|---|---|</span>
+<span class="ln">| TEST-01 | 기본 CSV | 005930 문자열, 종가 int | 01 | test_01_schema_and_leading_zero |</span>
+<span class="ln">| TEST-02 | 70000/71400, 200000/198000, 100/100 | +2%, -1%, 0% | 03 | test_02_changes |</span>
+<span class="ln">| TEST-03 | 0/음수/NaN 가격, 음수·소수 거래량, 잘못된 날짜·코드·시장·빈 이름 | ValueError | 02 | test_03_reject_invalid_fields |</span>
+<span class="ln">| TEST-04 | KOSPI 필터와 동률 두 행 | 3개·내림차순, 동률 코드 오름차순, 원본 불변 | 03 | test_04_filter_and_sort |</span>
+<span class="ln">| TEST-05 | ALL 가상 표본 | count 5, up 2, down 2, flat 1, mean 0.4 | 04 | test_05_sample_summary |</span>
+<span class="ln">| TEST-06 | 빈 입력 또는 선택 결과 | 0개, mean None, HTML N/A·빈 안내 | 04/05 | test_06_empty_data |</span>
+<span class="ln">| TEST-07 | 중복코드 또는 날짜 혼합 | ValueError | 02 | test_07_snapshot_identity |</span>
+<span class="ln">| TEST-08 | 종목명에 script 태그 | 실행 태그 없음, escape 문자·005930·+2.00%·71,400 표시 | 05 | test_08_html_escape |</span>
+<span class="ln">| TEST-09 | 누락 CSV, 잘못된 헤더 | 종료 1, 기존 HTML OLD 유지 | 01/02/06 | test_09_missing_and_bad_csv_preserve_report |</span>
+<span class="ln">| TEST-10 | os.replace 오류 주입 | 기존 파일 유지, 임시 파일 제거 | 06 | test_10_atomic_write_failure |</span>
+<span class="ln">| TEST-11 | main KOSPI 실행 | HTML 존재, 삼성전자 포함, KOSDAQ 종목 제외 | 05 | test_11_end_to_end |</span>
+<span class="ln">| TEST-12 | BOM·헤더만, 부족/초과 필드 | [] 또는 ValueError | 01/02 | test_12_csv_boundaries |</span>
+<span class="ln"> </span>
+<span class="ln">**TEST-13 (수동, Not run):** 브라우저 수락 테스트: 로컬 서버를 열고 제목·한글·기준일·시장·출처, 표의 다섯 종목, 부호·색상, 좁은 화면 가로 스크롤, 빈 상태를 확인한다. 서버는 저장된 HTML을 제공할 뿐 Python 분석을 다시 수행하지 않는다. 직접 확인 후에만 워크북 Actual result와 Pass status를 갱신한다.</span>
+<span class="ln"> </span>
+<span class="ln">추적 예: REQ-03 → FEAT-02 → FUNC-03 change_pct / FUNC-04 analyze → 아래 시퀀스의 analyze 호출 → TEST-02/04. REQ-06 → FEAT-01/03 → load_quotes/write_html/main → 활동도의 오류 분기 → TEST-09/10.</span>
+<span class="ln"> </span>
+<span class="ln">## 6. UML</span>
+<span class="ln"> </span>
+<span class="ln">### Use case (텍스트 UML)</span>
+<span class="ln"> </span>
+<span class="ln">```text</span>
+<span class="ln">Actor: Student</span>
+<span class="ln">System boundary: Korean Market Report</span>
+<span class="ln">Student --&gt; (Load a validated snapshot)      FEAT-01</span>
+<span class="ln">Student --&gt; (Compare stocks by market)      FEAT-02</span>
+<span class="ln">Student --&gt; (Generate and view web report)   FEAT-03</span>
+<span class="ln">Actor: Browser (opens generated HTML)</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">### Component 관계</span>
+<span class="ln"> </span>
+<span class="ln">```mermaid</span>
+<span class="ln">flowchart TD</span>
+<span class="ln">    main[main.py / CLI] --&gt; storage[storage.py / CSV and HTML I/O]</span>
+<span class="ln">    main --&gt; logic[logic.py / validation and analysis]</span>
+<span class="ln">    main --&gt; report[report.py / HTML string]</span>
+<span class="ln">    storage --&gt; logic</span>
+<span class="ln">    browser[Browser] --&gt; html[docs/index.html]</span>
+<span class="ln">    storage --&gt; html</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">위 그림은 모듈 의존성과 산출물 관계를 보여준다. 아래 시퀀스에서 실제 호출 순서를 구분한다.</span>
+<span class="ln"> </span>
+<span class="ln">### Sequence: 정상 실행과 실패</span>
+<span class="ln"> </span>
+<span class="ln">```mermaid</span>
+<span class="ln">sequenceDiagram</span>
+<span class="ln">    actor Student</span>
+<span class="ln">    participant Main as main.py</span>
+<span class="ln">    participant Storage as storage.py</span>
+<span class="ln">    participant Logic as logic.py</span>
+<span class="ln">    participant Report as report.py</span>
+<span class="ln">    Student-&gt;&gt;Main: main --market KOSPI</span>
+<span class="ln">    Main-&gt;&gt;Storage: load_quotes(path)</span>
+<span class="ln">    loop Each CSV row</span>
+<span class="ln">        Storage-&gt;&gt;Logic: parse_row(row)</span>
+<span class="ln">        Logic--&gt;&gt;Storage: typed quote or ValueError</span>
+<span class="ln">    end</span>
+<span class="ln">    Storage--&gt;&gt;Main: quotes</span>
+<span class="ln">    Main-&gt;&gt;Logic: analyze(quotes, market)</span>
+<span class="ln">    Logic--&gt;&gt;Main: sorted rows</span>
+<span class="ln">    Main-&gt;&gt;Logic: summarize(rows)</span>
+<span class="ln">    Logic--&gt;&gt;Main: summary</span>
+<span class="ln">    Main-&gt;&gt;Report: render_html(rows, summary, market, date)</span>
+<span class="ln">    Report--&gt;&gt;Main: html string</span>
+<span class="ln">    Main-&gt;&gt;Storage: write_html(path, html)</span>
+<span class="ln">    Storage--&gt;&gt;Main: None (atomic replacement complete)</span>
+<span class="ln">    Main--&gt;&gt;Student: Generated ...</span>
+<span class="ln">    Note over Main,Storage: On any validation/I/O failure: stop, report error, preserve old HTML</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">### Activity: 실패 경로 포함</span>
+<span class="ln"> </span>
+<span class="ln">```mermaid</span>
+<span class="ln">flowchart TD</span>
+<span class="ln">    Start([Start]) --&gt; Read[Read CSV and validate rows]</span>
+<span class="ln">    Read --&gt; Valid{File and rows valid?}</span>
+<span class="ln">    Valid --&gt;|No| Fail[Print reason / exit 1 / preserve old HTML]</span>
+<span class="ln">    Valid --&gt;|Yes| Analyze[Validate identity / filter / sort / summarize]</span>
+<span class="ln">    Analyze --&gt; Identity{One date and unique codes?}</span>
+<span class="ln">    Identity --&gt;|No| Fail</span>
+<span class="ln">    Identity --&gt;|Yes| Render[Escape text / render HTML]</span>
+<span class="ln">    Render --&gt; Write[Write temporary file]</span>
+<span class="ln">    Write --&gt; Success{Write and replace succeeded?}</span>
+<span class="ln">    Success --&gt;|No| Fail</span>
+<span class="ln">    Success --&gt;|Yes| Done([Generated / exit 0])</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">빈 목록은 정상 분석 경로를 따라 빈 HTML을 생성한다. Missing file은 오류 경로다. UML의 함수명은 계약 표와 실제 코드의 이름을 사용한다.</span>
+<span class="ln"> </span>
+<span class="ln">## 7. MVP 완료 기준</span>
+<span class="ln"> </span>
+<span class="ln">- 새 폴더에서 Python 표준 라이브러리만으로 테스트 12개 통과.</span>
+<span class="ln">- ALL/KOSPI/KOSDAQ 명령과 빈 데이터·오류 시나리오를 재현 가능.</span>
+<span class="ln">- docs/index.html을 브라우저에서 열고 가상 데이터·기준일·출처와 결과를 확인.</span>
+<span class="ln">- 분석 코드에 input/print/open이 없고, 출력 실패가 기존 HTML을 훼손하지 않음.</span>
+<span class="ln">- 요구사항·Feature·Function·Test·UML·README가 같은 이름·정렬·오류 정책을 사용.</span>
+<span class="ln">- Must 기능에 fake/TODO 없음. PR에 REQ/FEAT ID, 테스트 결과, 화면 캡처 첨부.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week11/labs/session2/slice-lab.md <span class="muted"><span lang="en">64 lines</span><span lang="ko">64줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># 실습: 한국 증권시장 분석 → 웹 보고서</span>
+<span class="ln"> </span>
+<span class="ln">18분. 참고 완성본은 `examples/korea_market_mvp/`입니다. 자신의 프로젝트에서는 같은 문서·구현 연결 방식을 적용합니다. 완성본을 복사한 것과 직접 구현한 부분을 PR에 구분해서 적습니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 제공 첨부 문서</span>
+<span class="ln"> </span>
+<span class="ln">- [team-name_user-scenario.md](team-name_user-scenario.md): SC-01 정상 / SC-02 오류 / SC-03 빈 데이터와 아키텍처.</span>
+<span class="ln">- [team-name_spec.xlsx](team-name_spec.xlsx): Requirement·Feature·Function·Test를 채운 예시. Function의 시스템 호출 열은 Python 표준 라이브러리·I/O로 바꿨다.</span>
+<span class="ln"> </span>
+<span class="ln">실제 제출 시 예시 작성자 정보와 테스트 결과를 본인의 것으로 갱신한다. 1인 프로젝트이며 별도 프로세스·IPC를 구현할 필요는 없다. TEST-13 브라우저 검증은 직접 확인 전까지 Not run이다.</span>
+<span class="ln"> </span>
+<span class="ln">## 1. 설계 추적 (4분)</span>
+<span class="ln"> </span>
+<span class="ln">`project-spec.md`를 열고 REQ-03 또는 REQ-06을 선택합니다.</span>
+<span class="ln"> </span>
+<span class="ln">```text</span>
+<span class="ln">관련 SC (시나리오):</span>
+<span class="ln">내가 선택한 REQ:</span>
+<span class="ln">연결된 FEAT:</span>
+<span class="ln">호출되는 FUNC ID, 함수와 모듈:</span>
+<span class="ln">UML에서 해당 호출 또는 오류 분기:</span>
+<span class="ln">검증할 TEST와 입력/기대 결과:</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">REQ-03을 고르면 `feature/feat02-market-analysis` 브랜치를 만들고 등락률·필터·정렬·요약 중 아직 fake인 부분을 구현합니다. REQ-06을 고르면 `feature/feat03-safe-report`에서 오류 처리와 출력 보존을 구현합니다. 먼저 작은 HTML이나 출력까지 연결해 실행 가능한 상태를 유지합니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 2. 한 슬라이스 구현 (9분)</span>
+<span class="ln"> </span>
+<span class="ln">- 함수 계약을 읽고 fake 하나를 실제 본문으로 교체합니다.</span>
+<span class="ln">- 순수 분석 함수에는 print/input/open을 넣지 않습니다.</span>
+<span class="ln">- `python3 -m unittest -v`로 관련 테스트를 확인하고 `python3 main.py`로 전체를 실행합니다.</span>
+<span class="ln">- `--market KOSPI`의 종목 3개와 평균 +0.33%를 확인합니다.</span>
+<span class="ln">- `docs/index.html`을 브라우저로 열어 한글·단위·부호·기준일·가상 데이터 표시를 봅니다.</span>
+<span class="ln">- 음수 가격이나 0 전일종가를 가진 별도 CSV를 만들어 오류와 기존 HTML 보존을 확인합니다. 원본 예제 CSV는 그대로 둡니다.</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">cd 11week/examples/korea_market_mvp</span>
+<span class="ln">python3 -m unittest -v</span>
+<span class="ln">python3 main.py</span>
+<span class="ln">python3 main.py --market KOSPI</span>
+<span class="ln">python3 main.py --market ALL</span>
+<span class="ln">python3 -m http.server 8000 --directory docs --bind 127.0.0.1</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">http://localhost:8000 에 접속합니다. 시장 변경은 CLI 재생성 후 브라우저 새로고침입니다. 서버를 종료하려면 Ctrl+C를 누릅니다. 헤더만 있는 CSV는 빈 보고서를 만들지만, 누락 파일은 오류입니다.</span>
+<span class="ln"> </span>
+<span class="ln">## 3. 검토와 PR (5분)</span>
+<span class="ln"> </span>
+<span class="ln">한 가지 리팩터링만 적용하고 테스트를 다시 실행합니다. 브랜치를 push하고 PR을 엽니다. 저장소가 없는 배포 ZIP에서 실습한다면 자신의 프로젝트 저장소로 필요한 파일을 복사한 뒤 Git 작업을 합니다.</span>
+<span class="ln"> </span>
+<span class="ln">```text</span>
+<span class="ln">## What</span>
+<span class="ln">FEAT-02 / REQ-03: KOSPI 필터와 등락률 정렬 구현</span>
+<span class="ln">## Why</span>
+<span class="ln">시장별 비교를 웹 보고서에 표시하기 위한 Must 기능</span>
+<span class="ln">## How I checked</span>
+<span class="ln">python3 -m unittest -v: 관련 테스트 통과</span>
+<span class="ln">python3 main.py --market KOSPI: 3종목, 평균 +0.33%</span>
+<span class="ln">브라우저 화면 캡처 첨부</span>
+<span class="ln">## Remaining</span>
+<span class="ln">미구현 fake와 다음 PR 범위 (없으면 없음)</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">제출: 작성한 `team-name_spec.xlsx`, `team-name_user-scenario.md`, UML, 구현 코드, 테스트 결과, 생성 HTML, 브라우저 캡처, PR 링크. 완성 MVP에는 Must 경로의 fake/TODO가 없어야 합니다. API·차트·클릭 필터는 후속 과제입니다.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week11/labs/session2/team-name_user-scenario.md <span class="muted"><span lang="en">164 lines</span><span lang="ko">164줄</span></span></summary>
+      <pre class="code"><code><span class="ln"># User Scenarios — 한국 증권시장 분석 웹 보고서</span>
+<span class="ln"> </span>
+<span class="ln">| Item | Details |</span>
+<span class="ln">|---|---|</span>
+<span class="ln">| Team name | Korea Market / 1인 수업 예시 |</span>
+<span class="ln">| Team members (name / student ID) | 실제 제출 시 본인 이름 / 학번 기입 |</span>
+<span class="ln">| 예제 작성일 | 2026-11-06 |</span>
+<span class="ln">| Document version | v2 / 수업용 작성 예시 |</span>
+<span class="ln"> </span>
+<span class="ln">첨부된 사용자 시나리오 양식의 항목을 시장 분석 프로젝트로 채운 예제다. 관련 명세는 같은 폴더의 [team-name_spec.xlsx](team-name_spec.xlsx)이며 Requirement 시트의 Related scenarios 열에서 SC-01~03을 참조한다. 명령은 저장소 루트에서 `cd 11week/examples/korea_market_mvp` 후 실행한다.</span>
+<span class="ln"> </span>
+<span class="ln">## 1. Project Overview</span>
+<span class="ln"> </span>
+<span class="ln">학생은 한국 주식 표본의 전일·당일 종가와 거래량을 CSV로 준비한다. Python 프로그램은 입력을 검증하고 일간 등락률, 시장별 순위, 상승·하락·보합 수와 표본 단순평균을 계산한다. 계산 결과는 한글 HTML로 생성하여 브라우저에서 확인한다. 제공 가격·거래량은 **수업용 가상 데이터**이며 실제 시세나 현재 상장 종목 목록이 아니다. 실시간 API·기간 분석·차트·브라우저 클릭 필터는 이번 MVP에서 구현하지 않는다.</span>
+<span class="ln"> </span>
+<span class="ln">## 2. Users</span>
+<span class="ln"> </span>
+<span class="ln">| User | Description |</span>
+<span class="ln">|---|---|</span>
+<span class="ln">| 학생 민지 | CSV를 준비하고 시장을 선택하여 분석 보고서를 생성·확인한다. |</span>
+<span class="ln">| 동료 검토자 / 교수자 | 동일한 CSV·명령·테스트로 요구사항과 결과를 재현한다. |</span>
+<span class="ln"> </span>
+<span class="ln">## 3. Scenarios</span>
+<span class="ln"> </span>
+<span class="ln">### SC-01. 시장별 분석 결과를 웹페이지로 확인한다</span>
+<span class="ln"> </span>
+<span class="ln">- **User**: 학생 민지</span>
+<span class="ln">- **Context**: 한 날짜의 KOSPI·KOSDAQ 표본 CSV를 준비했다. 두 종가는 같은 가격 기준이다.</span>
+<span class="ln">- **Goal**: 전체 표본과 KOSPI 표본을 등락률 순서로 비교한다.</span>
+<span class="ln">- **Related requirements**: REQ-01~05. REQ-07/08은 이 상황에서 출발하는 후속 아이디어이며 현재 수락 조건에 포함하지 않는다.</span>
+<span class="ln"> </span>
+<span class="ln">**Workflow**</span>
+<span class="ln"> </span>
+<span class="ln">1. 민지는 `data/prices.csv`를 확인한다. 종목코드는 선행 0이 있는 문자열이며 가격·거래량은 정수다.</span>
+<span class="ln">2. ALL 보고서를 생성한다. 프로그램은 파일·헤더·행·단일 날짜·중복 코드를 검증한다.</span>
+<span class="ln">3. 프로그램이 등락률을 계산하고 내림차순으로 정렬한다. 동률은 코드 오름차순이다.</span>
+<span class="ln">4. 민지는 `docs/index.html`을 브라우저로 열어 기준일, 시장, 가상 데이터 출처, 요약과 표를 확인한다.</span>
+<span class="ln">5. `--market KOSPI`로 다시 생성하고 브라우저를 새로고침한다. 시장 선택은 CLI에서 이루어진다.</span>
+<span class="ln"> </span>
+<span class="ln">**Example Execution**</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">$ python3 main.py --market ALL --output docs/index.html</span>
+<span class="ln">Generated docs/index.html (5 stocks)</span>
+<span class="ln">$ python3 main.py --market KOSPI --output docs/index.html</span>
+<span class="ln">Generated docs/index.html (3 stocks)</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">**Expected web result**</span>
+<span class="ln"> </span>
+<span class="ln">| 시장 | 순서 / 등락률 | 표본 요약 |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| ALL | 247540 +3%, 005930 +2%, 035420 0%, 000660 -1%, 035900 -2% | 5개, 상승 2·하락 2·보합 1, 평균 +0.40% |</span>
+<span class="ln">| KOSPI | 005930 +2%, 035420 0%, 000660 -1% | 3개, 상승 1·하락 1·보합 1, 평균 +0.33% |</span>
+<span class="ln"> </span>
+<span class="ln">화면에서는 등락률을 부호 포함 소수 2자리로 표시한다. 평균은 표본의 동일 가중 평균이며 KOSPI/KOSDAQ 지수 등락률이 아니다.</span>
+<span class="ln"> </span>
+<span class="ln">**Outcome**: 선택한 시장의 보고서가 저장되고 민지가 브라우저로 확인한다. 입력 CSV는 변하지 않는다. 자동 검증: TEST-01/02/04/05/08/11/12. 브라우저 시각 검증: TEST-13, 수업에서 직접 확인.</span>
+<span class="ln"> </span>
+<span class="ln">### SC-02. 전일종가가 0인 입력을 거부하고 기존 보고서를 보존한다</span>
+<span class="ln"> </span>
+<span class="ln">- **User**: 학생 민지</span>
+<span class="ln">- **Context**: SC-01에서 정상 보고서를 생성한 후, 잘못된 전일종가가 들어 있는 별도 파일을 전달한다.</span>
+<span class="ln">- **Expected behavior**: CSV 행 번호와 원인을 알리고 종료 코드 1로 끝낸다. 기존 HTML과 원본 CSV는 바뀌지 않는다.</span>
+<span class="ln">- **Related requirements**: REQ-02, REQ-06</span>
+<span class="ln"> </span>
+<span class="ln">**Workflow**</span>
+<span class="ln"> </span>
+<span class="ln">1. 정상 보고서의 내용을 확인한다.</span>
+<span class="ln">2. 민지는 제공된 `data/invalid-zero.csv`를 입력으로 지정한다. 첫 종목의 전일종가가 0이다.</span>
+<span class="ln">3. `load_quotes`가 두 번째 CSV 행을 `parse_row`로 검증하다 ValueError를 받는다.</span>
+<span class="ln">4. `main`이 오류를 출력한다. 분석·렌더링·최종 HTML 교체는 수행하지 않는다.</span>
+<span class="ln">5. 민지는 기존 보고서를 유지한 채 입력 파일을 수정한다. 출력 도중 오류가 생기는 경우에도 임시 파일을 정리하고 이전 결과를 보존한다.</span>
+<span class="ln"> </span>
+<span class="ln">**Example Execution**</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">$ python3 main.py --output docs/index.html</span>
+<span class="ln">Generated docs/index.html (5 stocks)</span>
+<span class="ln">$ python3 main.py --input data/invalid-zero.csv --output docs/index.html</span>
+<span class="ln">Report not generated: CSV row 2: previous_close must be &gt;= 1</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">**Outcome**: 종료 코드 1, 기존 HTML 불변. 데이터 오류 검증은 TEST-03/07, 누락·잘못된 파일과 보존은 TEST-09, 출력 교체 오류·임시 파일 정리는 TEST-10에 연결된다. 실패 후 열린 브라우저 화면은 이전 결과이므로 기준일과 CLI 오류 메시지를 함께 확인한다.</span>
+<span class="ln"> </span>
+<span class="ln">### SC-03. 정상 헤더만 있는 CSV로 빈 보고서를 만든다</span>
+<span class="ln"> </span>
+<span class="ln">- **User**: 동료 검토자</span>
+<span class="ln">- **Context**: 데이터가 없는 정상 입력과 파일 누락을 구분해 검증하려 한다.</span>
+<span class="ln">- **Goal**: 프로그램이 정상적인 빈 상태를 명확히 보여주는지 확인한다.</span>
+<span class="ln">- **Related requirements**: REQ-01, REQ-04, REQ-05</span>
+<span class="ln"> </span>
+<span class="ln">**Workflow**</span>
+<span class="ln"> </span>
+<span class="ln">1. 검토자는 정상 헤더만 있는 `data/empty.csv`로 별도 보고서를 생성한다.</span>
+<span class="ln">2. 프로그램은 빈 목록을 정상 입력으로 취급한다.</span>
+<span class="ln">3. 웹페이지에 종목 0개, 상승·하락·보합 0, 평균 N/A, 빈 종목 안내, 기준일 '데이터 없음'을 표시한다.</span>
+<span class="ln">4. 파일 자체가 없으면 SC-02와 같은 오류 경로로 종료함을 구분한다.</span>
+<span class="ln"> </span>
+<span class="ln">**Example Execution**</span>
+<span class="ln"> </span>
+<span class="ln">```bash</span>
+<span class="ln">$ python3 main.py --input data/empty.csv --output docs/empty.html</span>
+<span class="ln">Generated docs/empty.html (0 stocks)</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">**Outcome**: 빈 상태 HTML 생성, 종료 코드 0. TEST-06/12와 연결된다. 빈 화면의 시각 확인은 TEST-13에서 수행한다.</span>
+<span class="ln"> </span>
+<span class="ln">## 4. System Architecture</span>
+<span class="ln"> </span>
+<span class="ln">### 4.1 Processes and Threads</span>
+<span class="ln"> </span>
+<span class="ln">```text</span>
+<span class="ln">[학생 CLI] -&gt; [Python main: 단일 프로세스·메인 스레드]</span>
+<span class="ln">                |-&gt; storage.load_quotes -&gt; logic.parse_row</span>
+<span class="ln">                |-&gt; logic.analyze -&gt; logic.summarize</span>
+<span class="ln">                |-&gt; report.render_html</span>
+<span class="ln">                `-&gt; storage.write_html -&gt; docs/index.html</span>
+<span class="ln"> </span>
+<span class="ln">[브라우저] -&gt; 생성된 HTML 파일 열기</span>
+<span class="ln">선택: [python -m http.server] -&gt; 정적 HTML 제공 (분석을 실행하지 않음)</span>
+<span class="ln">```</span>
+<span class="ln"> </span>
+<span class="ln">| Process / Thread | Role | Creation / Termination |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| Python CLI / 메인 스레드 | CSV 검증·분석·HTML 생성 | `python3 main.py`; 성공 0, 데이터/I/O 실패 1, CLI 인자 오류 2로 종료 |</span>
+<span class="ln">| 브라우저 | 생성된 파일 표시 | 사용자가 파일을 연다. CLI와 별도 프로그램이며 자식 프로세스로 만들지 않음 |</span>
+<span class="ln">| 로컬 HTTP 서버 (선택) | docs 폴더의 정적 파일 제공 | 별도 터미널에서 실행, Ctrl+C 종료. Python 분석 백엔드가 아님 |</span>
+<span class="ln"> </span>
+<span class="ln">fork·자식 프로세스·작업 스레드·서버 프레임워크는 사용하지 않는다.</span>
+<span class="ln"> </span>
+<span class="ln">### 4.2 IPC and Synchronization</span>
+<span class="ln"> </span>
+<span class="ln">| Where Used | Method | Reason |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| 모듈 간 | 일반 함수 인자와 반환값 | 단일 Python 프로세스이므로 IPC 없음 |</span>
+<span class="ln">| HTML 출력 | 같은 디렉터리의 임시 파일 작성 후 `os.replace` | 작성 실패가 기존 보고서를 훼손하지 않도록 함 |</span>
+<span class="ln">| 동시 생성 | 지원 범위 밖, 같은 경로에 한 번에 한 프로세스만 실행 | 파일 잠금·다중 작성자 동기화는 구현하지 않음 |</span>
+<span class="ln"> </span>
+<span class="ln">### 4.3 Data Storage Format</span>
+<span class="ln"> </span>
+<span class="ln">| File / Data | Format (Text / Binary) | Structure |</span>
+<span class="ln">|---|---|---|</span>
+<span class="ln">| `data/prices.csv` | UTF-8 text (BOM 허용) | `date,code,name,market,previous_close,close,volume`; 단일 날짜·중복 없는 코드 |</span>
+<span class="ln">| `data/invalid-zero.csv` | UTF-8 text | 같은 구조, 첫 종목 전일종가 0인 오류 실습 파일 |</span>
+<span class="ln">| `data/empty.csv` | UTF-8 text | 정상 헤더만 존재 |</span>
+<span class="ln">| `docs/index.html` | UTF-8 HTML | 한글 제목·기준일·시장·출처·표본 요약·종목 표; 외부 텍스트 escape |</span>
+<span class="ln">| 메모리 Quote | Python dict | 날짜/코드/이름/시장 str, 가격·거래량 int; 분석 후 change_pct float 추가 |</span>
+<span class="ln">| 메모리 Summary | Python dict | count/up/down/flat int, mean float 또는 None |</span>
+<span class="ln"> </span>
+<span class="ln">## 5. Division of Responsibilities</span>
+<span class="ln"> </span>
+<span class="ln">| Team Member | Responsibility |</span>
+<span class="ln">|---|---|</span>
+<span class="ln">| 1인 작성자 (실제 제출 시 본인 이름으로 변경) | SC-01~03, REQ-01~08, FEAT-01~03, FUNC-01~08, TEST-01~13, UML·README·구현·PR |</span>
+<span class="ln">| 동료 검토자 | 추적성·실행 재현 검토; 구현 책임을 대신하지 않음 |</span>
+<span class="ln"> </span>
+<span class="ln">## 6. Additional Notes</span>
+<span class="ln"> </span>
+<span class="ln">- 상세 함수 계약·UML 원본은 [project-spec.md](../../examples/korea_market_mvp/project-spec.md)를 참조한다.</span>
+<span class="ln">- `python3 -m unittest -v`로 자동 테스트 12개를 실행한다. 엑셀 Test 시트는 실행 명령·기대값·실제 결과·상태를 구분한다.</span>
+<span class="ln">- TEST-13은 실제 브라우저 확인 전까지 Not run이다. 자동 테스트 PASS가 시각 검증 완료를 의미하지 않는다.</span>
+<span class="ln">- 선택적 로컬 열람: `python3 -m http.server 8000 --directory docs --bind 127.0.0.1`, 접속 http://localhost:8000, 종료 Ctrl+C.</span>
+<span class="ln">- 입력 오류 후 기존 파일을 보는 경우 새 분석이 성공한 것으로 간주하지 않는다. 실제 제출 시 이름·학번·제출일과 재실행 결과를 갱신한다.</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="tidy_lab" hidden>
+    <details class="source" open>
+      <summary>tidy_lab.py <span class="muted"><span lang="en">68 lines</span><span lang="ko">68줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: refactor without changing behavior.</span>
+<span class="ln"> </span>
+<span class="ln">Everything below works: every check at the bottom prints PASS. The code is</span>
+<span class="ln">still hard to read. The names say nothing, the number 2000 appears three</span>
+<span class="ln">times, and the same line is written twice.</span>
+<span class="ln"> </span>
+<span class="ln">Your task (8 minutes): make it readable without changing any output.</span>
+<span class="ln"> </span>
+<span class="ln">  Move 1  Rename: entries, day, ml, totals instead of x, d, m, tmp.</span>
+<span class="ln">  Move 2  Constant: 2000 means &quot;daily goal in ml&quot;. Name it once, at the top.</span>
+<span class="ln">  Move 3  Extract: the line that builds &quot;day: total ml (status)&quot; exists</span>
+<span class="ln">          twice. Write it once as a function and call it.</span>
+<span class="ln">  Bonus   Guard clause: goal_status does not need a nested if.</span>
+<span class="ln"> </span>
+<span class="ln">Run the file after every move. All six checks must still print PASS.</span>
+<span class="ln">Keep the function names used by the checks. Do not change the check() calls.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def daily_totals(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return {day: total ml} for a list of (day, ml) pairs. An empty list returns {}.&quot;&quot;&quot;</span>
+<span class="ln">    tmp = {}</span>
+<span class="ln">    for d, m in x:</span>
+<span class="ln">        if d in tmp:</span>
+<span class="ln">            tmp[d] = tmp[d] + m</span>
+<span class="ln">        else:</span>
+<span class="ln">            tmp[d] = m</span>
+<span class="ln">    return tmp</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def goal_status(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return &quot;goal&quot; if x ml reaches the daily goal of 2000 ml, otherwise &quot;under&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    if x &gt;= 2000:</span>
+<span class="ln">        return &quot;goal&quot;</span>
+<span class="ln">    else:</span>
+<span class="ln">        if x &lt; 2000:</span>
+<span class="ln">            return &quot;under&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def format_report(x):</span>
+<span class="ln">    &quot;&quot;&quot;Return one line per day in day order, like &quot;2026-11-10: 2100 ml (goal)&quot;.&quot;&quot;&quot;</span>
+<span class="ln">    tmp = daily_totals(x)</span>
+<span class="ln">    out = []</span>
+<span class="ln">    for d in sorted(tmp):</span>
+<span class="ln">        if tmp[d] &gt;= 2000:</span>
+<span class="ln">            out.append(d + &quot;: &quot; + str(tmp[d]) + &quot; ml (&quot; + goal_status(tmp[d]) + &quot;)&quot;)</span>
+<span class="ln">        else:</span>
+<span class="ln">            out.append(d + &quot;: &quot; + str(tmp[d]) + &quot; ml (&quot; + goal_status(tmp[d]) + &quot;)&quot;)</span>
+<span class="ln">    return out</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def check(name, actual, expected):</span>
+<span class="ln">    if actual == expected:</span>
+<span class="ln">        print(&quot;PASS&quot;, name)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;FAIL&quot;, name, &quot;-&gt; got&quot;, repr(actual), &quot;expected&quot;, repr(expected))</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    sample = [(&quot;2026-11-10&quot;, 500), (&quot;2026-11-10&quot;, 1600), (&quot;2026-11-11&quot;, 1500)]</span>
+<span class="ln">    check(&quot;daily_totals(sample)&quot;, daily_totals(sample),</span>
+<span class="ln">          {&quot;2026-11-10&quot;: 2100, &quot;2026-11-11&quot;: 1500})</span>
+<span class="ln">    check(&quot;daily_totals([])&quot;, daily_totals([]), {})</span>
+<span class="ln">    check(&quot;goal_status(2100)&quot;, goal_status(2100), &quot;goal&quot;)</span>
+<span class="ln">    check(&quot;goal_status(1500)&quot;, goal_status(1500), &quot;under&quot;)</span>
+<span class="ln">    check(&quot;format_report(sample)&quot;, format_report(sample),</span>
+<span class="ln">          [&quot;2026-11-10: 2100 ml (goal)&quot;, &quot;2026-11-11: 1500 ml (under)&quot;])</span>
+<span class="ln">    check(&quot;format_report([])&quot;, format_report([]), [])</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-week11-1">
+      <h2 class="notes-title"><span lang="en">Session 1 — Writing the Project Documents: Requirement, Feature, Function, UML</span><span lang="ko">1차시 — 프로젝트 문서 쓰기: 요구사항·기능·함수·UML</span></h2>
+<div lang="en">
+<p>In this session you write the four design documents for your project: Requirement, Feature, Function and UML. The four documents do not describe different programs; they look at <strong>the same program</strong> from four directions. The requirement answers what must hold, the feature what the user sees, the function what the code promises, and UML how they connect. Today's shared example is the study logger from Weeks 9 and 10. On the lab pages you run <a href="study_logger_skeleton.html">study_logger_skeleton</a>, a skeleton with only contracts, and <a href="study_logger_f1.html">study_logger_f1</a>, which implements F1, and carry out the documents' checks yourself.</p>
+
+<p>The session is 120 minutes with a 10-minute break in the middle. The first half covers three documents (requirement, feature, function), the second half UML and traceability, followed by a 46-minute lab in which you write the four documents for your own project.</p>
+
+<h2>Project guidance and document scope</h2>
+
+<p>The project uses only Python 3 and the standard library. Data is kept in a file and results are reported on the screen. Every project is checked on the same three points:</p>
+
+<ul>
+<li>Does it refuse bad input?</li>
+<li>Does it survive a missing file?</li>
+<li>Is the file left unchanged after a failure?</li>
+</ul>
+
+<p>The design covers the problem, the feature scope, the module structure and the data format. The four documents introduced today are a guide; the actual submission items and weights follow the syllabus.</p>
+
+<h3>The role of the four documents</h3>
+
+<table>
+<thead>
+<tr><th>Document</th><th>Question it answers</th><th>What it contains</th></tr>
+</thead>
+<tbody>
+<tr><td>DOC 1 · Requirement</td><td>What must hold?</td><td>The requirements, and a pass/fail criterion for each</td></tr>
+<tr><td>DOC 2 · Feature</td><td>What does the user do?</td><td>How to use it, and the results the user can observe</td></tr>
+<tr><td>DOC 3 · Function</td><td>Which Python function does it?</td><td>Inputs, return value and failure, as a contract</td></tr>
+<tr><td>DOC 4 · UML</td><td>How does it connect?</td><td>Module relations, the order of calls, state changes</td></tr>
+</tbody>
+</table>
+
+<h3>Linking requirements to implementation</h3>
+
+<p>A requirement is a condition to satisfy, and a feature is what the user does to satisfy it. A function is the code's promise, and a check decides whether that promise holds. UML sits under feature and function and shows the structure and flow that connect them.</p>
+
+<blockquote>Rule: use the same ID in every document. Then you can follow one requirement all the way to its code and its check.</blockquote>
+
+<h3>Shared example: the study logger</h3>
+
+<p>There are three basic features: log one entry, reload the file, and show weekly totals per course. The result report prints one line per course, largest first, or, if the entry could not be saved, "Not saved" with the reason. Its duties are to refuse bad input, leave the file unchanged on failure, and survive a missing file.</p>
+
+<pre><code>$ python3 main.py
+Date (YYYY-MM-DD): 2026-11-10
+Course: python
+Minutes: 90
+Saved.
+python   180 min
+stats     45 min</code></pre>
+
+<p>Minutes are a value the student types in. Timing sessions with a clock is an extension.</p>
+
+<h2>DOC 1 · Requirement: the specification</h2>
+
+<p>The requirement document states what must hold, for whom, and how far. Each line must be something you can judge pass or fail.</p>
+
+<ul>
+<li><strong>Purpose and scope</strong>: who has what problem, what the program solves, and where it stops.</li>
+<li><strong>Requirement items</strong>: an ID, the statement, a priority (Must, Should, Could) and a check.</li>
+<li><strong>Functional requirements</strong>: log an entry, apply the input rules, report totals, keep the data.</li>
+<li><strong>Constraints</strong>: standard library only, input checked, file unchanged on failure.</li>
+</ul>
+
+<p>Write only one condition per line. A check must be something a classmate can do at the keyboard.</p>
+
+<h3>Requirement example</h3>
+
+<table>
+<thead>
+<tr><th>ID</th><th>Statement</th><th>Priority</th><th>Check</th></tr>
+</thead>
+<tbody>
+<tr><td>REQ-01</td><td>Save one entry with a date, a course and positive minutes</td><td>Must</td><td>Enter 2026-11-10, python, 90 → one new row in study.csv</td></tr>
+<tr><td>REQ-02</td><td>Reject minutes that are not a positive whole number</td><td>Must</td><td>-30 → Not saved, file unchanged</td></tr>
+<tr><td>REQ-03</td><td>Show weekly totals per course, largest first</td><td>Must</td><td>python 90 + 90, stats 45 → python 180 printed first</td></tr>
+<tr><td>REQ-04</td><td>Keep entries between runs</td><td>Must</td><td>Run twice; the second run counts the first run's entry</td></tr>
+</tbody>
+</table>
+
+<p>Every requirement carries an observable check. No check, no requirement. The statement says <em>what</em>, not <em>how</em>: no function names and no file formats. The check must be something a classmate can try at the keyboard in a minute. The Must requirements are the MVP; Should and Could wait until the MVP runs. These checks become next session's <code>test_logic.py</code>, and the Week 12 test list.</p>
+
+<p>On the lab page <a href="study_logger_f1.html">study_logger_f1</a> you can carry out the checks for REQ-01 and REQ-02 exactly as written. Entering 2026-11-10, python, 90 adds one line to study.csv, and entering -30 prints Not saved and leaves the line count the same.</p>
+
+<h3>Matching requirements to checks</h3>
+
+<p>Give each requirement sentence an input condition and an observable result.</p>
+
+<ul>
+<li><strong>Input condition</strong>: exactly what is typed, or what the file holds before the run.</li>
+<li><strong>Observed result</strong>: what is printed, and what the file contains after the run.</li>
+</ul>
+
+<p>A check that only works if its author stands beside you and explains it is not a check yet.</p>
+
+<h2>DOC 2 · Feature: the user-facing specification</h2>
+
+<p>The feature document describes the program as the user meets it: the command, the questions (prompts), and the results that come back.</p>
+
+<pre><code>FEAT-xx  &lt;name&gt;              basic | extension
+purpose  one sentence
+usage    command, prompts, allowed values
+flow     step 1 ... step n, the normal path
+result   what the user sees on success
+errors   each failure and its message
+serves   REQ-xx, REQ-yy</code></pre>
+
+<ul>
+<li><strong>Identification</strong>: feature ID, name, purpose, and whether it is a basic feature or an extension.</li>
+<li><strong>How to use</strong>: the command, the prompts, the allowed values, the preconditions.</li>
+<li><strong>Behavior and result</strong>: the normal flow and the output the user checks.</li>
+<li><strong>Exceptions and links</strong>: bad input, failures, and the requirement IDs this feature serves.</li>
+</ul>
+
+<h3>Feature example: logging one entry</h3>
+
+<pre><code>FEAT-01  Log one entry                     basic
+purpose  record one study session
+usage    python3 main.py, then three prompts:
+         date YYYY-MM-DD, course, minutes &gt; 0
+flow     check input -&gt; build record
+         -&gt; append one row to data/study.csv
+result   "Saved."
+errors   bad minutes or empty course:
+         "Not saved: &lt;reason&gt;", file unchanged
+         data/ missing: report it, write nothing
+serves   REQ-01, REQ-02, REQ-04</code></pre>
+
+<p>The usage line is what you will actually type in the demo. Write it so that a stranger could follow it. List errors one by one, each with its message; a single line saying "handles errors" is not an error entry. The serves line is the traceability link back to the requirements.</p>
+
+<h3>A feature's normal path and error path</h3>
+
+<p>Define what the user sees on both the good day and the bad day. Both belong in the feature sheet.</p>
+
+<ul>
+<li><strong>Normal path</strong>: four steps, each with something the user can observe.</li>
+<li><strong>Input error</strong>: a sentence with the reason is printed, and nothing is written to the file.</li>
+<li><strong>File error</strong>: the cause is reported, nothing is left half-written, and the program ends cleanly.</li>
+</ul>
+
+<h2>DOC 3 · Function: Python function design</h2>
+
+<p>One function, one contract. Your Week 10 design document already has the fields.</p>
+
+<pre><code>make_record(date: str, course: str,
+            minutes_text: str) -&gt; dict
+module   logic.py       called by main()
+I/O      none           pure   yes
+returns  {"date", "course", "minutes": int}
+fails    ValueError: empty course, or
+         minutes not a whole number above 0</code></pre>
+
+<ul>
+<li><strong>Signature</strong>: name, parameters with types, return type.</li>
+<li><strong>Inputs and results</strong>: allowed values and units, what success returns, and how failure shows.</li>
+<li><strong>Where it runs</strong>: which module it is in and who calls it, and whether it uses the keyboard, a file, or neither.</li>
+<li><strong>Failure and resources</strong>: whether it raises an exception or returns None, and who opens and closes the file.</li>
+</ul>
+
+<h3>Function example: make_record()</h3>
+
+<p>Write the contract in the docstring and the body under it, then add one call that shows the promise is kept.</p>
+
+<pre><code>def make_record(date, course, minutes_text):
+    """Return {"date": str, "course": str,
+    "minutes": int}. The course is trimmed and
+    lower-cased. Raises ValueError if course is
+    empty or minutes_text is not a whole number
+    above 0.
+    """
+    course = course.strip().lower()
+    if not course:
+        raise ValueError("course must not be empty")
+    minutes = int(minutes_text)
+    if minutes &lt;= 0:
+        raise ValueError("minutes must be positive")
+    return {"date": date.strip(), "course": course,
+            "minutes": minutes}
+
+rec = make_record("2026-11-10", " Python ", "90")
+print(rec["course"], repr(rec["minutes"]))</code></pre>
+
+<pre><code>python 90</code></pre>
+
+<p>The input is three strings from <code>input()</code>. Trimming and lower-casing the course happens here and only here. <code>main()</code> calls this function before anything is written. It returns one dict, with minutes as an int. On failure it raises ValueError with a reason, and main prints Not saved and writes nothing. The real implementation is in <code>logic.py</code> of <a href="study_logger_f1.html">study_logger_f1</a> (with the minutes check split out into <code>parse_minutes()</code>), and you can run the same call on the lab page.</p>
+
+<h3>Decomposing into functions</h3>
+
+<p>Six functions, six single responsibilities, named with the verb test from Week 10.</p>
+
+<table>
+<thead>
+<tr><th>Function</th><th>Contract</th></tr>
+</thead>
+<tbody>
+<tr><td><code>parse_minutes()</code></td><td>minutes string → positive int, or ValueError</td></tr>
+<tr><td><code>make_record()</code></td><td>date, course, minutes → one record dict</td></tr>
+<tr><td><code>append_record()</code></td><td>one record → one row in data/study.csv</td></tr>
+<tr><td><code>load_records()</code></td><td>file → list of records, [] if the file is missing</td></tr>
+<tr><td><code>weekly_totals()</code></td><td>list of records → {course: minutes}</td></tr>
+<tr><td><code>format_totals()</code></td><td>totals → list of lines, largest first</td></tr>
+</tbody>
+</table>
+
+<p>Two rule functions, two file functions, one report function, and <code>main()</code>, which calls them. Every name is a verb plus a noun, and each line of the table above is one row of the contract table. If you need "and" to describe a function, split it before you write the contract.</p>
+
+<p>This table turned into code is <a href="study_logger_skeleton.html">study_logger_skeleton</a>. Every function has a name and a docstring, but the bodies are <code>raise NotImplementedError</code> or TODO. It runs (Loaded 0 records), but it does not satisfy the requirements yet.</p>
+
+<h3>Functions and modules: who does what</h3>
+
+<p>Once <code>main()</code> has asked the user, each module answers only one kind of question. None of them asks the user anything.</p>
+
+<ul>
+<li><code>main.py</code> asks, calls and prints. It holds no rules.</li>
+<li><code>logic.py</code> holds the rules and never touches the keyboard or the disk.</li>
+<li><code>storage.py</code> is the only module that opens <code>data/study.csv</code>.</li>
+<li><code>report.py</code> turns results into lines.</li>
+</ul>
+
+<h2>DOC 4 · UML: choosing a diagram by purpose</h2>
+
+<p>You do not need every diagram. Pick the one that answers your reader's question.</p>
+
+<table>
+<thead>
+<tr><th>Reader's question</th><th>Diagram</th></tr>
+</thead>
+<tbody>
+<tr><td>Who uses it, and for what?</td><td>Use case</td></tr>
+<tr><td>Which file imports which?</td><td>Module (component) diagram</td></tr>
+<tr><td>In what order do the calls happen?</td><td>Sequence diagram</td></tr>
+<tr><td>What happens to one entry?</td><td>State (or activity) diagram</td></tr>
+</tbody>
+</table>
+
+<p>The arrows in a module diagram point one way only. An activity diagram shows the steps, including the error branches.</p>
+
+<h3>Use case example</h3>
+
+<p>Draw the user and the goals the system offers: goals, not functions. There is one actor, the student, and the system boundary is the study logger. There are three goals: log an entry, review weekly totals, and find earlier entries again. Function names do not appear here; the order of calls belongs in the sequence diagram.</p>
+
+<h3>Sequence example: one run</h3>
+
+<p>Draw one run of the normal path, with time flowing from top to bottom. Every arrow is a call from your contract table. <code>main()</code> calls logic first, so nothing is written before the record is valid. Each return arrow carries one data shape: a record, a list of records, a totals dict, or a list of lines. Draw the failure path (ValueError) as a separate branch or as a second, shorter diagram.</p>
+
+<h3>State example: one entry</h3>
+
+<p>Four states and one dead end; each transition is a function from the table. Typed → checked by <code>make_record()</code> → saved by <code>append_record()</code> → counted by <code>weekly_totals()</code>. An empty course or bad minutes ends in rejected: "Not saved" is printed and nothing is written. A file error after the check is also reported, and no half-written file is left behind.</p>
+
+<h3>Traceability across documents</h3>
+
+<p>Write the requirement ID in the feature, the function, the diagram and the test, and nothing gets lost. For example, REQ-02 says what must hold (minutes that are not positive are rejected). FEAT-01 shows it to the user, <code>parse_minutes()</code> enforces it, the state diagram draws it, and TEST-02 proves it. A grader, or you in Week 14, can follow this chain in either direction.</p>
+
+<h2>Document review and demo preparation</h2>
+
+<p>Ask five questions before you say the documents are done.</p>
+
+<ol>
+<li><strong>Scope</strong>: are basic features and extensions separated, and is the MVP boundary visible?</li>
+<li><strong>Done</strong>: can each requirement be judged pass/fail by its check?</li>
+<li><strong>Consistency</strong>: do the feature sheet, the function contracts and the UML flow agree with each other?</li>
+<li><strong>Data checks</strong>: have you covered bad input, a missing file, the header row and "file unchanged on failure"?</li>
+<li><strong>Reproduction</strong>: are the setup, the run command, one normal scenario and one error scenario written down?</li>
+</ol>
+
+<h2>Lab: your four documents</h2>
+
+<p>In 46 minutes, write four short documents for your own project, using one ID scheme.</p>
+
+<ul>
+<li>A. Requirements, 12 minutes</li>
+<li>B. The feature sheet for F1, 10 minutes</li>
+<li>C. Function contracts, 10 minutes</li>
+<li>D. One UML diagram, 10 minutes</li>
+<li>Last 4 minutes: swap with a classmate and follow one REQ ID through all four documents.</li>
+</ul>
+
+<h2>Submission and next session</h2>
+
+<p>Submit the four documents today. Keep the REQ and FEAT IDs as they are; these IDs go into your commit messages, test names and README.</p>
+
+<p>Next session moves from design to running code: you make F1 work end to end on a feature branch. Bring a laptop on which your repository is cloned, <code>git status</code> is clean and <code>python3 main.py</code> runs. This web lab has no git, so do the branch and commit work on your real PC; here you only check that the code runs and passes its checks.</p>
+
+<blockquote>Rule: the Must scope is frozen. A new idea becomes a Should or Could line, not a new Must requirement.</blockquote>
+
+<h3>Reference: the GitHub homepage guides</h3>
+
+<p>In Week 11, separate "Your GitHub Homepage" guides for Intel Mac and for Windows were also handed out. They are copy-and-paste exercises to follow on your real PC: in a terminal (Terminal on Mac, PowerShell on Windows) you install Git and the GitHub CLI (<code>gh</code>) (with Homebrew on Mac, WinGet on Windows), log in with <code>gh auth login</code>, and create or clone a <code>username.github.io</code> repository. You have the agent in the Antigravity IDE build a student homepage (About Me, My Python Project, Contact) from <code>index.html</code> and <code>style.css</code>, preview it locally, then <code>git add</code>, <code>git commit</code> and <code>git push</code>, and turn on GitHub Pages from the root (/) of the main branch. For computers where installation gets stuck, the guides also describe a route in which you create the repository in the browser, add <code>index.html</code> and an empty <code>.nojekyll</code> by hand, and deploy from Settings → Pages. This process needs a network and git, so it cannot be done in this web lab's virtual machine; do it on your real PC.</p>
+</div><div lang="ko">
+<p>이번 시간에는 프로젝트의 설계 문서 네 가지를 씁니다. 요구사항(Requirement), 기능(Feature), 함수(Function), UML입니다. 네 문서는 서로 다른 프로그램을 설명하는 것이 아니라 <strong>같은 프로그램</strong>을 네 방향에서 봅니다. 요구사항은 무엇이 성립해야 하는지, 기능은 사용자가 무엇을 보는지, 함수는 코드가 무엇을 약속하는지, UML은 그것들이 어떻게 연결되는지를 답합니다. 오늘의 공통 예제는 9·10주차에 다룬 공부 기록기(study logger)이고, 실습 페이지에서는 계약만 있는 뼈대 <a href="study_logger_skeleton.html">study_logger_skeleton</a>과 F1이 구현된 <a href="study_logger_f1.html">study_logger_f1</a>을 실행하며 문서의 검사(check)를 직접 해 봅니다.</p>
+
+<p>수업은 120분이며 중간에 10분 휴식이 있습니다. 전반에 문서 세 개(요구사항·기능·함수), 후반에 UML과 추적성, 그리고 46분 동안 자기 프로젝트의 네 문서를 쓰는 실습을 합니다.</p>
+
+<h2>프로젝트 안내와 문서의 범위</h2>
+
+<p>프로젝트는 Python 3와 표준 라이브러리만 사용합니다. 데이터는 파일에 보관하고 결과는 화면에 보고합니다. 모든 프로젝트가 공통으로 확인받는 점은 세 가지입니다.</p>
+
+<ul>
+<li>잘못된 입력을 거절하는가</li>
+<li>파일이 없을 때 견디는가</li>
+<li>실패한 뒤에도 파일이 바뀌지 않고 그대로인가</li>
+</ul>
+
+<p>설계 문서는 문제, 기능 범위, 모듈 구조, 데이터 형식을 다룹니다. 오늘 소개하는 네 문서는 길잡이이며, 실제 제출 항목과 배점은 강의계획서를 따릅니다.</p>
+
+<h3>네 문서의 역할</h3>
+
+<table>
+<thead>
+<tr><th>문서</th><th>답하는 질문</th><th>담는 내용</th></tr>
+</thead>
+<tbody>
+<tr><td>DOC 1 · 요구사항</td><td>무엇이 성립해야 하는가?</td><td>요구사항과, 각각의 합격/불합격 기준</td></tr>
+<tr><td>DOC 2 · 기능</td><td>사용자는 무엇을 하는가?</td><td>사용 방법과 사용자가 관찰할 수 있는 결과</td></tr>
+<tr><td>DOC 3 · 함수</td><td>어느 파이썬 함수가 그 일을 하는가?</td><td>입력, 반환값, 실패를 계약으로</td></tr>
+<tr><td>DOC 4 · UML</td><td>어떻게 연결되는가?</td><td>모듈 관계, 호출 순서, 상태 변화</td></tr>
+</tbody>
+</table>
+
+<h3>요구사항과 구현의 연결</h3>
+
+<p>요구사항은 만족해야 할 조건이고, 기능은 그 조건을 만족시키기 위해 사용자가 하는 일입니다. 함수는 코드의 약속이고, 검사(check)는 그 약속이 지켜지는지를 판정합니다. UML은 기능과 함수 아래에서 둘을 잇는 구조와 흐름을 보여 줍니다.</p>
+
+<blockquote>규칙: 모든 문서에서 같은 ID를 씁니다. 그래야 요구사항 하나를 그 코드와 검사까지 따라갈 수 있습니다.</blockquote>
+
+<h3>공통 예제: 공부 기록기</h3>
+
+<p>기본 기능은 세 가지입니다. 한 건 기록하기, 파일 다시 읽기, 과목별 주간 합계 보여 주기. 결과 보고는 과목마다 한 줄씩 큰 값부터 출력하거나, 저장하지 못했으면 이유와 함께 "Not saved"를 출력합니다. 지켜야 할 의무는 잘못된 입력 거절, 실패 시 파일 보존, 파일이 없어도 견디기입니다.</p>
+
+<pre><code>$ python3 main.py
+Date (YYYY-MM-DD): 2026-11-10
+Course: python
+Minutes: 90
+Saved.
+python   180 min
+stats     45 min</code></pre>
+
+<p>분(minutes)은 학생이 직접 입력하는 값입니다. 시계로 시간을 재는 것은 확장 기능입니다.</p>
+
+<h2>DOC 1 · 요구사항: 명세</h2>
+
+<p>요구사항 문서는 무엇이 성립해야 하는지, 누구를 위해, 어디까지인지를 적습니다. 각 줄은 합격 또는 불합격으로 판정할 수 있어야 합니다.</p>
+
+<ul>
+<li><strong>목적과 범위</strong>: 누가 어떤 문제를 겪는지, 프로그램이 무엇을 해결하고 어디서 멈추는지.</li>
+<li><strong>요구사항 항목</strong>: ID, 문장, 우선순위(Must, Should, Could), 검사.</li>
+<li><strong>기능 요구사항</strong>: 한 건 기록, 입력 규칙 적용, 합계 보고, 데이터 보관.</li>
+<li><strong>제약</strong>: 표준 라이브러리만 사용, 입력 검사, 실패 시 파일 불변.</li>
+</ul>
+
+<p>한 줄에는 조건 하나만 씁니다. 검사는 같은 반 친구가 키보드 앞에서 할 수 있는 것이어야 합니다.</p>
+
+<h3>요구사항 예</h3>
+
+<table>
+<thead>
+<tr><th>ID</th><th>문장</th><th>우선순위</th><th>검사</th></tr>
+</thead>
+<tbody>
+<tr><td>REQ-01</td><td>날짜, 과목, 양수 분으로 한 건을 저장한다</td><td>Must</td><td>2026-11-10, python, 90 입력 → study.csv에 새 행 하나</td></tr>
+<tr><td>REQ-02</td><td>양의 정수가 아닌 분은 거절한다</td><td>Must</td><td>-30 → Not saved, 파일 불변</td></tr>
+<tr><td>REQ-03</td><td>과목별 주간 합계를 큰 값부터 보여 준다</td><td>Must</td><td>python 90 + 90, stats 45 → python 180이 먼저 출력</td></tr>
+<tr><td>REQ-04</td><td>실행과 실행 사이에 기록을 유지한다</td><td>Must</td><td>두 번 실행하면 두 번째 실행이 첫 번째 기록을 센다</td></tr>
+</tbody>
+</table>
+
+<p>모든 요구사항에는 관찰할 수 있는 검사가 붙습니다. 검사가 없으면 요구사항이 아닙니다. 문장은 <em>무엇</em>을 말하고 <em>어떻게</em>는 말하지 않습니다. 함수 이름이나 파일 형식은 쓰지 않습니다. 검사는 친구가 1분 안에 키보드로 해 볼 수 있어야 합니다. Must 요구사항이 MVP이며, Should와 Could는 MVP가 돌아간 뒤로 미룹니다. 이 검사들은 다음 차시의 <code>test_logic.py</code>가 되고, 12주차의 테스트 목록이 됩니다.</p>
+
+<p>실습 페이지 <a href="study_logger_f1.html">study_logger_f1</a>에서 REQ-01과 REQ-02의 검사를 그대로 해 볼 수 있습니다. 2026-11-10, python, 90을 넣으면 study.csv의 줄 수가 하나 늘고, -30을 넣으면 Not saved와 함께 줄 수가 그대로입니다.</p>
+
+<h3>요구사항과 검사 맞추기</h3>
+
+<p>요구사항 문장마다 입력 조건과 관찰 가능한 결과를 붙입니다.</p>
+
+<ul>
+<li><strong>입력 조건</strong>: 정확히 무엇을 입력하는지, 또는 실행 전에 파일에 무엇이 들어 있는지.</li>
+<li><strong>관찰 결과</strong>: 무엇이 출력되는지, 그리고 실행 뒤 파일에 무엇이 들어 있는지.</li>
+</ul>
+
+<p>작성자가 옆에서 설명해 줘야 할 수 있는 검사는 아직 검사가 아닙니다.</p>
+
+<h2>DOC 2 · 기능: 사용자 관점의 명세</h2>
+
+<p>기능 문서는 사용자가 만나는 프로그램을 적습니다. 명령, 질문(프롬프트), 그리고 돌아오는 결과입니다.</p>
+
+<pre><code>FEAT-xx  &lt;name&gt;              basic | extension
+purpose  one sentence
+usage    command, prompts, allowed values
+flow     step 1 ... step n, the normal path
+result   what the user sees on success
+errors   each failure and its message
+serves   REQ-xx, REQ-yy</code></pre>
+
+<ul>
+<li><strong>식별</strong>: 기능 ID, 이름, 목적, 기본 기능인지 확장 기능인지.</li>
+<li><strong>사용 방법</strong>: 명령, 프롬프트, 허용되는 값, 사전 조건.</li>
+<li><strong>동작과 결과</strong>: 정상 흐름과 사용자가 확인하는 출력.</li>
+<li><strong>예외와 연결</strong>: 잘못된 입력, 실패, 그리고 이 기능이 충족하는 요구사항 ID.</li>
+</ul>
+
+<h3>기능 예: 한 건 기록하기</h3>
+
+<pre><code>FEAT-01  Log one entry                     basic
+purpose  record one study session
+usage    python3 main.py, then three prompts:
+         date YYYY-MM-DD, course, minutes &gt; 0
+flow     check input -&gt; build record
+         -&gt; append one row to data/study.csv
+result   "Saved."
+errors   bad minutes or empty course:
+         "Not saved: &lt;reason&gt;", file unchanged
+         data/ missing: report it, write nothing
+serves   REQ-01, REQ-02, REQ-04</code></pre>
+
+<p>usage 줄은 시연에서 실제로 입력할 내용입니다. 처음 보는 사람도 따라 할 수 있게 씁니다. 오류는 하나씩, 각각의 메시지와 함께 나열합니다. "오류를 처리한다"는 한 줄은 오류 항목이 아닙니다. serves 줄은 요구사항으로 돌아가는 추적 연결입니다.</p>
+
+<h3>정상 경로와 오류 경로</h3>
+
+<p>좋은 날과 나쁜 날에 사용자가 무엇을 보는지 모두 정의합니다. 둘 다 기능 명세에 들어갑니다.</p>
+
+<ul>
+<li><strong>정상 경로</strong>: 네 단계, 각 단계마다 사용자가 관찰할 수 있는 것이 있습니다.</li>
+<li><strong>입력 오류</strong>: 이유를 담은 문장이 나오고 파일에는 아무것도 쓰지 않습니다.</li>
+<li><strong>파일 오류</strong>: 원인을 알리고, 반쯤 쓴 파일을 남기지 않으며, 프로그램은 깔끔하게 끝납니다.</li>
+</ul>
+
+<h2>DOC 3 · 함수: 파이썬 함수 설계</h2>
+
+<p>함수 하나에 계약 하나입니다. 10주차 설계 문서에 이미 항목이 있습니다.</p>
+
+<pre><code>make_record(date: str, course: str,
+            minutes_text: str) -&gt; dict
+module   logic.py       called by main()
+I/O      none           pure   yes
+returns  {"date", "course", "minutes": int}
+fails    ValueError: empty course, or
+         minutes not a whole number above 0</code></pre>
+
+<ul>
+<li><strong>시그니처</strong>: 이름, 자료형이 붙은 매개변수, 반환 자료형.</li>
+<li><strong>입력과 결과</strong>: 허용되는 값과 단위, 성공하면 무엇을 반환하는지, 실패는 어떻게 드러나는지.</li>
+<li><strong>실행 위치</strong>: 어느 모듈에 있고 누가 호출하는지, 키보드나 파일에 접근하는지 아니면 둘 다 하지 않는지.</li>
+<li><strong>실패와 자원</strong>: 예외를 던지는지 None을 반환하는지, 파일은 누가 열고 닫는지.</li>
+</ul>
+
+<h3>함수 예: make_record()</h3>
+
+<p>계약은 docstring에, 본문은 그 아래에 씁니다. 그리고 약속이 지켜지는 것을 보여 주는 호출 하나를 붙입니다.</p>
+
+<pre><code>def make_record(date, course, minutes_text):
+    """Return {"date": str, "course": str,
+    "minutes": int}. The course is trimmed and
+    lower-cased. Raises ValueError if course is
+    empty or minutes_text is not a whole number
+    above 0.
+    """
+    course = course.strip().lower()
+    if not course:
+        raise ValueError("course must not be empty")
+    minutes = int(minutes_text)
+    if minutes &lt;= 0:
+        raise ValueError("minutes must be positive")
+    return {"date": date.strip(), "course": course,
+            "minutes": minutes}
+
+rec = make_record("2026-11-10", " Python ", "90")
+print(rec["course"], repr(rec["minutes"]))</code></pre>
+
+<pre><code>python 90</code></pre>
+
+<p>입력은 <code>input()</code>에서 온 문자열 세 개입니다. 과목의 공백 제거와 소문자 변환은 여기에서만 합니다. 이 함수는 무엇이든 쓰기 전에 <code>main()</code>이 호출합니다. 반환값은 dict 하나이고 minutes는 int입니다. 실패하면 이유를 담은 ValueError를 던지고, main은 Not saved를 출력하고 아무것도 쓰지 않습니다. <a href="study_logger_f1.html">study_logger_f1</a>의 <code>logic.py</code>에 실제 구현이 있으며(분 검사는 <code>parse_minutes()</code>로 분리), 실습 페이지에서 같은 호출을 실행할 수 있습니다.</p>
+
+<h3>함수로 나누기</h3>
+
+<p>여섯 함수, 여섯 개의 단일 책임입니다. 10주차의 동사 테스트로 이름을 붙입니다.</p>
+
+<table>
+<thead>
+<tr><th>함수</th><th>계약</th></tr>
+</thead>
+<tbody>
+<tr><td><code>parse_minutes()</code></td><td>분 문자열 → 양의 int, 아니면 ValueError</td></tr>
+<tr><td><code>make_record()</code></td><td>날짜, 과목, 분 → 기록 dict 하나</td></tr>
+<tr><td><code>append_record()</code></td><td>기록 하나 → data/study.csv에 한 행</td></tr>
+<tr><td><code>load_records()</code></td><td>파일 → 기록 목록, 파일이 없으면 []</td></tr>
+<tr><td><code>weekly_totals()</code></td><td>기록 목록 → {과목: 분}</td></tr>
+<tr><td><code>format_totals()</code></td><td>합계 → 줄 목록, 큰 값부터</td></tr>
+</tbody>
+</table>
+
+<p>규칙 함수 둘, 파일 함수 둘, 보고 함수 하나, 그리고 이들을 호출하는 <code>main()</code>입니다. 이름은 모두 동사+명사이고, 위 표의 한 줄이 계약 표의 한 행입니다. 함수를 설명하는 데 "그리고"가 필요하다면, 계약을 쓰기 전에 나눕니다.</p>
+
+<p>이 표가 코드가 된 모습이 <a href="study_logger_skeleton.html">study_logger_skeleton</a>입니다. 모든 함수가 이름과 docstring을 갖추었지만 본문은 <code>raise NotImplementedError</code>나 TODO입니다. 실행하면 동작은 하지만(Loaded 0 records) 요구사항은 아직 만족하지 못합니다.</p>
+
+<h3>함수와 모듈: 누가 무엇을 하는가</h3>
+
+<p><code>main()</code>이 사용자에게 묻고 나면, 각 모듈은 한 종류의 질문에만 답합니다. 그중 어느 모듈도 사용자에게 무언가를 묻지 않습니다.</p>
+
+<ul>
+<li><code>main.py</code>는 묻고, 호출하고, 출력합니다. 규칙은 갖지 않습니다.</li>
+<li><code>logic.py</code>는 규칙을 갖고, 키보드나 디스크를 절대 건드리지 않습니다.</li>
+<li><code>storage.py</code>는 <code>data/study.csv</code>를 여는 유일한 모듈입니다.</li>
+<li><code>report.py</code>는 결과를 줄로 바꿉니다.</li>
+</ul>
+
+<h2>DOC 4 · UML: 목적에 따라 다이어그램 고르기</h2>
+
+<p>모든 다이어그램이 필요하지는 않습니다. 읽는 사람의 질문에 답하는 다이어그램 하나를 고릅니다.</p>
+
+<table>
+<thead>
+<tr><th>읽는 사람의 질문</th><th>다이어그램</th></tr>
+</thead>
+<tbody>
+<tr><td>누가 무엇을 위해 쓰는가?</td><td>유스케이스</td></tr>
+<tr><td>어느 파일이 어느 파일을 import하는가?</td><td>모듈(컴포넌트) 다이어그램</td></tr>
+<tr><td>호출은 어떤 순서로 일어나는가?</td><td>시퀀스 다이어그램</td></tr>
+<tr><td>기록 하나에 무슨 일이 일어나는가?</td><td>상태(또는 활동) 다이어그램</td></tr>
+</tbody>
+</table>
+
+<p>모듈 다이어그램의 화살표는 한 방향만 가리킵니다. 활동 다이어그램은 오류 분기를 포함한 단계를 보여 줍니다.</p>
+
+<h3>유스케이스 예</h3>
+
+<p>사용자와, 시스템이 제공하는 목표를 그립니다. 함수가 아니라 목표입니다. 행위자(actor)는 학생 한 명이고, 시스템 경계는 공부 기록기입니다. 목표는 세 가지입니다. 한 건 기록하기, 주간 합계 보기, 예전 기록 다시 찾기. 함수 이름은 여기에 나오지 않습니다. 호출 순서는 시퀀스 다이어그램의 몫입니다.</p>
+
+<h3>시퀀스 예: 한 번의 실행</h3>
+
+<p>정상 경로의 한 번 실행을, 시간이 위에서 아래로 흐르게 그립니다. 모든 화살표는 계약 표에 있는 호출입니다. <code>main()</code>은 logic을 먼저 호출하므로, 기록이 유효해지기 전에는 아무것도 쓰이지 않습니다. 돌아오는 화살표마다 데이터 모양 하나를 나릅니다. 기록, 기록 목록, 합계 dict, 줄 목록입니다. 실패 경로(ValueError)는 별도의 분기로 그리거나, 더 짧은 두 번째 다이어그램으로 그립니다.</p>
+
+<h3>상태 예: 기록 하나</h3>
+
+<p>상태 넷과 막다른 길 하나입니다. 각 전이는 표에 있는 함수입니다. 입력됨(typed) → <code>make_record()</code>가 검사함(checked) → <code>append_record()</code>가 저장함(saved) → <code>weekly_totals()</code>가 셈(counted). 빈 과목이나 잘못된 분이면 거절됨(rejected)으로 끝나고 "Not saved"가 나오며 아무것도 쓰이지 않습니다. 검사를 통과한 뒤에 파일 오류가 나도 보고하고, 반쯤 쓴 파일은 남기지 않습니다.</p>
+
+<h3>문서 간 추적성</h3>
+
+<p>요구사항 ID를 기능, 함수, 다이어그램, 테스트에 모두 적으면 아무것도 잃어버리지 않습니다. 예를 들어 REQ-02는 무엇이 성립해야 하는지(양수가 아닌 분은 거절)를 말합니다. FEAT-01은 그것을 사용자에게 보여 주고, <code>parse_minutes()</code>가 강제하고, 상태 다이어그램이 그리고, TEST-02가 증명합니다. 채점자나 14주차의 내가 이 사슬을 어느 방향으로든 따라갈 수 있습니다.</p>
+
+<h2>문서 검토와 시연 준비</h2>
+
+<p>문서를 끝냈다고 말하기 전에 다섯 가지를 묻습니다.</p>
+
+<ol>
+<li><strong>범위</strong>: 기본 기능과 확장 기능이 나뉘어 있고, MVP의 경계선이 보이는가?</li>
+<li><strong>완료</strong>: 각 요구사항을 그 검사로 합격/불합격 판정할 수 있는가?</li>
+<li><strong>일관성</strong>: 기능 명세, 함수 계약, UML 흐름이 서로 맞는가?</li>
+<li><strong>데이터 검사</strong>: 잘못된 입력, 파일 없음, 헤더 행, "실패 시 파일 불변"을 다루었는가?</li>
+<li><strong>재현</strong>: 준비 과정, 실행 명령, 정상 시나리오 하나와 오류 시나리오 하나가 적혀 있는가?</li>
+</ol>
+
+<h2>실습: 나의 네 문서</h2>
+
+<p>46분 동안 자기 프로젝트의 짧은 문서 네 개를 하나의 ID 체계로 씁니다.</p>
+
+<ul>
+<li>A. 요구사항, 12분</li>
+<li>B. F1의 기능 명세, 10분</li>
+<li>C. 함수 계약, 10분</li>
+<li>D. UML 다이어그램 하나, 10분</li>
+<li>마지막 4분: 친구와 바꿔서 REQ ID 하나를 네 문서 전체에서 따라가 봅니다.</li>
+</ul>
+
+<h2>제출과 다음 차시</h2>
+
+<p>작성한 네 문서는 오늘 제출합니다. REQ와 FEAT ID는 그대로 유지합니다. 이 ID들은 커밋 메시지, 테스트 이름, README에 들어갑니다.</p>
+
+<p>다음 차시는 설계에서 실행되는 코드로 넘어갑니다. F1이 기능 브랜치에서 처음부터 끝까지 동작하게 만듭니다. 저장소가 클론되어 있고 <code>git status</code>가 깨끗하며 <code>python3 main.py</code>가 실행되는 노트북을 가져옵니다. 이 웹 실습에는 git이 없으므로, 브랜치·커밋 작업은 실제 PC에서 하고 여기서는 코드 실행과 검사만 확인합니다.</p>
+
+<blockquote>규칙: Must 범위는 동결합니다. 새 아이디어는 새 Must 요구사항이 아니라 Should나 Could 줄이 됩니다.</blockquote>
+
+<h3>참고: GitHub 홈페이지 만들기 안내</h3>
+
+<p>11주차에는 별도 자료로 Intel Mac용과 Windows용 "Your GitHub Homepage" 안내가 함께 배포되었습니다. 실제 PC에서 따라 하는 복사·붙여넣기 실습으로, 터미널(Mac은 Terminal, Windows는 PowerShell)에서 Git과 GitHub CLI(<code>gh</code>)를 설치하고(Mac은 Homebrew, Windows는 WinGet), <code>gh auth login</code>으로 로그인한 뒤 <code>사용자이름.github.io</code> 저장소를 만들거나 클론합니다. Antigravity IDE의 에이전트에게 <code>index.html</code>과 <code>style.css</code>로 된 학생 홈페이지(About Me, My Python Project, Contact)를 만들게 하고, 로컬에서 미리 본 뒤 <code>git add</code>, <code>git commit</code>, <code>git push</code>하고 GitHub Pages를 main 브랜치의 루트(/)로 켭니다. 설치가 막히는 컴퓨터를 위해 브라우저에서 저장소를 만들고 <code>index.html</code>과 빈 <code>.nojekyll</code>을 직접 추가한 다음 Settings → Pages에서 배포하는 경로도 안내되어 있습니다. 이 과정은 네트워크와 git이 필요하므로 이 웹 실습의 가상 머신에서는 할 수 없고, 실제 PC에서 진행합니다.</p>
+</div>
+    </article>
+    <article class="notes" id="notes-week11-2">
+      <h2 class="notes-title"><span lang="en">Session 2 — Korean Stock Market Analysis: From Scenario to a Web Report MVP</span><span lang="ko">2차시 — 한국 증권시장 분석: 시나리오에서 웹 보고서 MVP까지</span></h2>
+<div lang="en">
+<p>In this session we follow one project from the user's problem all the way to a web report that passes its checks. The topic is Korean stock market analysis. Using the previous close and today's close of five stocks in a fictional classroom CSV, we calculate the daily percentage change, compare by market, and produce an HTML report. The session runs in four acts: define the task with requirements and features (ACT 1), trace and prove the promises with function contracts and tests (ACT 2), draw the structure in UML (ACT 3), and build the MVP and open the web report (ACT 4). The finished version is <a href="korea_market_mvp.html">korea_market_mvp</a>, and at the end you practice refactoring that does not change behavior with <a href="tidy_lab.html">tidy_lab</a>.</p>
+
+<h2>Development workflow</h2>
+
+<p>Two documents are the starting point: the scenario document <code>team-name_user-scenario.md</code> and the specification workbook <code>team-name_spec.xlsx</code>. The workbook has Requirement, Feature, Function and Test sheets. Using these two, link SC → REQ → FEAT → FUNC → TEST, then build the MVP. Run the tests and review the page, and revise when a check fails. You can read the scenario document and the full project specification (<code>project-spec.md</code>) in the file list on the lab page. Open the xlsx workbook with a spreadsheet program on your real PC.</p>
+
+<h3>Scenario: Minji reviews the market</h3>
+
+<p>After the market closes, Minji wants to compare a few stocks.</p>
+
+<ul>
+<li><strong>SC-01</strong>: prepare a CSV, generate the report and compare markets. She generates the report for ALL, then regenerates it for KOSPI, and checks the reference date, the daily change ranking and the sample summary.</li>
+<li><strong>SC-02</strong>: reject bad input.</li>
+<li><strong>SC-03</strong>: generate a valid empty report.</li>
+</ul>
+
+<h3>Scope and data honesty</h3>
+
+<p>A snapshot sample is useful when its limits are visible. All supplied prices and volumes are fictional classroom data: a single date, two market labels, five example stocks. The Mean is the equal-weight average of the changes in the selected sample. It is neither a KOSPI/KOSDAQ index return nor a live market feed.</p>
+
+<h3>The input contract</h3>
+
+<p>Define the data before writing the loop.</p>
+
+<pre><code>date,code,name,market,previous_close,close,volume
+2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</code></pre>
+
+<ul>
+<li>A UTF-8 CSV; an optional BOM is accepted. The header must match exactly, including order.</li>
+<li>The six-digit stock code stays text: 005930 must keep its leading zeros.</li>
+<li>previous_close is the previous trading day's close (KRW) and close is the snapshot close (KRW), both positive integers. volume is the number of shares traded, a nonnegative integer.</li>
+<li>There is one date, and codes must be unique. Both closes use the same price basis.</li>
+</ul>
+
+<h2>ACT 1 · Requirements and features</h2>
+
+<h3>Requirement: observable conditions</h3>
+
+<p>Each REQ in the Requirement sheet links to SC IDs and has a check.</p>
+
+<ul>
+<li><strong>REQ-01</strong>: read a valid CSV and preserve stock codes.</li>
+<li><strong>REQ-02</strong>: reject invalid values, duplicate codes and mixed dates.</li>
+<li><strong>REQ-03</strong>: calculate, filter and sort daily percentage changes. For example, previous_close=70000 and close=71400 gives +2%. Choosing KOSPI yields only KOSPI rows. The order is by change, descending; ties are broken by code, ascending.</li>
+<li><strong>REQ-04</strong>: count up, down and flat, and calculate a sample mean.</li>
+<li><strong>REQ-05</strong>: show the date, market, source, units, summary and table in HTML.</li>
+<li><strong>REQ-06</strong>: report file and data errors, and preserve the old HTML on failure.</li>
+</ul>
+
+<p>The output and the failure policy are part of the product too. A header-only CSV produces a valid empty report (count 0, mean N/A). A missing CSV file is an error, not a successful empty report.</p>
+
+<h3>MVP cut: Must, Should, Could</h3>
+
+<p>Ship the complete CSV → analysis → HTML path first.</p>
+
+<ul>
+<li><strong>Must</strong>: validated input, analysis, static HTML, clear error handling.</li>
+<li><strong>Should</strong>: a clickable market filter in the browser.</li>
+<li><strong>Could</strong>: API data, history, moving averages, charts, publishing.</li>
+</ul>
+
+<p>Do not add a new Must until the existing acceptance checks pass.</p>
+
+<h3>Feature: three user goals</h3>
+
+<pre><code>python3 main.py --input data/prices.csv
+python3 main.py --market KOSPI
+python3 main.py --output docs/index.html</code></pre>
+
+<ul>
+<li><strong>FEAT-01</strong>: load a validated snapshot (REQ-01/02/06).</li>
+<li><strong>FEAT-02</strong>: compare stocks by market (REQ-02/03/04).</li>
+<li><strong>FEAT-03</strong>: generate and view a web report (REQ-05/06).</li>
+</ul>
+
+<p>In the workbook's Feature sheet, link each FEAT ID to its related requirement IDs.</p>
+
+<h3>Feature sheet: market comparison</h3>
+
+<p>Write down the normal, empty and error outcomes before implementing.</p>
+
+<pre><code>FEAT-02 / basic
+serves: REQ-02, REQ-03, REQ-04
+ALL:    5 stocks, up 2 / down 2 / flat 1
+        sample mean +0.40%
+KOSPI:  3 stocks, sample mean +0.33%
+KOSDAQ: 2 stocks, sample mean +0.50%</code></pre>
+
+<p>The usage is <code>python3 main.py --market KOSPI</code>, and the flow is validate snapshot → filter → calculate → sort → summarize. The KOSPI result is 3 stocks (005930, 035420, 000660) with a mean of +0.33%. If the chosen market has no stocks, the result is 0 stocks and N/A; an unknown market name is a CLI error.</p>
+
+<h2>ACT 2 · Functions and tests</h2>
+
+<h3>Contracts before bodies</h3>
+
+<p>Keep the values and failure rules that cross module boundaries consistent.</p>
+
+<pre><code>Quote = {date, code, name, market,
+         previous_close: int, close: int,
+         volume: int}
+Analyzed row = Quote + {change_pct: float}
+Summary = {count, up, down, flat, mean}</code></pre>
+
+<ul>
+<li><strong>FUNC-01</strong> <code>parse_row(row)</code>: strings → a typed quote. ValueError on invalid fields.</li>
+<li><strong>FUNC-02</strong> <code>load_quotes(path)</code>: CSV → list. A missing file raises OSError.</li>
+<li><strong>FUNC-04</strong> <code>analyze(quotes, market)</code>: validated list → freshly made, sorted rows.</li>
+<li><strong>FUNC-05</strong> <code>summarize(rows)</code>: counts and mean. If empty, the mean is None.</li>
+</ul>
+
+<h3>Implement the smallest rule</h3>
+
+<p>Compute with full precision and round only in the report. The formula is (close − previous_close) / previous_close × 100. Reject a zero or negative price before dividing. A rise, a fall and a flat price are separate checks.</p>
+
+<pre><code>def change_pct(previous_close, close):
+    if previous_close &lt;= 0 or close &lt;= 0:
+        raise ValueError("prices must be positive")
+    difference = close - previous_close
+    return difference / previous_close * 100
+
+assert change_pct(70000, 71400) == 2.0
+assert change_pct(200000, 198000) == -1.0
+assert change_pct(100, 100) == 0.0
+print("Daily change checks passed.")</code></pre>
+
+<h3>Modules: keep I/O at the edges</h3>
+
+<p>The module diagram tells us where each responsibility lives.</p>
+
+<ul>
+<li><code>main</code>: arguments, orchestration, messages and exit codes.</li>
+<li><code>storage</code>: CSV reads and atomic HTML writes. It imports <code>parse_row</code>.</li>
+<li><code>logic</code>: validation and analysis. <code>report</code>: escaped HTML strings.</li>
+</ul>
+
+<p>Neither logic nor report opens files or asks the user questions.</p>
+
+<h3>Test: give each promise evidence</h3>
+
+<p>Use fixed examples, not online prices that keep changing.</p>
+
+<pre><code>cd 11week/examples/korea_market_mvp
+python3 -m unittest -v</code></pre>
+
+<ul>
+<li>TEST-01/12: CSV schema, BOM, empty file, leading-zero codes.</li>
+<li>TEST-02/04: exact changes, market filter, tie-breaking.</li>
+<li>TEST-03/07: invalid fields, duplicate codes, mixed dates.</li>
+<li>TEST-05/06: sample summary, empty selection and N/A.</li>
+</ul>
+
+<p>In this lab the folder is <code>~/week11/examples/korea_market_mvp</code>. The first step of <a href="korea_market_mvp.html">korea_market_mvp</a> is this command, and all 12 come out ok.</p>
+
+<h3>Test the web and the failure boundary</h3>
+
+<p>Correct arithmetic is only part of a working report.</p>
+
+<ul>
+<li>TEST-08: escape a stock name containing a script tag.</li>
+<li>TEST-09: a missing CSV or a bad header leaves the old HTML unchanged.</li>
+<li>TEST-10: the file is preserved even when an output replacement failure is simulated.</li>
+<li>TEST-11: main generates the expected KOSPI HTML.</li>
+</ul>
+
+<p>In the workbook's Test sheet, record TEST-01 to TEST-12 as PASS as automated tests, and TEST-13 (visual check in a browser) as Not run until you have checked it yourself. Record the Actual result separately from the Expected result. File tests use <code>TemporaryDirectory</code> so that the tests never overwrite the classroom demo report.</p>
+
+<h2>ACT 3 · UML</h2>
+
+<h3>Actor, goals and call order</h3>
+
+<p>Choose the diagram that answers the reader's question.</p>
+
+<ul>
+<li><strong>Use case</strong>: Student → load snapshot, compare stocks, view report.</li>
+<li><strong>Component</strong>: which module depends on which.</li>
+<li><strong>Sequence</strong>: the calls made during one successful run.</li>
+<li><strong>Activity</strong>: the normal path and the branches that stop on error.</li>
+</ul>
+
+<h3>Sequence: one successful run</h3>
+
+<p>Every call name appears in the function contract table. main → <code>load_quotes</code> → <code>parse_row</code> for each row. main → <code>analyze</code> → <code>summarize</code> → <code>render_html</code>. main → <code>write_html</code>. Success is reported only after the replacement has finished. The browser opens the generated file after Python finishes.</p>
+
+<h3>Activity: stop before replacing output</h3>
+
+<p>Validate first, then render, and only then commit the output file. Bad input ends with a reason and exit code 1. A complete new file replaces the old file in one step. A valid empty input follows the successful report path. The full Mermaid diagrams are in <code>project-spec.md</code>.</p>
+
+<h3>Trace one requirement end to end</h3>
+
+<p>The same ID must survive all the way to a passing check.</p>
+
+<pre><code>REQ-06 -&gt; FEAT-01 / FEAT-03
+       -&gt; load_quotes / write_html / main
+       -&gt; activity error branch
+       -&gt; TEST-09 / TEST-10</code></pre>
+
+<p>For REQ-03 (daily change and market ranking), the chain runs to FEAT-02 (compare by market), FUNC-03 <code>change_pct</code> and FUNC-04 <code>analyze</code> (code contracts), the analyze call in the sequence diagram, and TEST-02/04 (proof of numbers and ordering). For practice, trace REQ-05 with the person next to you.</p>
+
+<h2>ACT 4 · MVP</h2>
+
+<h3>Prototype a complete path first</h3>
+
+<p>A fake function makes the whole pipeline runnable before every rule exists.</p>
+
+<pre><code>def load_quotes(path):
+    return [{"code": "005930", "change_pct": 2.0}]
+
+def render_html(rows):
+    return "&lt;h1&gt;FAKE classroom report&lt;/h1&gt;"
+
+rows = load_quotes("data/prices.csv")
+print(render_html(rows))</code></pre>
+
+<pre><code>&lt;h1&gt;FAKE classroom report&lt;/h1&gt;</code></pre>
+
+<p>Start with one known quote and a tiny HTML table. Keep the planned names and return types. Replace the fakes one at a time: rules, CSV, HTML, output. In the final MVP there must be no fake on any Must-feature path.</p>
+
+<h3>CSV to validated quotes</h3>
+
+<p>Convert text only once, and keep the code as a string.</p>
+
+<pre><code>import csv, io
+source = ("code,previous_close,close\n"
+          "005930,70000,71400\n")
+row = next(csv.DictReader(io.StringIO(source)))
+print(row["code"], type(row["code"]).__name__)
+difference = (int(row["close"])
+              - int(row["previous_close"]))
+print(difference)</code></pre>
+
+<pre><code>005930 str
+1400</code></pre>
+
+<p><code>csv.DictReader</code> reads every field as a string. Check that the header is exact before trusting any row. <code>parse_row</code> validates and converts the prices and volume. Validate every row, even those outside the selected market.</p>
+
+<h3>Filter, sort and summarize</h3>
+
+<p>Keep calculations independent of HTML. Reject mixed dates and duplicate codes before filtering. Return new dicts and leave the loaded quotes unchanged. Sort on the unrounded change, then by stock code for equal values. If there are no rows, the mean is None, which the view turns into N/A.</p>
+
+<pre><code>ALL order from the supplied fictional CSV:
+247540  +3.00%
+005930  +2.00%
+035420  +0.00%
+000660  -1.00%
+035900  -2.00%
+mean    +0.40% (sample, equal weight)</code></pre>
+
+<h3>HTML is a view of the result</h3>
+
+<p>Formatting changes only the presentation; it must not change the calculation. <code>render_html</code> returns a string, and storage does the writing. Use <code>html.escape</code> for stock names and other external text. Show the sign and the number as well as color. Include the date, the source, a fictional-data label and the units.</p>
+
+<pre><code>from html import escape
+name = "&lt;b&gt;Example&lt;/b&gt;"
+change = 2.0
+print(escape(name))
+print(f"{change:+.2f}%")</code></pre>
+
+<pre><code>&amp;lt;b&amp;gt;Example&amp;lt;/b&amp;gt;
++2.00%</code></pre>
+
+<h3>main: assemble the program</h3>
+
+<p>The top-level function coordinates the contracts.</p>
+
+<pre><code>quotes = load_quotes(args.input)
+rows = analyze(quotes, args.market)
+summary = summarize(rows)
+html = render_html(rows, summary, market, day)
+write_html(args.output, html)
+# Only now print Generated ...</code></pre>
+
+<p>argparse takes <code>--input</code>, <code>--output</code> and <code>--market</code>. Data and file errors are caught at the user-facing boundary (main). Prepare all results before calling <code>write_html</code>. The exit codes are 0 for success, 1 for data or I/O failure, and 2 for CLI misuse.</p>
+
+<h3>Run the MVP and open the page</h3>
+
+<p>No package installation or network data is required. Run from <code>examples/korea_market_mvp/</code>.</p>
+
+<pre><code>python3 -m unittest -v
+python3 main.py
+python3 -m http.server 8000 \
+  --directory docs --bind 127.0.0.1
+# Open http://localhost:8000
+# Ctrl+C stops the local server.</code></pre>
+
+<p>The default report contains five rows of fictional stocks. Open <code>docs/index.html</code> directly, or serve docs with a local server. The server only shows the saved HTML, so regenerate the report to change the market.</p>
+
+<p>This web lab's virtual machine has no browser, so instead of <code>http.server</code>, download the generated file. In <a href="korea_market_mvp.html">korea_market_mvp</a>, run <code>python3 main.py</code>, then <code>cp docs/index.html /mnt/host/report.html</code>; type <code>/mnt/host/report.html</code> into the Download box and click Download to open the report in your own computer's browser. On the same page, run <code>--market KOSPI</code>, an empty CSV, a CSV with a previous close of 0, a missing file and an unknown market name in turn, and check the exit code and whether the report is preserved.</p>
+
+<h3>Refactor with evidence</h3>
+
+<p>Keep the behavior identical while improving the structure. Run all 12 checks before and after each move. Rename vague variables to quote, rows and summary. Keep FIELDS and MARKETS in one place. Extract the HTML formatting into a function, but leave the numbers, order and messages as they are.</p>
+
+<pre><code>Feature commit:  add KOSPI filtering
+Refactor commit: extract render_html
+Fix commit:      preserve leading zero in stock code</code></pre>
+
+<p>These three are different kinds of change and need different evidence. The evidence for a refactoring is "same checks, same results". <a href="tidy_lab.html">tidy_lab</a> is the file for this practice. To hard-to-read code whose checks all PASS, apply renaming, constant extraction (the 2000 ml goal), pulling a duplicated line into a function, and guard clauses, one at a time, running it each time to check that the six PASS lines stay the same.</p>
+
+<h2>Lab: build your own slice</h2>
+
+<p>In 18 minutes, make one branch, one visible result and one reviewable PR.</p>
+
+<ul>
+<li>4 minutes: trace SC → REQ → FEAT → FUNC → TEST in the attached documents.</li>
+<li>9 minutes: implement one slice and replace its fake.</li>
+<li>5 minutes: run the checks, inspect the HTML, commit and open a PR.</li>
+</ul>
+
+<p>The files are <code>labs/session2/team-name_spec.xlsx</code> and <code>team-name_user-scenario.md</code>. The lab sheet <code>slice-lab.md</code> (viewable on the lab page) guides you to implement the change calculation, filtering, sorting and summary if you choose REQ-03, or error handling and output preservation if you choose REQ-06. Do the branch and PR on a real PC with git; on this virtual machine, run the code and tests and check the report.</p>
+
+<h2>Acceptance demo and submission</h2>
+
+<p>A working web report is the evidence for your documents.</p>
+
+<ul>
+<li>Show ALL and then KOSPI, and explain why the two sample means differ.</li>
+<li>Show that bad input preserves the previous HTML.</li>
+<li>Submit the completed workbook and the scenario .md together with your code, HTML and PR link.</li>
+<li>Record the actual results and pass/fail, and attach a browser screenshot.</li>
+</ul>
+
+<h2>Exit check</h2>
+
+<p>Explain one chain from start to finish without changing your vocabulary.</p>
+
+<ul>
+<li>Why must 005930 remain a string?</li>
+<li>Why is the sample mean not an index return?</li>
+<li>How does an empty input differ from a missing file?</li>
+<li>Where does rounding happen? Where does HTML escaping happen?</li>
+<li>Which test proves that the previous web report survives a failure?</li>
+</ul>
+</div><div lang="ko">
+<p>이번 시간에는 하나의 프로젝트를 사용자의 문제에서 출발해 검사를 통과한 웹 보고서까지 따라갑니다. 주제는 한국 증권시장 분석입니다. 수업용 가상 CSV에 담긴 다섯 종목의 전일 종가와 당일 종가로 일간 등락률을 계산하고, 시장별로 비교해 HTML 보고서로 만듭니다. 수업은 네 막으로 진행됩니다. 요구사항과 기능으로 할 일을 정하고(ACT 1), 함수 계약과 테스트로 약속을 추적하고 증명하고(ACT 2), UML로 구조를 그리고(ACT 3), MVP를 만들어 웹 보고서를 엽니다(ACT 4). 완성본은 <a href="korea_market_mvp.html">korea_market_mvp</a>이고, 마지막에 동작을 바꾸지 않는 리팩터링을 <a href="tidy_lab.html">tidy_lab</a>으로 연습합니다.</p>
+
+<h2>개발 흐름</h2>
+
+<p>문서 두 개가 출발점입니다. 시나리오 문서 <code>team-name_user-scenario.md</code>와 명세 워크북 <code>team-name_spec.xlsx</code>입니다. 워크북에는 Requirement·Feature·Function·Test 시트가 있습니다. 이 둘을 이용해 SC → REQ → FEAT → FUNC → TEST를 연결한 뒤 MVP를 만듭니다. 테스트를 실행하고 페이지를 검토하며, 검사가 실패하면 고칩니다. 시나리오 문서와 프로젝트 전체 명세(<code>project-spec.md</code>)는 실습 페이지의 파일 목록에서 읽을 수 있습니다. xlsx 워크북은 실제 PC의 스프레드시트 프로그램으로 엽니다.</p>
+
+<h3>시나리오: 민지가 시장을 살펴본다</h3>
+
+<p>장이 마감된 뒤 민지는 몇 종목을 비교하고 싶습니다.</p>
+
+<ul>
+<li><strong>SC-01</strong>: CSV를 준비하고 보고서를 만들어 시장을 비교한다. ALL로 보고서를 만든 다음 KOSPI로 다시 만든다. 기준일, 일간 등락률 순위, 표본 요약을 확인한다.</li>
+<li><strong>SC-02</strong>: 잘못된 입력을 거절한다.</li>
+<li><strong>SC-03</strong>: 유효한 빈 보고서를 만든다.</li>
+</ul>
+
+<h3>범위와 데이터의 정직성</h3>
+
+<p>스냅숏 표본은 그 한계가 드러나 있을 때 쓸모가 있습니다. 제공된 가격과 거래량은 모두 수업용 가상 데이터입니다. 날짜 하나, 시장 라벨 둘, 예시 종목 다섯입니다. 평균(Mean)은 선택된 표본의 등락률을 같은 가중치로 평균한 값입니다. KOSPI/KOSDAQ 지수 수익률도 아니고 실시간 시세도 아닙니다.</p>
+
+<h3>입력 계약</h3>
+
+<p>반복문을 쓰기 전에 데이터를 먼저 정의합니다.</p>
+
+<pre><code>date,code,name,market,previous_close,close,volume
+2026-11-05,005930,삼성전자,KOSPI,70000,71400,1000000</code></pre>
+
+<ul>
+<li>UTF-8 CSV이며 BOM이 있어도 받아들입니다. 헤더는 순서까지 정확해야 합니다.</li>
+<li>여섯 자리 종목 코드는 텍스트로 둡니다. 005930은 앞자리 0을 유지해야 합니다.</li>
+<li>previous_close는 전 거래일 종가(원), close는 스냅숏 종가(원)이며 양의 정수입니다. volume은 거래된 주식 수로 0 이상의 정수입니다.</li>
+<li>날짜는 하나, 코드는 중복이 없어야 합니다. 두 종가는 같은 가격 기준을 씁니다.</li>
+</ul>
+
+<h2>ACT 1 · 요구사항과 기능</h2>
+
+<h3>요구사항: 관찰 가능한 조건</h3>
+
+<p>요구사항 시트의 각 REQ는 SC ID와 연결되고 검사를 가집니다.</p>
+
+<ul>
+<li><strong>REQ-01</strong>: 유효한 CSV를 읽고 종목 코드를 보존한다.</li>
+<li><strong>REQ-02</strong>: 잘못된 값, 중복 코드, 섞인 날짜를 거절한다.</li>
+<li><strong>REQ-03</strong>: 일간 등락률을 계산하고, 필터하고, 정렬한다. 예: previous_close=70000, close=71400이면 +2%. KOSPI를 고르면 KOSPI 행만 나온다. 순서는 등락률 내림차순, 같으면 코드 오름차순.</li>
+<li><strong>REQ-04</strong>: 상승·하락·보합을 세고 표본 평균을 계산한다.</li>
+<li><strong>REQ-05</strong>: HTML에 날짜, 시장, 출처, 단위, 요약, 표를 보여 준다.</li>
+<li><strong>REQ-06</strong>: 파일·데이터 오류를 알리고, 실패하면 기존 HTML을 보존한다.</li>
+</ul>
+
+<p>출력과 실패 정책도 제품의 일부입니다. 헤더만 있는 CSV는 유효한 빈 보고서(개수 0, 평균 N/A)를 만듭니다. CSV 파일이 없으면 성공한 빈 보고서가 아니라 오류입니다.</p>
+
+<h3>MVP 범위: Must, Should, Could</h3>
+
+<p>CSV → 분석 → HTML의 완전한 경로를 먼저 내놓습니다.</p>
+
+<ul>
+<li><strong>Must</strong>: 검증된 입력, 분석, 정적 HTML, 명확한 오류 처리.</li>
+<li><strong>Should</strong>: 브라우저에서 클릭하는 시장 필터.</li>
+<li><strong>Could</strong>: API 데이터, 기간 기록, 이동평균, 차트, 게시(publishing).</li>
+</ul>
+
+<p>기존 수락 검사가 통과하기 전에는 새 Must를 추가하지 않습니다.</p>
+
+<h3>기능: 사용자의 세 가지 목표</h3>
+
+<pre><code>python3 main.py --input data/prices.csv
+python3 main.py --market KOSPI
+python3 main.py --output docs/index.html</code></pre>
+
+<ul>
+<li><strong>FEAT-01</strong>: 검증된 스냅숏을 불러온다(REQ-01/02/06).</li>
+<li><strong>FEAT-02</strong>: 시장별로 종목을 비교한다(REQ-02/03/04).</li>
+<li><strong>FEAT-03</strong>: 웹 보고서를 만들고 본다(REQ-05/06).</li>
+</ul>
+
+<p>워크북의 Feature 시트에서 FEAT ID를 관련 요구사항 ID와 연결합니다.</p>
+
+<h3>기능 명세: 시장 비교</h3>
+
+<p>구현하기 전에 정상, 빈 입력, 오류의 결과를 씁니다.</p>
+
+<pre><code>FEAT-02 / basic
+serves: REQ-02, REQ-03, REQ-04
+ALL:    5 stocks, up 2 / down 2 / flat 1
+        sample mean +0.40%
+KOSPI:  3 stocks, sample mean +0.33%
+KOSDAQ: 2 stocks, sample mean +0.50%</code></pre>
+
+<p>사용법은 <code>python3 main.py --market KOSPI</code>, 흐름은 스냅숏 검증 → 필터 → 계산 → 정렬 → 요약입니다. KOSPI 결과는 3종목(005930, 035420, 000660), 평균 +0.33%입니다. 고른 시장에 종목이 없으면 0종목과 N/A, 모르는 시장 이름은 CLI 오류입니다.</p>
+
+<h2>ACT 2 · 함수와 테스트</h2>
+
+<h3>본문보다 계약 먼저</h3>
+
+<p>모듈 경계를 넘나드는 값과 실패 규칙을 일관되게 유지합니다.</p>
+
+<pre><code>Quote = {date, code, name, market,
+         previous_close: int, close: int,
+         volume: int}
+Analyzed row = Quote + {change_pct: float}
+Summary = {count, up, down, flat, mean}</code></pre>
+
+<ul>
+<li><strong>FUNC-01</strong> <code>parse_row(row)</code>: 문자열 → 자료형이 있는 quote. 잘못된 필드는 ValueError.</li>
+<li><strong>FUNC-02</strong> <code>load_quotes(path)</code>: CSV → 목록. 파일이 없으면 OSError.</li>
+<li><strong>FUNC-04</strong> <code>analyze(quotes, market)</code>: 검증된 목록 → 새로 만든 정렬된 행.</li>
+<li><strong>FUNC-05</strong> <code>summarize(rows)</code>: 개수와 평균. 비어 있으면 평균은 None.</li>
+</ul>
+
+<h3>가장 작은 규칙 구현하기</h3>
+
+<p>계산은 전체 정밀도로 하고, 반올림은 보고서에서만 합니다. 공식은 (close − previous_close) / previous_close × 100입니다. 나누기 전에 0이나 음수 가격을 거절합니다. 상승, 하락, 보합은 각각 별도의 검사입니다.</p>
+
+<pre><code>def change_pct(previous_close, close):
+    if previous_close &lt;= 0 or close &lt;= 0:
+        raise ValueError("prices must be positive")
+    difference = close - previous_close
+    return difference / previous_close * 100
+
+assert change_pct(70000, 71400) == 2.0
+assert change_pct(200000, 198000) == -1.0
+assert change_pct(100, 100) == 0.0
+print("Daily change checks passed.")</code></pre>
+
+<h3>모듈: 입출력은 가장자리에</h3>
+
+<p>모듈 다이어그램은 각 책임이 어디에 있는지 알려 줍니다.</p>
+
+<ul>
+<li><code>main</code>: 인자, 전체 조율, 메시지와 종료 코드.</li>
+<li><code>storage</code>: CSV 읽기와 원자적(atomic) HTML 쓰기. <code>parse_row</code>를 import합니다.</li>
+<li><code>logic</code>: 검증과 분석. <code>report</code>: escape된 HTML 문자열.</li>
+</ul>
+
+<p>logic과 report는 파일을 열지도 사용자에게 묻지도 않습니다.</p>
+
+<h3>테스트: 약속마다 증거를</h3>
+
+<p>계속 바뀌는 온라인 가격이 아니라 고정된 예제를 씁니다.</p>
+
+<pre><code>cd 11week/examples/korea_market_mvp
+python3 -m unittest -v</code></pre>
+
+<ul>
+<li>TEST-01/12: CSV 스키마, BOM, 빈 파일, 앞자리 0 코드.</li>
+<li>TEST-02/04: 정확한 등락률, 시장 필터, 동률 처리.</li>
+<li>TEST-03/07: 잘못된 필드, 중복 코드, 섞인 날짜.</li>
+<li>TEST-05/06: 표본 요약, 빈 선택과 N/A.</li>
+</ul>
+
+<p>이 실습에서 폴더는 <code>~/week11/examples/korea_market_mvp</code>입니다. <a href="korea_market_mvp.html">korea_market_mvp</a>의 첫 단계가 이 명령이며 12개가 모두 ok로 나옵니다.</p>
+
+<h3>웹과 실패 경계 테스트</h3>
+
+<p>계산이 맞는 것은 동작하는 보고서의 일부일 뿐입니다.</p>
+
+<ul>
+<li>TEST-08: 종목 이름에 script 태그가 들어 있으면 escape한다.</li>
+<li>TEST-09: CSV가 없거나 헤더가 잘못되면 기존 HTML이 바뀌지 않는다.</li>
+<li>TEST-10: 출력 교체가 실패하는 상황을 흉내 내도 파일이 보존된다.</li>
+<li>TEST-11: main이 기대한 KOSPI HTML을 만든다.</li>
+</ul>
+
+<p>워크북 Test 시트에는 TEST-01~12가 자동 테스트로 PASS, TEST-13(브라우저 육안 확인)은 직접 확인하기 전까지 Not run으로 적습니다. 실제 결과(Actual)는 기대 결과(Expected)와 따로 기록합니다. 파일 테스트는 <code>TemporaryDirectory</code>를 쓰고, 테스트가 수업용 데모 보고서를 덮어쓰지 않게 합니다.</p>
+
+<h2>ACT 3 · UML</h2>
+
+<h3>행위자, 목표, 호출 순서</h3>
+
+<p>읽는 사람의 질문에 답하는 다이어그램을 고릅니다.</p>
+
+<ul>
+<li><strong>유스케이스</strong>: 학생 → 스냅숏 불러오기, 종목 비교, 보고서 보기.</li>
+<li><strong>컴포넌트</strong>: 어느 모듈이 어느 모듈에 의존하는가.</li>
+<li><strong>시퀀스</strong>: 성공한 한 번의 실행 동안 일어나는 호출.</li>
+<li><strong>활동</strong>: 정상 경로와 오류 시 멈추는 분기.</li>
+</ul>
+
+<h3>시퀀스: 성공한 한 번의 실행</h3>
+
+<p>모든 호출 이름은 함수 계약 표에 있습니다. main → <code>load_quotes</code> → 각 행에 <code>parse_row</code>. main → <code>analyze</code> → <code>summarize</code> → <code>render_html</code>. main → <code>write_html</code>. 성공은 교체가 끝난 뒤에만 보고합니다. 브라우저는 파이썬이 끝난 뒤 생성된 파일을 엽니다.</p>
+
+<h3>활동: 출력을 교체하기 전에 멈추기</h3>
+
+<p>먼저 검증하고, 다음에 렌더링하고, 마지막에 출력 파일을 확정합니다. 잘못된 입력은 이유와 종료 코드 1로 끝납니다. 완성된 새 파일이 한 번에 옛 파일을 교체합니다. 유효한 빈 입력은 성공한 보고서 경로를 따릅니다. 전체 Mermaid 다이어그램은 <code>project-spec.md</code>에 있습니다.</p>
+
+<h3>요구사항 하나를 끝까지 추적하기</h3>
+
+<p>같은 ID가 통과하는 검사까지 살아남아야 합니다.</p>
+
+<pre><code>REQ-06 -&gt; FEAT-01 / FEAT-03
+       -&gt; load_quotes / write_html / main
+       -&gt; activity error branch
+       -&gt; TEST-09 / TEST-10</code></pre>
+
+<p>REQ-03(일간 등락률과 시장 순위)이라면 FEAT-02(시장별 비교), FUNC-03 <code>change_pct</code>와 FUNC-04 <code>analyze</code>(코드 계약), 시퀀스의 analyze 호출, TEST-02/04(숫자와 순서의 증명)로 이어집니다. 연습으로 옆 사람과 REQ-05를 추적해 봅니다.</p>
+
+<h2>ACT 4 · MVP</h2>
+
+<h3>완전한 경로부터 프로토타입으로</h3>
+
+<p>가짜(fake) 함수를 쓰면 모든 규칙이 생기기 전에도 파이프라인 전체를 실행할 수 있습니다.</p>
+
+<pre><code>def load_quotes(path):
+    return [{"code": "005930", "change_pct": 2.0}]
+
+def render_html(rows):
+    return "&lt;h1&gt;FAKE classroom report&lt;/h1&gt;"
+
+rows = load_quotes("data/prices.csv")
+print(render_html(rows))</code></pre>
+
+<pre><code>&lt;h1&gt;FAKE classroom report&lt;/h1&gt;</code></pre>
+
+<p>알려진 quote 하나와 작은 HTML 표로 시작합니다. 계획한 이름과 반환 자료형은 지킵니다. 가짜는 한 번에 하나씩 바꿉니다. 규칙, CSV, HTML, 출력 순서로. 최종 MVP의 Must 기능 경로에는 가짜가 하나도 없어야 합니다.</p>
+
+<h3>CSV에서 검증된 quote로</h3>
+
+<p>텍스트 변환은 한 번만 하고, 코드는 문자열로 둡니다.</p>
+
+<pre><code>import csv, io
+source = ("code,previous_close,close\n"
+          "005930,70000,71400\n")
+row = next(csv.DictReader(io.StringIO(source)))
+print(row["code"], type(row["code"]).__name__)
+difference = (int(row["close"])
+              - int(row["previous_close"]))
+print(difference)</code></pre>
+
+<pre><code>005930 str
+1400</code></pre>
+
+<p><code>csv.DictReader</code>는 모든 필드를 문자열로 읽습니다. 어떤 행도 믿기 전에 헤더가 정확한지 검사합니다. <code>parse_row</code>가 가격과 거래량을 검증하고 변환합니다. 선택한 시장 밖의 행이라도 모든 행을 검증합니다.</p>
+
+<h3>필터, 정렬, 요약</h3>
+
+<p>계산은 HTML과 독립적으로 유지합니다. 섞인 날짜와 중복 코드는 필터하기 전에 거절합니다. 불러온 quote는 바꾸지 않고 새 dict를 반환합니다. 반올림하지 않은 등락률로 정렬하고, 값이 같으면 종목 코드로 정렬합니다. 행이 비면 평균은 None이고, 화면에서 N/A로 바꿉니다.</p>
+
+<pre><code>ALL order from the supplied fictional CSV:
+247540  +3.00%
+005930  +2.00%
+035420  +0.00%
+000660  -1.00%
+035900  -2.00%
+mean    +0.40% (sample, equal weight)</code></pre>
+
+<h3>HTML은 결과를 보여 주는 뷰다</h3>
+
+<p>서식은 보여 주는 방식을 바꿀 뿐 계산을 바꾸면 안 됩니다. <code>render_html</code>은 문자열을 반환하고, 쓰기는 storage가 합니다. 종목 이름처럼 외부에서 온 텍스트에는 <code>html.escape</code>를 씁니다. 색깔뿐 아니라 부호와 숫자도 보여 줍니다. 날짜, 출처, 가상 데이터 표시, 단위를 넣습니다.</p>
+
+<pre><code>from html import escape
+name = "&lt;b&gt;Example&lt;/b&gt;"
+change = 2.0
+print(escape(name))
+print(f"{change:+.2f}%")</code></pre>
+
+<pre><code>&amp;lt;b&amp;gt;Example&amp;lt;/b&amp;gt;
++2.00%</code></pre>
+
+<h3>main: 프로그램 조립</h3>
+
+<p>최상위 함수가 계약들을 조율합니다.</p>
+
+<pre><code>quotes = load_quotes(args.input)
+rows = analyze(quotes, args.market)
+summary = summarize(rows)
+html = render_html(rows, summary, market, day)
+write_html(args.output, html)
+# Only now print Generated ...</code></pre>
+
+<p>argparse로 <code>--input</code>, <code>--output</code>, <code>--market</code>을 받습니다. 데이터·파일 오류는 사용자와 맞닿는 경계(main)에서 잡습니다. <code>write_html</code>을 부르기 전에 모든 결과를 준비합니다. 종료 코드는 성공 0, 데이터·입출력 실패 1, CLI 사용 오류 2입니다.</p>
+
+<h3>MVP를 실행하고 페이지 열기</h3>
+
+<p>패키지 설치도 네트워크 데이터도 필요 없습니다. <code>examples/korea_market_mvp/</code>에서 실행합니다.</p>
+
+<pre><code>python3 -m unittest -v
+python3 main.py
+python3 -m http.server 8000 \
+  --directory docs --bind 127.0.0.1
+# Open http://localhost:8000
+# Ctrl+C stops the local server.</code></pre>
+
+<p>기본 보고서에는 가상 종목 다섯 행이 들어 있습니다. <code>docs/index.html</code>을 직접 열거나 docs를 로컬 서버로 띄워 봅니다. 서버는 저장된 HTML을 보여 줄 뿐이므로, 시장을 바꾸려면 다시 생성합니다.</p>
+
+<p>이 웹 실습의 가상 머신에는 브라우저가 없으므로 <code>http.server</code> 대신 생성된 파일을 내려받습니다. <a href="korea_market_mvp.html">korea_market_mvp</a>에서 <code>python3 main.py</code>를 실행한 뒤 <code>cp docs/index.html /mnt/host/report.html</code>을 하고, 받기 칸에 <code>/mnt/host/report.html</code>을 입력해 받기를 누르면 내 컴퓨터의 브라우저로 보고서를 열 수 있습니다. 같은 페이지에서 <code>--market KOSPI</code>, 빈 CSV, 전일종가 0인 CSV, 없는 파일, 모르는 시장 이름을 차례로 실행하며 종료 코드와 보고서 보존 여부를 확인합니다.</p>
+
+<h3>증거와 함께 리팩터링</h3>
+
+<p>동작은 똑같이 두고 구조를 개선합니다. 옮기기 전과 후에 12개 검사를 모두 실행합니다. 모호한 변수 이름은 quote, rows, summary로 바꿉니다. FIELDS와 MARKETS는 한 곳에 둡니다. HTML 서식을 함수로 뽑아내되 숫자, 순서, 메시지는 그대로 둡니다.</p>
+
+<pre><code>Feature commit:  add KOSPI filtering
+Refactor commit: extract render_html
+Fix commit:      preserve leading zero in stock code</code></pre>
+
+<p>이 셋은 서로 다른 변경이고 서로 다른 증거가 필요합니다. 리팩터링의 증거는 "같은 검사, 같은 결과"입니다. <a href="tidy_lab.html">tidy_lab</a>은 이 연습을 위한 파일입니다. 모든 검사가 PASS인 읽기 어려운 코드에 이름 바꾸기, 상수 추출(2000 ml 목표량), 중복 줄을 함수로 빼기, guard clause를 차례로 적용하고, 매번 실행해 여섯 PASS가 그대로인지 확인합니다.</p>
+
+<h2>실습: 나만의 슬라이스 만들기</h2>
+
+<p>18분 동안 브랜치 하나, 눈에 보이는 결과 하나, 검토 가능한 PR 하나를 만듭니다.</p>
+
+<ul>
+<li>4분: 첨부 문서에서 SC → REQ → FEAT → FUNC → TEST를 추적한다.</li>
+<li>9분: 슬라이스 하나를 구현하고 그 가짜를 교체한다.</li>
+<li>5분: 검사를 실행하고, HTML을 살펴보고, 커밋하고 PR을 연다.</li>
+</ul>
+
+<p>파일은 <code>labs/session2/team-name_spec.xlsx</code>와 <code>team-name_user-scenario.md</code>입니다. 실습지 <code>slice-lab.md</code>(실습 페이지에서 볼 수 있음)는 REQ-03을 고르면 등락률·필터·정렬·요약을, REQ-06을 고르면 오류 처리와 출력 보존을 구현하도록 안내합니다. 브랜치와 PR은 git이 있는 실제 PC에서 하고, 이 가상 머신에서는 코드 실행과 테스트, 보고서 확인을 합니다.</p>
+
+<h2>수락 시연과 제출</h2>
+
+<p>동작하는 웹 보고서가 문서의 증거입니다.</p>
+
+<ul>
+<li>ALL을 보이고 이어서 KOSPI를 보이며, 두 표본 평균이 왜 다른지 설명합니다.</li>
+<li>잘못된 입력이 이전 HTML을 보존하는 것을 보입니다.</li>
+<li>채운 워크북과 시나리오 .md를 코드, HTML, PR 링크와 함께 제출합니다.</li>
+<li>실제 결과와 합격 여부를 기록하고 브라우저 스크린숏을 첨부합니다.</li>
+</ul>
+
+<h2>퇴실 확인</h2>
+
+<p>어휘를 바꾸지 않고 사슬 하나를 끝까지 설명해 봅니다.</p>
+
+<ul>
+<li>왜 005930은 문자열로 남아야 하는가?</li>
+<li>왜 표본 평균은 지수 수익률이 아닌가?</li>
+<li>빈 입력과 누락된 파일은 무엇이 다른가?</li>
+<li>반올림은 어디에서 하는가? HTML escape는 어디에서 하는가?</li>
+<li>어떤 테스트가 이전 웹 보고서가 실패에도 살아남는다는 것을 증명하는가?</li>
+</ul>
+</div>
+    </article>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

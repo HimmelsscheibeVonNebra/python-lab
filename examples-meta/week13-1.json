@@ -18,11 +18,11 @@
           "note": "sqlite3는 표준 라이브러리에 들어 있어 설치할 것이 없다. 서버도 로그인도 없이 파일 하나가 데이터베이스 전체다. 이 가상 머신에는 sqlite3 명령줄 셸이 없으므로 모든 SQL을 파이썬에서 실행한다."
         },
         {
-          "cmd": "python3 -c 'import csv; rows = list(csv.DictReader(open(\"prices.csv\", encoding=\"utf-8\"))); kospi = [r for r in rows if r[\"market\"] == \"KOSPI\"]; print(len(rows), len(kospi)); print(type(rows[0][\"close\"]))'",
+          "cmd": "python3 - <<'EOF'\nimport csv\nrows = list(csv.DictReader(open(\"prices.csv\", encoding=\"utf-8\")))\nkospi = [r for r in rows if r[\"market\"] == \"KOSPI\"]\nprint(len(rows), len(kospi))\nprint(type(rows[0][\"close\"]))\nEOF",
           "note": "CSV가 못 하는 일: 질문할 때마다 모든 행을 읽고 반복문을 돈다(5 3). 가격도 <class 'str'>로 들어온다. 중복 행이나 빠진 가격도 막아 주지 않는다."
         },
         {
-          "cmd": "python3 -c 'from pathlib import Path; f = Path(\"/tmp/balance.txt\"); f.write_text(\"100\"); a = int(f.read_text()); b = int(f.read_text()); f.write_text(str(a - 50)); f.write_text(str(b - 50)); print(\"saved:\", f.read_text(), \"expected: 0\")'",
+          "cmd": "python3 - <<'EOF'\nfrom pathlib import Path\nf = Path(\"/tmp/balance.txt\")\nf.write_text(\"100\")\na = int(f.read_text())\nb = int(f.read_text())\nf.write_text(str(a - 50))\nf.write_text(str(b - 50))\nprint(\"saved:\", f.read_text(), \"expected: 0\")\nEOF",
           "note": "두 사람, 파일 하나: 둘 다 상대가 저장하기 전에 100을 읽고 각자 50을 저장한다. saved: 50 expected: 0. 오류 없이 인출 한 건이 사라진다(갱신 손실). 파일은 쓰는 순서를 세워 주지 못한다."
         },
         {
@@ -38,15 +38,15 @@
           "note": "두 번째 실행도 실패하지 않고 여전히 5 rows다. IF NOT EXISTS가 이미 있는 테이블을 그대로 두고, DELETE FROM quotes로 비운 뒤 다시 넣기 때문이다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(con.execute(\"SELECT typeof(code), code, typeof(close), close FROM quotes\").fetchone())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(con.execute(\"SELECT typeof(code), code, typeof(close), close FROM quotes\").fetchone())\nEOF",
           "note": "CSV에서 읽은 값은 모두 문자열이었지만 INTEGER 열은 \"71400\"을 숫자 71400(integer)으로, TEXT 열은 '005930'을 글자 그대로 저장했다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); con.execute(\"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\", (\"2026-11-05\", \"999999\", \"Test\", \"KOSPI\", 100, 110, 1)); print(\"before close:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone()); con.close(); con = sqlite3.connect(\"market.db\"); print(\"after reopen:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\ncon.execute(\"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\", (\"2026-11-05\", \"999999\", \"Test\", \"KOSPI\", 100, 110, 1))\nprint(\"before close:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\ncon.close()\ncon = sqlite3.connect(\"market.db\")\nprint(\"after reopen:\", con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\nEOF",
           "note": "commit()을 잊으면 행이 사라진다. 같은 연결 안에서는 (6,)으로 보이지만, commit 없이 close하고 다시 열면 (5,)다. 오류도 경고도 없다. \"화면에서는 됐다\"와 \"저장됐다\"는 다른 말이다."
         },
         {
-          "cmd": "printf '%s\\n' 'import sqlite3' 'con = sqlite3.connect(\"market.db\")' 'INSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"' 'row = (\"2026-11-05\", \"000660\", \"SK하이닉스\", \"KOSPI\", 200000, 198000, 500000)' 'for values in (row, row[:5] + (0, 500000)):' '    try:' '        con.execute(INSERT, values)' '    except sqlite3.IntegrityError as error:' '        print(type(error).__name__, error)' 'print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())' > try_insert.py; cat try_insert.py; python3 try_insert.py",
+          "cmd": "cat > try_insert.py <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nINSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"\nrow = (\"2026-11-05\", \"000660\", \"SK하이닉스\", \"KOSPI\", 200000, 198000, 500000)\nfor values in (row, row[:5] + (0, 500000)):\n    try:\n        con.execute(INSERT, values)\n    except sqlite3.IntegrityError as error:\n        print(type(error).__name__, error)\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\nEOF\ncat try_insert.py\npython3 try_insert.py",
           "note": "실습 C를 미리 보는 스크립트다. 이미 있는 (2026-11-05, 000660)을 한 번 더 넣으면 IntegrityError UNIQUE constraint failed: quotes.date, quotes.code, close를 0으로 바꾸면 IntegrityError CHECK constraint failed: close > 0이다. 실패한 문장만 취소되고 행 수는 (5,) 그대로다."
         }
       ],
@@ -67,31 +67,31 @@
           "note": "Q1 KOSPI stocks 아래에 ('SK하이닉스', 198000), ('삼성전자', 71400), ('NAVER', 200000)이 나온다. 이름순이 아니라 ORDER BY code(000660, 005930, 035420) 순서다. \"KOSPI\"는 SQL 문자열 안이 아니라 (\"KOSPI\",) 튜플로 전달된다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(*con.execute(\"SELECT code, name, close FROM quotes\"), sep=\"\\n\")'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(*con.execute(\"SELECT code, name, close FROM quotes\"), sep=\"\\n\")\nEOF",
           "note": "SELECT는 열을 고른다. 행마다 요청한 열 순서의 튜플 하나가 돌아온다. ORDER BY가 없으면 순서는 보장되지 않는다(지금은 넣은 순서로 보일 뿐이다)."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(con.execute(\"SELECT name, close FROM quotes WHERE market = ? AND close >= ?\", (\"KOSDAQ\", 50000)).fetchall())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(con.execute(\"SELECT name, close FROM quotes WHERE market = ? AND close >= ?\", (\"KOSDAQ\", 50000)).fetchall())\nEOF",
           "note": "WHERE는 행을 고른다. 비교는 =이고 AND로 조건을 묶는다. 결과는 [('에코프로비엠', 103000)]뿐이다. JYP Ent.도 KOSDAQ이지만 종가 49000이 50000보다 작다. close가 INTEGER라서 숫자로 비교된다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(*con.execute(\"SELECT name, volume FROM quotes ORDER BY volume DESC LIMIT 3\"), sep=\"\\n\")'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(*con.execute(\"SELECT name, volume FROM quotes ORDER BY volume DESC LIMIT 3\"), sep=\"\\n\")\nEOF",
           "note": "ORDER BY volume DESC로 큰 값부터 정렬하고 LIMIT 3으로 앞의 세 행만 남긴다: 삼성전자 1000000, SK하이닉스 500000, NAVER 300000. 동점이 있으면 ORDER BY volume DESC, code처럼 둘째 기준을 준다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); q = \"SELECT name, (close - previous_close) * 100.0 / previous_close AS change_pct FROM quotes ORDER BY change_pct DESC, code\"; print(*[f\"{pct:+5.1f}% {name}\" for name, pct in con.execute(q)], sep=\"\\n\")'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nq = \"SELECT name, (close - previous_close) * 100.0 / previous_close AS change_pct FROM quotes ORDER BY change_pct DESC, code\"\nprint(*[f\"{pct:+5.1f}% {name}\" for name, pct in con.execute(q)], sep=\"\\n\")\nEOF",
           "note": "SELECT 안에서 logic.py의 change_pct()와 같은 식을 계산하고 AS로 이름을 붙여 ORDER BY에 쓴다. +3.0% 에코프로비엠부터 -2.0% JYP Ent.까지 나온다. 각 행을 name, pct 두 변수로 풀어 받았다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\":memory:\"); print(con.execute(\"SELECT 7 / 2, 7 * 1.0 / 2, (71400 - 70000) / 70000\").fetchone())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\":memory:\")\nprint(con.execute(\"SELECT 7 / 2, 7 * 1.0 / 2, (71400 - 70000) / 70000\").fetchone())\nEOF",
           "note": "함정: SQL에서 정수 / 정수는 소수점을 버린다. 7 / 2는 3, 7 * 1.0 / 2는 3.5이고, 100.0을 먼저 곱하지 않은 (71400 - 70000) / 70000은 0이 된다. \":memory:\"는 파일이 없는 임시 데이터베이스다."
         },
         {
-          "cmd": "python3 -c \"import sqlite3; con = sqlite3.connect('market.db'); market = \\\"KOSPI' OR '1'='1\\\"; bad = f\\\"SELECT COUNT(*) FROM quotes WHERE market = '{market}'\\\"; print(bad); print(con.execute(bad).fetchone()); print(con.execute('SELECT COUNT(*) FROM quotes WHERE market = ?', (market,)).fetchone())\"",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect('market.db')\nmarket = \"KOSPI' OR '1'='1\"\nbad = f\"SELECT COUNT(*) FROM quotes WHERE market = '{market}'\"\nprint(bad)\nprint(con.execute(bad).fetchone())\nprint(con.execute('SELECT COUNT(*) FROM quotes WHERE market = ?', (market,)).fetchone())\nEOF",
           "note": "SQL 인젝션: f-string은 입력을 SQL 문장 안에 붙여 넣으므로 입력 속 따옴표가 조건을 OR '1'='1'로 바꿔 쓴다. 출력된 SQL을 읽어 보면 (5,), 즉 모든 행이 나온 이유가 보인다. ? 를 쓰면 입력은 언제나 값일 뿐이어서 그런 시장 이름은 없으므로 (0,)이다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); con.row_factory = sqlite3.Row; row = con.execute(\"SELECT * FROM quotes WHERE code = ?\", (\"005930\",)).fetchone(); print(row[\"name\"], row[\"close\"]); quote = dict(row); print(type(quote[\"close\"]), quote[\"code\"])'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\ncon.row_factory = sqlite3.Row\nrow = con.execute(\"SELECT * FROM quotes WHERE code = ?\", (\"005930\",)).fetchone()\nprint(row[\"name\"], row[\"close\"])\nquote = dict(row)\nprint(type(quote[\"close\"]), quote[\"code\"])\nEOF",
           "note": "sqlite3.Row를 쓰면 row[2] 대신 row[\"close\"]처럼 열 이름으로 꺼낸다. 삼성전자 71400, 그리고 dict(row)의 가격은 이미 <class 'int'>, 코드는 005930 그대로다. 이 dict가 logic.py가 받는 바로 그 모양이다(2차시)."
         }
       ],

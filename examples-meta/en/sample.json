@@ -57,7 +57,7 @@
         "web html shows the raw HTML. Thanks to escape(), <b> became &lt;b&gt;, so the tag you typed is shown as text instead of being run.",
         "For an address that does not exist, Flask answers HTTP 404 (Not Found).",
         "The server log has one line per request with its address and status code (200, 404).",
-        "Stop the server. After editing app.py, run web stop and then web start again so the new code is used."
+        "Stop the server. While it runs, saving a change to app.py is enough: web notices it, restarts the app by itself, and the preview panel redraws with the new code."
       ]
     }
   }

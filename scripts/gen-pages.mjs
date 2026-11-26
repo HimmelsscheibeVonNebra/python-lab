@@ -2,10 +2,12 @@
 // sources in course/.  Every page carries both languages; js/lang.js shows one
 // (English by default, the reader's choice is remembered).
 //
-//   index.html                           hub: every class + the playground
+//   index.html                           hub: every week + the playground
 //   playground.html                      free practice (hello.py, grades.py)
-//   classes/<class>/index.html           one class: its examples + lecture notes
-//   classes/<class>/<example>.html       one example: terminal + steps + source
+//   classes/weekNN/index.html            one week: one machine for all its
+//                                        examples (#ex=<name> picks one),
+//                                        steps, source, lecture notes
+//   classes/<class>/...                  old addresses, redirect to the above
 //
 //   node scripts/gen-pages.mjs
 //
@@ -288,100 +290,182 @@ const txt = (enText, koText) => ({ en: enText ?? koText, ko: koText });
 let pageCount = 0;
 let notesCount = 0;
 
+// One page per week: one virtual machine for all of that week's examples.
+// Choosing an example swaps the steps and the source and runs cd in the
+// same machine.  weekNN-S classes share the page classes/weekNN/; any other
+// class (e.g. "sample") has its own.
+const weekOf = (cls) => {
+  const m = cls.class.match(/^week(\d+)-(\d+)$/);
+  return m ? { key: `week${m[1]}`, n: Number(m[1]), session: Number(m[2]) } : { key: cls.class };
+};
+const weeks = [];
 for (const cls of classes) {
-  const label = classLabel(cls);
-  const title = txt(cls.en.title, cls.title);
-  const summary = txt(cls.en.summary, cls.summary);
-  const notesKo = loadNotes(`class-notes/${cls.class}.html`, cls);
-  const notesEn = loadNotes(`class-notes/en/${cls.class}.html`, cls) || notesKo;
-  if (notesKo) notesCount++;
-  const slugs = cls.examples.map(slugOf);
-  if (new Set(slugs).size !== slugs.length) throw new Error(`${cls.class}: duplicate example names`);
+  const w = weekOf(cls);
+  let week = weeks.find((x) => x.key === w.key);
+  if (!week) {
+    week = { key: w.key, n: w.n, classes: [] };
+    weeks.push(week);
+  }
+  week.classes.push(cls);
+}
+const weekLabel = (week) =>
+  week.n ? { en: `Week ${week.n}`, ko: `${week.n}주차` } : classLabel(week.classes[0]);
+const sessionLabel = (cls) => {
+  const w = weekOf(cls);
+  return w.session ? { en: `Session ${w.session}`, ko: `${w.session}차시` } : classLabel(cls);
+};
 
-  write(
-    `classes/${cls.class}/index.html`,
-    layout({
-      title: { en: `${label.en} ${title.en}`, ko: `${label.ko} ${title.ko}` },
-      root: "../../",
-      crumbs: [{ text: SITE, href: "../../index.html" }, { text: label }],
-      body: `  <header>
-    <h1>${bothText(title.en, title.ko)}</h1>
-    <p>${bothText(summary.en, summary.ko)}</p>
-  </header>
-  <main class="list">
-    <section>
-      <h2>${bothText("Examples to run", "실행해 볼 예제")}</h2>
-      <ul class="cards">
-${cls.examples
-  .map(
-    (ex) => `        <li><a href="${slugOf(ex)}.html"><strong>${esc(ex.name)}</strong><span>${bothText(ex.en.summary, ex.summary)}</span></a></li>`
-  )
-  .join("\n")}
-      </ul>
-    </section>
-${notesKo ? `    <article class="notes">\n${both({ en: `\n${notesEn}\n`, ko: `\n${notesKo}\n` }, "div")}\n    </article>\n` : ""}  </main>`,
-    })
-  );
+// Example ids within a week page (#ex=<id>): the slug, or class-slug when
+// two sessions use the same name.
+function exampleIds(week) {
+  const all = week.classes.flatMap((cls) => cls.examples.map((ex) => ({ cls, ex, slug: slugOf(ex) })));
+  const count = {};
+  all.forEach((e) => { count[e.slug] = (count[e.slug] || 0) + 1; });
+  all.forEach((e) => { e.id = count[e.slug] > 1 ? `${e.cls.class}-${e.slug}` : e.slug; });
+  return all;
+}
 
-  cls.examples.forEach((ex, i) => {
-    const prev = cls.examples[i - 1];
-    const next = cls.examples[i + 1];
-    const dir = dirOf(ex);
-    const files = [ex.source, ...(ex.also || [])];
-    for (const f of files) {
-      if (!exists(homeFile(f))) throw new Error(`${cls.class}/${ex.name}: no course/${f}`);
-    }
-    if (!exists(homeFile(dir))) throw new Error(`${cls.class}/${ex.name}: no course/${dir}`);
-    const steps = ex.steps.map((s, k) => ({
-      cmd: s.cmd,
-      note: s.note ? txt((ex.en.steps || [])[k], s.note) : undefined,
-    }));
-    const exSummary = txt(ex.en.summary, ex.summary);
+// A page left at an old address (classes/<class>/<example>.html) sends the
+// reader to the example on its week page.
+const redirect = (to) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=${esc(to)}">
+  <link rel="icon" href="data:,">
+  <title>${SITE}</title>
+  <script>location.replace(${JSON.stringify(to)});</script>
+</head>
+<body><p><a href="${esc(to)}">${esc(to)}</a></p></body>
+</html>
+`;
 
-    write(
-      `classes/${cls.class}/${slugOf(ex)}.html`,
-      layout({
-        title: { en: `${ex.name} — ${title.en}`, ko: `${ex.name} — ${title.ko}` },
-        root: "../../",
-        labDir: dir,
-        withLab: true,
-        crumbs: [
-          { text: SITE, href: "../../index.html" },
-          { text: label, href: "index.html" },
-          { text: ex.name },
-        ],
-        body: `  <header>
-    <h1>${esc(ex.name)}</h1>
-    <p>${bothText(exSummary.en, exSummary.ko)}</p>
-  </header>
-  <main>
-${machine({
-  en: `Starts as user <code>student</code> in <code>/home/student/${esc(dir)}</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). ${COMMON_HINT.en}`,
-  ko: `<code>/home/student/${esc(dir)}</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. ${COMMON_HINT.ko}`,
-})}
-    <aside class="guide">
-      <h2>${bothText("Steps", "실행 순서")}</h2>
-      ${stepsHtml(steps)}
+function examplePanel({ cls, ex, id }, first) {
+  const dir = dirOf(ex);
+  const files = [ex.source, ...(ex.also || [])];
+  for (const f of files) {
+    if (!exists(homeFile(f))) throw new Error(`${cls.class}/${ex.name}: no course/${f}`);
+  }
+  if (!exists(homeFile(dir))) throw new Error(`${cls.class}/${ex.name}: no course/${dir}`);
+  const steps = ex.steps.map((s, k) => ({
+    cmd: s.cmd,
+    note: s.note ? txt((ex.en.steps || [])[k], s.note) : undefined,
+  }));
+  const exSummary = txt(ex.en.summary, ex.summary);
+  const panel = `      <section class="ex-panel" data-ex="${esc(id)}" data-dir="${esc(dir)}"${first ? "" : " hidden"}>
+        <h2>${esc(ex.name)} <span class="muted">~/${esc(dir)}</span></h2>
+        <p>${bothText(exSummary.en, exSummary.ko)}</p>
+        <h3>${bothText("Steps", "실행 순서")}</h3>
+        ${stepsHtml(steps)}
 ${ex.manual ? callout({
   en: "Some steps need your own typing. Click the terminal and type (stop: <kbd>Ctrl</kbd>+<kbd>C</kbd>).",
   ko: "직접 입력해야 하는 단계가 있습니다. 터미널을 클릭한 뒤 입력하세요 (중단: <kbd>Ctrl</kbd>+<kbd>C</kbd>).",
 }) : ""}${ex.slow ? callout({
   en: "pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.",
   ko: "pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.",
-}) : ""}${ex.notes ? `      <p class="callout">${bothText(ex.en.notes, ex.notes)}</p>\n` : ""}    </aside>
+}) : ""}${ex.notes ? `      <p class="callout">${bothText(ex.en.notes, ex.notes)}</p>\n` : ""}      </section>`;
+  const sources = `    <div class="ex-sources" data-ex="${esc(id)}"${first ? "" : " hidden"}>
+${files.map((f, k) => sourceHtml(shownName(f, dir), read(homeFile(f)), k === 0)).join("\n")}
+    </div>`;
+  return { panel, sources };
+}
+
+for (const week of weeks) {
+  const label = weekLabel(week);
+  const entries = exampleIds(week);
+  const single = week.classes.length === 1;
+  const titleOf = (cls) => txt(cls.en.title, cls.title);
+  const built = entries.map((e, i) => ({ ...e, ...examplePanel(e, i === 0) }));
+
+  const picker = week.classes
+    .map((cls) => {
+      const sl = sessionLabel(cls);
+      const t = titleOf(cls);
+      return `      <div class="ex-group">
+${single ? "" : `        <h3>${bothText(`${sl.en} · ${t.en}`, `${sl.ko} · ${t.ko}`)}</h3>\n`}        <div class="ex-buttons">
+${entries
+  .filter((e) => e.cls === cls)
+  .map((e) => `          <button type="button" data-pick="${esc(e.id)}" aria-pressed="${e === entries[0]}">${esc(e.ex.name)}</button>`)
+  .join("\n")}
+        </div>
+      </div>`;
+    })
+    .join("\n");
+
+  const notes = week.classes
+    .map((cls) => {
+      const ko = loadNotes(`class-notes/${cls.class}.html`, cls);
+      const en = loadNotes(`class-notes/en/${cls.class}.html`, cls) || ko;
+      if (!ko) return "";
+      notesCount++;
+      const sl = sessionLabel(cls);
+      const t = titleOf(cls);
+      return `    <article class="notes" id="notes-${esc(cls.class)}">
+      <h2 class="notes-title">${single ? bothText(t.en, t.ko) : bothText(`${sl.en} — ${t.en}`, `${sl.ko} — ${t.ko}`)}</h2>
+${both({ en: `\n${en}\n`, ko: `\n${ko}\n` }, "div")}
+    </article>`;
+    })
+    .filter(Boolean)
+    .join("\n");
+
+  const h1 = single
+    ? { en: `${label.en} — ${titleOf(week.classes[0]).en}`, ko: `${label.ko} — ${titleOf(week.classes[0]).ko}` }
+    : label;
+  const intro = single
+    ? `<p>${bothText(txt(week.classes[0].en.summary, week.classes[0].summary).en, week.classes[0].summary)}</p>`
+    : `<ul class="sessions">
+${week.classes
+  .map((cls) => {
+    const sl = sessionLabel(cls);
+    const t = titleOf(cls);
+    const sm = txt(cls.en.summary, cls.summary);
+    return `      <li><a href="#notes-${esc(cls.class)}"><strong>${bothText(`${sl.en} · ${t.en}`, `${sl.ko} · ${t.ko}`)}</strong></a> ${bothText(sm.en, sm.ko)}</li>`;
+  })
+  .join("\n")}
+    </ul>`;
+
+  write(
+    `classes/${week.key}/index.html`,
+    layout({
+      title: h1,
+      root: "../../",
+      labDir: dirOf(entries[0].ex),
+      withLab: true,
+      crumbs: [{ text: SITE, href: "../../index.html" }, { text: label }],
+      body: `  <header>
+    <h1>${bothText(h1.en, h1.ko)}</h1>
+    ${intro}
+  </header>
+  <main>
+${machine({
+  en: `One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). ${COMMON_HINT.en}`,
+  ko: `이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 수업 코드는 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 있습니다. ${COMMON_HINT.ko}`,
+})}
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2>${bothText("Examples", "예제")}</h2>
+${picker}
+      </nav>
+${built.map((b) => b.panel).join("\n")}
+    </aside>
   </main>
   <section class="sources">
     <h2>${bothText("Source", "소스")}</h2>
-${files.map((f, k) => sourceHtml(shownName(f, dir), read(homeFile(f)), k === 0)).join("\n")}
+${built.map((b) => b.sources).join("\n")}
   </section>
-  <nav class="pager">
-    ${prev ? `<a href="${slugOf(prev)}.html">← ${esc(prev.name)}</a>` : "<span></span>"}
-    ${next ? `<a href="${slugOf(next)}.html">${esc(next.name)} →</a>` : "<span></span>"}
-  </nav>`,
-      })
-    );
-    pageCount++;
-  });
+${notes}`,
+    })
+  );
+  pageCount++;
+
+  // Old addresses: classes/<class>/index.html and classes/<class>/<example>.html
+  for (const cls of week.classes) {
+    const base = cls.class === week.key ? "index.html" : `../${week.key}/index.html`;
+    if (cls.class !== week.key) write(`classes/${cls.class}/index.html`, redirect(base));
+    for (const e of entries.filter((x) => x.cls === cls)) {
+      write(`classes/${cls.class}/${slugOf(e.ex)}.html`, redirect(`${base}#ex=${e.id}`));
+    }
+  }
 }
 
 // ---------------------------------------------------------------- playground
@@ -486,8 +570,8 @@ write(
     body: `  <header>
     <h1>${SITE} — ${bothText("Basic Programming Using Python", "파이썬 기초 프로그래밍")}</h1>
     <p>${bothText(
-      `Run the course examples in your browser with nothing to install. Every page boots its own 32-bit x86 Linux with Python ${pythonVersion()} inside your browser and starts in that class's code directory.`,
-      `설치 없이 브라우저에서 Linux를 부팅해 수업 예제를 실행합니다. 각 페이지는 자신의 브라우저 안에서 32비트 x86 Linux와 Python ${pythonVersion()}를 새로 부팅하며, 그 주차의 수업 코드 디렉터리에서 시작합니다.`
+      `Run the course examples in your browser with nothing to install. Each week's page boots one 32-bit x86 Linux with Python ${pythonVersion()} inside your browser; switch between that week's examples without rebooting.`,
+      `설치 없이 브라우저에서 Linux를 부팅해 수업 예제를 실행합니다. 주차마다 한 페이지에서 32비트 x86 Linux와 Python ${pythonVersion()}를 한 번 부팅하고, 그 주의 예제를 재부팅 없이 바꿔 가며 실행합니다.`
     )}</p>
   </header>
   <main class="list">
@@ -500,15 +584,24 @@ write(
         )}</span></a></li>
       </ul>
     </section>
-${classes
-  .map((cls) => {
-    const label = classLabel(cls);
+${weeks
+  .map((week) => {
+    const label = weekLabel(week);
+    const entries = exampleIds(week);
+    const href = `classes/${week.key}/index.html`;
     return `    <section>
-      <h2><a href="classes/${cls.class}/index.html">${bothText(`${label.en} — ${cls.en.title ?? cls.title}`, `${label.ko} — ${cls.title}`)}</a></h2>
-      <p class="muted">${bothText(cls.en.summary, cls.summary)}</p>
+      <h2><a href="${href}">${week.classes.length === 1
+        ? bothText(`${label.en} — ${week.classes[0].en.title ?? week.classes[0].title}`, `${label.ko} — ${week.classes[0].title}`)
+        : bothText(label.en, label.ko)}</a></h2>
+${week.classes
+  .map((cls) => {
+    const sl = sessionLabel(cls);
+    return `      ${week.classes.length === 1 ? "" : `<h3>${bothText(`${sl.en} · ${cls.en.title ?? cls.title}`, `${sl.ko} · ${cls.title}`)}</h3>\n      `}<p class="muted">${bothText(cls.en.summary, cls.summary)}</p>
       <ul class="chips">
-${cls.examples.map((ex) => `        <li><a href="classes/${cls.class}/${slugOf(ex)}.html">${esc(ex.name)}</a></li>`).join("\n")}
-      </ul>
+${entries.filter((e) => e.cls === cls).map((e) => `        <li><a href="${href}#ex=${e.id}">${esc(e.ex.name)}</a></li>`).join("\n")}
+      </ul>`;
+  })
+  .join("\n")}
     </section>`;
   })
   .join("\n")}
@@ -517,6 +610,6 @@ ${cls.examples.map((ex) => `        <li><a href="classes/${cls.class}/${slugOf(e
 );
 
 console.log(
-  `generated ${pageCount} example pages in ${classes.length} classes (${notesCount} with lecture notes), plus index.html and playground.html`
+  `generated ${pageCount} week pages for ${classes.length} classes (${notesCount} with lecture notes), plus index.html and playground.html`
 );
 if (untranslated.length) console.log(`no English yet: ${untranslated.join("; ")}`);

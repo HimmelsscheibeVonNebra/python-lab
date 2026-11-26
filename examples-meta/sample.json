@@ -43,7 +43,7 @@
         },
         {
           "cmd": "web stop",
-          "note": "서버를 끈다. app.py를 고친 뒤에는 web stop → web start로 다시 띄워야 바뀐 코드가 적용된다."
+          "note": "서버를 끈다. 서버가 켜져 있는 동안 app.py를 고쳐 저장하면 web이 알아채고 앱을 저절로 다시 시작하며, 미리보기 창도 새 코드로 다시 그려진다."
         }
       ],
       "slow": true,
@@ -188,7 +188,7 @@
           "note": "다시 가져오면 반영된다. 삼성전자 등락률이 +2%에서 +10%로 바뀌어 평균이 +2.00%가 된다."
         },
         {
-          "cmd": "sed -n 2p data/prices.csv >> data/prices.csv; flask --app app init-db 2>&1 | tail -n 1",
+          "cmd": "sed -n 2p data/prices.csv >> data/prices.csv\nflask --app app init-db 2>&1 | tail -n 1",
           "note": "같은 종목 줄을 하나 더 붙이면 검증에서 실패한다: ValueError: duplicate code in snapshot."
         },
         {

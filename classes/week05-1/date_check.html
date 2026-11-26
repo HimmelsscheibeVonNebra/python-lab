@@ -1,110 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="date_check — Modules and the Standard Library · Python Lab" data-title-ko="date_check — 모듈과 표준 라이브러리 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>date_check — Modules and the Standard Library · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week05/index.html#ex=date_check">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week05/index.html#ex=date_check");</script>
 </head>
-<body data-root="../../" data-lab-dir="week05/starter/session1">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 5 · Session 1</span><span lang="ko">5주차 1차시</span></a><span class="sep">/</span><span>date_check</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>date_check</h1>
-    <p><span lang="en">Practice 2. Read a date in YYYY-MM-DD format, turn it into a date with datetime.strptime, and print its weekday name (strftime(&quot;%A&quot;)) and the number of days remaining from today (date.today()).</span><span lang="ko">Practice 2. YYYY-MM-DD 형식의 날짜를 읽어 datetime.strptime으로 날짜로 바꾸고, 요일 이름(strftime(&quot;%A&quot;))과 오늘(date.today())부터 남은 날 수를 출력한다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week05/starter/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week05/starter/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 date_check.py">▶</button><code>printf '2026-12-25\n' | python3 date_check.py</code></div>
-          <p><span lang="en">The starter only reads the date and converts it, so it prints nothing apart from the prompt. The date is well formed, so there is no error either.</span><span lang="ko">스타터는 날짜를 읽고 변환까지만 하므로 프롬프트 외에는 아무것도 출력하지 않는다. 형식이 맞는 날짜라 오류도 없다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="date +%F" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F">▶</button><code>date +%F</code></div>
-          <p><span lang="en">This is today's date as the virtual machine sees it. The days remaining below are counted from this date.</span><span lang="ko">가상 머신이 생각하는 오늘 날짜다. 아래 남은 날 수는 이 날짜를 기준으로 계산된다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py">▶</button><code>printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py</code></div>
-          <p><span lang="en">Christmas 2026 is a Friday. The Days remaining value depends on today's date.</span><span lang="ko">2026년 성탄절은 Friday다. Days remaining 값은 오늘 날짜에 따라 달라진다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="date +%F | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F | python3 ../../solutions/session1/date_check.py">▶</button><code>date +%F | python3 ../../solutions/session1/date_check.py</code></div>
-          <p><span lang="en">Feeding in today's date gives Days remaining: 0.</span><span lang="ko">오늘 날짜를 그대로 넣으면 Days remaining: 0이다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py">▶</button><code>printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py</code></div>
-          <p><span lang="en">A date that has already passed gives a negative number of days remaining. 2026-01-01 is a Thursday.</span><span lang="ko">이미 지난 날짜는 남은 날 수가 음수로 나온다. 2026-01-01은 Thursday다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from datetime import date, timedelta; today = date(2026, 9, 27); exam = date(2026, 11, 13); print((exam - today).days); print(today + timedelta(days=100))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from datetime import date, timedelta; today = date(2026, 9, 27); exam = date(2026, 11, 13); print((exam - today).days); print(today + timedelta(days=100))'">▶</button><code>python3 -c 'from datetime import date, timedelta; today = date(2026, 9, 27); exam = date(2026, 11, 13); print((exam - today).days); print(today + timedelta(days=100))'</code></div>
-          <p><span lang="en">Date arithmetic from the slides: the difference of two dates is a timedelta whose .days is 47, and the date + 100 days is 2027-01-05.</span><span lang="ko">슬라이드의 날짜 계산: 두 날짜의 차는 timedelta이고 .days는 47, 날짜 + 100일은 2027-01-05다.</span></p>
-        </li>
-      </ol>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>date_check.py <span class="muted"><span lang="en">9 lines</span><span lang="ko">9줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: weekday and countdown for a target date.</span>
-<span class="ln">Tests: today -&gt; Days remaining: 0; a past date -&gt; a negative count.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln">from datetime import date, datetime</span>
-<span class="ln"> </span>
-<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
-<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
-<span class="ln"># TODO: print the weekday name, e.g. Friday.</span>
-<span class="ln"># TODO: print &quot;Days remaining:&quot; and the day count from date.today().</span></code></pre>
-    </details>
-    <details class="source">
-      <summary>week05/solutions/session1/date_check.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution: weekday and countdown for a target date.&quot;&quot;&quot;</span>
-<span class="ln">from datetime import date, datetime</span>
-<span class="ln"> </span>
-<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
-<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
-<span class="ln">print(target.strftime(&quot;%A&quot;))</span>
-<span class="ln">print(&quot;Days remaining:&quot;, (target - date.today()).days)</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="math_practice.html">← math_practice</a>
-    <a href="number_tools.html">number_tools →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week05/index.html#ex=date_check">../week05/index.html#ex=date_check</a></p></body>
 </html>

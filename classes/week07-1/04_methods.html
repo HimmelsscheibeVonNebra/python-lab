@@ -1,102 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="04_methods — Object-Oriented Programming · Python Lab" data-title-ko="04_methods — 객체 지향 프로그래밍 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>04_methods — Object-Oriented Programming · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week07/index.html#ex=04_methods">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week07/index.html#ex=04_methods");</script>
 </head>
-<body data-root="../../" data-lab-dir="week07/examples/session1">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 7 · Session 1</span><span lang="ko">7주차 1차시</span></a><span class="sep">/</span><span>04_methods</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>04_methods</h1>
-    <p><span lang="en">The deposit(self, amount) and withdraw(self, amount) methods change self.balance and return True. When you call minsu.deposit(3000), the minsu before the dot becomes self. This is a teaching version that does not check the amount yet.</span><span lang="ko">deposit(self, amount)와 withdraw(self, amount) 메서드가 self.balance를 바꾸고 True를 돌려준다. minsu.deposit(3000)을 부르면 점 앞의 minsu가 self가 된다. 아직 금액 검사가 없는 수업용 버전이다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week07/examples/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week07/examples/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 04_methods.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 04_methods.py">▶</button><code>python3 04_methods.py</code></div>
-          <p><span lang="en">Deposit: True 13000, Withdraw: True 9000, Jisu: 5000. return gives True back to the caller, and print shows that value on the screen.</span><span lang="ko">Deposit: True 13000, Withdraw: True 9000, Jisu: 5000. return은 호출한 쪽에 True를 돌려주고, print가 그 값을 화면에 보여 준다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;04_methods&quot;).BankAccount; account = BankAccount(&quot;Minsu&quot;, 10000); print(account.withdraw(20000), account.balance); account.balance = -9999; print(account.balance)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;04_methods&quot;).BankAccount; account = BankAccount(&quot;Minsu&quot;, 10000); print(account.withdraw(20000), account.balance); account.balance = -9999; print(account.balance)'">▶</button><code>python3 -c 'from importlib import import_module; BankAccount = import_module(&quot;04_methods&quot;).BankAccount; account = BankAccount(&quot;Minsu&quot;, 10000); print(account.withdraw(20000), account.balance); account.balance = -9999; print(account.balance)'</code></div>
-          <p><span lang="en">Importing prints the file's three lines first. Then True -10000: a withdraw without checks accepts even a withdrawal larger than the balance. There is also no way to stop the direct assignment account.balance = -9999. Encapsulation in the next example solves this problem.</span><span lang="ko">import하면서 파일의 세 줄이 먼저 나온다. 그 다음 True -10000: 검사 없는 withdraw는 잔액보다 큰 출금도 받아들인다. 직접 대입 account.balance = -9999도 막을 방법이 없다. 이 문제를 다음 예제의 캡슐화가 해결한다.</span></p>
-        </li>
-      </ol>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>04_methods.py <span class="muted"><span lang="en">27 lines</span><span lang="ko">27줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Step 4: methods change the object and return a result.</span>
-<span class="ln"> </span>
-<span class="ln">Teaching version: assume positive amounts and sufficient funds.</span>
-<span class="ln">Step 5 adds checks. Do not use this version for the final lab.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">class BankAccount:</span>
-<span class="ln">    def __init__(self, owner, balance):</span>
-<span class="ln">        self.owner = owner</span>
-<span class="ln">        self.balance = balance</span>
-<span class="ln"> </span>
-<span class="ln">    def deposit(self, amount):</span>
-<span class="ln">        self.balance = self.balance + amount</span>
-<span class="ln">        return True</span>
-<span class="ln"> </span>
-<span class="ln">    def withdraw(self, amount):</span>
-<span class="ln">        self.balance = self.balance - amount</span>
-<span class="ln">        return True</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">minsu = BankAccount(&quot;Minsu&quot;, 10000)</span>
-<span class="ln">jisu = BankAccount(&quot;Jisu&quot;, 5000)</span>
-<span class="ln">accepted = minsu.deposit(3000)</span>
-<span class="ln">print(&quot;Deposit:&quot;, accepted, minsu.balance)</span>
-<span class="ln">print(&quot;Withdraw:&quot;, minsu.withdraw(4000), minsu.balance)</span>
-<span class="ln">print(&quot;Jisu:&quot;, jisu.balance)</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="03b_class_and_instance_variables.html">← 03b_class_and_instance_variables</a>
-    <a href="05_encapsulation.html">05_encapsulation →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week07/index.html#ex=04_methods">../week07/index.html#ex=04_methods</a></p></body>
 </html>

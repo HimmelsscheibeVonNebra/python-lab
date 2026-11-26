@@ -13,27 +13,27 @@
       "summary": "1차시의 market.db(quotes 다섯 행)에서 행을 바꾸고, 요약하고, 트랜잭션으로 묶는다. 각 단계는 create_db.py로 다시 만든 깨끗한 다섯 행에서 출발한다.",
       "steps": [
         {
-          "cmd": "python3 create_db.py; python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone()); print(*con.execute(\"SELECT code, close FROM quotes\"), sep=\"\\n\")'",
+          "cmd": "python3 create_db.py\npython3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\nprint(*con.execute(\"SELECT code, close FROM quotes\"), sep=\"\\n\")\nEOF",
           "note": "복습: (5,)와 다섯 종목의 코드·종가. SELECT는 묻기만 하고 테이블을 바꾸지 않는다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); U = \"UPDATE quotes SET close = ? WHERE code = ?\"; print(con.execute(U, (72000, \"005930\")).rowcount); print(con.execute(U, (72000, \"999999\")).rowcount); print(con.execute(\"DELETE FROM quotes\").rowcount); print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone()); con.rollback(); print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone(), con.execute(\"SELECT close FROM quotes WHERE code = ?\", (\"005930\",)).fetchone())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nU = \"UPDATE quotes SET close = ? WHERE code = ?\"\nprint(con.execute(U, (72000, \"005930\")).rowcount)\nprint(con.execute(U, (72000, \"999999\")).rowcount)\nprint(con.execute(\"DELETE FROM quotes\").rowcount)\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\ncon.rollback()\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone(), con.execute(\"SELECT close FROM quotes WHERE code = ?\", (\"005930\",)).fetchone())\nEOF",
           "note": "WHERE가 있는 UPDATE는 1행을 바꾼다(1). 틀린 코드 999999는 오류가 아니라 조용히 0행이다. WHERE를 잊은 DELETE는 5행을 모두 지워 (0,)이 된다. 아직 커밋하지 않았으므로 rollback()으로 (5,)가 되고, 앞의 72000 수정도 함께 되돌아가 종가가 (71400,)이다."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(con.execute(\"SELECT COUNT(*), SUM(volume), MAX(close), AVG(close) FROM quotes\").fetchone()); print(*con.execute(\"SELECT market, COUNT(*), SUM(volume) FROM quotes GROUP BY market ORDER BY market\"), sep=\"\\n\")'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(con.execute(\"SELECT COUNT(*), SUM(volume), MAX(close), AVG(close) FROM quotes\").fetchone())\nprint(*con.execute(\"SELECT market, COUNT(*), SUM(volume) FROM quotes GROUP BY market ORDER BY market\"), sep=\"\\n\")\nEOF",
           "note": "집계 함수는 여러 행을 값 하나로 만든다. 튜플 하나 (5, 2100000, 200000, 124280.0)가 돌아오고, AVG는 INTEGER 열에서도 REAL을 준다. GROUP BY market은 시장마다 한 행: ('KOSDAQ', 2, 300000), ('KOSPI', 3, 1800000)."
         },
         {
-          "cmd": "python3 -c 'import sqlite3; con = sqlite3.connect(\"market.db\"); print(con.execute(\"SELECT SUM(close > previous_close), SUM(close < previous_close), SUM(close = previous_close) FROM quotes\").fetchone())'",
+          "cmd": "python3 - <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nprint(con.execute(\"SELECT SUM(close > previous_close), SUM(close < previous_close), SUM(close = previous_close) FROM quotes\").fetchone())\nEOF",
           "note": "비교식은 참이면 1, 거짓이면 0이므로 그 SUM은 조건이 참인 행의 수다. (2, 2, 1)은 summarize()의 상승 2, 하락 2, 보합 1과 같다. 그래도 규칙의 집은 테스트가 있는 logic.py 한 곳이고, SQL은 행을 가져오는 일을 맡는다."
         },
         {
-          "cmd": "printf '%s\\n' 'import sqlite3' 'con = sqlite3.connect(\"market.db\")' 'INSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"' 'new_rows = [(\"2026-11-06\", \"005930\", \"삼성전자\", \"KOSPI\", 71400, 72100, 900000),' '            (\"2026-11-06\", \"000660\", \"SK하이닉스\", \"KOSPI\", 198000, 0, 450000)]' 'try:' '    with con:' '        con.executemany(INSERT, new_rows)' 'except sqlite3.IntegrityError as error:' '    print(error)' 'print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())' > tx.py; cat tx.py; python3 tx.py",
+          "cmd": "cat > tx.py <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nINSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"\nnew_rows = [(\"2026-11-06\", \"005930\", \"삼성전자\", \"KOSPI\", 71400, 72100, 900000),\n            (\"2026-11-06\", \"000660\", \"SK하이닉스\", \"KOSPI\", 198000, 0, 450000)]\ntry:\n    with con:\n        con.executemany(INSERT, new_rows)\nexcept sqlite3.IntegrityError as error:\n    print(error)\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\nEOF\ncat tx.py\npython3 tx.py",
           "note": "다음 날 스냅숏 두 행 중 둘째 행의 close가 0이다. with con 블록에서 예외가 나면 롤백하고 예외를 다시 던진다. CHECK constraint failed: close > 0 뒤 행 수는 (5,): 첫째 행도 둘째 행과 함께 취소됐다. with con은 연결을 닫지 않고 트랜잭션만 끝낸다."
         },
         {
-          "cmd": "printf '%s\\n' 'import sqlite3' 'con = sqlite3.connect(\"market.db\")' 'INSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"' 'new_rows = [(\"2026-11-06\", \"005930\", \"삼성전자\", \"KOSPI\", 71400, 72100, 900000),' '            (\"2026-11-06\", \"000660\", \"SK하이닉스\", \"KOSPI\", 198000, 0, 450000)]' 'for row in new_rows:' '    try:' '        con.execute(INSERT, row)' '        con.commit()' '    except sqlite3.IntegrityError as error:' '        print(error)' 'print(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())' > per_row.py; python3 per_row.py; python3 create_db.py",
+          "cmd": "cat > per_row.py <<'EOF'\nimport sqlite3\ncon = sqlite3.connect(\"market.db\")\nINSERT = \"INSERT INTO quotes VALUES (?, ?, ?, ?, ?, ?, ?)\"\nnew_rows = [(\"2026-11-06\", \"005930\", \"삼성전자\", \"KOSPI\", 71400, 72100, 900000),\n            (\"2026-11-06\", \"000660\", \"SK하이닉스\", \"KOSPI\", 198000, 0, 450000)]\nfor row in new_rows:\n    try:\n        con.execute(INSERT, row)\n        con.commit()\n    except sqlite3.IntegrityError as error:\n        print(error)\nprint(con.execute(\"SELECT COUNT(*) FROM quotes\").fetchone())\nEOF\npython3 per_row.py\npython3 create_db.py",
           "note": "비교: 행마다 커밋하면 같은 오류 뒤에 (6,)이 된다. 2026-11-06의 삼성전자 한 행만 들어간 반쪽짜리 스냅숏이 남아, 보고서에 이틀 치가 섞이는데도 정상처럼 보인다. 마지막의 create_db.py로 다섯 행으로 되돌린다."
         }
       ],
@@ -76,19 +76,19 @@
           "note": "read_csv()가 11주차와 똑같이 CSV를 검증한 뒤 replace_quotes()가 스냅숏을 교체한다. Generated … (5 stocks)."
         },
         {
-          "cmd": "python3 main.py --market KOSPI; cp docs/index.html /mnt/host/report.html",
+          "cmd": "python3 main.py --market KOSPI\ncp docs/index.html /mnt/host/report.html",
           "note": "이제 CSV 없이 market.db만 읽어 (3 stocks) 보고서를 만든다. 받기 칸에 /mnt/host/report.html을 입력해 내려받으면 11주차와 같은 KOSPI 보고서(평균 +0.33%)가 보인다."
         },
         {
-          "cmd": "python3 -c 'from storage import connect, load_quotes; quotes = load_quotes(connect(\"data/market.db\")); print(len(quotes)); print(*[f\"{k:<15}{v!r}\" for k, v in quotes[0].items()], sep=\"\\n\")'",
+          "cmd": "python3 - <<'EOF'\nfrom storage import connect, load_quotes\nquotes = load_quotes(connect(\"data/market.db\"))\nprint(len(quotes))\nprint(*[f\"{k:<15}{v!r}\" for k, v in quotes[0].items()], sep=\"\\n\")\nEOF",
           "note": "load_quotes()가 돌려주는 행 하나. ORDER BY code라 첫 행은 000660이다. 키는 테이블의 열 순서이고, code는 앞자리 0이 남은 문자열, 가격과 거래량은 이미 int다. analyze()와 summarize()가 이 dict를 그대로 받는다."
         },
         {
-          "cmd": "python3 main.py --import-csv data/invalid-zero.csv; echo \"exit=$?\"; python3 -c 'from storage import connect, load_quotes; print(len(load_quotes(connect(\"data/market.db\"))), \"rows kept\")'; grep -oE '시장: [A-Z]+' docs/index.html",
+          "cmd": "python3 main.py --import-csv data/invalid-zero.csv\necho \"exit=$?\"\npython3 - <<'EOF'\nfrom storage import connect, load_quotes\nprint(len(load_quotes(connect(\"data/market.db\"))), \"rows kept\")\nEOF\ngrep -oE '시장: [A-Z]+' docs/index.html",
           "note": "잘못된 CSV: Report not generated: CSV row 2: previous_close must be >= 1, 종료 코드 1. read_csv() 단계에서 거절되어 테이블은 5 rows kept, HTML은 바로 앞의 KOSPI 보고서 그대로다."
         },
         {
-          "cmd": "python3 main.py --import-csv data/empty.csv; python3 main.py --import-csv data/prices.csv",
+          "cmd": "python3 main.py --import-csv data/empty.csv\npython3 main.py --import-csv data/prices.csv",
           "note": "헤더만 있는 CSV는 정상적인 빈 스냅숏이므로 테이블을 비우고 (0 stocks) 보고서를 만든다. 다시 prices.csv를 가져와 (5 stocks)로 되돌린다."
         },
         {

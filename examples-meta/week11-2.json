@@ -34,7 +34,7 @@
           "note": "SC-01, 기본값은 --market ALL이다. Generated .../docs/index.html (5 stocks)가 나오면 보고서가 교체된 것이다. 성공 메시지는 write_html()이 끝난 뒤에만 출력된다."
         },
         {
-          "cmd": "grep -oE '종목 [0-9]+개[^<]*|<strong>[^<]*</strong>' docs/index.html; grep -oE '<td>[0-9]{6}</td>' docs/index.html",
+          "cmd": "grep -oE '종목 [0-9]+개[^<]*|<strong>[^<]*</strong>' docs/index.html\ngrep -oE '<td>[0-9]{6}</td>' docs/index.html",
           "note": "요약은 종목 5개 · 상승 2 · 하락 2 · 보합 1, 표본 단순평균 +0.40%다. 표의 코드 순서는 247540, 005930, 035420, 000660, 035900으로 등락률 내림차순이며 005930의 앞자리 0이 그대로 남아 있다."
         },
         {
@@ -42,11 +42,11 @@
           "note": "위쪽 받기 칸에 /mnt/host/report.html을 입력하고 받기를 누르면 내 컴퓨터의 브라우저로 보고서를 열 수 있다(TEST-13 브라우저 확인). 기준일·시장·출처·단위(원, 주)·부호가 붙은 등락률·가상 데이터 안내를 확인한다."
         },
         {
-          "cmd": "python3 main.py --market KOSPI; grep -oE '시장: [A-Z]+|<strong>[^<]*</strong>' docs/index.html",
+          "cmd": "python3 main.py --market KOSPI\ngrep -oE '시장: [A-Z]+|<strong>[^<]*</strong>' docs/index.html",
           "note": "FEAT-02: KOSPI만 남겨 3 stocks, 평균 +0.33%다. ALL의 +0.40%와 다른 이유는 평균을 내는 표본이 달라졌기 때문이다. 이 평균은 동일 가중 표본 평균이지 KOSPI 지수 수익률이 아니다."
         },
         {
-          "cmd": "python3 main.py --input data/invalid-zero.csv; echo \"exit=$?\"; grep -oE '시장: [A-Z]+' docs/index.html; ls docs",
+          "cmd": "python3 main.py --input data/invalid-zero.csv\necho \"exit=$?\"\ngrep -oE '시장: [A-Z]+' docs/index.html\nls docs",
           "note": "SC-02: 전일종가 0인 행은 Report not generated: CSV row 2: previous_close must be >= 1로 거절되고 종료 코드는 1이다. docs/index.html은 여전히 바로 앞의 KOSPI 보고서이고, 임시 파일도 남지 않았다(REQ-06)."
         },
         {
@@ -54,7 +54,7 @@
           "note": "누락 파일은 빈 데이터가 아니라 오류다. [Errno 2] No such file or directory 메시지와 종료 코드 1이 나오고 보고서는 바뀌지 않는다."
         },
         {
-          "cmd": "python3 main.py --input data/empty.csv; echo \"exit=$?\"; grep -oE '<strong>[^<]*</strong>|표시할 종목이 없습니다' docs/index.html",
+          "cmd": "python3 main.py --input data/empty.csv\necho \"exit=$?\"\ngrep -oE '<strong>[^<]*</strong>|표시할 종목이 없습니다' docs/index.html",
           "note": "SC-03: 헤더만 있는 CSV는 정상적인 빈 입력이다. (0 stocks)로 성공(종료 코드 0)하고, 평균은 N/A, 표에는 표시할 종목이 없습니다 안내가 들어간다. 누락 파일과 결과가 다르다는 점이 핵심이다."
         },
         {
@@ -62,11 +62,11 @@
           "note": "모르는 시장은 argparse가 invalid choice로 거절하고 종료 코드는 2다. 정리하면 성공 0, 데이터·파일 오류 1, CLI 사용 오류 2다."
         },
         {
-          "cmd": "python3 -c 'from logic import change_pct; assert change_pct(70000, 71400) == 2.0; assert change_pct(200000, 198000) == -1.0; assert change_pct(100, 100) == 0.0; print(\"Daily change checks passed.\")'",
+          "cmd": "python3 - <<'EOF'\nfrom logic import change_pct\nassert change_pct(70000, 71400) == 2.0\nassert change_pct(200000, 198000) == -1.0\nassert change_pct(100, 100) == 0.0\nprint(\"Daily change checks passed.\")\nEOF",
           "note": "슬라이드의 가장 작은 규칙: 상승·하락·보합을 각각 별도 검사로 확인한다. 계산은 반올림하지 않고, 반올림은 보고서에서 f\"{change:+.2f}%\"로만 한다."
         },
         {
-          "cmd": "python3 -c 'from html import escape; print(escape(\"<b>Example</b>\")); print(f\"{2.0:+.2f}%\")'",
+          "cmd": "python3 - <<'EOF'\nfrom html import escape\nprint(escape(\"<b>Example</b>\"))\nprint(f\"{2.0:+.2f}%\")\nEOF",
           "note": "html.escape는 종목명 같은 외부 텍스트의 <, >를 &lt;, &gt;로 바꿔 HTML 태그로 해석되지 않게 한다(TEST-08). +2.00%처럼 부호를 숫자와 함께 보여 주면 색이 없어도 방향을 알 수 있다."
         },
         {
@@ -95,7 +95,7 @@
           "note": "같은 줄이 if와 else에 두 번 있다(Move 3). 두 분기가 완전히 같으므로 한 줄을 만드는 함수 하나로 뽑아내면 분기 자체가 필요 없다."
         },
         {
-          "cmd": "[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py; python3 tidy_lab.py > before.txt; python3 my_tidy.py > after.txt; diff before.txt after.txt && echo same output",
+          "cmd": "[ -f my_tidy.py ] || cp tidy_lab.py my_tidy.py\npython3 tidy_lab.py > before.txt\npython3 my_tidy.py > after.txt\ndiff before.txt after.txt && echo same output",
           "note": "처음 실행하면 복사본 my_tidy.py를 만들고(아직 고치지 않았으므로 same output), 이후에는 있는 복사본을 그대로 둔다. nano my_tidy.py로 한 가지씩 고친 뒤 이 명령을 다시 실행해 원본과 출력을 비교한다. same output이 나오면 동작이 그대로라는 증거다. x, d, m, tmp 대신 entries, day, ml, totals 같은 이름을 쓴다(Move 1). check() 호출과 함수 이름은 바꾸지 않는다."
         }
       ],

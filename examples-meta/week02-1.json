@@ -6,26 +6,26 @@
     {
       "name": "operators",
       "source": "week02/solutions/leap_year.py",
-      "summary": "슬라이드의 연산자 예제를 한 줄 프로그램으로 실행한다. 식의 값과 자료형, //와 %, 비교와 범위, and·or의 단락 평가, 우선순위와 복합 대입을 확인한다. 마지막에 이 연산자들을 모두 쓰는 윤년 프로그램(2차시 실습 4의 답안)을 돌려 본다.",
+      "summary": "슬라이드의 연산자 예제를 짧은 프로그램으로 실행한다. 식의 값과 자료형, //와 %, 비교와 범위, and·or의 단락 평가, 우선순위와 복합 대입을 확인한다. 마지막에 이 연산자들을 모두 쓰는 윤년 프로그램(2차시 실습 4의 답안)을 돌려 본다.",
       "steps": [
         {
-          "cmd": "python3 -c 'print(8 + 2, type(8 + 2)); print(8 / 2, type(8 / 2)); print(\"8\" + \"2\", type(\"8\" + \"2\"))'",
+          "cmd": "python3 - <<'EOF'\nprint(8 + 2, type(8 + 2))\nprint(8 / 2, type(8 / 2))\nprint(\"8\" + \"2\", type(\"8\" + \"2\"))\nEOF",
           "note": "8 / 2는 정수끼리 나눠도 float 4.0이고, \"8\" + \"2\"는 str 82다. 실행 전에 값과 자료형을 먼저 예측해 본다."
         },
         {
-          "cmd": "python3 -c 'raw = \" 12 \"; clean = raw.strip(); number = int(clean); print(repr(raw), repr(clean)); print(number + 3, clean + \"3\")'",
+          "cmd": "python3 - <<'EOF'\nraw = \" 12 \"\nclean = raw.strip()\nnumber = int(clean)\nprint(repr(raw), repr(clean))\nprint(number + 3, clean + \"3\")\nEOF",
           "note": "repr로 보면 raw의 앞뒤 공백이 그대로 남아 있다. 숫자 덧셈은 15, 문자열 연결은 123이다."
         },
         {
-          "cmd": "python3 -c 'a, b = 7, 3; print(a + b, a - b, a * b, a / b); print(a // b, a % b, a ** b, -7 // 3)'",
+          "cmd": "python3 - <<'EOF'\na, b = 7, 3\nprint(a + b, a - b, a * b, a / b)\nprint(a // b, a % b, a ** b, -7 // 3)\nEOF",
           "note": "7 // 3은 2, 7 % 3은 1, 7 ** 3은 343이다. -7 // 3은 내림이라 -2가 아니라 -3이다."
         },
         {
-          "cmd": "python3 -c 'minutes = 185; print(minutes // 60, minutes % 60); students = 29; print(students // 4, students % 4); print(3 * 60 + 5, 7 * 4 + 1)'",
+          "cmd": "python3 - <<'EOF'\nminutes = 185\nprint(minutes // 60, minutes % 60)\nstudents = 29\nprint(students // 4, students % 4)\nprint(3 * 60 + 5, 7 * 4 + 1)\nEOF",
           "note": "연습 문제의 답: 3시간 5분, 4명씩 7모둠에 1명 남음. 몫 × 나누는 수 + 나머지가 원래 값 185, 29로 돌아오는지 확인한다."
         },
         {
-          "cmd": "python3 -c 'score = 85; print(score == 85, score != 85, score >= 60, 0 <= score <= 100, \"85\" == 85)'",
+          "cmd": "python3 - <<'EOF'\nscore = 85\nprint(score == 85, score != 85, score >= 60, 0 <= score <= 100, \"85\" == 85)\nEOF",
           "note": "비교 결과는 True/False다. 문자열 \"85\"와 정수 85는 같지 않으므로 입력은 비교 전에 변환해야 한다."
         },
         {
@@ -33,19 +33,19 @@
           "note": "<=는 끝값을 포함하고 <는 제외한다. 0과 100에서 두 결과가 갈리고, 101은 둘 다 False다."
         },
         {
-          "cmd": "python3 -c 'age = 20; has_id = True; print(age >= 18 and has_id, age < 18 or has_id, not has_id)'",
+          "cmd": "python3 - <<'EOF'\nage = 20\nhas_id = True\nprint(age >= 18 and has_id, age < 18 or has_id, not has_id)\nEOF",
           "note": "and는 둘 다 참일 때, or는 하나만 참이어도 True, not은 뒤집는다."
         },
         {
-          "cmd": "python3 -c 'n = 0; print(n != 0 and 10 / n > 2); text = \"\"; print(text != \"\" and text[0] == \"A\")'",
+          "cmd": "python3 - <<'EOF'\nn = 0\nprint(n != 0 and 10 / n > 2)\ntext = \"\"\nprint(text != \"\" and text[0] == \"A\")\nEOF",
           "note": "둘 다 False가 나오고 오류가 없다. 앞쪽 조건이 False라 10 / n과 text[0]은 평가되지 않는다(단락 평가)."
         },
         {
-          "cmd": "python3 -c 'print(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2); print(True or False and False, (True or False) and False)'",
+          "cmd": "python3 - <<'EOF'\nprint(2 + 3 * 4, (2 + 3) * 4, -2 ** 2, (-2) ** 2)\nprint(True or False and False, (True or False) and False)\nEOF",
           "note": "14, 20, -4, 4. **가 단항 -보다 먼저라 -2 ** 2는 -4다. and가 or보다 먼저라 첫 식은 True, 괄호를 치면 False다."
         },
         {
-          "cmd": "python3 -c 'score = 80; score += 5; print(score); x = 5; x += 3; x *= 2; print(x)'",
+          "cmd": "python3 - <<'EOF'\nscore = 80\nscore += 5\nprint(score)\nx = 5\nx += 3\nx *= 2\nprint(x)\nEOF",
           "note": "복합 대입은 적힌 순서대로 실행된다: 85, 그리고 (5 + 3) × 2 = 16."
         },
         {
@@ -61,7 +61,7 @@
       "summary": "문자열 인덱스와 음수 인덱스, IndexError, 슬라이싱과 역순, 불변성, strip·lower·upper·replace·split과 in, 문자열 연결과 f-string, 영수증 예제를 실행한다. 마지막에 이를 조합한 문자열 처리 프로그램(2차시 실습 1의 답안)을 돌린다.",
       "steps": [
         {
-          "cmd": "python3 -c 'text = \"Python\"; print(len(text), text[0], text[2], text[-1], text[-2])'",
+          "cmd": "python3 - <<'EOF'\ntext = \"Python\"\nprint(len(text), text[0], text[2], text[-1], text[-2])\nEOF",
           "note": "길이 6, 첫 글자 P(인덱스 0), text[2]는 t, 음수 인덱스 -1과 -2는 끝에서부터 n, o다."
         },
         {
@@ -73,31 +73,31 @@
           "note": "한 글자 문자열은 첫 글자와 마지막 글자가 같다(True). 빈 문자열에는 유효한 인덱스가 없어 IndexError다."
         },
         {
-          "cmd": "python3 -c 'text = \"Python\"; print(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])'",
+          "cmd": "python3 - <<'EOF'\ntext = \"Python\"\nprint(text[0:2], text[2:], text[:4], text[::2], text[::-1], text[:99])\nEOF",
           "note": "Py, thon, Pyth, Pto, nohtyP, Python. stop 인덱스는 포함되지 않고, 범위를 넘는 슬라이스 [:99]는 오류 없이 끝까지 잘린다."
         },
         {
-          "cmd": "python3 -c 'text = \"PYTHON\"; print(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))'",
+          "cmd": "python3 - <<'EOF'\ntext = \"PYTHON\"\nprint(text[1:4], text[:3], text[-3:], text[1::2], text[::-1], repr(text[2:2]))\nEOF",
           "note": "연습 문제의 답: YTH, PYT, HON, YHN, NOHTYP. start와 stop이 같으면 빈 문자열이고 repr로 ''가 보인다."
         },
         {
-          "cmd": "python3 -u -c 'text = \"Python\"; text = \"J\" + text[1:]; print(text); text[0] = \"J\"' 2>&1 | grep -v -e '^Traceback' -e '^ '",
+          "cmd": "python3 -u - <<'EOF' 2>&1 | grep -v -e '^Traceback' -e '^ '\ntext = \"Python\"\ntext = \"J\" + text[1:]\nprint(text)\ntext[0] = \"J\"\nEOF",
           "note": "새 문자열을 만들면 Jython이 된다. 문자열은 불변이라 text[0]에 대입하면 TypeError: 'str' object does not support item assignment다."
         },
         {
-          "cmd": "python3 -c 'raw = \"  Hello Python  \"; clean = raw.strip(); print(clean.lower(), \"|\", clean.upper(), \"|\", clean.replace(\"Python\", \"AI\")); print(clean.split(), \"Python\" in clean, \"python\" in clean)'",
+          "cmd": "python3 - <<'EOF'\nraw = \"  Hello Python  \"\nclean = raw.strip()\nprint(clean.lower(), \"|\", clean.upper(), \"|\", clean.replace(\"Python\", \"AI\"))\nprint(clean.split(), \"Python\" in clean, \"python\" in clean)\nEOF",
           "note": "메서드는 새 문자열을 돌려준다. split()은 ['Hello', 'Python'] 리스트를 만들고, in은 대소문자를 구별해 True, False다."
         },
         {
-          "cmd": "python3 -c 'raw = \"  Hello Python  \"; clean = raw.strip(); lowered = clean.lower(); slug = lowered.replace(\" \", \"-\"); print(repr(raw), clean, lowered, slug, sep=\" / \")'",
+          "cmd": "python3 - <<'EOF'\nraw = \"  Hello Python  \"\nclean = raw.strip()\nlowered = clean.lower()\nslug = lowered.replace(\" \", \"-\")\nprint(repr(raw), clean, lowered, slug, sep=\" / \")\nEOF",
           "note": "문자열 정리 과정: strip은 양끝만, replace는 가운데 공백까지 바꿔 hello-python이 된다. 원래 raw는 그대로 남아 있다."
         },
         {
-          "cmd": "python3 -c 'name = \"Mina\"; score = 87.5; print(\"Hi, \" + name); print(\"-\" * 5); print(\"Score: \" + str(score)); print(f\"{name}: {score:.2f}\"); print(\" YES \".strip().lower() == \"yes\")'",
+          "cmd": "python3 - <<'EOF'\nname = \"Mina\"\nscore = 87.5\nprint(\"Hi, \" + name)\nprint(\"-\" * 5)\nprint(\"Score: \" + str(score))\nprint(f\"{name}: {score:.2f}\")\nprint(\" YES \".strip().lower() == \"yes\")\nEOF",
           "note": "+는 연결, *는 반복이다. 숫자를 +로 붙이려면 str()이 필요하다. 입력을 정규화하면 \" YES \"도 \"yes\"와 같다(True)."
         },
         {
-          "cmd": "python3 -c 'item = \"Notebook\"; price = 2.5; quantity = 3; total = price * quantity; print(f\"Item: {item}\"); print(f\"Quantity: {quantity}\"); print(f\"Total: {total:.2f}\"); print(total)'",
+          "cmd": "python3 - <<'EOF'\nitem = \"Notebook\"\nprice = 2.5\nquantity = 3\ntotal = price * quantity\nprint(f\"Item: {item}\")\nprint(f\"Quantity: {quantity}\")\nprint(f\"Total: {total:.2f}\")\nprint(total)\nEOF",
           "note": "영수증 예제: 표시는 Total: 7.50이지만 total 변수에는 여전히 숫자 7.5가 들어 있다."
         },
         {
@@ -113,27 +113,27 @@
       "summary": "if / else의 실행 순서, elif 사슬과 독립된 if의 차이, 0으로 나누기를 막는 중첩 조건, 입력 검증, or를 잘못 쓴 할인 조건 버그와 수정을 실행해 확인한다. 마지막에 성적 분류 프로그램(2차시 실습 2의 답안)을 돌린다.",
       "steps": [
         {
-          "cmd": "for age in 17 18; do printf '%s\\n' 'age = '$age'' 'print(\"Start\")' 'if age >= 18:' '    print(\"Adult\")' 'else:' '    print(\"Under 18\")' 'print(\"Done\")' | python3 -; done",
+          "cmd": "for age in 17 18; do\npython3 - <<EOF\nage = $age\nprint(\"Start\")\nif age >= 18:\n    print(\"Adult\")\nelse:\n    print(\"Under 18\")\nprint(\"Done\")\nEOF\ndone",
           "note": "if와 else 중 정확히 하나만 실행된다. 17이면 Under 18, 18이면 Adult이고 들여쓰기 밖의 Start와 Done은 항상 출력된다."
         },
         {
-          "cmd": "printf '%s\\n' 'score = 95' 'if score >= 90:' '    print(\"A\")' 'if score >= 80:' '    print(\"B\")' 'print(\"--- if/elif ---\")' 'if score >= 90:' '    print(\"A\")' 'elif score >= 80:' '    print(\"B\")' | python3 -",
+          "cmd": "python3 - <<'EOF'\nscore = 95\nif score >= 90:\n    print(\"A\")\nif score >= 80:\n    print(\"B\")\nprint(\"--- if/elif ---\")\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nEOF",
           "note": "독립된 if 두 개는 각자 검사해 A와 B가 모두 나온다. elif 사슬은 처음 맞은 A에서 멈춘다."
         },
         {
-          "cmd": "printf '%s\\n' 'a = float(input(\"First number: \"))' 'b = float(input(\"Second number: \"))' 'if b == 0:' '    print(\"Cannot divide by zero\")' 'else:' '    result = a / b' '    if result < 0:' '        print(\"Negative result\")' '    print(f\"Result: {result:.2f}\")' > /tmp/divide.py; printf '7\\n0\\n' | python3 /tmp/divide.py; echo; printf -- '-6\\n4\\n' | python3 /tmp/divide.py",
+          "cmd": "cat > /tmp/divide.py <<'EOF'\na = float(input(\"First number: \"))\nb = float(input(\"Second number: \"))\nif b == 0:\n    print(\"Cannot divide by zero\")\nelse:\n    result = a / b\n    if result < 0:\n        print(\"Negative result\")\n    print(f\"Result: {result:.2f}\")\nEOF\nprintf '7\\n0\\n' | python3 /tmp/divide.py\necho\nprintf -- '-6\\n4\\n' | python3 /tmp/divide.py",
           "note": "슬라이드의 중첩 조건을 /tmp/divide.py로 저장해 두 번 실행했다. 7, 0은 Cannot divide by zero, -6, 4는 Negative result 다음에 Result: -1.50이 나온다."
         },
         {
-          "cmd": "for t in -1 0 2; do printf '%s\\n' 'tickets = '$t'' 'if tickets < 0:' '    print(tickets, \"Invalid quantity\")' 'else:' '    if tickets == 0:' '        print(tickets, \"No booking\")' '    else:' '        print(tickets, f\"Booked: {tickets}\")' | python3 -; done",
+          "cmd": "for t in -1 0 2; do\npython3 - <<EOF\ntickets = $t\nif tickets < 0:\n    print(tickets, \"Invalid quantity\")\nelse:\n    if tickets == 0:\n        print(tickets, \"No booking\")\n    else:\n        print(tickets, f\"Booked: {tickets}\")\nEOF\ndone",
           "note": "검증을 먼저 하고 정상 처리를 else 안에 둔다. 음수·0·양수 세 경우가 각각 다른 메시지를 낸다."
         },
         {
-          "cmd": "for c in adult student senior; do printf '%s\\n' 'customer = \"'$c'\"' 'price = 100' 'if customer == \"student\" or \"senior\":' '    price *= 0.8' 'print(customer, price)' | python3 -; done",
+          "cmd": "for c in adult student senior; do\npython3 - <<EOF\ncustomer = \"$c\"\nprice = 100\nif customer == \"student\" or \"senior\":\n    price *= 0.8\nprint(customer, price)\nEOF\ndone",
           "note": "디버깅 연습의 버그: adult까지 80.0으로 할인된다. or 오른쪽의 \"senior\"는 비어 있지 않은 문자열이라 항상 참이다."
         },
         {
-          "cmd": "for c in adult student senior; do printf '%s\\n' 'customer = \"'$c'\"' 'price = 100' 'if customer == \"student\" or customer == \"senior\":' '    price *= 0.8' 'print(customer, price)' | python3 -; done",
+          "cmd": "for c in adult student senior; do\npython3 - <<EOF\ncustomer = \"$c\"\nprice = 100\nif customer == \"student\" or customer == \"senior\":\n    price *= 0.8\nprint(customer, price)\nEOF\ndone",
           "note": "양쪽을 모두 customer == 로 비교하면 adult 100, student 80.0, senior 80.0이 된다."
         },
         {

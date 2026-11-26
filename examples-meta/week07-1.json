@@ -29,7 +29,7 @@
           "note": "Minsu 13000, Jisu 5000. minsu의 잔액을 바꿔도 jisu는 그대로다. 마지막 False는 minsu is jisu의 결과로, 생성자를 두 번 부르면 서로 다른 두 객체가 생긴다는 뜻이다."
         },
         {
-          "cmd": "python3 -c 'from importlib import import_module; m = import_module(\"02_classes_and_objects\"); print(type(m.minsu).__name__, isinstance(m.jisu, m.BankAccount))'",
+          "cmd": "python3 - <<'EOF'\nfrom importlib import import_module\nm = import_module(\"02_classes_and_objects\")\nprint(type(m.minsu).__name__, isinstance(m.jisu, m.BankAccount))\nEOF",
           "note": "import하면서 파일의 세 줄이 먼저 한 번 더 나오고, 이어서 BankAccount True가 나온다. minsu의 타입 이름은 BankAccount이고, jisu도 BankAccount의 인스턴스다. 파일 이름이 숫자로 시작해 import 문 대신 import_module을 썼다."
         }
       ],
@@ -45,7 +45,7 @@
           "note": "Minsu 10000, Jisu 5000으로 초기화된 뒤 minsu만 3000 늘려 After changing Minsu: 13000 5000이 된다."
         },
         {
-          "cmd": "python3 -c 'from importlib import import_module; BankAccount = import_module(\"03_init_and_self\").BankAccount; a = BankAccount(\"A\", 2000); b = BankAccount(\"B\", 7000); a.balance = a.balance + 1000; print(a.balance); print(b.balance)'",
+          "cmd": "python3 - <<'EOF'\nfrom importlib import import_module\nBankAccount = import_module(\"03_init_and_self\").BankAccount\na = BankAccount(\"A\", 2000)\nb = BankAccount(\"B\", 7000)\na.balance = a.balance + 1000\nprint(a.balance)\nprint(b.balance)\nEOF",
           "note": "슬라이드의 예측 문제다. 먼저 파일을 import하면서 맨 위 코드가 한 번 실행되어 위와 같은 세 줄이 나오고, 그 다음에 3000과 7000이 나온다. a.balance를 바꿔도 b는 영향을 받지 않는다. 파일 이름이 숫자로 시작해서 import 문 대신 import_module을 썼다."
         }
       ],
@@ -73,7 +73,7 @@
           "note": "Deposit: True 13000, Withdraw: True 9000, Jisu: 5000. return은 호출한 쪽에 True를 돌려주고, print가 그 값을 화면에 보여 준다."
         },
         {
-          "cmd": "python3 -c 'from importlib import import_module; BankAccount = import_module(\"04_methods\").BankAccount; account = BankAccount(\"Minsu\", 10000); print(account.withdraw(20000), account.balance); account.balance = -9999; print(account.balance)'",
+          "cmd": "python3 - <<'EOF'\nfrom importlib import import_module\nBankAccount = import_module(\"04_methods\").BankAccount\naccount = BankAccount(\"Minsu\", 10000)\nprint(account.withdraw(20000), account.balance)\naccount.balance = -9999\nprint(account.balance)\nEOF",
           "note": "import하면서 파일의 세 줄이 먼저 나온다. 그 다음 True -10000: 검사 없는 withdraw는 잔액보다 큰 출금도 받아들인다. 직접 대입 account.balance = -9999도 막을 방법이 없다. 이 문제를 다음 예제의 캡슐화가 해결한다."
         }
       ],
@@ -89,7 +89,7 @@
           "note": "실습 기대표와 같은 결과다. Withdraw 10000, Deposit -1000, Withdraw 0은 모두 False이고 잔액은 9000으로 그대로다. 잔액 전부를 출금하는 Jisu withdraw 5000은 허용되어 0이 된다."
         },
         {
-          "cmd": "python3 -c 'from importlib import import_module; BankAccount = import_module(\"05_encapsulation\").BankAccount; account = BankAccount(\"Jisu\", 5000); account._balance = -1; print(account.get_balance())'",
+          "cmd": "python3 - <<'EOF'\nfrom importlib import import_module\nBankAccount = import_module(\"05_encapsulation\").BankAccount\naccount = BankAccount(\"Jisu\", 5000)\naccount._balance = -1\nprint(account.get_balance())\nEOF",
           "note": "파일 출력 뒤에 -1이 나온다. 밑줄은 \"내부용\"이라는 약속일 뿐 Python이 막지는 않는다. 클래스를 쓰는 쪽이 공개 메서드만 사용해야 캡슐화가 지켜진다."
         }
       ],
@@ -148,7 +148,7 @@
           "note": "같은 순서의 연산을 하는 완성된 클래스의 출력이다. 실습 기대표와 같이 Start: 10000 5000부터 Final: 9000 0까지 나와야 한다."
         },
         {
-          "cmd": "python3 -c 'from bank_account import BankAccount; a = BankAccount(\"Test\", 1000); print(a.deposit(0), a.withdraw(-5), a.get_balance())'",
+          "cmd": "python3 - <<'EOF'\nfrom bank_account import BankAccount\na = BankAccount(\"Test\", 1000)\nprint(a.deposit(0), a.withdraw(-5), a.get_balance())\nEOF",
           "note": "스타터에 남겨진 추가 확인 두 가지(0 입금, 음수 출금)다. 완성 후에는 False False 1000이 나와야 한다. 지금은 잔액이 저장되지 않아 False False 0이다."
         }
       ],

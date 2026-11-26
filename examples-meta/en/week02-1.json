@@ -3,7 +3,7 @@
   "summary": "Run short pieces of code for arithmetic, comparison and logical operators and precedence, string indexing, slicing and methods, and if / elif / else, and check the results predicted on the slides.",
   "examples": {
     "operators": {
-      "summary": "Run the operator examples from the slides as one-line programs. Check the value and type of expressions, // and %, comparisons and ranges, short-circuiting with and / or, precedence and compound assignment. At the end, run a leap-year program that uses all of these operators (the solution to Session 2, Lab 4).",
+      "summary": "Run the operator examples from the slides as short programs. Check the value and type of expressions, // and %, comparisons and ranges, short-circuiting with and / or, precedence and compound assignment. At the end, run a leap-year program that uses all of these operators (the solution to Session 2, Lab 4).",
       "steps": [
         "8 / 2 is the float 4.0 even though both operands are integers, and \"8\" + \"2\" is the str 82. Predict the value and type before running it.",
         "Seen with repr, raw still has its leading and trailing spaces. The numeric addition gives 15, and the string concatenation gives 123.",

@@ -1,108 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="position_report — Files, Classes, Charts · Python Lab" data-title-ko="position_report — 파일, 클래스, 차트 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>position_report — Files, Classes, Charts · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week06/index.html#ex=position_report">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week06/index.html#ex=position_report");</script>
 </head>
-<body data-root="../../" data-lab-dir="week06/starter">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 6 · Session 1</span><span lang="ko">6주차 1차시</span></a><span class="sep">/</span><span>position_report</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>position_report</h1>
-    <p><span lang="en">Practice 2. The Position class stores ticker, shares and buy on self in __init__. Add a profit(self, close) method, build Position objects from the five rows, and print each stock's profit or loss on the screen while writing the same lines to portfolio_report.txt.</span><span lang="ko">Practice 2. Position 클래스는 __init__에서 ticker, shares, buy를 self에 저장한다. profit(self, close) 메서드를 추가하고, 다섯 행으로 Position 객체를 만들어 종목별 손익을 화면에 출력하면서 같은 줄을 portfolio_report.txt에도 쓴다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week06/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week06/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 position_report.py; echo &quot;exit=$?&quot;; ls portfolio_report.txt" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 position_report.py; echo &quot;exit=$?&quot;; ls portfolio_report.txt">▶</button><code>python3 position_report.py; echo &quot;exit=$?&quot;; ls portfolio_report.txt</code></div>
-          <p><span lang="en">The starter only defines the class and the data, so there is no output, and the report file has not been created yet (No such file or directory).</span><span lang="ko">스타터는 클래스와 데이터만 정의하므로 출력이 없고, 보고서 파일도 아직 만들어지지 않는다(No such file or directory).</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from position_report import Position; p1 = Position(&quot;CODE&quot;, 2, 10000); p2 = Position(&quot;TEA&quot;, 10, 5000); print(p1.ticker, p2.shares); print(p1.ticker, p1.shares, p1.buy)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from position_report import Position; p1 = Position(&quot;CODE&quot;, 2, 10000); p2 = Position(&quot;TEA&quot;, 10, 5000); print(p1.ticker, p2.shares); print(p1.ticker, p1.shares, p1.buy)'">▶</button><code>python3 -c 'from position_report import Position; p1 = Position(&quot;CODE&quot;, 2, 10000); p2 = Position(&quot;TEA&quot;, 10, 5000); print(p1.ticker, p2.shares); print(p1.ticker, p1.shares, p1.buy)'</code></div>
-          <p><span lang="en">Two objects made from one class each have their own attributes: CODE 10, then CODE 2 10000. Importing a module runs its top-level code, but this starter has no print, so it stays quiet.</span><span lang="ko">한 클래스에서 만든 두 객체가 각자의 속성을 가진다: CODE 10, 그리고 CODE 2 10000. 모듈을 import하면 맨 위 코드가 실행되지만 이 스타터에는 print가 없어 조용하다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 -c 'from position_report import Position; print(hasattr(Position(&quot;TEA&quot;, 40, 5000), &quot;profit&quot;))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from position_report import Position; print(hasattr(Position(&quot;TEA&quot;, 40, 5000), &quot;profit&quot;))'">▶</button><code>python3 -c 'from position_report import Position; print(hasattr(Position(&quot;TEA&quot;, 40, 5000), &quot;profit&quot;))'</code></div>
-          <p><span lang="en">There is no profit method yet, so this is False. Once you add the method it becomes True, and Position(&quot;TEA&quot;, 40, 5000).profit(4800) should return -8000.</span><span lang="ko">아직 profit 메서드가 없으므로 False다. 메서드를 추가하면 True가 되고, Position(&quot;TEA&quot;, 40, 5000).profit(4800)은 -8000을 돌려줘야 한다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="printf 'class P:\n    def profit(close):\n        return close\nprint(P().profit(4800))\n' &gt; no_self.py; python3 no_self.py; rm no_self.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf 'class P:\n    def profit(close):\n        return close\nprint(P().profit(4800))\n' &gt; no_self.py; python3 no_self.py; rm no_self.py">▶</button><code>printf 'class P:\n    def profit(close):\n        return close\nprint(P().profit(4800))\n' &gt; no_self.py; python3 no_self.py; rm no_self.py</code></div>
-          <p><span lang="en">Calling a method whose def leaves out self gives TypeError: P.profit() takes 1 positional argument but 2 were given. This is because Python passes the object itself as the first argument in the call.</span><span lang="ko">def에서 self를 빼먹은 메서드를 호출하면 TypeError: P.profit() takes 1 positional argument but 2 were given이 난다. 호출할 때 Python이 객체 자신을 첫 인자로 넘기기 때문이다.</span></p>
-        </li>
-      </ol>
-      <p class="callout"><span lang="en">The TypeError in the last step is an intended error reproducing the TRAP from the slides. The finished program should print CODE +8000, TEA -8000, ROBO +25000, MLBK +15000, FIT +24000 and Saved portfolio_report.txt; check with cat portfolio_report.txt that the same five lines were saved to the file. To get the report onto your computer, run cp portfolio_report.txt /mnt/host/ and then enter its name in the Download box.</span><span lang="ko">마지막 단계의 TypeError는 슬라이드의 TRAP을 재현한 의도된 오류다. 완성한 프로그램은 CODE +8000, TEA -8000, ROBO +25000, MLBK +15000, FIT +24000과 Saved portfolio_report.txt를 출력해야 하고, cat portfolio_report.txt로 같은 다섯 줄이 파일에 저장됐는지 확인한다. 보고서를 내 컴퓨터로 받으려면 cp portfolio_report.txt /mnt/host/ 후 받기 상자에 이름을 넣는다.</span></p>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>position_report.py <span class="muted"><span lang="en">24 lines</span><span lang="ko">24줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: the portfolio as objects.</span>
-<span class="ln">Tests: five profit lines / Saved</span>
-<span class="ln">portfolio_report.txt.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln"> </span>
-<span class="ln">class Position:</span>
-<span class="ln">    def __init__(self, ticker, shares, buy):</span>
-<span class="ln">        self.ticker = ticker</span>
-<span class="ln">        self.shares = shares</span>
-<span class="ln">        self.buy = buy</span>
-<span class="ln">    # TODO: add profit(self, close) that returns</span>
-<span class="ln">    # (close - self.buy) * self.shares</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">rows = [(&quot;CODE&quot;, 10, 10000), (&quot;TEA&quot;, 40, 5000),</span>
-<span class="ln">        (&quot;ROBO&quot;, 5, 40000), (&quot;MLBK&quot;, 30, 2000),</span>
-<span class="ln">        (&quot;FIT&quot;, 20, 3000)]</span>
-<span class="ln">closes = {&quot;CODE&quot;: 10800, &quot;TEA&quot;: 4800,</span>
-<span class="ln">          &quot;ROBO&quot;: 45000, &quot;MLBK&quot;: 2500,</span>
-<span class="ln">          &quot;FIT&quot;: 4200}</span>
-<span class="ln"># TODO: build a Position for each row, print</span>
-<span class="ln"># &quot;TICKER +N&quot; (or &quot;TICKER -N&quot;) for each, write</span>
-<span class="ln"># the same lines to portfolio_report.txt, and</span>
-<span class="ln"># print Saved portfolio_report.txt last.</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="journal_by_hand.html">← journal_by_hand</a>
-    <a href="my_charts.html">my_charts →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week06/index.html#ex=position_report">../week06/index.html#ex=position_report</a></p></body>
 </html>

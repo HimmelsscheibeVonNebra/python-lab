@@ -3,8 +3,8 @@
 웹브라우저에서 32비트 x86 Linux를 부팅해 [2026_BasicProgrammingUsingPython](../2026_BasicProgrammingUsingPython) 강의의 수업 내용과 예제(`Codes/`, `Sample/`의 Flask 예제)를 실행하는 교육용 실습 환경입니다. 모든 페이지는 영어/한국어를 고를 수 있으며 기본은 영어입니다.
 [Linux Lab](../LinuxSystemProgramming_Lab/linux-kernel-lab/)과 같은 구조(v86 에뮬레이터 + xterm.js + 정적 파일)이며, 정적 파일만으로 동작하므로 GitHub Pages에 그대로 배포됩니다. C 컴파일러(gcc)와 커널 모듈 실습은 넣지 않았습니다.
 
-- **수업별 페이지** — `classes/<주차-차시>/index.html`에 그 차시 슬라이드를 풀어 쓴 강의 내용과 예제 목록이 있습니다.
-- **예제 페이지** — 예제마다 페이지가 하나씩 있습니다. 페이지를 열면 그 예제의 디렉터리(예: `/home/student/week03/starter/session1`)에서 `student` 사용자 셸이 뜨고, ▶ 버튼을 누르면 실행 순서의 명령이 터미널에 입력됩니다. 수업 코드 전체가 `/home/student/week01` … 에 들어 있습니다.
+- **주차별 페이지** — `classes/weekNN/index.html` 하나에 그 주의 모든 차시가 들어 있습니다. 페이지를 열면 가상 머신을 한 번 부팅하고, 오른쪽에서 예제를 고르면 재부팅 없이 실행 순서와 소스만 바뀌고 터미널에서 그 예제의 디렉터리로 `cd`합니다 (Flask 앱이 켜져 있으면 `web stop`도). 주소의 `#ex=<예제 이름>`으로 처음 예제를 고를 수 있고, 아래에 차시별 강의 내용(슬라이드를 풀어 쓴 글)이 있습니다. 예전 주소 `classes/<주차-차시>/…`는 새 페이지로 넘겨 줍니다.
+- **실행 순서** — ▶ 버튼을 누르면 명령이 터미널에 입력됩니다. 짧은 Python 코드는 한 줄짜리 `python3 -c '…; …'` 대신 `python3 - <<'EOF'` … `EOF`처럼 여러 줄로 적어 코드 그대로 읽히게 합니다. 수업 코드 전체가 `/home/student/week01` … 에 들어 있습니다.
 - **Flask 예제** — `classes/sample/`. 강의 저장소 `Sample/`의 sample1·sample2·sample4 (네이버 API를 쓰는 sample3은 제외).
 - **자유 실습** — `playground.html`. REPL, `nano`로 스크립트 작성, 파일 올리기/받기.
 
@@ -23,6 +23,7 @@ examples-meta/                          예제별 설명과 실행 순서 (차�
 examples-meta/en/                       같은 내용의 영어 문장 (명령은 한국어 파일 것을 씀)
 class-notes/, class-notes/en/           차시별 강의 내용 (슬라이드를 풀어 쓴 HTML 조각, 한국어/영어)
 rootfs/overlay/                         게스트에 덮어쓰는 파일: /init, inittab, 계정, 프로필, 자유 실습 예제
+rootfs/site-packages/_lab_flask.py      게스트 Python이 /opt/py/flask.zip에서 Flask를 import하게 하는 훅
 scripts/                                이미지 빌드, 페이지 생성, 강의 코드 동기화
 tests/                                  Node.js 헤드리스 테스트
 ```
@@ -54,6 +55,7 @@ python3 -m http.server 8000
 
 pandas·numpy·matplotlib·Flask와 그 의존 라이브러리는 기본 이미지에 넣지 않고 9p 파일시스템(`images/9p/`, 게스트의 `/opt/py`)으로 제공합니다. 페이지는 부팅할 때 파일 목록(`fs.json`)만 받고, 각 파일은 게스트가 처음 열 때 HTTP로 내려받습니다 (전체 50 MB, zstd). Python은 `site-packages/lab-9p.pth`로 이 경로를 찾고, 공유 라이브러리는 `LD_LIBRARY_PATH=/opt/py/usr/lib`로 찾습니다.
 
+- **Flask는 zip 하나로**: 9p에서는 파일을 열 때마다 HTTP 요청이 하나씩 생기는데 `import flask`는 약 200개 파일을 엽니다 (지연 80 ms를 흉내 내면 25초). 빌드 스크립트가 `scripts/make-flask-zip.py`로 flask·werkzeug·jinja2·markupsafe·click·itsdangerous·blinker·dotenv를 `/opt/py/flask.zip` 하나로 묶고, 게스트의 `_lab_flask.py`(`rootfs/site-packages/`, `lab-flask.pth`로 불러옴)가 이 zip을 한 번 읽어 메모리에서 import합니다 (같은 조건에서 7초). zipimport는 모듈마다 zip을 다시 열어 그때마다 다시 내려받기 때문에 쓰지 않습니다. Flask 예제 디렉터리로 부팅하면 `lab.sh`가 zip을 미리 받아 둡니다.
 - 에뮬레이터 안에서는 `import pandas`가 약 12–15초, matplotlib로 그림 하나를 저장하는 데 약 20초(첫 실행은 글꼴 캐시 생성으로 30초) 걸립니다.
 - 그림은 화면에 띄울 수 없으므로 `savefig`로 파일에 저장한 뒤 `/mnt/host`로 복사해 받습니다. 기본 글꼴(DejaVu)에는 한글이 없어 한글 제목은 네모로 나옵니다.
 - **OpenBLAS 대신 참조 BLAS/LAPACK**: Alpine의 OpenBLAS는 Core2 기준으로 빌드되어 공통 코드에도 SSSE3 명령(`palignr`)이 있는데, v86은 SSSE3를 지원하지 않아 `numpy.linalg`(그리고 matplotlib의 좌표 변환)가 SIGILL로 죽습니다. 빌드 스크립트는 OpenBLAS를 지우고, 참조 구현(`blas`, `cblas`, `lapack` 패키지)을 `DT_NEEDED`로만 가리키는 코드 없는 `libopenblas.so.3`를 `ld.lld`로 만들어 넣습니다. 선형대수는 느려지지만 수업 규모에서는 문제가 없습니다.
@@ -66,12 +68,14 @@ Flask 서버는 게스트의 `127.0.0.1`에서만 접속할 수 있습니다 (�
 
 | 파일 | 쓰는 쪽 | 내용 |
 |---|---|---|
-| `server.json` | 게스트 | 앱이 실행 중일 때만 존재: `{port, app, started}` → 페이지가 미리보기 창을 연다 |
+| `server.json` | 게스트 | 앱이 실행 중일 때만 존재: `{port, app, started, state, message}` → 페이지가 미리보기 창을 연다. `state`: `running`, `restarting`(파일이 바뀌어 다시 시작하는 중), `error`(앱이 오류로 멈춤, `message`에 로그) |
 | `req-<id>.json` | 페이지 | 요청 `{method, path, body, type}` (창 안의 링크·폼, 주소 칸) |
 | `res-<id>.json` | 게스트 | 응답 `{status, path, type, body}`. HTML에는 앱의 CSS와 그림을 넣어 줌 |
 | `show.json` | 게스트 | `web show PATH` → 페이지가 그 주소를 연다 |
 
 페이지는 응답 HTML을 스크립트를 막은 iframe(`sandbox="allow-same-origin allow-forms"`)에 그리고, 링크 클릭과 폼 제출을 가로채 다시 요청 파일로 보냅니다. 요청 하나에 0.2–1초 걸립니다. 게스트는 부팅할 때 `.web`을 지웁니다.
+
+**자동 재시작** — 다리는 1초마다 앱 디렉터리의 `.py`·`.html`·`.css`·`.js`·Jinja 파일을 살펴, 바뀌면 앱을 다시 시작하고 페이지는 보고 있던 주소를 다시 엽니다. 고친 코드에 오류가 있으면 미리보기 창에 로그가 나오고, 고쳐 저장하면 다시 시작합니다.
 
 ```sh
 web start [app.py]     # 서버를 백그라운드로 띄우고 준비될 때까지 기다림 → 미리보기 창이 열림
@@ -80,6 +84,7 @@ web get '/?market=KOSPI'   # 상태 코드와 화면을 글자로 (표는 한 �
 web html /             # HTML 원문
 web save page.html     # CSS를 넣은 HTML 한 파일로 /mnt/host에 저장 → 받기
 web log                # 서버 로그
+web restart            # 직접 다시 시작 (보통은 저장만 하면 저절로)
 web stop
 ```
 
@@ -119,6 +124,8 @@ Flask 예제 차시는 가장 작은 앱 `flask_hello`(`rootfs/overlay/home/stud
 
 3. `class-notes/<주차-차시>.html`과 `class-notes/en/<주차-차시>.html`을 고칩니다. 생성기가 허용 태그(`h2 h3 p ul ol li pre code table … a kbd`)와 예제 링크를 검사합니다.
 
+   긴 코드는 `"cmd"`에 줄바꿈을 넣어 여러 줄로 적습니다 (`cat > file.py <<'EOF'` … `EOF`, `python3 - <<'EOF'` … `EOF`). 테스트는 여러 줄 명령 뒤의 확인 명령을 새 줄에 붙입니다.
+
 4. 페이지를 다시 만들고 테스트합니다.
 
    ```bash
@@ -138,7 +145,7 @@ scripts/build-images.sh
 Alpine 컨테이너 안에서 `apk --arch x86`으로 빈 루트에 x86 패키지를 풉니다 (설치 스크립트는 실행하지 않으므로 BusyBox 명령 링크는 부팅할 때 `/init`이 만듭니다).
 
 - **initramfs**: Python과 표준 라이브러리에서 GUI·pip 휠·CPython 자체 테스트 모듈 등을 지우고, `rootfs/overlay/`와 `course/`를 덮어써서 cpio로 묶습니다.
-- **9p**: 같은 루트에 `PACKAGES_9P`(기본 `py3-pandas py3-matplotlib`)를 더 설치해, 추가된 파일만 `images/9p/`로 변환합니다 (v86의 `fs2json.py`, `copy-to-sha256.py`; `scripts/v86/`. Python 3.14에서 `compression.zstd`가 없으면 `zstandard`를 쓰도록 고쳤습니다).
+- **9p**: 같은 루트에 `PACKAGES_9P`(기본 `py3-pandas py3-matplotlib py3-flask`)를 더 설치해, 추가된 파일만(Flask 계열은 `flask.zip` 하나로 묶어) `images/9p/`로 변환합니다 (v86의 `fs2json.py`, `copy-to-sha256.py`; `scripts/v86/`. Python 3.14에서 `compression.zstd`가 없으면 `zstandard`를 쓰도록 고쳤습니다).
 - 다른 Alpine 버전: `ALPINE_VERSION=3.23`, initramfs에 패키지 추가: `PACKAGES="..."`, 9p 패키지 바꾸기: `PACKAGES_9P="py3-pandas py3-matplotlib py3-flask"`(기본값), 9p 없이: `PACKAGES_9P=""`.
 
 커널은 다시 빌드하지 않고 Linux Lab의 `images/bzImage`를 그대로 씁니다 (설정: Linux Lab의 `buildroot-external/board/kernellab/linux.config`).

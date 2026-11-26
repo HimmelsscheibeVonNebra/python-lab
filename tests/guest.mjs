@@ -65,7 +65,9 @@ export async function bootGuest(labDir = "") {
     const marker = `__DONE_${++seq}__`;
     const from = serial.length;
     // "prog &; echo" is a syntax error, "prog & echo" is fine.
-    const sep = /&\s*$/.test(cmd) ? " " : "; ";
+    // A multi-line command (a heredoc ends with its EOF line) gets the
+    // marker on a line of its own.
+    const sep = cmd.includes("\n") ? "\n" : /&\s*$/.test(cmd) ? " " : "; ";
     send(`${cmd}${sep}echo ${marker}$?\n`);
     try {
       // The tty echoes the command line (marker followed by "$?"); the real

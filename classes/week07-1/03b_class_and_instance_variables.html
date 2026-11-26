@@ -1,100 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="03b_class_and_instance_variables — Object-Oriented Programming · Python Lab" data-title-ko="03b_class_and_instance_variables — 객체 지향 프로그래밍 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>03b_class_and_instance_variables — Object-Oriented Programming · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week07/index.html#ex=03b_class_and_instance_variables">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week07/index.html#ex=03b_class_and_instance_variables");</script>
 </head>
-<body data-root="../../" data-lab-dir="week07/examples/session1">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 7 · Session 1</span><span lang="ko">7주차 1차시</span></a><span class="sep">/</span><span>03b_class_and_instance_variables</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>03b_class_and_instance_variables</h1>
-    <p><span lang="en">bank_name, placed in the class body, is a class variable that all instances read together, while owner and balance, stored on self in __init__, are instance variables that each account has separately.</span><span lang="ko">클래스 몸체에 둔 bank_name은 모든 인스턴스가 함께 읽는 클래스 변수이고, __init__에서 self에 저장한 owner와 balance는 계좌마다 따로 있는 인스턴스 변수다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week07/examples/session1</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week07/examples/session1</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 03b_class_and_instance_variables.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 03b_class_and_instance_variables.py">▶</button><code>python3 03b_class_and_instance_variables.py</code></div>
-          <p><span lang="en">First line: both accounts read the class variable Python Bank. Third line: changing BankAccount.bank_name makes both Campus Bank. Fourth line: minsu.bank_name = ... creates a new instance attribute with the same name on minsu only, giving Minsu Bank Campus Bank, while, as the fifth line shows, the class variable itself is still Campus Bank. The last line shows that each account has its own balance (13000 5000).</span><span lang="ko">첫 줄: 두 계좌 모두 클래스 변수 Python Bank를 읽는다. 셋째 줄: BankAccount.bank_name을 바꾸면 둘 다 Campus Bank가 된다. 넷째 줄: minsu.bank_name = ... 은 minsu에만 같은 이름의 인스턴스 속성을 새로 만들어 Minsu Bank Campus Bank가 되고, 다섯째 줄처럼 클래스 변수 자체는 Campus Bank 그대로다. 마지막 줄은 잔액이 계좌마다 따로라는 것(13000 5000)을 보여 준다.</span></p>
-        </li>
-      </ol>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>03b_class_and_instance_variables.py <span class="muted"><span lang="en">29 lines</span><span lang="ko">29줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Compare shared class data with each account's instance data.&quot;&quot;&quot;</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">class BankAccount:</span>
-<span class="ln">    bank_name = &quot;Python Bank&quot;  # class variable</span>
-<span class="ln"> </span>
-<span class="ln">    def __init__(self, owner, balance):</span>
-<span class="ln">        self.owner = owner    # instance variable</span>
-<span class="ln">        self.balance = balance</span>
-<span class="ln"> </span>
-<span class="ln"> </span>
-<span class="ln">if __name__ == &quot;__main__&quot;:</span>
-<span class="ln">    minsu = BankAccount(&quot;Minsu&quot;, 10000)</span>
-<span class="ln">    jisu = BankAccount(&quot;Jisu&quot;, 5000)</span>
-<span class="ln">    print(minsu.bank_name, jisu.bank_name)</span>
-<span class="ln">    print(minsu.balance, jisu.balance)</span>
-<span class="ln"> </span>
-<span class="ln">    # Updating the class changes the value both accounts read.</span>
-<span class="ln">    BankAccount.bank_name = &quot;Campus Bank&quot;</span>
-<span class="ln">    print(minsu.bank_name, jisu.bank_name)</span>
-<span class="ln"> </span>
-<span class="ln">    # Assignment on one instance creates its own attribute of this name.</span>
-<span class="ln">    minsu.bank_name = &quot;Minsu Bank&quot;</span>
-<span class="ln">    print(minsu.bank_name, jisu.bank_name)</span>
-<span class="ln">    print(BankAccount.bank_name)</span>
-<span class="ln"> </span>
-<span class="ln">    # Each account also keeps its own balance.</span>
-<span class="ln">    minsu.balance = 13000</span>
-<span class="ln">    print(minsu.balance, jisu.balance)</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="03_init_and_self.html">← 03_init_and_self</a>
-    <a href="04_methods.html">04_methods →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week07/index.html#ex=03b_class_and_instance_variables">../week07/index.html#ex=03b_class_and_instance_variables</a></p></body>
 </html>

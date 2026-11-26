@@ -1,0 +1,2382 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en" data-title-en="Week 5 · Python Lab" data-title-ko="5주차 · Python Lab">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 5 · Python Lab</title>
+  <link rel="icon" href="data:,">
+  <script src="../../js/lang.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
+  <script src="../../vendor/xterm/xterm.js"></script>
+  <script src="../../build/libv86.js"></script>
+</head>
+<body data-root="../../" data-lab-dir="week05/starter/session1">
+  <div class="topbar">
+    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><span><span lang="en">Week 5</span><span lang="ko">5주차</span></span></nav>
+    <div class="lang-switch" role="group" aria-label="Language / 언어">
+      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <header>
+    <h1><span lang="en">Week 5</span><span lang="ko">5주차</span></h1>
+    <ul class="sessions">
+      <li><a href="#notes-week05-1"><strong><span lang="en">Session 1 · Modules and the Standard Library</span><span lang="ko">1차시 · 모듈과 표준 라이브러리</span></strong></a> <span lang="en">Use import to bring in math, datetime and random, and import a module you wrote yourself (number_tools) from another program. Practice with circle area and hypotenuse, a date countdown, lotto numbers and a number-guessing game.</span><span lang="ko">import로 math·datetime·random을 불러 쓰고, 직접 만든 모듈(number_tools)을 다른 프로그램에서 import한다. 원 넓이·빗변, 날짜 카운트다운, 로또 번호, 숫자 맞히기 게임을 실습한다.</span></li>
+      <li><a href="#notes-week05-2"><strong><span lang="en">Session 2 · pandas: Series and DataFrame</span><span lang="ko">2차시 · pandas: Series와 DataFrame</span></strong></a> <span lang="en">Analyze a week of stock trades with Series (a labeled column) and DataFrame (a table). Filter with masks, sort with sort_values, and summarize with idxmax, value_counts and mean. The step that imports pandas takes about 10–30 seconds in the virtual machine.</span><span lang="ko">라벨이 붙은 열 Series와 표 DataFrame으로 한 주간의 주식 거래를 분석한다. 마스크로 거르고, sort_values로 정렬하고, idxmax·value_counts·mean으로 요약한다. pandas를 import하는 단계는 가상 머신에서 10–30초쯤 걸린다.</span></li>
+    </ul>
+  </header>
+  <main>
+    <section class="machine">
+      <div class="toolbar">
+        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
+        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
+        <form id="download-form" class="download">
+          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
+        </form>
+        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
+      </div>
+      <div class="terminal-wrap"><div id="terminal"></div></div>
+      <section id="preview" class="preview" hidden>
+        <form id="preview-form" class="preview-bar">
+          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
+          <span id="preview-port" class="muted"></span>
+          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
+          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
+          <span id="preview-info" class="muted" role="status"></span>
+        </form>
+        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
+      </section>
+      <p class="hint"><span lang="en">One machine for the whole page: choosing another example runs <code>cd</code> to its directory in the same terminal, and the files you changed stay as they are (Reboot to start over). All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko">이 페이지의 예제는 모두 한 가상 머신에서 실행합니다. 다른 예제를 고르면 같은 터미널에서 그 디렉터리로 <code>cd</code>하며, 고친 파일은 그대로 남습니다 (처음 상태로 돌리려면 재부팅). 수업 코드는 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
+    </section>
+    <aside class="guide">
+      <nav class="ex-picker" aria-label="Examples / 예제">
+        <h2><span lang="en">Examples</span><span lang="ko">예제</span></h2>
+      <div class="ex-group">
+        <h3><span lang="en">Session 1 · Modules and the Standard Library</span><span lang="ko">1차시 · 모듈과 표준 라이브러리</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="math_practice" aria-pressed="true">math_practice</button>
+          <button type="button" data-pick="date_check" aria-pressed="false">date_check</button>
+          <button type="button" data-pick="number_tools" aria-pressed="false">number_tools</button>
+          <button type="button" data-pick="lotto" aria-pressed="false">lotto</button>
+          <button type="button" data-pick="guessing" aria-pressed="false">guessing</button>
+        </div>
+      </div>
+      <div class="ex-group">
+        <h3><span lang="en">Session 2 · pandas: Series and DataFrame</span><span lang="ko">2차시 · pandas: Series와 DataFrame</span></h3>
+        <div class="ex-buttons">
+          <button type="button" data-pick="first_stock" aria-pressed="false">first_stock</button>
+          <button type="button" data-pick="positions" aria-pressed="false">positions</button>
+          <button type="button" data-pick="my_portfolio" aria-pressed="false">my_portfolio</button>
+          <button type="button" data-pick="trade_log" aria-pressed="false">trade_log</button>
+          <button type="button" data-pick="price_report" aria-pressed="false">price_report</button>
+        </div>
+      </div>
+      </nav>
+      <section class="ex-panel" data-ex="math_practice" data-dir="week05/starter/session1">
+        <h2>math_practice <span class="muted">~/week05/starter/session1</span></h2>
+        <p><span lang="en">Practice 1. Read a radius and print the circle's area and circumference, then read two legs and print the hypotenuse. math.pi and math.hypot, loaded with import math, are reached with the dot (.).</span><span lang="ko">Practice 1. 반지름을 읽어 원의 넓이와 둘레를, 두 변을 읽어 빗변을 출력한다. import math로 불러온 math.pi와 math.hypot을 점(.)으로 꺼내 쓴다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n3\n4\n' | python3 math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n3\n4\n' | python3 math_practice.py">▶</button><code>printf '3\n3\n4\n' | python3 math_practice.py</code></div>
+          <p><span lang="en">Runs the program with the inputs 3, 3, 4 fed in ahead of time (you can also run python3 math_practice.py yourself and type them). The starter only has TODOs, so the prompts Radius: First leg: Second leg: come out run together on one line with no results. Piped input is not echoed to the screen, which is why the prompts look glued together.</span><span lang="ko">입력 3, 3, 4를 미리 넣어 실행한다(직접 python3 math_practice.py로 실행해 입력해도 된다). 스타터는 TODO만 있어서 프롬프트 Radius: First leg: Second leg: 만 한 줄로 이어 나오고 결과는 없다. 파이프로 넣은 입력은 화면에 다시 찍히지 않기 때문에 프롬프트가 붙어 보인다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n3\n4\n' | python3 ../../solutions/session1/math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n3\n4\n' | python3 ../../solutions/session1/math_practice.py">▶</button><code>printf '3\n3\n4\n' | python3 ../../solutions/session1/math_practice.py</code></div>
+          <p><span lang="en">The finished version prints Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0. round(..., 2) keeps two decimal places.</span><span lang="ko">완성본은 Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0을 출력한다. round(..., 2)로 소수 둘째 자리까지 맞췄다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '1\n5\n12\n' | python3 ../../solutions/session1/math_practice.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '1\n5\n12\n' | python3 ../../solutions/session1/math_practice.py">▶</button><code>printf '1\n5\n12\n' | python3 ../../solutions/session1/math_practice.py</code></div>
+          <p><span lang="en">Second test: with radius 1 the area is 3.14 (equal to π) and the circumference is 6.28. The hypotenuse of 5 and 12 is 13.0.</span><span lang="ko">두 번째 테스트: 반지름 1이면 넓이는 π와 같은 3.14, 둘레는 6.28이다. 5와 12의 빗변은 13.0이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import math
+print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))
+EOF</code></div>
+          <p><span lang="en">Checks the math functions from the slides in one go: 2 3 120 6 5.0. Floor, ceil, factorial, greatest common divisor and hypotenuse.</span><span lang="ko">슬라이드의 math 함수들을 한 번에 확인한다: 2 3 120 6 5.0. 내림·올림, 계승, 최대공약수, 빗변이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'print(sqrt(16))'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'print(sqrt(16))'">▶</button><code>python3 -c 'print(sqrt(16))'</code></div>
+          <p><span lang="en">Using sqrt without importing it gives NameError: name 'sqrt' is not defined. Read the traceback from the last line.</span><span lang="ko">import 없이 sqrt를 쓰면 NameError: name 'sqrt' is not defined가 난다. Traceback은 마지막 줄부터 읽는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'">▶</button><code>python3 -c 'from math import sqrt, pi; print(sqrt(16)); print(pi)'</code></div>
+          <p><span lang="en">from math import sqrt, pi brings the names in directly, so you can use them without a prefix: 4.0 and 3.141592653589793.</span><span lang="ko">from math import sqrt, pi로 이름을 직접 가져오면 접두사 없이 쓸 수 있다: 4.0과 3.141592653589793.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The NameError in the fifth step is on purpose. In the actual practice, fill in the TODOs with nano math_practice.py, then rerun the first step and compare its output with the finished version.</span><span lang="ko">다섯 번째 단계의 NameError는 일부러 낸 오류다. 실제 실습에서는 nano math_practice.py로 TODO를 채운 뒤 첫 단계를 다시 실행해 완성본과 같은 출력이 나오는지 비교한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="date_check" data-dir="week05/starter/session1" hidden>
+        <h2>date_check <span class="muted">~/week05/starter/session1</span></h2>
+        <p><span lang="en">Practice 2. Read a date in YYYY-MM-DD format, turn it into a date with datetime.strptime, and print its weekday name (strftime(&quot;%A&quot;)) and the number of days remaining from today (date.today()).</span><span lang="ko">Practice 2. YYYY-MM-DD 형식의 날짜를 읽어 datetime.strptime으로 날짜로 바꾸고, 요일 이름(strftime(&quot;%A&quot;))과 오늘(date.today())부터 남은 날 수를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 date_check.py">▶</button><code>printf '2026-12-25\n' | python3 date_check.py</code></div>
+          <p><span lang="en">The starter only reads the date and converts it, so it prints nothing apart from the prompt. The date is well formed, so there is no error either.</span><span lang="ko">스타터는 날짜를 읽고 변환까지만 하므로 프롬프트 외에는 아무것도 출력하지 않는다. 형식이 맞는 날짜라 오류도 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="date +%F" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F">▶</button><code>date +%F</code></div>
+          <p><span lang="en">This is today's date as the virtual machine sees it. The days remaining below are counted from this date.</span><span lang="ko">가상 머신이 생각하는 오늘 날짜다. 아래 남은 날 수는 이 날짜를 기준으로 계산된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py">▶</button><code>printf '2026-12-25\n' | python3 ../../solutions/session1/date_check.py</code></div>
+          <p><span lang="en">Christmas 2026 is a Friday. The Days remaining value depends on today's date.</span><span lang="ko">2026년 성탄절은 Friday다. Days remaining 값은 오늘 날짜에 따라 달라진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="date +%F | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: date +%F | python3 ../../solutions/session1/date_check.py">▶</button><code>date +%F | python3 ../../solutions/session1/date_check.py</code></div>
+          <p><span lang="en">Feeding in today's date gives Days remaining: 0.</span><span lang="ko">오늘 날짜를 그대로 넣으면 Days remaining: 0이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py">▶</button><code>printf '2026-01-01\n' | python3 ../../solutions/session1/date_check.py</code></div>
+          <p><span lang="en">A date that has already passed gives a negative number of days remaining. 2026-01-01 is a Thursday.</span><span lang="ko">이미 지난 날짜는 남은 날 수가 음수로 나온다. 2026-01-01은 Thursday다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+from datetime import date, timedelta
+today = date(2026, 9, 27)
+exam = date(2026, 11, 13)
+print((exam - today).days)
+print(today + timedelta(days=100))
+EOF</code></div>
+          <p><span lang="en">Date arithmetic from the slides: the difference of two dates is a timedelta whose .days is 47, and the date + 100 days is 2027-01-05.</span><span lang="ko">슬라이드의 날짜 계산: 두 날짜의 차는 timedelta이고 .days는 47, 날짜 + 100일은 2027-01-05다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="number_tools" data-dir="week05/starter/session1" hidden>
+        <h2>number_tools <span class="muted">~/week05/starter/session1</span></h2>
+        <p><span lang="en">Lab 1. number_tools.py is a module holding the functions average and count_above, and stats_report.py in the same folder calls them through import number_tools to print a score report. The if __name__ == &quot;__main__&quot;: block at the bottom of the module shows a demo only when the file is run directly.</span><span lang="ko">Lab 1. number_tools.py는 average와 count_above 함수를 담은 모듈이고, 같은 폴더의 stats_report.py가 import number_tools로 그 함수를 불러 점수 보고서를 출력한다. 모듈 맨 아래의 if __name__ == &quot;__main__&quot;: 블록은 직접 실행할 때만 데모를 보여 준다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 number_tools.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 number_tools.py">▶</button><code>python3 number_tools.py</code></div>
+          <p><span lang="en">When run directly, __name__ is &quot;__main__&quot;, so the demo runs. The starter's average is just pass and returns None, so it prints Demo average: None.</span><span lang="ko">직접 실행하면 __name__이 &quot;__main__&quot;이므로 데모가 돈다. 스타터의 average는 pass뿐이라 None을 돌려주어 Demo average: None이 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 stats_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 stats_report.py">▶</button><code>python3 stats_report.py</code></div>
+          <p><span lang="en">The starter report prints only Scores: [88, 92, 79, 93]. import number_tools passes silently: the demo does not run when the module is imported.</span><span lang="ko">스타터 보고서는 Scores: [88, 92, 79, 93]만 출력한다. import number_tools는 조용히 지나간다. 가져올 때는 데모가 실행되지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session1/number_tools.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session1/number_tools.py">▶</button><code>python3 ../../solutions/session1/number_tools.py</code></div>
+          <p><span lang="en">Running the finished module directly: Demo average: 5.0 (2+4+6+8 divided by 4).</span><span lang="ko">완성본 모듈의 직접 실행 결과: Demo average: 5.0 (2+4+6+8을 4로 나눈 값).</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session1/stats_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session1/stats_report.py">▶</button><code>python3 ../../solutions/session1/stats_report.py</code></div>
+          <p><span lang="en">Finished report: Average: 88.0 (352 / 4), Above 85: 3 (88, 92, 93). The script's own folder comes first in the module search path, so the number_tools in the solutions folder is the one imported.</span><span lang="ko">완성본 보고서: Average: 88.0 (352 / 4), Above 85: 3 (88, 92, 93). 스크립트가 있는 폴더가 모듈 검색 경로의 첫 자리라서 solutions 폴더의 number_tools가 import된다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 -c 'import number_tools; print(number_tools.__name__)'" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 -c 'import number_tools; print(number_tools.__name__)'">▶</button><code>python3 -c 'import number_tools; print(number_tools.__name__)'</code></div>
+          <p><span lang="en">Inside an imported module, __name__ is the file name minus .py: number_tools. That is why the demo line is not printed.</span><span lang="ko">import된 모듈 안에서 __name__은 파일 이름에서 .py를 뺀 number_tools다. 그래서 데모 줄은 출력되지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="(cd ../../solutions/session1 &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')" title="Run in the terminal / 터미널에서 실행" aria-label="Run: (cd ../../solutions/session1 &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')">▶</button><code>(cd ../../solutions/session1 &amp;&amp; python3 -c 'import number_tools; print(number_tools.average([]))')</code></div>
+          <p><span lang="en">The average of an empty list divides by zero and raises ZeroDivisionError: division by zero (Lab 1 Checks). How to handle this error is next session's topic. Because the cd happens inside the parentheses, the current folder does not change.</span><span lang="ko">빈 리스트의 평균은 0으로 나누게 되어 ZeroDivisionError: division by zero가 난다(Lab 1 Checks). 이 오류를 처리하는 방법은 다음 시간 주제다. 괄호 안에서 cd했으므로 현재 폴더는 바뀌지 않는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The ZeroDivisionError in the last step is shown on purpose. After filling in the two TODO functions, rerun the first two steps: you should get Demo average: 5.0, Average: 88.0, Above 85: 3, the same as the finished version.</span><span lang="ko">마지막 단계의 ZeroDivisionError는 일부러 보여 주는 오류다. 두 TODO 함수를 채운 뒤 첫 두 단계를 다시 실행하면 완성본과 같은 Demo average: 5.0, Average: 88.0, Above 85: 3이 나와야 한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="lotto" data-dir="week05/starter/session1" hidden>
+        <h2>lotto <span class="muted">~/week05/starter/session1</span></h2>
+        <p><span lang="en">Lab 2. Read the number of games (1–5); for each game draw 6 different numbers with random.sample(range(1, 46), 6), sort them and print them on one line. Input outside the range prints Invalid games.</span><span lang="ko">Lab 2. 게임 수(1–5)를 읽어 게임마다 random.sample(range(1, 46), 6)으로 서로 다른 번호 6개를 뽑고 정렬해 한 줄에 출력한다. 범위를 벗어난 입력은 Invalid games.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n' | python3 lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n' | python3 lotto.py">▶</button><code>printf '3\n' | python3 lotto.py</code></div>
+          <p><span lang="en">The starter's loop body is pass, so even with 3 as input not a single line of numbers is printed.</span><span lang="ko">스타터는 반복문 몸체가 pass라서 3을 넣어도 번호가 한 줄도 나오지 않는다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '3\n' | python3 ../../solutions/session1/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '3\n' | python3 ../../solutions/session1/lotto.py">▶</button><code>printf '3\n' | python3 ../../solutions/session1/lotto.py</code></div>
+          <p><span lang="en">The finished version prints three lines. Check that each line is sorted smallest first, has no duplicates and stays between 1 and 45. The numbers change on every run.</span><span lang="ko">완성본은 세 줄을 출력한다. 줄마다 숫자가 작은 것부터 정렬되어 있고, 중복이 없으며, 모두 1에서 45 사이인지 확인한다. 실행할 때마다 번호가 달라진다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '1\n' | python3 ../../solutions/session1/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '1\n' | python3 ../../solutions/session1/lotto.py">▶</button><code>printf '1\n' | python3 ../../solutions/session1/lotto.py</code></div>
+          <p><span lang="en">Input 1 gives exactly one line. print(*numbers) unpacks the list and prints it separated by spaces, without brackets or commas.</span><span lang="ko">1을 넣으면 정확히 한 줄이다. print(*numbers)가 리스트를 풀어 대괄호와 쉼표 없이 공백으로 구분해 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '6\n' | python3 ../../solutions/session1/lotto.py
+printf '0\n' | python3 ../../solutions/session1/lotto.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '6\n' | python3 ../../solutions/session1/lotto.py
+printf '0\n' | python3 ../../solutions/session1/lotto.py">▶</button><code>printf '6\n' | python3 ../../solutions/session1/lotto.py
+printf '0\n' | python3 ../../solutions/session1/lotto.py</code></div>
+          <p><span lang="en">6 and 0 are both out of range, so only Invalid games is printed.</span><span lang="ko">6과 0은 모두 범위 밖이라 Invalid games만 출력한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import random
+random.seed(42)
+print(random.randint(1, 100), random.randint(1, 100))
+random.seed(42)
+print(random.randint(1, 100))
+EOF</code></div>
+          <p><span lang="en">With seed(42) the same sequence comes back: 82 15, and then 82 again. seed is useful for testing, but we do not use it for the lotto.</span><span lang="ko">seed(42)를 주면 같은 수열이 다시 나온다: 82 15, 그리고 다시 82. 테스트할 때는 seed가 유용하지만 로또에는 쓰지 않는다.</span></p>
+        </li>
+      </ol>
+      </section>
+      <section class="ex-panel" data-ex="guessing" data-dir="week05/starter/session1" hidden>
+        <h2>guessing <span class="muted">~/week05/starter/session1</span></h2>
+        <p><span lang="en">Lab 3 (take-home). The computer picks a secret number from 1 to 100 once, answers each guess with Higher/Lower until it is guessed, and on success prints Correct! with the number of attempts and ends the loop with break.</span><span lang="ko">Lab 3(과제). 컴퓨터가 1–100 사이의 비밀 수를 한 번 고르고, 맞힐 때까지 추측마다 Higher/Lower를 알려 주며, 맞히면 시도 횟수와 함께 Correct!를 출력하고 break로 반복을 끝낸다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 3 | python3 guessing.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 3 | python3 guessing.py">▶</button><code>seq 1 3 | python3 guessing.py</code></div>
+          <p><span lang="en">The starter has neither the comparison nor break, so while True never ends. It uses up the three input lines and the fourth input() raises EOFError: EOF when reading a line. If you ran it yourself, you would have to stop it with Ctrl+C.</span><span lang="ko">스타터에는 비교도 break도 없어서 while True가 끝나지 않는다. 입력 세 줄을 다 쓰고 네 번째 input()에서 EOFError: EOF when reading a line이 난다. 직접 실행했다면 Ctrl+C로 멈춰야 한다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3">▶</button><code>seq 1 100 | python3 ../../solutions/session1/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding 1 to 100 in order into the finished version prints Higher until it reaches the secret, then ends with Correct! Attempts: N. Here N is the secret itself. Only the last three lines are shown.</span><span lang="ko">완성본에 1부터 100까지 차례로 넣으면 비밀 수에 닿을 때까지 Higher가 이어지다가 Correct! Attempts: N으로 끝난다. 이 경우 N이 곧 비밀 수다. 마지막 세 줄만 보여 준다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3" title="Run in the terminal / 터미널에서 실행" aria-label="Run: seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3">▶</button><code>seq 100 -1 1 | python3 ../../solutions/session1/guessing.py | tail -n 3</code></div>
+          <p><span lang="en">Feeding the numbers backwards from 100 prints Lower this time. A new secret is chosen on every run.</span><span lang="ko">거꾸로 100부터 넣으면 이번에는 Lower가 이어진다. 비밀 수는 실행마다 새로 정해진다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">The EOFError in the first step is an intended error showing that the starter never finishes. To play yourself, run python3 ../../solutions/session1/guessing.py, start at 50 and halve the range according to Higher/Lower (you can always win within 7 guesses). The starter's TODO is to split Higher, Lower and Correct! with if/elif/else and break on a correct guess. When you are done, check with seq 1 100 | python3 guessing.py | tail -n 3 that the last lines match the finished version.</span><span lang="ko">첫 단계의 EOFError는 스타터가 끝나지 않는다는 것을 보여 주는 의도된 오류다. 직접 플레이하려면 python3 ../../solutions/session1/guessing.py를 실행하고 50부터 시작해 Higher/Lower에 따라 범위를 반씩 줄여 본다(7번 안에 맞힐 수 있다). 스타터의 TODO는 if/elif/else로 Higher, Lower, Correct!를 나누고 맞힌 경우 break하는 것이다. 완성한 뒤 seq 1 100 | python3 guessing.py | tail -n 3으로 완성본과 같은 마지막 줄이 나오는지 확인한다.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="first_stock" data-dir="week05/starter/session2" hidden>
+        <h2>first_stock <span class="muted">~/week05/starter/session2</span></h2>
+        <p><span lang="en">Practice 1. From a Series of CODE's closing prices indexed by weekday (Mon–Fri), print the mean, the high, the number of days that closed above the buy price of 10000, and the weekday and close of each such day.</span><span lang="ko">Practice 1. 요일(Mon–Fri)을 index로 가진 CODE의 종가 Series에서 평균, 최고가, 매수가 10000보다 높은 날의 수, 그리고 그런 날의 요일과 종가를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 first_stock.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 first_stock.py; echo &quot;exit=$?&quot;">▶</button><code>python3 first_stock.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter only builds the Series, so after waiting while pandas loads it prints nothing and ends with exit=0.</span><span lang="ko">스타터는 Series를 만들기만 하므로 pandas를 불러오는 동안 기다린 뒤 아무것도 출력하지 않고 exit=0으로 끝난다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/first_stock.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/first_stock.py">▶</button><code>python3 ../../solutions/session2/first_stock.py</code></div>
+          <p><span lang="en">Finished version: Mean: 10260.0, High: 10800, Above buy (10000): 3, followed by the winning days Tue 10200, Thu 10500, Fri 10800. closes[closes &gt; 10000] keeps only the days where the mask is True.</span><span lang="ko">완성본: Mean: 10260.0, High: 10800, Above buy (10000): 3, 그리고 이긴 날 Tue 10200, Thu 10500, Fri 10800. closes[closes &gt; 10000]이 마스크가 True인 날만 남긴다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import pandas as pd
+closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;])
+print(closes)
+print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax())
+print((closes - 10000).tolist())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import pandas as pd
+closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;])
+print(closes)
+print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax())
+print((closes - 10000).tolist())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import pandas as pd
+closes = pd.Series([10000, 10200, 9800, 10500, 10800], index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;])
+print(closes)
+print(closes[&quot;Tue&quot;], closes.loc[&quot;Mon&quot;], closes.idxmax())
+print((closes - 10000).tolist())
+EOF</code></div>
+          <p><span lang="en">Printing a Series as is shows the index (weekdays) on the left, the values on the right, and dtype: int64 at the bottom. Reading by label, closes[&quot;Tue&quot;] is 10200, .loc[&quot;Mon&quot;] is 10000, and idxmax() is Fri, the label of the largest value. closes - 10000 produces every day's profit or loss [0, 200, -200, 500, 800] with no loop.</span><span lang="ko">Series를 그대로 출력하면 왼쪽에 index(요일), 오른쪽에 값, 맨 아래에 dtype: int64가 보인다. 라벨로 읽기 closes[&quot;Tue&quot;]는 10200, .loc[&quot;Mon&quot;]은 10000, idxmax()는 가장 큰 값의 라벨 Fri다. closes - 10000은 반복문 없이 모든 날의 손익 [0, 200, -200, 500, 800]을 만든다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="positions" data-dir="week05/starter/session2" hidden>
+        <h2>positions <span class="muted">~/week05/starter/session2</span></h2>
+        <p><span lang="en">Practice 2. Add a profit = (close - buy) * shares column to a DataFrame of four stocks, then print the tickers and profits sorted from largest profit, the top stock, and the number of stocks that made a profit.</span><span lang="ko">Practice 2. 네 종목의 DataFrame에 profit = (close - buy) * shares 열을 추가하고, 수익이 큰 순서로 정렬한 종목과 수익, 1위 종목, 수익이 난 종목 수를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 positions.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 positions.py; echo &quot;exit=$?&quot;">▶</button><code>python3 positions.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter only builds the table and prints nothing.</span><span lang="ko">스타터는 표만 만들고 출력이 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/positions.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/positions.py">▶</button><code>python3 ../../solutions/session2/positions.py</code></div>
+          <p><span lang="en">Finished version: ['ROBO', 'MLBK', 'CODE', 'TEA'] and [25000, 15000, 8000, -8000]. With sort_values(&quot;profit&quot;, ascending=False) whole rows move along with the sort key. The ticker of the row found with idxmax gives Top: ROBO, and the number of Trues in the mask gives Winners: 3.</span><span lang="ko">완성본: ['ROBO', 'MLBK', 'CODE', 'TEA']와 [25000, 15000, 8000, -8000]. sort_values(&quot;profit&quot;, ascending=False)로 행 전체가 정렬 키와 함께 움직인다. idxmax로 찾은 행의 ticker가 Top: ROBO, 마스크의 True 개수가 Winners: 3이다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="my_portfolio" data-dir="week05/starter/session2" hidden>
+        <h2>my_portfolio <span class="muted">~/week05/starter/session2</span></h2>
+        <p><span lang="en">Lab 1. From a Friday-evening portfolio table of five stocks, print its shape, add a value = shares * close column, and print the list of values, the largest holding and the mean value.</span><span lang="ko">Lab 1. 다섯 종목의 금요일 저녁 포트폴리오 표에서 shape를 출력하고, value = shares * close 열을 추가해 평가액 목록, 가장 큰 보유 종목, 평균 평가액을 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 my_portfolio.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 my_portfolio.py; echo &quot;exit=$?&quot;">▶</button><code>python3 my_portfolio.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter prints nothing.</span><span lang="ko">스타터는 출력이 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/my_portfolio.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/my_portfolio.py">▶</button><code>python3 ../../solutions/session2/my_portfolio.py</code></div>
+          <p><span lang="en">Finished version: Shape: (5, 4) means 5 rows and 4 columns (printed before value was added). Value: [108000, 192000, 225000, 75000, 84000] is a column made with a single multiplication, followed by Top holding: ROBO and Mean value: 136800.0 (684000 divided by 5).</span><span lang="ko">완성본: Shape: (5, 4)는 5행 4열이다(value를 추가하기 전에 출력했다). Value: [108000, 192000, 225000, 75000, 84000]은 곱셈 한 번으로 만든 열이고, Top holding: ROBO, Mean value: 136800.0(684000을 5로 나눈 값)이다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 - &lt;&lt;'EOF'
+import pandas as pd
+df = pd.DataFrame({&quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;], &quot;shares&quot;: [10, 40, 5], &quot;buy&quot;: [10000, 5000, 40000], &quot;close&quot;: [10800, 4800, 45000]})
+print(df)
+print(df.head(2))
+print(df.columns.tolist())
+print(df.iloc[-1][&quot;ticker&quot;])
+print(df[&quot;close&quot;].describe())
+EOF" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 - &lt;&lt;'EOF'
+import pandas as pd
+df = pd.DataFrame({&quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;], &quot;shares&quot;: [10, 40, 5], &quot;buy&quot;: [10000, 5000, 40000], &quot;close&quot;: [10800, 4800, 45000]})
+print(df)
+print(df.head(2))
+print(df.columns.tolist())
+print(df.iloc[-1][&quot;ticker&quot;])
+print(df[&quot;close&quot;].describe())
+EOF">▶</button><code>python3 - &lt;&lt;'EOF'
+import pandas as pd
+df = pd.DataFrame({&quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;], &quot;shares&quot;: [10, 40, 5], &quot;buy&quot;: [10000, 5000, 40000], &quot;close&quot;: [10800, 4800, 45000]})
+print(df)
+print(df.head(2))
+print(df.columns.tolist())
+print(df.iloc[-1][&quot;ticker&quot;])
+print(df[&quot;close&quot;].describe())
+EOF</code></div>
+          <p><span lang="en">Prints the three-stock table from the slides. The 0, 1, 2 on the far left is the default index. head(2) is the first two rows, columns is the list of column names, and iloc[-1] is the last row (ROBO). describe() shows count, mean (20200.0), std, min, the quartiles and max (45000) all at once.</span><span lang="ko">슬라이드의 3종목 표를 출력해 본다. 맨 왼쪽 0, 1, 2가 기본 index다. head(2)는 앞 두 행, columns는 열 이름 목록, iloc[-1]은 마지막 행(ROBO)이다. describe()는 count, mean(20200.0), std, min, 사분위수, max(45000)를 한 번에 보여 준다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="trade_log" data-dir="week05/starter/session2" hidden>
+        <h2>trade_log <span class="muted">~/week05/starter/session2</span></h2>
+        <p><span lang="en">Lab 2. From a journal of ten trades, count the buys and sells with value_counts, and print the total amount traded and the kinds of the big trades (40000 won or more).</span><span lang="ko">Lab 2. 열 건의 매매 일지에서 value_counts로 buy/sell 횟수를 세고, 총 거래 금액과 40000원 이상인 큰 거래의 종류를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 trade_log.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 trade_log.py; echo &quot;exit=$?&quot;">▶</button><code>python3 trade_log.py; echo &quot;exit=$?&quot;</code></div>
+          <p><span lang="en">The starter prints nothing.</span><span lang="ko">스타터는 출력이 없다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="python3 ../../solutions/session2/trade_log.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 ../../solutions/session2/trade_log.py">▶</button><code>python3 ../../solutions/session2/trade_log.py</code></div>
+          <p><span lang="en">Finished version: value_counts counts from most to least frequent, so Actions: ['buy', 'sell'] and Counts: [6, 4]. Traded: 340000 is the sum of the amount column, and Big trades shows that the four trades kept by the amount &gt;= 40000 mask are all buys.</span><span lang="ko">완성본: value_counts는 많은 것부터 세므로 Actions: ['buy', 'sell'], Counts: [6, 4]. Traded: 340000은 amount 열의 합, Big trades는 amount &gt;= 40000 마스크로 거른 네 건이 모두 buy임을 보여 준다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+      <section class="ex-panel" data-ex="price_report" data-dir="week05/starter/session2" hidden>
+        <h2>price_report <span class="muted">~/week05/starter/session2</span></h2>
+        <p><span lang="en">Lab 3 (take-home). Read FIT's five Mon–Fri closing prices with input(), build a Series indexed by weekday, and print the mean, the high, the day of the high, and the number of days above the mean.</span><span lang="ko">Lab 3(과제). FIT의 월–금 종가 다섯 개를 input()으로 읽어 요일을 index로 하는 Series를 만들고 평균, 최고가, 최고가인 요일, 평균보다 높은 날의 수를 출력한다.</span></p>
+        <h3><span lang="en">Steps</span><span lang="ko">실행 순서</span></h3>
+        <ol class="steps">
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py">▶</button><code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py</code></div>
+          <p><span lang="en">Runs the program with the five values fed in ahead of time (you can also run it yourself and type them one by one). The starter only reads the input, so only the prompts Close Mon: … Close Fri: come out, run together.</span><span lang="ko">다섯 값을 미리 넣어 실행한다(직접 실행해 하나씩 입력해도 된다). 스타터는 읽기만 하므로 Close Mon: … Close Fri: 프롬프트만 이어서 나온다.</span></p>
+        </li>
+        <li>
+          <div class="cmd"><button type="button" data-cmd="printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py" title="Run in the terminal / 터미널에서 실행" aria-label="Run: printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py">▶</button><code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 ../../solutions/session2/price_report.py</code></div>
+          <p><span lang="en">Finished version: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3 (4350, 4400, 4300). values and days are in the same order, so Series(values, index=days) pairs each weekday with its value.</span><span lang="ko">완성본: Mean: 4270.0, High: 4400, Best day: Thu 4400, Above mean: 3(4350, 4400, 4300). values와 days가 같은 순서라서 Series(values, index=days)가 요일과 값을 짝짓는다.</span></p>
+        </li>
+      </ol>
+      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
+      </section>
+    </aside>
+  </main>
+  <section class="sources">
+    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
+    <div class="ex-sources" data-ex="math_practice">
+    <details class="source" open>
+      <summary>math_practice.py <span class="muted"><span lang="en">11 lines</span><span lang="ko">11줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: circle statistics and a hypotenuse. Assume numeric input.</span>
+<span class="ln">Tests: 3 then 3, 4 -&gt; Area: 28.27, Circumference: 18.85, Hypotenuse: 5.0.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import math</span>
+<span class="ln"> </span>
+<span class="ln">radius = float(input(&quot;Radius: &quot;))</span>
+<span class="ln"># TODO: print the area and circumference, rounded to 2 decimals.</span>
+<span class="ln"> </span>
+<span class="ln">a = float(input(&quot;First leg: &quot;))</span>
+<span class="ln">b = float(input(&quot;Second leg: &quot;))</span>
+<span class="ln"># TODO: print the hypotenuse, rounded to 2 decimals.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/math_practice.py <span class="muted"><span lang="en">10 lines</span><span lang="ko">10줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: circle statistics and a hypotenuse.&quot;&quot;&quot;</span>
+<span class="ln">import math</span>
+<span class="ln"> </span>
+<span class="ln">radius = float(input(&quot;Radius: &quot;))</span>
+<span class="ln">print(&quot;Area:&quot;, round(math.pi * radius ** 2, 2))</span>
+<span class="ln">print(&quot;Circumference:&quot;, round(2 * math.pi * radius, 2))</span>
+<span class="ln"> </span>
+<span class="ln">a = float(input(&quot;First leg: &quot;))</span>
+<span class="ln">b = float(input(&quot;Second leg: &quot;))</span>
+<span class="ln">print(&quot;Hypotenuse:&quot;, round(math.hypot(a, b), 2))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="date_check" hidden>
+    <details class="source" open>
+      <summary>date_check.py <span class="muted"><span lang="en">9 lines</span><span lang="ko">9줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: weekday and countdown for a target date.</span>
+<span class="ln">Tests: today -&gt; Days remaining: 0; a past date -&gt; a negative count.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date, datetime</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
+<span class="ln"># TODO: print the weekday name, e.g. Friday.</span>
+<span class="ln"># TODO: print &quot;Days remaining:&quot; and the day count from date.today().</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/date_check.py <span class="muted"><span lang="en">7 lines</span><span lang="ko">7줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution: weekday and countdown for a target date.&quot;&quot;&quot;</span>
+<span class="ln">from datetime import date, datetime</span>
+<span class="ln"> </span>
+<span class="ln">text = input(&quot;Date (YYYY-MM-DD): &quot;)</span>
+<span class="ln">target = datetime.strptime(text, &quot;%Y-%m-%d&quot;).date()</span>
+<span class="ln">print(target.strftime(&quot;%A&quot;))</span>
+<span class="ln">print(&quot;Days remaining:&quot;, (target - date.today()).days)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="number_tools" hidden>
+    <details class="source" open>
+      <summary>number_tools.py <span class="muted"><span lang="en">20 lines</span><span lang="ko">20줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 module: small statistics tools for lists of numbers.</span>
+<span class="ln"> </span>
+<span class="ln">Run directly to see the demo: python3 number_tools.py</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def average(numbers):</span>
+<span class="ln">    # TODO: return the mean of numbers.</span>
+<span class="ln">    pass</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def count_above(numbers, limit):</span>
+<span class="ln">    count = 0</span>
+<span class="ln">    # TODO: count the values greater than limit.</span>
+<span class="ln">    return count</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    demo = [2, 4, 6, 8]</span>
+<span class="ln">    print(&quot;Demo average:&quot;, average(demo))</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>stats_report.py <span class="muted"><span lang="en">8 lines</span><span lang="ko">8줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 report: import and use number_tools.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import number_tools</span>
+<span class="ln"> </span>
+<span class="ln">scores = [88, 92, 79, 93]</span>
+<span class="ln">print(&quot;Scores:&quot;, scores)</span>
+<span class="ln"># TODO: print the average, e.g. Average: 88.0</span>
+<span class="ln"># TODO: print how many scores are above 85, e.g. Above 85: 3</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/number_tools.py <span class="muted"><span lang="en">18 lines</span><span lang="ko">18줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 solution module: small statistics tools for lists of numbers.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def average(numbers):</span>
+<span class="ln">    return sum(numbers) / len(numbers)</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">def count_above(numbers, limit):</span>
+<span class="ln">    count = 0</span>
+<span class="ln">    for value in numbers:</span>
+<span class="ln">        if value &gt; limit:</span>
+<span class="ln">            count += 1</span>
+<span class="ln">    return count</span>
+<span class="ln"> </span>
+<span class="ln"> </span>
+<span class="ln">if __name__ == &quot;__main__&quot;:</span>
+<span class="ln">    demo = [2, 4, 6, 8]</span>
+<span class="ln">    print(&quot;Demo average:&quot;, average(demo))</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/stats_report.py <span class="muted"><span lang="en">8 lines</span><span lang="ko">8줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 report solution: import and use number_tools.&quot;&quot;&quot;</span>
+<span class="ln"> </span>
+<span class="ln">import number_tools</span>
+<span class="ln"> </span>
+<span class="ln">scores = [88, 92, 79, 93]</span>
+<span class="ln">print(&quot;Scores:&quot;, scores)</span>
+<span class="ln">print(&quot;Average:&quot;, number_tools.average(scores))</span>
+<span class="ln">print(&quot;Above 85:&quot;, number_tools.count_above(scores, 85))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="lotto" hidden>
+    <details class="source" open>
+      <summary>lotto.py <span class="muted"><span lang="en">13 lines</span><span lang="ko">13줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: generate lotto games. Assume integer-formatted input.</span>
+<span class="ln">Tests: 1 -&gt; one line of 6 sorted unique numbers; 6 -&gt; Invalid games.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">games = int(input(&quot;Games (1-5): &quot;))</span>
+<span class="ln">if 1 &lt;= games &lt;= 5:</span>
+<span class="ln">    for game in range(1, games + 1):</span>
+<span class="ln">        # TODO: draw 6 different numbers from 1 to 45,</span>
+<span class="ln">        # sort them, and print them on one line.</span>
+<span class="ln">        pass</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid games&quot;)</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/lotto.py <span class="muted"><span lang="en">11 lines</span><span lang="ko">11줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 solution: generate lotto games.&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">games = int(input(&quot;Games (1-5): &quot;))</span>
+<span class="ln">if 1 &lt;= games &lt;= 5:</span>
+<span class="ln">    for game in range(1, games + 1):</span>
+<span class="ln">        numbers = random.sample(range(1, 46), 6)</span>
+<span class="ln">        numbers.sort()</span>
+<span class="ln">        print(*numbers)</span>
+<span class="ln">else:</span>
+<span class="ln">    print(&quot;Invalid games&quot;)</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="guessing" hidden>
+    <details class="source" open>
+      <summary>guessing.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3: number guessing game. Assume integer-formatted input.</span>
+<span class="ln">Test: a finished game ends with Correct! Attempts: N.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    # TODO: print Higher or Lower, or print</span>
+<span class="ln">    # &quot;Correct! Attempts:&quot; with the count and stop the loop.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session1/guessing.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution: number guessing game.&quot;&quot;&quot;</span>
+<span class="ln">import random</span>
+<span class="ln"> </span>
+<span class="ln">secret = random.randint(1, 100)</span>
+<span class="ln">attempts = 0</span>
+<span class="ln">while True:</span>
+<span class="ln">    guess = int(input(&quot;Guess: &quot;))</span>
+<span class="ln">    attempts += 1</span>
+<span class="ln">    if guess &lt; secret:</span>
+<span class="ln">        print(&quot;Higher&quot;)</span>
+<span class="ln">    elif guess &gt; secret:</span>
+<span class="ln">        print(&quot;Lower&quot;)</span>
+<span class="ln">    else:</span>
+<span class="ln">        print(&quot;Correct! Attempts:&quot;, attempts)</span>
+<span class="ln">        break</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="first_stock" hidden>
+    <details class="source" open>
+      <summary>first_stock.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1: one stock, one week of closes.</span>
+<span class="ln">You bought CODE at 10,000 on Monday.</span>
+<span class="ln">Tests: Mean: 10260.0, High: 10800,</span>
+<span class="ln">Above buy (10000): 3, winning days</span>
+<span class="ln">Tue 10200, Thu 10500 and Fri 10800.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">closes = pd.Series([10000, 10200, 9800, 10500,</span>
+<span class="ln">                    10800],</span>
+<span class="ln">                   index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;,</span>
+<span class="ln">                          &quot;Thu&quot;, &quot;Fri&quot;])</span>
+<span class="ln"># TODO: print the mean rounded to 1, the high,</span>
+<span class="ln"># the count of closes above the 10000 buy, and</span>
+<span class="ln"># each winning day with its close.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/first_stock.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 1 solution: one stock, one week of closes.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">closes = pd.Series([10000, 10200, 9800, 10500, 10800],</span>
+<span class="ln">                   index=[&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;])</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;Mean:&quot;, round(closes.mean(), 1))</span>
+<span class="ln">print(&quot;High:&quot;, closes.max())</span>
+<span class="ln">print(&quot;Above buy (10000):&quot;, (closes &gt; 10000).sum())</span>
+<span class="ln">wins = closes[closes &gt; 10000]</span>
+<span class="ln">for day, close in wins.items():</span>
+<span class="ln">    print(day, int(close))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="positions" hidden>
+    <details class="source" open>
+      <summary>positions.py <span class="muted"><span lang="en">16 lines</span><span lang="ko">16줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2: rank four positions by profit.</span>
+<span class="ln">Tests: ['ROBO', 'MLBK', 'CODE', 'TEA'],</span>
+<span class="ln">[25000, 15000, 8000, -8000], Top: ROBO,</span>
+<span class="ln">Winners: 3.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">positions = pd.DataFrame({</span>
+<span class="ln">    &quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;, &quot;MLBK&quot;],</span>
+<span class="ln">    &quot;shares&quot;: [10, 40, 5, 30],</span>
+<span class="ln">    &quot;buy&quot;: [10000, 5000, 40000, 2000],</span>
+<span class="ln">    &quot;close&quot;: [10800, 4800, 45000, 2500],</span>
+<span class="ln">})</span>
+<span class="ln"># TODO: add profit = (close - buy) * shares,</span>
+<span class="ln"># print tickers and profits sorted top first,</span>
+<span class="ln"># the top ticker's name and the winner count.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/positions.py <span class="muted"><span lang="en">17 lines</span><span lang="ko">17줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Practice 2 solution: rank four positions by profit.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">positions = pd.DataFrame({</span>
+<span class="ln">    &quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;, &quot;MLBK&quot;],</span>
+<span class="ln">    &quot;shares&quot;: [10, 40, 5, 30],</span>
+<span class="ln">    &quot;buy&quot;: [10000, 5000, 40000, 2000],</span>
+<span class="ln">    &quot;close&quot;: [10800, 4800, 45000, 2500],</span>
+<span class="ln">})</span>
+<span class="ln"> </span>
+<span class="ln">positions[&quot;profit&quot;] = (positions[&quot;close&quot;] - positions[&quot;buy&quot;]) * positions[&quot;shares&quot;]</span>
+<span class="ln">ranked = positions.sort_values(&quot;profit&quot;, ascending=False)</span>
+<span class="ln">print(ranked[&quot;ticker&quot;].tolist())</span>
+<span class="ln">print(ranked[&quot;profit&quot;].tolist())</span>
+<span class="ln">best = positions[&quot;profit&quot;].idxmax()</span>
+<span class="ln">print(&quot;Top:&quot;, positions.loc[best, &quot;ticker&quot;])</span>
+<span class="ln">print(&quot;Winners:&quot;, (positions[&quot;profit&quot;] &gt; 0).sum())</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="my_portfolio" hidden>
+    <details class="source" open>
+      <summary>my_portfolio.py <span class="muted"><span lang="en">17 lines</span><span lang="ko">17줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1: a Friday-evening portfolio report.</span>
+<span class="ln">Tests: Shape: (5, 4),</span>
+<span class="ln">Value: [108000, 192000, 225000, 75000, 84000],</span>
+<span class="ln">Top holding: ROBO, Mean value: 136800.0.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">holdings = pd.DataFrame({</span>
+<span class="ln">    &quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;, &quot;MLBK&quot;, &quot;FIT&quot;],</span>
+<span class="ln">    &quot;shares&quot;: [10, 40, 5, 30, 20],</span>
+<span class="ln">    &quot;buy&quot;: [10000, 5000, 40000, 2000, 3000],</span>
+<span class="ln">    &quot;close&quot;: [10800, 4800, 45000, 2500, 4200],</span>
+<span class="ln">})</span>
+<span class="ln"># TODO: print the shape, add a value column</span>
+<span class="ln"># (shares * close), print the value list,</span>
+<span class="ln"># the top holding's ticker and the mean value</span>
+<span class="ln"># rounded to 1.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/my_portfolio.py <span class="muted"><span lang="en">16 lines</span><span lang="ko">16줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 1 solution: a Friday-evening portfolio report.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">holdings = pd.DataFrame({</span>
+<span class="ln">    &quot;ticker&quot;: [&quot;CODE&quot;, &quot;TEA&quot;, &quot;ROBO&quot;, &quot;MLBK&quot;, &quot;FIT&quot;],</span>
+<span class="ln">    &quot;shares&quot;: [10, 40, 5, 30, 20],</span>
+<span class="ln">    &quot;buy&quot;: [10000, 5000, 40000, 2000, 3000],</span>
+<span class="ln">    &quot;close&quot;: [10800, 4800, 45000, 2500, 4200],</span>
+<span class="ln">})</span>
+<span class="ln"> </span>
+<span class="ln">print(&quot;Shape:&quot;, holdings.shape)</span>
+<span class="ln">holdings[&quot;value&quot;] = holdings[&quot;shares&quot;] * holdings[&quot;close&quot;]</span>
+<span class="ln">print(&quot;Value:&quot;, holdings[&quot;value&quot;].tolist())</span>
+<span class="ln">best = holdings[&quot;value&quot;].idxmax()</span>
+<span class="ln">print(&quot;Top holding:&quot;, holdings.loc[best, &quot;ticker&quot;])</span>
+<span class="ln">print(&quot;Mean value:&quot;, round(holdings[&quot;value&quot;].mean(), 1))</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="trade_log" hidden>
+    <details class="source" open>
+      <summary>trade_log.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2: a week's trade journal.</span>
+<span class="ln">Tests: Actions ['buy', 'sell'], Counts [6, 4],</span>
+<span class="ln">Traded: 340000, and the four big buys.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">log = pd.DataFrame({</span>
+<span class="ln">    &quot;action&quot;: [&quot;buy&quot;, &quot;buy&quot;, &quot;sell&quot;, &quot;buy&quot;, &quot;sell&quot;,</span>
+<span class="ln">               &quot;buy&quot;, &quot;buy&quot;, &quot;sell&quot;, &quot;sell&quot;, &quot;buy&quot;],</span>
+<span class="ln">    &quot;amount&quot;: [50000, 20000, 30000, 40000, 30000,</span>
+<span class="ln">               20000, 50000, 30000, 30000, 40000],</span>
+<span class="ln">})</span>
+<span class="ln"># TODO: count actions with value_counts, print</span>
+<span class="ln"># action names and counts, the total traded,</span>
+<span class="ln"># and the actions of trades &gt;= 40000.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/trade_log.py <span class="muted"><span lang="en">16 lines</span><span lang="ko">16줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 2 solution: a week's trade journal.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">log = pd.DataFrame({</span>
+<span class="ln">    &quot;action&quot;: [&quot;buy&quot;, &quot;buy&quot;, &quot;sell&quot;, &quot;buy&quot;, &quot;sell&quot;,</span>
+<span class="ln">               &quot;buy&quot;, &quot;buy&quot;, &quot;sell&quot;, &quot;sell&quot;, &quot;buy&quot;],</span>
+<span class="ln">    &quot;amount&quot;: [50000, 20000, 30000, 40000, 30000,</span>
+<span class="ln">               20000, 50000, 30000, 30000, 40000],</span>
+<span class="ln">})</span>
+<span class="ln"> </span>
+<span class="ln">counts = log[&quot;action&quot;].value_counts()</span>
+<span class="ln">print(&quot;Actions:&quot;, counts.index.tolist())</span>
+<span class="ln">print(&quot;Counts:&quot;, counts.tolist())</span>
+<span class="ln">print(&quot;Traded:&quot;, log[&quot;amount&quot;].sum())</span>
+<span class="ln">big = log[log[&quot;amount&quot;] &gt;= 40000]</span>
+<span class="ln">print(&quot;Big trades:&quot;, big[&quot;action&quot;].tolist())</span></code></pre>
+    </details>
+    </div>
+    <div class="ex-sources" data-ex="price_report" hidden>
+    <details class="source" open>
+      <summary>price_report.py <span class="muted"><span lang="en">15 lines</span><span lang="ko">15줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 (take-home): FIT's week in review.</span>
+<span class="ln">Tests: 4200, 4350, 4100, 4400, 4300 -&gt;</span>
+<span class="ln">Mean: 4270.0, High: 4400, Best day: Thu 4400,</span>
+<span class="ln">Above mean: 3. Assume integer-formatted input.</span>
+<span class="ln">&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">days = [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]</span>
+<span class="ln">values = []</span>
+<span class="ln">for day in days:</span>
+<span class="ln">    values.append(int(input(&quot;Close &quot; + day + &quot;: &quot;)))</span>
+<span class="ln"># TODO: build a Series with days as the index,</span>
+<span class="ln"># then print the mean rounded to 1, the high,</span>
+<span class="ln"># the best day with its close, and the count of</span>
+<span class="ln"># days above the mean.</span></code></pre>
+    </details>
+    <details class="source">
+      <summary>week05/solutions/session2/price_report.py <span class="muted"><span lang="en">14 lines</span><span lang="ko">14줄</span></span></summary>
+      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 solution: FIT's week in review.&quot;&quot;&quot;</span>
+<span class="ln">import pandas as pd</span>
+<span class="ln"> </span>
+<span class="ln">days = [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;]</span>
+<span class="ln">values = []</span>
+<span class="ln">for day in days:</span>
+<span class="ln">    values.append(int(input(&quot;Close &quot; + day + &quot;: &quot;)))</span>
+<span class="ln"> </span>
+<span class="ln">closes = pd.Series(values, index=days)</span>
+<span class="ln">print(&quot;Mean:&quot;, round(closes.mean(), 1))</span>
+<span class="ln">print(&quot;High:&quot;, closes.max())</span>
+<span class="ln">best = closes.idxmax()</span>
+<span class="ln">print(&quot;Best day:&quot;, best, closes[best])</span>
+<span class="ln">print(&quot;Above mean:&quot;, (closes &gt; closes.mean()).sum())</span></code></pre>
+    </details>
+    </div>
+  </section>
+    <article class="notes" id="notes-week05-1">
+      <h2 class="notes-title"><span lang="en">Session 1 — Modules and the Standard Library</span><span lang="ko">1차시 — 모듈과 표준 라이브러리</span></h2>
+<div lang="en">
+<p>This session is about modules. When you want to use the same function in several programs, instead of copying the code you keep it in one file (a module) and load it with <code>import</code>. First we look at the different forms of <code>import</code>, what the dot (.) means, and the <code>NameError</code> you get when a name was never imported; then we use a module we wrote ourselves, <code>number_tools</code>, from another program. Next we apply the standard library's <code>math</code>, <code>datetime</code> and <code>random</code> to real tasks, and finally we get a first taste of computing on a whole array at once with the external package NumPy. The practice programs are <a href="math_practice.html">math_practice</a>, <a href="date_check.html">date_check</a>, <a href="number_tools.html">number_tools</a>, <a href="lotto.html">lotto</a> and <a href="guessing.html">guessing</a>.</p>
+
+<h2>Review: One Function, Two Programs</h2>
+
+<p><code>sum_to(n)</code>, which we wrote in Week 3, returns 1 + 2 + … + n. Imagine a second program that needs this function. Copying and pasting the code works for now, but when you find a bug you have to fix it in both places. Today's goal is to give reusable code a home of its own.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>Modules and import</h2>
+
+<h3>What Is a Module?</h3>
+
+<p>A module is a file containing Python definitions (functions, variables and so on). The file name minus <code>.py</code> is the module name. For example, <code>greetings.py</code> is the <code>greetings</code> module. Importing a module runs its top-level code once. In fact, every program you have written so far was already a module.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import and the Dot</h3>
+
+<p><code>import math</code> loads the <code>math</code> module. The dot reaches a name inside the module: <code>math.sqrt(2)</code> means "the sqrt inside the math module". Keeping the prefix makes it clear from the code alone where each name came from. Python remembers (caches) a module after its first import, so importing the same module again does not run it again.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>If you import only the names you need, you can use them without a prefix. You can list several names separated by commas, and you can also rename a name while importing it. Only the imported names become visible: writing <code>math.pi</code> after <code>from math import sqrt</code> fails because there is no name <code>math</code>.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>Import Styles Compared</h3>
+
+<table>
+<thead>
+<tr><th>Form</th><th>Use</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>Clearest origin, but a little more typing</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>Short; best when you use only a few names</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>A shorter alias; used for conventional aliases such as <code>np</code> and <code>pd</code></td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>Hides where names came from, so avoid it</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Reading the Traceback</h3>
+
+<p>Using a name you did not import raises a <code>NameError</code>. The traceback tells you the file and line that failed. Read the last line (the error type and message) first, fix the cause, and run again. In the example below the cause is that <code>math</code> was never imported. You can trigger the same error yourself in the steps of the <a href="math_practice.html">math_practice</a> page.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math Essentials</h3>
+
+<p>There are the constants <code>pi</code> and <code>e</code>, the square root <code>sqrt</code>, and <code>floor</code> and <code>ceil</code> for rounding down and up. <code>factorial(n)</code> and <code>gcd(a, b)</code> work on integers, and <code>hypot(a, b)</code> is the length of the hypotenuse (diagonal) of a right triangle.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: Circle &amp; Hypotenuse</h3>
+
+<p>Open <a href="math_practice.html">math_practice</a>. Read a radius and print the circle's area and circumference rounded to two decimals, then read the lengths of two legs and print the hypotenuse. Assume numeric input and use <code>math.pi</code> and <code>math.hypot</code> (5 minutes).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>In the web lab you can feed the input in ahead of time, as in <code>printf '3\n3\n4\n' | python3 math_practice.py</code>, or simply run <code>python3 math_practice.py</code> and type the input yourself.</p>
+
+<h3>The Standard Library: Batteries Included</h3>
+
+<p>Python ships with hundreds of tested modules, so there is nothing to install or download. Today we cover <code>math</code>, <code>random</code> and <code>datetime</code>. The full list is at docs.python.org/3/library.</p>
+
+<table>
+<thead>
+<tr><th>Module</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>files and data exchange</td></tr>
+</tbody>
+</table>
+
+<h2>Your Own Modules</h2>
+
+<h3>Your First Module: number_tools.py</h3>
+
+<p>Reusable code lives in its own <code>.py</code> file. <code>average</code> returns the mean of a list of numbers, and <code>spread</code> returns the difference between the largest and smallest values. The module only defines tools; it does not talk to the user (input, print). Put this file in the same folder as the program that imports it.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>Importing Your Own File</h3>
+
+<p><code>stats_report.py</code> brings in the tools it needs with <code>import number_tools</code> and calls them as <code>number_tools.average(...)</code>. The two files must be in the same folder. After editing the module, run the program again to pick up the change.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>Run or Import: __name__ == "__main__"</h3>
+
+<p>When you run a file directly, its <code>__name__</code> is <code>"__main__"</code>; when another file imports it, <code>__name__</code> is the module name (<code>"number_tools"</code>). A condition (a guard) based on this difference separates the reusable tools from the demo code: imports stay silent, and the demo appears only on a direct run. On the <a href="number_tools.html">number_tools</a> page you can print <code>number_tools.__name__</code> yourself to check.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>Packages: Modules in Folders</h3>
+
+<p>A package is a folder of related modules. An <code>__init__.py</code> inside the folder marks it as a package. Dotted names navigate down: <code>package.module.function</code>. Packages come back when we deal with pip and external libraries.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>Midpoint Check</h3>
+
+<ul>
+<li>What does the dot in <code>math.sqrt</code> connect? A module and a name inside it.</li>
+<li>Why does a name you did not import raise <code>NameError</code>? Because that name was never defined in the current file.</li>
+<li>When does a module's top-level code run? Once, the first time it is imported.</li>
+</ul>
+
+<h2>datetime: Dates and Moments</h2>
+
+<h3>date and datetime</h3>
+
+<p>A <code>date</code> holds a year, month and day, and a <code>datetime</code> also holds hours, minutes and seconds. <code>today()</code> and <code>now()</code> report the current moment, and each part is read as an attribute such as <code>.year</code>, <code>.month</code>, <code>.day</code> or <code>.hour</code>. The web lab's virtual machine takes today's date from your computer's clock; you can check it with the <code>date</code> command in the terminal.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>Formatting Dates: strftime</h3>
+
+<p><code>strftime</code> turns a date into a string in the layout you want. <code>%Y</code>, <code>%m</code> and <code>%d</code> are the year, month and day, and <code>%A</code> is the full weekday name. You can build exactly the string a report needs.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>Date Arithmetic: timedelta</h3>
+
+<p>Subtracting two dates gives a <code>timedelta</code> in days, and <code>.days</code> extracts the whole number of days. Adding a <code>timedelta</code> to a date gives a future date. A negative number of days means the date has already passed.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: Days Until a Date</h3>
+
+<p>Open <a href="date_check.html">date_check</a>. Read a target date in YYYY-MM-DD format and print its weekday name and the number of days remaining. Test a past date, today and a future date (5 minutes). Hint: convert the string to a date with <code>strptime(text, "%Y-%m-%d")</code>, then subtract <code>date.today()</code>.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>The days remaining depend on the day you run it. The 89 on the slide is counted from 2026-09-27.</p>
+
+<h2>random: Random Numbers</h2>
+
+<h3>Floats and Integers</h3>
+
+<p><code>random()</code> returns a float from 0.0 up to, but not including, 1.0, and <code>uniform(a, b)</code> returns a float over a wider range. <code>randint(a, b)</code> picks an integer with both ends included. The results differ on every run.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>Pick, Shuffle, Sample</h3>
+
+<p><code>choice(seq)</code> picks one element. <code>shuffle(list)</code> mixes the list in place and returns <code>None</code>, so writing <code>names = random.shuffle(names)</code> loses the list. <code>sample(seq, k)</code> picks k different elements. All of these work on the lists from Week 4.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>Repeatability: seed</h3>
+
+<p>The same seed produces the same sequence, and different seeds give different results. Seeds are used for testing and for reproducing a run; games and lotteries rely on unseeded randomness that differs every time.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>Labs</h2>
+
+<h3>Lab 1: A number_tools Module</h3>
+
+<p>In <a href="number_tools.html">number_tools</a>, finish <code>average</code> and <code>count_above</code> in <code>number_tools.py</code>. <code>count_above(numbers, limit)</code> counts the values larger than <code>limit</code>. Then finish <code>stats_report.py</code> so it prints the report. Keep the <code>__main__</code> guard demo at the bottom of the module.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>Checks: the direct run (<code>python3 number_tools.py</code>) prints the demo, and the imported run (<code>stats_report.py</code>) uses both tools. Average 88.0 is 352 / 4, the 3 in Above 85 is 88, 92 and 93, and the demo's 5.0 is 2+4+6+8 divided by 4. <code>average([])</code> raises <code>ZeroDivisionError</code> on an empty list. Handling that error gracefully is next session's topic.</p>
+
+<h3>Lab 2: Lotto Generator</h3>
+
+<p>In <a href="lotto.html">lotto</a>, read how many games to play (1–5); for each game draw 6 different numbers from 1 to 45 and print them on one line, sorted smallest first. Assume integer-formatted input and use <code>random.sample</code> once per game.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>Checks: input 1 prints exactly one line, and 5 prints five lines. Every line is sorted (each number is at least the previous one), has six different values, and stays between 1 and 45. 0 and 6 print only <code>Invalid games</code>. To print a list separated by spaces without brackets, unpack it when passing it, as in <code>print(*numbers)</code>.</p>
+
+<h3>Lab 3 (Take-Home): Guessing Game</h3>
+
+<p>In <a href="guessing.html">guessing</a>, the computer picks a secret number from 1 to 100 and answers each guess with <code>Higher</code>, <code>Lower</code> or <code>Correct!</code>. Count the attempts and print the count along with the correct guess.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>Here is how the game loop works. <code>randint(1, 100)</code> chooses the secret once, before the loop. The loop repeats until the guess matches, comparing with <code>if</code>/<code>elif</code>/<code>else</code> and counting attempts. A correct guess stops the loop. The slide's example fixes the guesses in a list to show just the flow; the real program reads guesses with <code>input()</code> and stops with <code>break</code>.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: Beyond the Standard Library</h2>
+
+<p>The standard library comes with Python, but NumPy is an external package for array computing. An array computes on a whole batch of numbers at once. Next session's pandas and, later, matplotlib are built on top of NumPy. The slides have you type along in Colab (NumPy preinstalled) or on your own PC (<code>pip install numpy</code>). The web lab's virtual machine already includes NumPy, so you can run <code>python3</code> in the terminal of any page and type the code below as is. Note, however, that <code>import numpy</code> takes from a few seconds to a few tens of seconds in the virtual machine.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: Lists Become Arrays</h3>
+
+<p><code>np.array</code> turns a list into an ndarray. A nested list becomes a 2D array. In the example below, rows are stores and columns are products. The ingredients are lists you already know.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>Arrays by Recipe</h3>
+
+<p><code>arange(1, 10, 2)</code> makes a range that excludes the end; <code>zeros((2, 3))</code> and <code>ones((2, 2))</code> make arrays of a given shape filled with 0 or 1; <code>full((4,), 0.03)</code> makes an array repeating one value; and <code>linspace(0, 1, 5)</code> makes evenly spaced values including both ends.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>Random Arrays, Seeded</h3>
+
+<p><code>np.random</code> is similar to the <code>random</code> module. <code>randint(50, 151, size=5)</code> draws five integers, and as with <code>range</code> the end 151 is excluded. With <code>seed(42)</code> everyone gets the same result.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>Reading an Array: shape and dtype</h3>
+
+<p><code>shape</code> is (rows, columns); the <code>sales</code> above is (3, 4). <code>ndim</code> is the number of dimensions, <code>size</code> the number of elements, and <code>dtype</code> the single data type all elements share. When you receive new data, ask for its shape and dtype first.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>The default dtype of an integer array depends on the environment. On a 64-bit PC it is usually <code>int64</code>, but on this 32-bit virtual machine it comes out as <code>int32</code>.</p>
+
+<h3>One dtype per Array</h3>
+
+<p>An array stores only one data type. Mixing integers and floats gives float64, and mixing numbers and strings turns everything into strings. <code>astype(np.float64)</code> converts to floats.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>Indexing and Slicing</h3>
+
+<p>Indexes and slices work just like with lists. <code>prices[1:3]</code> starts at 1 and stops before 3. The difference is that a slice is a view onto the same memory: changing the view changes the original too. When you need a real copy, use <code>prices[1:3].copy()</code>.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2D Indexing: [row, column]</h3>
+
+<p>Write the row and column inside one pair of brackets, separated by a comma. <code>sales[1, 2]</code> is a single cell, and <code>sales[:, 1]</code> is one whole column. Both directions can be sliced: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>Choosing by Condition: Masks</h3>
+
+<p>A comparison returns a Boolean array, and using it as an index keeps only the elements that are True. To combine masks, use <code>&amp;</code> and <code>|</code>, not <code>and</code>/<code>or</code>, and put parentheses around each comparison.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>Fancy Indexing</h3>
+
+<p>Passing a list of positions picks elements in the order you want, and the same position may be repeated. The result is a new array, not a view. We use this later to pair names with rankings.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>Vectorized Math and Broadcasting</h3>
+
+<p>Operators are applied element by element. <code>prices * 2</code> doubles every value, whereas <code>* 2</code> on a list repeats the whole list. <code>np.sqrt</code> and <code>np.round</code> also apply to the whole array. NumPy computes by stretching a smaller shape to fit a larger one (broadcasting). A single number spreads over the whole array, so <code>prices * 0.9</code> discounts every product. The trailing dimensions must be equal or 1.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>Aggregation with axis</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code> and <code>min</code> fold an array into a single value. <code>axis=0</code> computes each column from top to bottom, and <code>axis=1</code> computes each row across. Check with the length of the result: 4 products, 3 stores.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, Stacking, Sorting</h3>
+
+<p><code>reshape(4, 3)</code> groups the same data into a new shape, for example splitting 12 months into four quarters. <code>-1</code> means "whatever is left", and <code>.T</code> swaps rows and columns. The number of elements (size) cannot change. <code>vstack</code> joins arrays as new rows and <code>hstack</code> as new columns (a new store is vstack, a new period is hstack). <code>sort</code> returns the sorted values and <code>argsort</code> the sorted positions, so together with fancy indexing you can line up names in order. <code>argsort(-x)</code> ranks from largest to smallest.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>Guided Tour: Annual Report</h3>
+
+<p>Reshape 12 months of sales (in units of ten thousand won) into four quarters, get the quarterly totals with <code>axis=1</code>, find the index of the best month with <code>argmax</code>, and find the top three months with <code>argsort(-monthly)[:3]</code>.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy in Five Lines</h3>
+
+<ul>
+<li>ndarray: many dimensions, one dtype.</li>
+<li>Create: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>Select: slices, masks, fancy indexing.</li>
+<li>Compute: vectorization, broadcasting, axis.</li>
+<li>Rearrange: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>A missing import is the first suspect for a <code>NameError</code>. When debugging, check the import lines at the top first.</li>
+<li><code>randint(1, 6)</code> includes 6, but <code>range(1, 6)</code> does not.</li>
+<li><code>shuffle(names)</code> shuffles in place and returns <code>None</code>.</li>
+<li><code>print(*numbers)</code> unpacks the list and prints the items separately.</li>
+<li>NumPy masks use <code>&amp;</code> and <code>|</code> with parentheses, not <code>and</code>/<code>or</code>.</li>
+</ul>
+
+<p>Before running, you should be able to say where each name came from.</p>
+
+<h2>Exit Quiz &amp; Submission</h2>
+
+<ol>
+<li><strong>What does the dot in <code>math.sqrt</code> connect?</strong> The module <code>math</code> and the function <code>sqrt</code> inside it.</li>
+<li><strong>Which error do you get when you use a name you did not import?</strong> <code>NameError</code>.</li>
+<li><strong>What does <code>shuffle</code> return?</strong> <code>None</code>. The list itself is shuffled.</li>
+<li><strong>How do you draw 6 different numbers from 1 to 45?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>What is <code>__name__</code> inside an imported module?</strong> The module name (for example, <code>"number_tools"</code>).</li>
+<li><strong>Does <code>sales.sum(axis=0)</code> fold rows or columns?</strong> It folds downward along the rows, leaving one total per column.</li>
+<li><strong>How do you rank sales from largest to smallest in NumPy?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>Submit: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>. <code>guessing.py</code> is due next session. Record at least three test cases in comments for each program. Files you changed in the web lab can be saved to your computer with <code>cp file /mnt/host/</code> followed by the page's Download box.</p>
+
+<h2>Next Session</h2>
+
+<p>The last slide previews exceptions as the next session's topic (why <code>int("abc")</code> raises a <code>ValueError</code>, and keeping a program from crashing with <code>try</code>/<code>except</code>). To prepare, find one input that breaks a Week 4 program. The actual materials for the next session cover pandas.</p>
+</div><div lang="ko">
+<p>이번 시간의 주제는 모듈입니다. 같은 함수를 여러 프로그램에서 쓰고 싶을 때 코드를 복사하는 대신 한 파일(모듈)에 담아 두고 <code>import</code>로 불러 쓰는 방법을 배웁니다. 먼저 <code>import</code>의 여러 형태와 점(.)의 의미, 이름을 불러오지 않았을 때 나는 <code>NameError</code>를 살펴보고, 직접 만든 모듈 <code>number_tools</code>를 다른 프로그램에서 가져다 씁니다. 그다음 표준 라이브러리의 <code>math</code>, <code>datetime</code>, <code>random</code>을 실제 과제에 적용하고, 마지막으로 외부 패키지인 NumPy로 배열 전체를 한 번에 계산하는 방법을 처음 맛봅니다. 실습 프로그램은 <a href="math_practice.html">math_practice</a>, <a href="date_check.html">date_check</a>, <a href="number_tools.html">number_tools</a>, <a href="lotto.html">lotto</a>, <a href="guessing.html">guessing</a>입니다.</p>
+
+<h2>복습: 함수 하나, 프로그램 둘</h2>
+
+<p>3주차에 만든 <code>sum_to(n)</code>은 1 + 2 + … + n을 돌려줍니다. 이 함수가 필요한 두 번째 프로그램이 생겼다고 해 봅시다. 코드를 복사해 붙이면 당장은 되지만, 버그를 발견하면 두 곳을 모두 고쳐야 합니다. 이번 시간의 목표는 다시 쓸 코드에 자기만의 집을 마련해 주는 것입니다.</p>
+
+<pre><code>def sum_to(n):
+    total = 0
+    for value in range(1, n + 1):
+        total += value
+    return total
+
+print(sum_to(10))   # 55</code></pre>
+
+<h2>모듈과 import</h2>
+
+<h3>모듈이란</h3>
+
+<p>모듈은 Python 정의(함수, 변수 등)가 들어 있는 파일입니다. 파일 이름에서 <code>.py</code>를 뺀 것이 모듈 이름이 됩니다. 예를 들어 <code>greetings.py</code>는 <code>greetings</code> 모듈입니다. 모듈을 import하면 그 모듈의 맨 위 수준 코드가 한 번 실행됩니다. 사실 지금까지 작성한 모든 프로그램도 이미 모듈이었습니다.</p>
+
+<pre><code># File: greetings.py
+def hello(name):
+    return "Hello, " + name + "!"</code></pre>
+
+<h3>import와 점(.)</h3>
+
+<p><code>import math</code>는 <code>math</code> 모듈을 불러옵니다. 모듈 안의 이름은 점으로 꺼냅니다. <code>math.sqrt(2)</code>는 "math 모듈 안의 sqrt"라는 뜻입니다. 접두사를 붙여 쓰면 각 이름이 어디에서 왔는지 코드만 보고도 알 수 있습니다. Python은 처음 import한 모듈을 기억해(캐시) 두므로, 같은 모듈을 다시 import해도 다시 실행하지 않습니다.</p>
+
+<pre><code>import math
+
+print(math.pi)           # 3.141592653589793
+print(math.sqrt(2))      # 1.4142135623730951
+print(math.floor(2.9))   # 2</code></pre>
+
+<h3>from module import name</h3>
+
+<p>필요한 이름만 골라 가져오면 접두사 없이 쓸 수 있습니다. 쉼표로 여러 이름을 나열할 수 있고, 가져오면서 이름을 바꿀 수도 있습니다. 이때는 가져온 이름만 보입니다. <code>from math import sqrt</code> 뒤에 <code>math.pi</code>를 쓰면 <code>math</code>라는 이름이 없어서 오류가 납니다.</p>
+
+<pre><code>from math import sqrt, pi
+
+print(sqrt(16))   # 4.0
+print(pi)         # 3.141592653589793</code></pre>
+
+<h3>import 방식 비교</h3>
+
+<table>
+<thead>
+<tr><th>형태</th><th>사용</th><th>특징</th></tr>
+</thead>
+<tbody>
+<tr><td><code>import math</code></td><td><code>math.sqrt(2)</code></td><td>출처가 가장 분명하지만 타이핑이 조금 많다</td></tr>
+<tr><td><code>from math import sqrt</code></td><td><code>sqrt(2)</code></td><td>짧다. 이름 몇 개만 쓸 때 좋다</td></tr>
+<tr><td><code>import math as m</code></td><td><code>m.sqrt(2)</code></td><td>짧은 별칭. <code>np</code>, <code>pd</code>처럼 관례적인 별칭에 쓴다</td></tr>
+<tr><td><code>from math import *</code></td><td><code>sqrt(2)</code></td><td>이름이 어디서 왔는지 감춰지므로 피한다</td></tr>
+</tbody>
+</table>
+
+<h3>NameError: Traceback 읽기</h3>
+
+<p>import하지 않은 이름을 쓰면 <code>NameError</code>가 납니다. Traceback은 실패한 파일과 줄 번호를 알려 줍니다. 읽을 때는 마지막 줄(오류 종류와 메시지)부터 보고, 원인을 고친 뒤 다시 실행합니다. 아래 예에서 원인은 <code>math</code>를 import하지 않은 것입니다. <a href="math_practice.html">math_practice</a> 페이지의 단계에서 같은 오류를 직접 내 볼 수 있습니다.</p>
+
+<pre><code>print(sqrt(16))     &lt;-- the failing line
+
+Traceback (most recent call last):
+  File "demo.py", line 1, in &lt;module&gt;
+NameError: name 'sqrt' is not defined</code></pre>
+
+<h3>math의 핵심 함수</h3>
+
+<p>상수 <code>pi</code>와 <code>e</code>, 제곱근 <code>sqrt</code>, 내림 <code>floor</code>와 올림 <code>ceil</code>이 있습니다. <code>factorial(n)</code>과 <code>gcd(a, b)</code>는 정수에 쓰고, <code>hypot(a, b)</code>는 직각삼각형의 빗변(대각선) 길이입니다.</p>
+
+<pre><code>import math
+
+print(math.floor(2.5))     # 2
+print(math.ceil(2.5))      # 3
+print(math.factorial(5))   # 120
+print(math.gcd(12, 18))    # 6
+print(math.hypot(3, 4))    # 5.0</code></pre>
+
+<h3>Practice 1: 원과 빗변</h3>
+
+<p><a href="math_practice.html">math_practice</a>를 엽니다. 반지름을 읽어 원의 넓이와 둘레를 소수 둘째 자리로 반올림해 출력하고, 이어서 두 변의 길이를 읽어 빗변을 출력합니다. 입력은 숫자라고 가정하고 <code>math.pi</code>와 <code>math.hypot</code>을 사용합니다(5분).</p>
+
+<pre><code>Radius: 3
+Area: 28.27
+Circumference: 18.85
+First leg: 3
+Second leg: 4
+Hypotenuse: 5.0</code></pre>
+
+<p>웹 실습에서는 <code>printf '3\n3\n4\n' | python3 math_practice.py</code>처럼 입력을 미리 넣어 실행할 수도 있고, 그냥 <code>python3 math_practice.py</code>로 실행해 직접 입력해도 됩니다.</p>
+
+<h3>표준 라이브러리: 배터리 포함</h3>
+
+<p>Python에는 검증된 모듈 수백 개가 함께 들어 있어 따로 설치하거나 내려받을 필요가 없습니다. 오늘은 <code>math</code>, <code>random</code>, <code>datetime</code>을 다룹니다. 전체 목록은 docs.python.org/3/library에 있습니다.</p>
+
+<table>
+<thead>
+<tr><th>모듈</th><th>예</th></tr>
+</thead>
+<tbody>
+<tr><td><code>math</code></td><td>sqrt, pi, factorial</td></tr>
+<tr><td><code>random</code></td><td>randint, choice, sample</td></tr>
+<tr><td><code>datetime</code></td><td>today, strftime, timedelta</td></tr>
+<tr><td><code>statistics</code></td><td>mean, median</td></tr>
+<tr><td><code>csv</code>, <code>json</code></td><td>파일과 데이터 교환</td></tr>
+</tbody>
+</table>
+
+<h2>나만의 모듈</h2>
+
+<h3>첫 모듈: number_tools.py</h3>
+
+<p>다시 쓸 코드는 별도의 <code>.py</code> 파일에 둡니다. <code>average</code>는 숫자 리스트의 평균을, <code>spread</code>는 최댓값과 최솟값의 차를 돌려줍니다. 모듈은 도구를 정의할 뿐 사용자와 대화(input, print)하지 않습니다. 이 파일을 import할 프로그램과 같은 폴더에 둡니다.</p>
+
+<pre><code># File: number_tools.py
+def average(numbers):
+    total = sum(numbers)
+    return total / len(numbers)
+
+def spread(numbers):
+    return max(numbers) - min(numbers)</code></pre>
+
+<h3>내 파일 import하기</h3>
+
+<p><code>stats_report.py</code>는 필요한 도구를 <code>import number_tools</code>로 가져와 <code>number_tools.average(...)</code>처럼 부릅니다. 두 파일은 같은 폴더에 있어야 합니다. 모듈을 수정했다면 프로그램을 다시 실행해야 반영됩니다.</p>
+
+<pre><code># File: stats_report.py
+import number_tools
+
+scores = [88, 92, 79, 93]
+print(number_tools.average(scores))   # 88.0
+print(number_tools.spread(scores))    # 14</code></pre>
+
+<h3>실행할까, import할까: __name__ == "__main__"</h3>
+
+<p>파일을 직접 실행하면 그 파일의 <code>__name__</code>은 <code>"__main__"</code>이고, 다른 파일이 import하면 <code>__name__</code>은 모듈 이름(<code>"number_tools"</code>)이 됩니다. 이 차이를 이용한 조건문(가드)으로 다시 쓸 도구와 데모 코드를 나눕니다. import할 때는 조용하고, 직접 실행할 때만 데모가 보입니다. <a href="number_tools.html">number_tools</a> 페이지에서 <code>number_tools.__name__</code>을 직접 출력해 확인할 수 있습니다.</p>
+
+<pre><code># added at the bottom of number_tools.py
+if __name__ == "__main__":
+    demo = [2, 4, 6, 8]
+    print(average(demo))
+# printed only when run directly</code></pre>
+
+<h3>패키지: 폴더 속의 모듈</h3>
+
+<p>패키지는 관련 모듈을 모은 폴더입니다. 폴더 안의 <code>__init__.py</code>가 그 폴더를 패키지로 표시합니다. 이름은 점으로 따라 내려갑니다: <code>package.module.function</code>. 패키지는 pip와 외부 라이브러리를 다룰 때 다시 나옵니다.</p>
+
+<pre><code>course/
+  __init__.py
+  stats.py        -&gt; course.stats
+  tools.py        -&gt; course.tools
+
+import course.stats
+course.stats.average([1, 2, 3])</code></pre>
+
+<h3>중간 점검</h3>
+
+<ul>
+<li><code>math.sqrt</code>의 점은 무엇과 무엇을 잇는가? 모듈과 그 안의 이름입니다.</li>
+<li>import하지 않은 이름은 왜 <code>NameError</code>를 내는가? 그 이름이 현재 파일에 정의된 적이 없기 때문입니다.</li>
+<li>모듈의 맨 위 수준 코드는 언제 실행되는가? 처음 import될 때 한 번입니다.</li>
+</ul>
+
+<h2>datetime: 날짜와 시각</h2>
+
+<h3>date와 datetime</h3>
+
+<p><code>date</code>는 연·월·일을, <code>datetime</code>은 거기에 시·분·초까지 담습니다. <code>today()</code>와 <code>now()</code>는 현재 시점을 알려 주고, 각 부분은 <code>.year</code>, <code>.month</code>, <code>.day</code>, <code>.hour</code> 같은 속성으로 읽습니다. 웹 실습의 가상 머신은 내 컴퓨터의 시계를 따라 오늘 날짜를 정하며, 터미널에서 <code>date</code> 명령으로 확인할 수 있습니다.</p>
+
+<pre><code>from datetime import date, datetime
+
+today = date.today()
+print(today)    # 2026-09-27 (example)
+print(today.year, today.month, today.day)
+
+now = datetime.now()
+print(now.hour, now.minute)</code></pre>
+
+<h3>날짜 서식: strftime</h3>
+
+<p><code>strftime</code>은 날짜를 원하는 모양의 문자열로 바꿉니다. <code>%Y</code>, <code>%m</code>, <code>%d</code>는 연·월·일, <code>%A</code>는 요일의 전체 이름입니다. 보고서에 필요한 문자열을 정확히 만들 수 있습니다.</p>
+
+<pre><code>from datetime import date
+
+today = date.today()
+print(today.strftime("%Y-%m-%d"))       # 2026-09-27
+print(today.strftime("%A, %d %B %Y"))   # Sunday, 27 September 2026 (example)</code></pre>
+
+<h3>날짜 계산: timedelta</h3>
+
+<p>두 날짜를 빼면 일 단위의 <code>timedelta</code>가 나오고, <code>.days</code>로 정수 일수를 꺼냅니다. 날짜에 <code>timedelta</code>를 더하면 미래의 날짜가 됩니다. 일수가 음수이면 그 날짜가 이미 지났다는 뜻입니다.</p>
+
+<pre><code>from datetime import date, timedelta
+
+today = date(2026, 9, 27)   # example
+exam = date(2026, 11, 13)
+print((exam - today).days)          # 47
+print(today + timedelta(days=100))  # 2027-01-05</code></pre>
+
+<h3>Practice 2: 날짜까지 남은 날</h3>
+
+<p><a href="date_check.html">date_check</a>를 엽니다. 목표 날짜를 YYYY-MM-DD 형식으로 읽어 요일 이름과 남은 날 수를 출력합니다. 지난 날짜, 오늘, 미래 날짜를 모두 시험해 봅니다(5분). 힌트: <code>strptime(text, "%Y-%m-%d")</code>로 문자열을 날짜로 바꾼 뒤 <code>date.today()</code>를 뺍니다.</p>
+
+<pre><code>Date (YYYY-MM-DD): 2026-12-25
+Friday
+Days remaining: 89</code></pre>
+
+<p>남은 날 수는 실행하는 날에 따라 달라집니다. 슬라이드의 89는 2026-09-27 기준입니다.</p>
+
+<h2>random: 난수</h2>
+
+<h3>실수와 정수</h3>
+
+<p><code>random()</code>은 0.0 이상 1.0 미만의 실수를, <code>uniform(a, b)</code>는 더 넓은 범위의 실수를 돌려줍니다. <code>randint(a, b)</code>는 양 끝을 모두 포함하는 정수를 고릅니다. 결과는 실행할 때마다 다릅니다.</p>
+
+<pre><code>import random
+
+print(random.random())        # 0.639... (varies)
+print(random.uniform(1, 10))  # 8.11... (varies)
+print(random.randint(1, 6))   # one die, 1..6
+print(random.randint(1, 6))   # a second roll</code></pre>
+
+<h3>고르기, 섞기, 뽑기</h3>
+
+<p><code>choice(seq)</code>는 원소 하나를 고릅니다. <code>shuffle(list)</code>는 리스트를 그 자리에서 섞고 <code>None</code>을 돌려줍니다. 그래서 <code>names = random.shuffle(names)</code>처럼 쓰면 리스트를 잃어버립니다. <code>sample(seq, k)</code>는 서로 다른 원소 k개를 뽑습니다. 모두 4주차의 리스트 위에서 동작합니다.</p>
+
+<pre><code>import random
+
+names = ["Ara", "Ben", "Cho", "Dan"]
+print(random.choice(names))            # one name
+random.shuffle(names)
+print(names)                           # new order
+print(random.sample(range(1, 46), 6))</code></pre>
+
+<h3>재현성: seed</h3>
+
+<p>같은 seed를 주면 같은 수열이 나오고, seed가 다르면 결과도 다릅니다. 테스트하거나 실행 결과를 재현할 때 쓰며, 게임이나 복권은 seed 없이 매번 다른 난수에 의존합니다.</p>
+
+<pre><code>import random
+
+random.seed(42)
+print(random.randint(1, 100))   # 82
+print(random.randint(1, 100))   # 15
+
+random.seed(42)
+print(random.randint(1, 100))   # 82 again</code></pre>
+
+<h2>실습</h2>
+
+<h3>Lab 1: number_tools 모듈</h3>
+
+<p><a href="number_tools.html">number_tools</a>에서 <code>number_tools.py</code>의 <code>average</code>와 <code>count_above</code>를 완성합니다. <code>count_above(numbers, limit)</code>은 <code>limit</code>보다 큰 값의 개수를 셉니다. 그런 다음 <code>stats_report.py</code>를 완성해 보고서를 출력합니다. 모듈 아래의 <code>__main__</code> 가드 데모는 그대로 둡니다.</p>
+
+<pre><code>$ python3 stats_report.py
+Scores: [88, 92, 79, 93]
+Average: 88.0
+Above 85: 3
+
+$ python3 number_tools.py
+Demo average: 5.0</code></pre>
+
+<p>확인할 점: 직접 실행(<code>python3 number_tools.py</code>)에서는 데모가 나오고, import된 실행(<code>stats_report.py</code>)에서는 두 도구를 모두 씁니다. Average 88.0은 352 / 4, Above 85의 3은 88, 92, 93이고, 데모의 5.0은 2+4+6+8을 4로 나눈 값입니다. <code>average([])</code>는 빈 리스트에서 <code>ZeroDivisionError</code>를 냅니다. 이 오류를 부드럽게 처리하는 방법은 다음 시간 주제입니다.</p>
+
+<h3>Lab 2: 로또 번호 생성기</h3>
+
+<p><a href="lotto.html">lotto</a>에서 몇 게임을 할지(1–5)를 읽고, 게임마다 1부터 45 사이의 서로 다른 수 6개를 뽑아 작은 수부터 정렬해 한 줄에 출력합니다. 입력은 정수 형식이라고 가정하고 게임마다 <code>random.sample</code>을 한 번 씁니다.</p>
+
+<pre><code>Games (1-5): 3
+4 10 19 23 35 41
+7 8 14 27 33 45
+2 15 22 30 38 44
+
+Games (1-5): 6
+Invalid games</code></pre>
+
+<p>확인할 점: 입력 1이면 정확히 한 줄, 5이면 다섯 줄이 나옵니다. 모든 줄은 정렬되어 있고(각 수가 앞의 수 이상), 여섯 값이 모두 다르며, 1에서 45 사이입니다. 0과 6은 <code>Invalid games</code>만 출력합니다. 리스트를 대괄호 없이 공백으로 구분해 출력하려면 <code>print(*numbers)</code>처럼 리스트를 풀어 넘깁니다.</p>
+
+<h3>Lab 3(과제): 숫자 맞히기 게임</h3>
+
+<p><a href="guessing.html">guessing</a>에서 컴퓨터가 1부터 100 사이의 비밀 수를 고르고, 추측할 때마다 <code>Higher</code>, <code>Lower</code>, <code>Correct!</code>를 알려 줍니다. 시도 횟수를 세어 맞혔을 때 함께 출력합니다.</p>
+
+<pre><code>Guess: 50
+Higher
+Guess: 75
+Lower
+Guess: 62
+Correct! Attempts: 3</code></pre>
+
+<p>게임 반복의 구조는 이렇습니다. <code>randint(1, 100)</code>은 반복 전에 비밀 수를 한 번만 고릅니다. 반복은 추측이 맞을 때까지 계속되고, <code>if</code>/<code>elif</code>/<code>else</code>로 비교하며 시도 횟수를 셉니다. 맞히면 반복을 멈춥니다. 슬라이드의 예는 추측을 리스트로 고정해 흐름만 보여 주고, 실제 프로그램은 <code>input()</code>으로 추측을 읽으며 <code>break</code>로 멈춥니다.</p>
+
+<pre><code>import random
+
+secret = random.randint(1, 100)
+attempts = 0
+for guess in [50, 75, 62]:
+    attempts += 1
+    if guess &lt; secret:
+        print("Higher")
+    elif guess &gt; secret:
+        print("Lower")
+    else:
+        print("Correct! Attempts:", attempts)</code></pre>
+
+<h2>NumPy: 표준 라이브러리 너머</h2>
+
+<p>표준 라이브러리는 Python과 함께 오지만, NumPy는 배열 계산을 위한 외부 패키지입니다. 배열은 숫자 묶음 전체를 한 번에 계산합니다. 다음 시간의 pandas와 이후의 matplotlib이 NumPy 위에 만들어져 있습니다. 슬라이드는 Colab(NumPy가 미리 설치됨)이나 내 PC(<code>pip install numpy</code>)에서 따라 치도록 되어 있습니다. 이 웹 실습의 가상 머신에는 NumPy가 이미 들어 있으므로 아무 페이지의 터미널에서 <code>python3</code>을 실행해 아래 코드를 그대로 입력해 볼 수 있습니다. 다만 <code>import numpy</code>는 가상 머신에서 몇 초에서 수십 초가 걸립니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+counts = np.array([12, 3, 45, 7])
+print(prices * counts)
+# [108000 75000 180000 126000]</code></pre>
+
+<h3>np.array: 리스트가 배열로</h3>
+
+<p><code>np.array</code>는 리스트를 ndarray로 바꿉니다. 중첩 리스트는 2차원 배열이 됩니다. 아래 예에서 행은 매장, 열은 상품입니다. 재료는 이미 알고 있는 리스트입니다.</p>
+
+<pre><code>import numpy as np
+
+r1 = [270000, 150000, 420000, 234000]
+r2 = [189000, 100000, 315000, 180000]
+r3 = [108000, 75000, 180000, 126000]
+sales = np.array([r1, r2, r3])
+print(sales)</code></pre>
+
+<h3>규칙으로 배열 만들기</h3>
+
+<p><code>arange(1, 10, 2)</code>는 끝을 제외한 범위를, <code>zeros((2, 3))</code>와 <code>ones((2, 2))</code>는 모양을 0이나 1로 채운 배열을, <code>full((4,), 0.03)</code>은 한 값을 반복한 배열을, <code>linspace(0, 1, 5)</code>는 양 끝을 포함해 고르게 나눈 값을 만듭니다.</p>
+
+<pre><code>import numpy as np
+
+print(np.arange(1, 10, 2))    # [1 3 5 7 9]
+print(np.full((4,), 0.03))    # [0.03 0.03 0.03 0.03]
+print(np.linspace(0, 1, 5))   # [0.   0.25 0.5  0.75 1.  ]</code></pre>
+
+<h3>seed를 준 난수 배열</h3>
+
+<p><code>np.random</code>은 <code>random</code> 모듈과 비슷합니다. <code>randint(50, 151, size=5)</code>는 정수 다섯 개를 뽑는데, <code>range</code>처럼 끝 151은 제외됩니다. <code>seed(42)</code>로 모두가 같은 결과를 얻습니다.</p>
+
+<pre><code>import numpy as np
+
+np.random.seed(42)
+print(np.random.randint(50, 151, size=5))   # [101 142 64 121 110]
+print(np.random.randint(1, 7, size=3))      # [5 2 3]</code></pre>
+
+<h3>배열 읽기: shape와 dtype</h3>
+
+<p><code>shape</code>는 (행, 열)이고 위 <code>sales</code>는 (3, 4)입니다. <code>ndim</code>은 차원 수, <code>size</code>는 원소 개수, <code>dtype</code>은 모든 원소가 공유하는 하나의 자료형입니다. 새 데이터를 받으면 먼저 shape와 dtype을 물어봅니다.</p>
+
+<pre><code>print(sales.shape, sales.ndim, sales.size)   # (3, 4) 2 12
+print(sales.dtype)                           # int64</code></pre>
+
+<p>정수 배열의 기본 dtype은 환경에 따라 다릅니다. 64비트 PC에서는 보통 <code>int64</code>이지만, 32비트인 이 가상 머신에서는 <code>int32</code>로 나옵니다.</p>
+
+<h3>배열 하나에 dtype 하나</h3>
+
+<p>배열은 한 가지 자료형만 저장합니다. 정수와 실수를 섞으면 float64가 되고, 숫자와 문자열을 섞으면 모두 문자열이 됩니다. <code>astype(np.float64)</code>로 실수로 바꿀 수 있습니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+print(prices.mean())                 # 14000.0
+print(prices.astype(np.float64))     # [ 9000. 25000.  4000. 18000.]
+print(np.array([9000, "event"]))     # ['9000' 'event']</code></pre>
+
+<h3>인덱싱과 슬라이싱</h3>
+
+<p>리스트와 똑같이 인덱스와 슬라이스를 씁니다. <code>prices[1:3]</code>은 1에서 시작해 3 앞에서 멈춥니다. 다른 점은 슬라이스가 같은 메모리를 보는 뷰(view)라는 것입니다. 뷰를 고치면 원본도 바뀝니다. 진짜 복사본이 필요하면 <code>prices[1:3].copy()</code>를 씁니다.</p>
+
+<pre><code>import numpy as np
+
+prices = np.array([9000, 25000, 4000, 18000])
+view = prices[1:3]
+view[0] = 9900
+print(prices)   # [ 9000  9900  4000 18000]</code></pre>
+
+<h3>2차원 인덱싱: [행, 열]</h3>
+
+<p>대괄호 한 쌍 안에 쉼표로 행과 열을 씁니다. <code>sales[1, 2]</code>는 칸 하나, <code>sales[:, 1]</code>은 열 하나 전체입니다. 두 방향 모두 슬라이스할 수 있습니다: <code>sales[:2, 1:3]</code>.</p>
+
+<pre><code>sales = np.array([r1, r2])
+print(sales[1, 2])   # 315000
+print(sales[:, 1])   # [150000 100000]</code></pre>
+
+<h3>조건으로 고르기: 마스크</h3>
+
+<p>비교 연산은 불리언 배열을 돌려주고, 그것을 인덱스로 쓰면 True인 원소만 남습니다. 마스크를 결합할 때는 <code>and</code>/<code>or</code>가 아니라 <code>&amp;</code>와 <code>|</code>를 쓰고, 비교마다 괄호를 씌워야 합니다.</p>
+
+<pre><code>revenue = prices * counts
+print(revenue[revenue &gt;= 100000])   # [108000 180000 126000]
+mask = (revenue &gt;= 100000) &amp; (revenue &lt; 150000)
+print(revenue[mask])                # [108000 126000]</code></pre>
+
+<h3>팬시 인덱싱</h3>
+
+<p>위치의 리스트를 넘기면 원하는 순서로 고를 수 있고, 같은 위치를 반복해도 됩니다. 결과는 뷰가 아닌 새 배열입니다. 뒤에서 이름과 순위를 짝지을 때 씁니다.</p>
+
+<pre><code>print(prices[[3, 0]])      # [18000  9000]
+print(prices[[0, 0, 1]])   # [ 9000  9000 25000]</code></pre>
+
+<h3>벡터화 연산과 브로드캐스팅</h3>
+
+<p>연산자는 원소별로 적용됩니다. <code>prices * 2</code>는 모든 값을 두 배로 만들지만, 리스트에 <code>* 2</code>를 하면 리스트 전체가 반복됩니다. <code>np.sqrt</code>, <code>np.round</code>도 배열 전체에 적용됩니다. NumPy는 작은 모양을 큰 모양에 맞게 늘려(브로드캐스팅) 계산합니다. 숫자 하나는 배열 전체에 퍼지므로 <code>prices * 0.9</code>는 모든 상품을 할인합니다. 끝쪽 차원이 같거나 1이어야 합니다.</p>
+
+<pre><code>print(prices * 2)                     # [18000 50000  8000 36000]
+print(prices + 1000)                  # [10000 26000  5000 19000]
+print(np.sqrt(np.array([1, 4, 9])))   # [1. 2. 3.]
+print(prices * 0.9)                   # [ 8100. 22500.  3600. 16200.]
+promo = np.array([1000, 2000, 500, 3000])
+print(prices + promo)                 # [10000 27000  4500 21000]</code></pre>
+
+<h3>axis로 집계하기</h3>
+
+<p><code>sum</code>, <code>mean</code>, <code>max</code>, <code>min</code>은 배열을 하나의 값으로 접습니다. <code>axis=0</code>은 각 열을 위에서 아래로, <code>axis=1</code>은 각 행을 가로로 계산합니다. 결과 길이로 확인합니다: 상품 4개, 매장 3개.</p>
+
+<pre><code>sales = np.array([r1, r2, r3])
+print(sales.sum(axis=0))   # [567000 325000 915000 540000]
+print(sales.sum(axis=1))   # [1074000  784000  489000]
+print(sales.sum())         # 2347000</code></pre>
+
+<h3>reshape, 쌓기, 정렬</h3>
+
+<p><code>reshape(4, 3)</code>은 같은 데이터를 새 모양으로 묶습니다. 12개월을 네 분기로 나누는 식입니다. <code>-1</code>은 "남는 만큼"이라는 뜻이고, <code>.T</code>는 행과 열을 바꿉니다. 원소 개수(size)는 바뀔 수 없습니다. <code>vstack</code>은 배열을 새 행으로, <code>hstack</code>은 새 열로 이어 붙입니다(새 매장은 vstack, 새 기간은 hstack). <code>sort</code>는 정렬된 값을, <code>argsort</code>는 정렬된 위치를 돌려주므로 팬시 인덱싱과 함께 이름을 순서대로 늘어놓을 수 있습니다. <code>argsort(-x)</code>는 큰 것부터 순위를 매깁니다.</p>
+
+<pre><code>monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))            # [470 533 592 666]
+print(monthly.reshape(2, -1).shape)   # (2, 6)
+
+wonju = np.array([90000, 60000, 120000, 70000])
+sales = np.array([r1, r2])
+print(np.vstack([sales, wonju]).shape)   # (3, 4)
+print(np.hstack([sales, sales]).shape)   # (2, 8)
+
+revenue = np.array([108000, 75000, 180000, 126000])
+names = np.array(["mug", "shirt", "stickers", "tumbler"])
+print(names[np.argsort(revenue)])
+# ['shirt' 'mug' 'tumbler' 'stickers']</code></pre>
+
+<h3>따라 하기: 연간 보고서</h3>
+
+<p>12개월 매출(단위: 만 원)을 네 분기로 reshape하고, <code>axis=1</code>로 분기별 합계를 구하고, <code>argmax</code>로 최고 매출 달의 인덱스를, <code>argsort(-monthly)[:3]</code>로 상위 세 달을 찾습니다.</p>
+
+<pre><code>import numpy as np
+
+monthly = np.array([150, 162, 158, 170, 175, 188,
+                    190, 197, 205, 214, 220, 232])
+quarter = monthly.reshape(4, 3)
+print(quarter.sum(axis=1))               # [470 533 592 666]
+print(monthly.sum(), monthly.argmax())   # 2261 11
+print(np.argsort(-monthly)[:3])          # [11 10  9]</code></pre>
+
+<h3>NumPy 다섯 줄 요약</h3>
+
+<ul>
+<li>ndarray: 여러 차원, 하나의 dtype.</li>
+<li>만들기: <code>array</code>, <code>arange</code>, <code>zeros</code>, <code>linspace</code>.</li>
+<li>고르기: 슬라이스, 마스크, 팬시 인덱싱.</li>
+<li>계산: 벡터화, 브로드캐스팅, axis.</li>
+<li>재배치: <code>reshape</code>, <code>vstack</code>, <code>hstack</code>, <code>argsort</code>.</li>
+</ul>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li>import를 빠뜨린 것이 <code>NameError</code>의 첫 번째 용의자입니다. 디버깅할 때는 맨 위의 import 줄부터 봅니다.</li>
+<li><code>randint(1, 6)</code>은 6을 포함하지만 <code>range(1, 6)</code>은 포함하지 않습니다.</li>
+<li><code>shuffle(names)</code>는 그 자리에서 섞고 <code>None</code>을 돌려줍니다.</li>
+<li><code>print(*numbers)</code>는 리스트를 풀어 따로따로 출력합니다.</li>
+<li>NumPy 마스크는 괄호와 함께 <code>&amp;</code>, <code>|</code>를 씁니다. <code>and</code>/<code>or</code>는 쓰지 않습니다.</li>
+</ul>
+
+<p>실행 전에는 각 이름이 어디에서 왔는지 말할 수 있어야 합니다.</p>
+
+<h2>확인 퀴즈와 제출</h2>
+
+<ol>
+<li><strong><code>math.sqrt</code>의 점은 무엇을 잇는가?</strong> 모듈 <code>math</code>와 그 안의 함수 <code>sqrt</code>입니다.</li>
+<li><strong>import하지 않은 이름을 쓰면 어떤 오류가 나는가?</strong> <code>NameError</code>입니다.</li>
+<li><strong><code>shuffle</code>은 무엇을 돌려주는가?</strong> <code>None</code>입니다. 리스트 자체가 섞입니다.</li>
+<li><strong>1부터 45 사이의 서로 다른 수 6개는 어떻게 뽑는가?</strong> <code>random.sample(range(1, 46), 6)</code>.</li>
+<li><strong>import된 모듈 안에서 <code>__name__</code>은?</strong> 모듈 이름입니다(예: <code>"number_tools"</code>).</li>
+<li><strong><code>sales.sum(axis=0)</code>은 행과 열 중 무엇을 접는가?</strong> 행 방향으로 내려가며 접어 열마다 합계 하나를 남깁니다.</li>
+<li><strong>NumPy에서 매출을 큰 것부터 순위 매기려면?</strong> <code>np.argsort(-revenue)</code>.</li>
+</ol>
+
+<p>제출: <code>math_practice.py</code>, <code>date_check.py</code>, <code>number_tools.py</code>, <code>stats_report.py</code>, <code>lotto.py</code>. <code>guessing.py</code>는 다음 시간까지입니다. 프로그램마다 테스트 사례를 세 개 이상 주석으로 기록합니다. 웹 실습에서 고친 파일은 <code>cp 파일 /mnt/host/</code> 후 페이지의 받기 상자로 내 컴퓨터에 내려받을 수 있습니다.</p>
+
+<h2>다음 시간</h2>
+
+<p>슬라이드 마지막 장은 다음 시간 주제로 예외(<code>int("abc")</code>가 <code>ValueError</code>를 내는 이유, <code>try</code>/<code>except</code>로 프로그램이 멈추지 않게 하기)를 예고합니다. 준비로 4주차 프로그램을 망가뜨리는 입력을 하나 찾아 옵니다. 실제 다음 차시 자료는 pandas를 다룹니다.</p>
+</div>
+    </article>
+    <article class="notes" id="notes-week05-2">
+      <h2 class="notes-title"><span lang="en">Session 2 — pandas: Series and DataFrame</span><span lang="ko">2차시 — pandas: Series와 DataFrame</span></h2>
+<div lang="en">
+<p>This session is our first look at pandas. Last session's NumPy arrays answer by position (row 2, column 0), but real data is asked about by name (CODE, Tuesday, close). pandas is a tool that puts labels and tables on top of arrays. Today's story is "the first week of stock trading": we track one stock's week with a Series and handle the whole portfolio with a DataFrame, learning selection, filtering, sorting and statistics along the way. The practice programs are <a href="first_stock.html">first_stock</a>, <a href="positions.html">positions</a>, <a href="my_portfolio.html">my_portfolio</a>, <a href="trade_log.html">trade_log</a> and <a href="price_report.html">price_report</a>.</p>
+
+<p>In the web lab's virtual machine, <code>import pandas</code> takes 10–30 seconds. If nothing happens for a while after you run a program, just wait.</p>
+
+<h2>Review: From NumPy to pandas</h2>
+
+<p>Yesterday we learned NumPy arrays, vector operations and masks. A pandas Series holds a NumPy array inside, which you can take out with <code>.values</code>. The take-home <code>guessing.py</code> is due today.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes.values)   # a NumPy array inside</code></pre>
+
+<h3>Why pandas Exists</h3>
+
+<p>Yesterday's arrays hold numbers of a single kind. A portfolio mixes ticker codes (strings), share counts and prices, and every column needs a name and every row a label. pandas is the standard tool for data like this.</p>
+
+<table>
+<thead>
+<tr><th>Question</th><th>NumPy</th><th>pandas</th></tr>
+</thead>
+<tbody>
+<tr><td>Same math</td><td>Yes</td><td>Yes (there is an array inside)</td></tr>
+<tr><td>Mixed types</td><td>One dtype</td><td>A type per column</td></tr>
+<tr><td>Row names</td><td>0, 1, 2</td><td>Any labels you like</td></tr>
+</tbody>
+</table>
+
+<h3>Installing pandas: pip</h3>
+
+<p>pandas is installed the same way as NumPy. On your own PC, run <code>pip install pandas</code> in the terminal (not inside Python); Colab already has it. The web lab's virtual machine also has pandas preinstalled, and since it has no network, pip cannot be used there. By convention it is imported as <code>import pandas as pd</code> (like NumPy's <code>np</code>).</p>
+
+<pre><code>$ pip install pandas
+Successfully installed pandas-2.2.3 ...
+
+import pandas as pd   # pd, like np</code></pre>
+
+<h2>Series: A Labeled Column</h2>
+
+<h3>Making a Series</h3>
+
+<p>A Series is a single column of values. You make one from a list with <code>pd.Series([...])</code>. Here it holds the closing prices (in won) of the CODE stock. <code>tolist()</code> turns it back into a list.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes)
+print(closes.tolist())   # [10000, ...]</code></pre>
+
+<h3>Vector Math, Zero Loops</h3>
+
+<p>Suppose you bought CODE on Monday at 10,000 won. <code>closes - 10000</code> computes each day's profit or loss in one go. <code>mean</code>, <code>max</code>, <code>min</code> and <code>sum</code> also aggregate the whole column at once. The sum of a mask (True/False) is the number of Trues, so it gives the number of up days.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800])
+print((closes - 10000).tolist())   # [0, 200, ...]
+print(closes.mean())               # 10260.0
+print(closes.max())                # 10800
+print((closes &gt; 10000).sum())      # 3</code></pre>
+
+<h3>The Index: Names or Rows</h3>
+
+<p>The index is the label of each row. The default is the positions 0, 1, 2, 3, and you can give weekday names with <code>index=</code>. Square brackets and <code>.loc</code> read by label.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes["Tue"])       # 10200
+print(closes.loc["Mon"])   # 10000</code></pre>
+
+<h3>Masks: Keep What You Want</h3>
+
+<p>A comparison returns True/False for each day and works exactly as in NumPy. <code>closes[mask]</code> keeps only the winning days. Combining conditions needs parentheses and <code>&amp;</code>.</p>
+
+<pre><code>mask = closes &gt; 10000
+print(closes[mask].tolist())   # [10200, ...]
+print(closes[mask].mean())     # 10500.0
+print(mask.tolist())           # False, True, ...</code></pre>
+
+<h3>Practice 1: One Stock, One Week</h3>
+
+<p>Open <a href="first_stock.html">first_stock</a>. The starter contains CODE's Mon–Fri closing prices. Print the rounded mean, the high, the number of days that closed above the buy price (10,000), and the weekday and close of each such day (5 minutes). The page's last step also lets you see how the index and values look when a Series is printed as is.</p>
+
+<pre><code>Mean: 10260.0
+High: 10800
+Above buy (10000): 3
+Tue 10200
+Thu 10500
+Fri 10800</code></pre>
+
+<h2>DataFrame: A Table of Columns</h2>
+
+<h3>Making a DataFrame</h3>
+
+<p>A DataFrame is a table of rows and columns. Here it is the portfolio on Friday evening. You make it from a dict of lists of equal length, and each column is a Series sharing a single index. CODE is yesterday's store, CodeShop.</p>
+
+<pre><code>import pandas as pd
+
+portfolio = pd.DataFrame({
+    "ticker": ["CODE", "TEA", "ROBO"],
+    "shares": [10, 40, 5],
+    "buy": [10000, 5000, 40000],
+    "close": [10800, 4800, 45000],
+})
+print(portfolio)</code></pre>
+
+<h3>Two Ways to Build a Frame</h3>
+
+<p>A dict of lists (one key per column) and a list of dicts (one dict per trade) both build the same table. The row dicts must have the same keys.</p>
+
+<pre><code>trades = [
+    {"ticker": "CODE", "shares": 10},
+    {"ticker": "TEA", "shares": 40},
+]
+log = pd.DataFrame(trades)
+print(log.shape)   # (2, 2)</code></pre>
+
+<h3>First Look: shape, head, columns</h3>
+
+<p><code>df.shape</code> is (rows, columns); the portfolio above is (3, 4). <code>df.head(n)</code> previews the first rows and <code>df.tail(n)</code> the last rows, and <code>df.columns</code> lists the column names.</p>
+
+<pre><code>print(portfolio.shape)            # (3, 4)
+print(portfolio.head(2))
+print(portfolio.columns.tolist())</code></pre>
+
+<h3>Selecting Columns</h3>
+
+<p>A single column, <code>portfolio["close"]</code>, is a Series. For several columns, put a list of names inside the brackets (double brackets); the order of the list becomes the column order. When the name is simple, the <code>df.col</code> form also works.</p>
+
+<pre><code>tickers = portfolio["ticker"]
+print(tickers.tolist())   # ['CODE', ...]
+
+friday = portfolio[["ticker", "close"]]
+print(friday.shape)       # (3, 2)</code></pre>
+
+<h3>Rows by Position: iloc</h3>
+
+<p><code>iloc</code> picks rows by position. <code>portfolio.iloc[0]</code> is the first trade, <code>iloc[0:2]</code> gives several rows, and negative numbers count from the end.</p>
+
+<pre><code>print(portfolio.iloc[0])
+print(portfolio.iloc[0:2])
+print(portfolio.iloc[-1]["ticker"])   # ROBO</code></pre>
+
+<p>In the last step of the <a href="my_portfolio.html">my_portfolio</a> page you can see this three-stock table and the output of <code>head</code>, <code>columns</code>, <code>iloc</code> and <code>describe</code> for yourself.</p>
+
+<h3>Midpoint Check</h3>
+
+<ul>
+<li>Series and DataFrame: which is one column, and which is a table?</li>
+<li>What exactly does a mask keep? The rows (values) at the positions that are True.</li>
+<li>Why must all the column lists have the same length? Because every column shares a single index.</li>
+</ul>
+
+<h2>Sorting and Statistics</h2>
+
+<h3>Sorting: sort_values</h3>
+
+<p><code>sort_values("close")</code> sorts by one column, and <code>ascending=False</code> puts the largest first. Whole rows move along with the sort key. Sorting returns a new table, so the original stays as it is.</p>
+
+<pre><code>ranked = portfolio.sort_values("close", ascending=False)
+print(ranked["ticker"].tolist())
+# ['ROBO', 'CODE', 'TEA']</code></pre>
+
+<h3>One-Column Statistics</h3>
+
+<p>The column operations of a Series work as they are. <code>describe()</code> shows count, mean, std, min, max and the quartiles all at once. Use <code>round(x, 2)</code> to keep reports tidy.</p>
+
+<pre><code>closes = portfolio["close"]
+print(closes.max())              # 45000
+print(round(closes.mean(), 1))   # 20200.0
+print(closes.describe())</code></pre>
+
+<h3>Where Is the Best Row? idxmax</h3>
+
+<p><code>idxmax()</code> returns the label of the largest value. Where NumPy's <code>argsort</code> ranked by position, <code>idxmax</code> tells you the name. You can read that whole row with <code>.loc[label]</code>, and it works the same on a Series and on a column of a table.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes.idxmax())           # Fri
+print(closes[closes.idxmax()])   # 10800</code></pre>
+
+<h2>Adding Columns and Counting</h2>
+
+<h3>New Columns from Old</h3>
+
+<p>Assigning adds a column to the table. invested is the amount paid (shares × buy price), and profit is (close − buy) × shares. The vector operation fills every row at once, and the table itself changes.</p>
+
+<pre><code>shares = portfolio["shares"]
+buy = portfolio["buy"]
+close = portfolio["close"]
+
+portfolio["invested"] = shares * buy
+portfolio["profit"] = (close - buy) * shares
+print(portfolio["profit"].tolist())
+# [8000, -8000, 25000]</code></pre>
+
+<h3>Counting Categories: value_counts</h3>
+
+<p><code>value_counts()</code> counts how many times each value appears and returns them from most to least frequent. We use it to count buys and sells in a trade journal, and it works on any column, strings or labels.</p>
+
+<pre><code>actions = pd.Series(["buy", "sell", "buy", "buy", "sell", "buy"])
+print(actions.value_counts())
+# buy: 4, sell: 2</code></pre>
+
+<h3>Filtering Whole Rows</h3>
+
+<p>A mask on a column filters whole rows. Keeping only the rows whose close is above the buy price leaves CODE and ROBO. Masks are combined with <code>(a) &amp; (b)</code> and <code>(a) | (b)</code>. If you store the result in a new variable, the original table stays safe.</p>
+
+<pre><code>win = portfolio["close"] &gt; portfolio["buy"]
+winners = portfolio[win]
+print(winners["ticker"].tolist())   # ['CODE', 'ROBO']
+print(winners.shape)                # (2, 4)</code></pre>
+
+<h3>Practice 2: Rank Your Positions</h3>
+
+<p>Open <a href="positions.html">positions</a>. Add a <code>profit = (close - buy) * shares</code> column, print the tickers and profits from largest profit down, then print the top stock and the number of stocks that made a profit (5 minutes). <code>idxmax</code> finds the row, and a mask counts the rest.</p>
+
+<pre><code>['ROBO', 'MLBK', 'CODE', 'TEA']
+[25000, 15000, 8000, -8000]
+Top: ROBO
+Winners: 3</code></pre>
+
+<h2>Labs</h2>
+
+<h3>Lab 1: Portfolio Report</h3>
+
+<p>In <a href="my_portfolio.html">my_portfolio</a>, print the table's shape, add a <code>value = shares * close</code> column, and print the list of values, the largest holding and the mean value.</p>
+
+<pre><code>Shape: (5, 4)
+Value: [108000, 192000, 225000, 75000, 84000]
+Top holding: ROBO
+Mean value: 136800.0</code></pre>
+
+<p>Checks: the shape is (5, 4), that is, five rows and four columns, with no counting by eye. value is a column made by a single vector multiplication, with no loop. <code>idxmax</code> and <code>.loc</code> find ROBO (225,000 won), and <code>round(..., 1)</code> tidies the mean (684,000 / 5).</p>
+
+<h3>Lab 2: Trade Journal</h3>
+
+<p>In <a href="trade_log.html">trade_log</a>, count the actions with <code>value_counts</code> and print the names and counts, then print the total amount traded and the kinds of the big trades (40,000 won or more).</p>
+
+<pre><code>Actions: ['buy', 'sell']
+Counts: [6, 4]
+Traded: 340000
+Big trades: ['buy', 'buy', 'buy', 'buy']</code></pre>
+
+<p>Checks: the counts come out most frequent first, so buy 6, sell 4. Traded is the sum of the whole amount column (an average of 34,000 won per trade), and the mask keeps the four trades of 40,000 won or more, all of them buys. Filtering does not touch the original journal.</p>
+
+<h3>Lab 3 (Take-Home): A Week in Review</h3>
+
+<p>In <a href="price_report.html">price_report</a>, read FIT's five Mon–Fri closing prices with <code>input()</code>, build a Series indexed by weekday, and print the mean, the high, the day of the high, and the number of days above the mean. Assume integer-formatted input.</p>
+
+<pre><code>Close Mon: 4200
+Close Tue: 4350
+Close Wed: 4100
+Close Thu: 4400
+Close Fri: 4300
+Mean: 4270.0
+High: 4400
+Best day: Thu 4400
+Above mean: 3</code></pre>
+
+<p>Read first, convert, then build the Series. <code>days</code> and the list of values share the same order, and mean, max, idxmax and a mask give the four answers. The index turns a list of prices into a report. The slide's example uses a list of strings instead of input, but the take-home program reads with <code>input()</code>. In the web lab you can feed all the input at once with <code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py</code>.</p>
+
+<pre><code>import pandas as pd
+
+days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+typed = ["4200", "4350", "4100", "4400", "4300"]
+
+values = []
+for text in typed:
+    values.append(int(text))
+closes = pd.Series(values, index=days)
+
+print(closes.mean())     # 4270.0
+print(closes.idxmax())   # Thu</code></pre>
+
+<h2>Common Mistakes</h2>
+
+<ul>
+<li>Run <code>pip install</code> in the terminal, not inside Python.</li>
+<li>The column lists of a DataFrame must all have the same length.</li>
+<li>Selecting one column with single brackets gives a Series; double brackets (a list of names) give a DataFrame.</li>
+<li>When combining masks, wrap each side in its own parentheses.</li>
+</ul>
+
+<p>Before running, say what type you will get back; when debugging, print <code>df.shape</code> first to check what you have.</p>
+
+<h2>Exit Quiz &amp; Submission</h2>
+
+<ol>
+<li><strong>Which command installs pandas?</strong> <code>pip install pandas</code> in the terminal.</li>
+<li><strong>Which pandas type holds a single labeled column?</strong> Series.</li>
+<li><strong>What type is <code>df["close"]</code>?</strong> Series.</li>
+<li><strong>Which call returns the label of the largest value?</strong> <code>idxmax()</code>.</li>
+<li><strong>What does <code>df[df["profit"] &gt; 0]</code> give?</strong> A DataFrame with only the rows whose profit is positive.</li>
+</ol>
+
+<p>Submit: <code>first_stock.py</code>, <code>positions.py</code>, <code>my_portfolio.py</code>, <code>trade_log.py</code>. <code>price_report.py</code> is due next session. Record at least three test cases in comments for each program.</p>
+
+<h2>Next Session: Files &amp; Classes</h2>
+
+<p>We read a text file line by line with a <code>for</code> loop and save results that last after the program ends. Then we design our own types with classes. Keep <code>my_portfolio.py</code> safe: that table becomes a CSV file in Week 6.</p>
+</div><div lang="ko">
+<p>이번 시간에는 pandas를 처음 다룹니다. 지난 시간의 NumPy 배열은 위치(2행 0열)로 답하지만, 실제 데이터는 이름(CODE, 화요일, 종가)으로 묻습니다. pandas는 배열 위에 라벨과 표를 얹은 도구입니다. 오늘의 이야기는 "주식 거래 첫 주"입니다. 주식 한 종목의 한 주를 Series로 추적하고, 포트폴리오 전체를 DataFrame으로 다루면서 선택·필터·정렬·통계를 익힙니다. 실습 프로그램은 <a href="first_stock.html">first_stock</a>, <a href="positions.html">positions</a>, <a href="my_portfolio.html">my_portfolio</a>, <a href="trade_log.html">trade_log</a>, <a href="price_report.html">price_report</a>입니다.</p>
+
+<p>웹 실습의 가상 머신에서는 <code>import pandas</code>에 10–30초가 걸립니다. 프로그램을 실행했는데 한동안 아무 반응이 없어도 기다리면 됩니다.</p>
+
+<h2>복습: NumPy에서 pandas로</h2>
+
+<p>어제는 NumPy 배열, 벡터 연산, 마스크를 배웠습니다. pandas의 Series 안에는 NumPy 배열이 들어 있어서 <code>.values</code>로 꺼내 볼 수 있습니다. 과제 <code>guessing.py</code>는 오늘까지입니다.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes.values)   # a NumPy array inside</code></pre>
+
+<h3>pandas가 필요한 이유</h3>
+
+<p>어제의 배열은 같은 종류의 숫자만 담습니다. 포트폴리오에는 종목 코드(문자열), 주식 수, 가격이 섞여 있고, 열마다 이름이, 행마다 라벨이 필요합니다. pandas는 이런 데이터를 다루는 표준 도구입니다.</p>
+
+<table>
+<thead>
+<tr><th>질문</th><th>NumPy</th><th>pandas</th></tr>
+</thead>
+<tbody>
+<tr><td>같은 계산</td><td>가능</td><td>가능(안에 배열이 있음)</td></tr>
+<tr><td>섞인 자료형</td><td>dtype 하나</td><td>열마다 자료형</td></tr>
+<tr><td>행 이름</td><td>0, 1, 2</td><td>원하는 라벨</td></tr>
+</tbody>
+</table>
+
+<h3>pandas 설치: pip</h3>
+
+<p>pandas는 NumPy와 같은 방법으로 설치합니다. 내 PC에서는 터미널(Python 안이 아님)에서 <code>pip install pandas</code>를 실행하고, Colab에는 이미 들어 있습니다. 이 웹 실습의 가상 머신에도 pandas가 미리 설치되어 있으며 네트워크가 없어 pip은 쓸 수 없습니다. 관례적으로 <code>import pandas as pd</code>로 불러옵니다(NumPy의 <code>np</code>처럼).</p>
+
+<pre><code>$ pip install pandas
+Successfully installed pandas-2.2.3 ...
+
+import pandas as pd   # pd, like np</code></pre>
+
+<h2>Series: 라벨이 붙은 열</h2>
+
+<h3>Series 만들기</h3>
+
+<p>Series는 값 한 열입니다. <code>pd.Series([...])</code>로 리스트에서 만듭니다. 여기서는 CODE 종목의 종가(원)입니다. <code>tolist()</code>로 다시 리스트로 바꿀 수 있습니다.</p>
+
+<pre><code>import pandas as pd
+
+closes = pd.Series([10000, 10200, 9800])
+print(closes)
+print(closes.tolist())   # [10000, ...]</code></pre>
+
+<h3>반복문 없는 벡터 연산</h3>
+
+<p>월요일에 CODE를 10,000원에 샀다고 합시다. <code>closes - 10000</code>은 날마다의 손익을 한 번에 계산합니다. <code>mean</code>, <code>max</code>, <code>min</code>, <code>sum</code>도 열 전체를 한 번에 집계합니다. 마스크(True/False)의 합은 True의 개수이므로 오른 날의 수가 됩니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800])
+print((closes - 10000).tolist())   # [0, 200, ...]
+print(closes.mean())               # 10260.0
+print(closes.max())                # 10800
+print((closes &gt; 10000).sum())      # 3</code></pre>
+
+<h3>index: 행의 이름</h3>
+
+<p>index는 각 행의 라벨입니다. 기본값은 위치 0, 1, 2, 3이고, <code>index=</code>로 요일 이름을 줄 수 있습니다. 대괄호와 <code>.loc</code>은 라벨로 읽습니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes["Tue"])       # 10200
+print(closes.loc["Mon"])   # 10000</code></pre>
+
+<h3>마스크: 원하는 것만 남기기</h3>
+
+<p>비교는 날마다 True/False를 돌려주고, NumPy와 똑같이 동작합니다. <code>closes[mask]</code>는 이긴 날만 남깁니다. 조건을 결합할 때는 괄호와 <code>&amp;</code>가 필요합니다.</p>
+
+<pre><code>mask = closes &gt; 10000
+print(closes[mask].tolist())   # [10200, ...]
+print(closes[mask].mean())     # 10500.0
+print(mask.tolist())           # False, True, ...</code></pre>
+
+<h3>Practice 1: 한 종목, 한 주</h3>
+
+<p><a href="first_stock.html">first_stock</a>을 엽니다. 스타터에는 CODE의 월–금 종가가 들어 있습니다. 반올림한 평균, 최고가, 매수가(10,000)보다 높게 끝난 날의 수, 그리고 그런 날마다 요일과 종가를 출력합니다(5분). 페이지의 마지막 단계에서 Series를 그대로 출력하면 index와 값이 어떻게 보이는지도 확인할 수 있습니다.</p>
+
+<pre><code>Mean: 10260.0
+High: 10800
+Above buy (10000): 3
+Tue 10200
+Thu 10500
+Fri 10800</code></pre>
+
+<h2>DataFrame: 열로 이루어진 표</h2>
+
+<h3>DataFrame 만들기</h3>
+
+<p>DataFrame은 행과 열로 된 표입니다. 여기서는 금요일 저녁의 포트폴리오입니다. 길이가 같은 리스트들의 dict로 만들며, 각 열은 하나의 index를 공유하는 Series입니다. CODE는 어제의 상점 CodeShop입니다.</p>
+
+<pre><code>import pandas as pd
+
+portfolio = pd.DataFrame({
+    "ticker": ["CODE", "TEA", "ROBO"],
+    "shares": [10, 40, 5],
+    "buy": [10000, 5000, 40000],
+    "close": [10800, 4800, 45000],
+})
+print(portfolio)</code></pre>
+
+<h3>표를 만드는 두 가지 방법</h3>
+
+<p>리스트의 dict(열마다 키 하나)와 dict의 리스트(거래마다 dict 하나) 모두 같은 표를 만듭니다. 행 dict들은 같은 키를 가져야 합니다.</p>
+
+<pre><code>trades = [
+    {"ticker": "CODE", "shares": 10},
+    {"ticker": "TEA", "shares": 40},
+]
+log = pd.DataFrame(trades)
+print(log.shape)   # (2, 2)</code></pre>
+
+<h3>첫 확인: shape, head, columns</h3>
+
+<p><code>df.shape</code>는 (행, 열)이며 위 포트폴리오는 (3, 4)입니다. <code>df.head(n)</code>은 앞쪽 행을, <code>df.tail(n)</code>은 뒤쪽 행을 미리 보여 주고, <code>df.columns</code>는 열 이름을 나열합니다.</p>
+
+<pre><code>print(portfolio.shape)            # (3, 4)
+print(portfolio.head(2))
+print(portfolio.columns.tolist())</code></pre>
+
+<h3>열 선택</h3>
+
+<p>열 하나 <code>portfolio["close"]</code>는 Series입니다. 여러 열은 대괄호 안에 이름의 리스트를 넣으며(대괄호 두 겹), 리스트의 순서가 열 순서가 됩니다. 이름이 단순하면 <code>df.col</code> 형태도 됩니다.</p>
+
+<pre><code>tickers = portfolio["ticker"]
+print(tickers.tolist())   # ['CODE', ...]
+
+friday = portfolio[["ticker", "close"]]
+print(friday.shape)       # (3, 2)</code></pre>
+
+<h3>위치로 행 선택: iloc</h3>
+
+<p><code>iloc</code>은 위치로 행을 고릅니다. <code>portfolio.iloc[0]</code>은 첫 거래, <code>iloc[0:2]</code>는 여러 행, 음수는 끝에서부터 셉니다.</p>
+
+<pre><code>print(portfolio.iloc[0])
+print(portfolio.iloc[0:2])
+print(portfolio.iloc[-1]["ticker"])   # ROBO</code></pre>
+
+<p><a href="my_portfolio.html">my_portfolio</a> 페이지의 마지막 단계에서 이 3종목 표와 <code>head</code>, <code>columns</code>, <code>iloc</code>, <code>describe</code>의 출력을 직접 볼 수 있습니다.</p>
+
+<h3>중간 점검</h3>
+
+<ul>
+<li>Series와 DataFrame: 열 하나인가, 표인가?</li>
+<li>마스크는 정확히 무엇을 남기는가? True인 위치의 행(값)입니다.</li>
+<li>왜 모든 열 리스트의 길이가 같아야 하는가? 모든 열이 하나의 index를 공유하기 때문입니다.</li>
+</ul>
+
+<h2>정렬과 통계</h2>
+
+<h3>정렬: sort_values</h3>
+
+<p><code>sort_values("close")</code>는 한 열을 기준으로 정렬하고, <code>ascending=False</code>는 큰 것부터 놓습니다. 정렬 키와 함께 행 전체가 이동합니다. 정렬은 새 표를 돌려주므로 원래 표는 그대로입니다.</p>
+
+<pre><code>ranked = portfolio.sort_values("close", ascending=False)
+print(ranked["ticker"].tolist())
+# ['ROBO', 'CODE', 'TEA']</code></pre>
+
+<h3>열 하나의 통계</h3>
+
+<p>Series의 열 연산이 그대로 통합니다. <code>describe()</code>는 count, mean, std, min, max, 사분위수를 한꺼번에 보여 줍니다. <code>round(x, 2)</code>로 보고서를 깔끔하게 만듭니다.</p>
+
+<pre><code>closes = portfolio["close"]
+print(closes.max())              # 45000
+print(round(closes.mean(), 1))   # 20200.0
+print(closes.describe())</code></pre>
+
+<h3>가장 큰 행은 어디에: idxmax</h3>
+
+<p><code>idxmax()</code>는 가장 큰 값의 라벨을 돌려줍니다. NumPy의 <code>argsort</code>가 위치로 순위를 매겼다면 <code>idxmax</code>는 이름을 알려 줍니다. <code>.loc[label]</code>로 그 행 전체를 읽을 수 있으며, Series에도 표의 열에도 똑같이 쓸 수 있습니다.</p>
+
+<pre><code>closes = pd.Series([10000, 10200, 9800, 10500, 10800],
+                   index=["Mon", "Tue", "Wed", "Thu", "Fri"])
+print(closes.idxmax())           # Fri
+print(closes[closes.idxmax()])   # 10800</code></pre>
+
+<h2>열 추가와 세기</h2>
+
+<h3>기존 열로 새 열 만들기</h3>
+
+<p>대입하면 표에 열이 추가됩니다. invested는 산 금액(주식 수 × 매수가), profit은 (종가 − 매수가) × 주식 수입니다. 벡터 연산이 모든 행을 한 번에 채우고, 표 자체가 바뀝니다.</p>
+
+<pre><code>shares = portfolio["shares"]
+buy = portfolio["buy"]
+close = portfolio["close"]
+
+portfolio["invested"] = shares * buy
+portfolio["profit"] = (close - buy) * shares
+print(portfolio["profit"].tolist())
+# [8000, -8000, 25000]</code></pre>
+
+<h3>범주 세기: value_counts</h3>
+
+<p><code>value_counts()</code>는 값마다 몇 번 나왔는지 세고, 많은 것부터 돌려줍니다. 매매 일지에서 buy와 sell을 세는 데 쓰며, 문자열이든 라벨이든 어떤 열에도 쓸 수 있습니다.</p>
+
+<pre><code>actions = pd.Series(["buy", "sell", "buy", "buy", "sell", "buy"])
+print(actions.value_counts())
+# buy: 4, sell: 2</code></pre>
+
+<h3>행 전체 거르기</h3>
+
+<p>열에 대한 마스크는 행 전체를 거릅니다. 종가가 매수가보다 높은 행만 남기면 CODE와 ROBO가 남습니다. 마스크는 <code>(a) &amp; (b)</code>, <code>(a) | (b)</code>로 결합합니다. 결과를 새 변수에 담으면 원래 표는 안전합니다.</p>
+
+<pre><code>win = portfolio["close"] &gt; portfolio["buy"]
+winners = portfolio[win]
+print(winners["ticker"].tolist())   # ['CODE', 'ROBO']
+print(winners.shape)                # (2, 4)</code></pre>
+
+<h3>Practice 2: 포지션 순위</h3>
+
+<p><a href="positions.html">positions</a>를 엽니다. <code>profit = (close - buy) * shares</code> 열을 추가하고, 수익이 큰 순서로 종목과 수익을 출력한 뒤, 1위 종목과 수익이 난 종목 수를 출력합니다(5분). <code>idxmax</code>가 행을 찾고, 마스크가 나머지를 셉니다.</p>
+
+<pre><code>['ROBO', 'MLBK', 'CODE', 'TEA']
+[25000, 15000, 8000, -8000]
+Top: ROBO
+Winners: 3</code></pre>
+
+<h2>실습</h2>
+
+<h3>Lab 1: 포트폴리오 보고서</h3>
+
+<p><a href="my_portfolio.html">my_portfolio</a>에서 표의 shape를 출력하고, <code>value = shares * close</code> 열을 추가해 평가액 목록, 가장 큰 보유 종목, 평균 평가액을 출력합니다.</p>
+
+<pre><code>Shape: (5, 4)
+Value: [108000, 192000, 225000, 75000, 84000]
+Top holding: ROBO
+Mean value: 136800.0</code></pre>
+
+<p>확인할 점: shape는 (5, 4), 즉 다섯 행 네 열이며 눈으로 셀 필요가 없습니다. value는 반복문 없이 벡터 곱 한 번으로 만든 열입니다. <code>idxmax</code>와 <code>.loc</code>이 ROBO(225,000원)를 찾고, <code>round(..., 1)</code>로 평균(684,000 / 5)을 정리합니다.</p>
+
+<h3>Lab 2: 매매 일지</h3>
+
+<p><a href="trade_log.html">trade_log</a>에서 <code>value_counts</code>로 action을 세어 이름과 횟수를 출력하고, 총 거래 금액과 큰 거래(40,000원 이상)의 종류를 출력합니다.</p>
+
+<pre><code>Actions: ['buy', 'sell']
+Counts: [6, 4]
+Traded: 340000
+Big trades: ['buy', 'buy', 'buy', 'buy']</code></pre>
+
+<p>확인할 점: 횟수는 많은 것부터 나오므로 buy 6, sell 4입니다. Traded는 amount 열 전체의 합이고(거래당 평균 34,000원), 마스크가 40,000원 이상 거래 네 건을 남기는데 모두 buy입니다. 거르기는 원래 일지를 건드리지 않습니다.</p>
+
+<h3>Lab 3(과제): 한 주 돌아보기</h3>
+
+<p><a href="price_report.html">price_report</a>에서 FIT의 월–금 종가 다섯 개를 <code>input()</code>으로 읽어, 요일을 index로 하는 Series를 만들고 평균, 최고가, 최고가인 요일, 평균보다 높은 날의 수를 출력합니다. 입력은 정수 형식이라고 가정합니다.</p>
+
+<pre><code>Close Mon: 4200
+Close Tue: 4350
+Close Wed: 4100
+Close Thu: 4400
+Close Fri: 4300
+Mean: 4270.0
+High: 4400
+Best day: Thu 4400
+Above mean: 3</code></pre>
+
+<p>먼저 읽고, 변환한 다음 Series를 만듭니다. <code>days</code>와 값 리스트는 같은 순서를 공유하고, mean, max, idxmax, 마스크가 네 가지 답을 줍니다. index가 가격 목록을 보고서로 바꿔 줍니다. 슬라이드의 예는 입력 대신 문자열 리스트를 쓰지만, 과제 프로그램은 <code>input()</code>으로 읽습니다. 웹 실습에서는 <code>printf '4200\n4350\n4100\n4400\n4300\n' | python3 price_report.py</code>로 입력을 한꺼번에 넣어 볼 수 있습니다.</p>
+
+<pre><code>import pandas as pd
+
+days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+typed = ["4200", "4350", "4100", "4400", "4300"]
+
+values = []
+for text in typed:
+    values.append(int(text))
+closes = pd.Series(values, index=days)
+
+print(closes.mean())     # 4270.0
+print(closes.idxmax())   # Thu</code></pre>
+
+<h2>흔한 실수</h2>
+
+<ul>
+<li><code>pip install</code>은 Python 안이 아니라 터미널에서 실행합니다.</li>
+<li>DataFrame의 열 리스트는 길이가 모두 같아야 합니다.</li>
+<li>대괄호 한 겹으로 열 하나를 고르면 Series, 두 겹(이름 리스트)이면 DataFrame입니다.</li>
+<li>마스크를 결합할 때는 양쪽을 각각 괄호로 감쌉니다.</li>
+</ul>
+
+<p>실행 전에 돌려받을 자료형을 말해 보고, 디버깅할 때는 먼저 <code>df.shape</code>를 출력해 무엇을 가지고 있는지 확인합니다.</p>
+
+<h2>확인 퀴즈와 제출</h2>
+
+<ol>
+<li><strong>pandas를 설치하는 명령은?</strong> 터미널에서 <code>pip install pandas</code>.</li>
+<li><strong>라벨이 붙은 열 하나를 담는 pandas 자료형은?</strong> Series.</li>
+<li><strong><code>df["close"]</code>의 자료형은?</strong> Series.</li>
+<li><strong>가장 큰 값의 라벨을 돌려주는 호출은?</strong> <code>idxmax()</code>.</li>
+<li><strong><code>df[df["profit"] &gt; 0]</code>은 무엇을 주는가?</strong> profit이 양수인 행만 남긴 DataFrame.</li>
+</ol>
+
+<p>제출: <code>first_stock.py</code>, <code>positions.py</code>, <code>my_portfolio.py</code>, <code>trade_log.py</code>. <code>price_report.py</code>는 다음 시간까지입니다. 프로그램마다 테스트 사례를 세 개 이상 주석으로 기록합니다.</p>
+
+<h2>다음 시간: 파일과 클래스</h2>
+
+<p>텍스트 파일을 <code>for</code> 반복으로 한 줄씩 읽고, 프로그램이 끝난 뒤에도 남는 결과를 저장합니다. 그다음 클래스로 나만의 자료형을 설계합니다. <code>my_portfolio.py</code>를 잘 보관해 두세요. 그 표가 6주차에 CSV 파일이 됩니다.</p>
+</div>
+    </article>
+  <script src="../../js/lab.js"></script>
+</body>
+</html>

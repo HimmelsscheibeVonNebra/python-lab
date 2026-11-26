@@ -98,6 +98,8 @@ python app.py</code></pre>
 
 <p>The preview panel exchanges requests and answers as files through the shared folder <code>/mnt/host/.web</code>, so each request takes about 0.2–1 second. The app's CSS and images are put into the answer, and JavaScript on the app's pages is not run.</p>
 
+<p><code>web start</code> runs <code>python3 app.py</code> as it is. There is only one terminal, though, so it runs the server in the background, together with the relay that connects it to the preview panel. While the server runs, edit the code with <code>nano app.py</code> and save: the app restarts by itself and the preview panel redraws with the new code. If the edited code has an error, the panel shows the error message, and the app comes back once you fix it and save. The Flask packages are downloaded in one go the first time they are used, so the first <code>web start</code> takes a little longer.</p>
+
 <p>Commands you can use in the terminal:</p>
 
 <table>
@@ -110,7 +112,8 @@ python app.py</code></pre>
 <tr><td><code>web html /</code></td><td>Shows the raw HTML</td></tr>
 <tr><td><code>web save file.html</code></td><td>Saves the page, CSS included, in <code>/mnt/host</code>. Type its name in the box above and press <strong>Download</strong> to open it in your own browser</td></tr>
 <tr><td><code>web log</code></td><td>The server log (address and status code of each request)</td></tr>
-<tr><td><code>web stop</code></td><td>Stops the server. After editing the code, run <code>web stop</code> and then <code>web start</code> again</td></tr>
+<tr><td><code>web restart</code></td><td>Restarts the app. Usually not needed: while the server runs, saving a <code>.py</code>, template or CSS file restarts it by itself</td></tr>
+<tr><td><code>web stop</code></td><td>Stops the server</td></tr>
 </tbody>
 </table>
 

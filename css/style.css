@@ -99,7 +99,7 @@ button:focus-visible, .upload:focus-within, a:focus-visible {
 .steps p { margin: 4px 0 0 38px; font-size: 14px; color: var(--muted); }
 .cmd { display: flex; gap: 8px; align-items: flex-start; }
 .cmd button { flex: none; width: 30px; padding: 2px 0; font-size: 12px; line-height: 20px; }
-.cmd code { flex: 1; min-width: 0; padding: 3px 8px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.cmd code { flex: 1; min-width: 0; padding: 3px 8px; overflow-wrap: break-word; white-space: pre-wrap; line-height: 1.45; }
 
 .callout {
   margin: 12px 0 0;
@@ -260,3 +260,20 @@ html[data-lang="ko"] body [lang="en"] { display: none !important; }
 #preview-info { flex-basis: 100%; font-size: 13px; }
 .preview iframe { display: block; width: 100%; height: 460px; border: 0; background: #fff; }
 .preview.stopped iframe { opacity: 0.45; }
+
+/* Week pages: one machine, several examples (js/lab.js switches them) */
+.ex-picker { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.ex-picker h2 { margin: 0 0 8px; font-size: 16px; }
+.ex-group h3 { margin: 10px 0 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.ex-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.ex-buttons button { padding: 3px 10px; font-size: 13px; font-family: inherit; }
+.ex-buttons button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ex-panel h2 { margin: 0 0 6px; font-size: 18px; }
+.ex-panel h2 .muted { font-size: 13px; font-weight: 400; }
+.ex-panel h3 { margin: 14px 0 4px; font-size: 15px; }
+.ex-panel > p { margin: 0; font-size: 14px; }
+.sessions { margin: 8px 0 0; padding-left: 18px; }
+.sessions li { margin: 4px 0; }
+.notes + .notes { margin-top: 24px; }
+.notes h2.notes-title { margin: 16px 0 8px; font-size: 24px; }
+.sources + .notes { margin-top: 28px; }

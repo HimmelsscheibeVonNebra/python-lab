@@ -24,7 +24,7 @@
           "note": "두 번째 테스트: 반지름 1이면 넓이는 π와 같은 3.14, 둘레는 6.28이다. 5와 12의 빗변은 13.0이다."
         },
         {
-          "cmd": "python3 -c 'import math; print(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))'",
+          "cmd": "python3 - <<'EOF'\nimport math\nprint(math.floor(2.5), math.ceil(2.5), math.factorial(5), math.gcd(12, 18), math.hypot(3, 4))\nEOF",
           "note": "슬라이드의 math 함수들을 한 번에 확인한다: 2 3 120 6 5.0. 내림·올림, 계승, 최대공약수, 빗변이다."
         },
         {
@@ -69,7 +69,7 @@
           "note": "이미 지난 날짜는 남은 날 수가 음수로 나온다. 2026-01-01은 Thursday다."
         },
         {
-          "cmd": "python3 -c 'from datetime import date, timedelta; today = date(2026, 9, 27); exam = date(2026, 11, 13); print((exam - today).days); print(today + timedelta(days=100))'",
+          "cmd": "python3 - <<'EOF'\nfrom datetime import date, timedelta\ntoday = date(2026, 9, 27)\nexam = date(2026, 11, 13)\nprint((exam - today).days)\nprint(today + timedelta(days=100))\nEOF",
           "note": "슬라이드의 날짜 계산: 두 날짜의 차는 timedelta이고 .days는 47, 날짜 + 100일은 2027-01-05다."
         }
       ],
@@ -135,11 +135,11 @@
           "note": "1을 넣으면 정확히 한 줄이다. print(*numbers)가 리스트를 풀어 대괄호와 쉼표 없이 공백으로 구분해 출력한다."
         },
         {
-          "cmd": "printf '6\\n' | python3 ../../solutions/session1/lotto.py; printf '0\\n' | python3 ../../solutions/session1/lotto.py",
+          "cmd": "printf '6\\n' | python3 ../../solutions/session1/lotto.py\nprintf '0\\n' | python3 ../../solutions/session1/lotto.py",
           "note": "6과 0은 모두 범위 밖이라 Invalid games만 출력한다."
         },
         {
-          "cmd": "python3 -c 'import random; random.seed(42); print(random.randint(1, 100), random.randint(1, 100)); random.seed(42); print(random.randint(1, 100))'",
+          "cmd": "python3 - <<'EOF'\nimport random\nrandom.seed(42)\nprint(random.randint(1, 100), random.randint(1, 100))\nrandom.seed(42)\nprint(random.randint(1, 100))\nEOF",
           "note": "seed(42)를 주면 같은 수열이 다시 나온다: 82 15, 그리고 다시 82. 테스트할 때는 seed가 유용하지만 로또에는 쓰지 않는다."
         }
       ],

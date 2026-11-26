@@ -1,102 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" data-lang="en" data-title-en="journal_chart — Files, Classes, Charts · Python Lab" data-title-ko="journal_chart — 파일, 클래스, 차트 · Python Lab">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>journal_chart — Files, Classes, Charts · Python Lab</title>
+  <meta http-equiv="refresh" content="0; url=../week06/index.html#ex=journal_chart">
   <link rel="icon" href="data:,">
-  <script src="../../js/lang.js"></script>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../vendor/xterm/xterm.css">
-  <script src="../../vendor/xterm/xterm.js"></script>
-  <script src="../../build/libv86.js"></script>
+  <title>Python Lab</title>
+  <script>location.replace("../week06/index.html#ex=journal_chart");</script>
 </head>
-<body data-root="../../" data-lab-dir="week06/starter">
-  <div class="topbar">
-    <nav class="crumbs"><a href="../../index.html">Python Lab</a><span class="sep">/</span><a href="index.html"><span lang="en">Week 6 · Session 1</span><span lang="ko">6주차 1차시</span></a><span class="sep">/</span><span>journal_chart</span></nav>
-    <div class="lang-switch" role="group" aria-label="Language / 언어">
-      <button type="button" data-set-lang="en" aria-pressed="true">English</button><button type="button" data-set-lang="ko" aria-pressed="false">한국어</button>
-    </div>
-  </div>
-  <header>
-    <h1>journal_chart</h1>
-    <p><span lang="en">Lab 3 (take-home). Read the trade journal with pd.read_csv, draw the buy/sell counts from value_counts as a bar chart (journal.png), and print the two counts and the total amount traded (the sum of shares * price).</span><span lang="ko">Lab 3(과제). pd.read_csv로 매매 일지를 읽어 value_counts로 buy/sell 횟수를 막대 그래프(journal.png)로 그리고, 두 횟수와 총 거래 금액(shares * price의 합)을 출력한다.</span></p>
-  </header>
-  <main>
-    <section class="machine">
-      <div class="toolbar">
-        <button id="reset" type="button"><span lang="en">Reboot</span><span lang="ko">재부팅</span></button>
-        <label class="upload"><span lang="en">Upload files</span><span lang="ko">파일 올리기</span><input id="upload" type="file" multiple hidden></label>
-        <form id="download-form" class="download">
-          <input id="download-name" type="text" placeholder="/mnt/host/file name" aria-label="File to download (in /mnt/host)" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Download</span><span lang="ko">받기</span></button>
-        </form>
-        <span id="status" role="status"><span lang="en">Loading…</span><span lang="ko">준비 중…</span></span>
-      </div>
-      <div class="terminal-wrap"><div id="terminal"></div></div>
-      <section id="preview" class="preview" hidden>
-        <form id="preview-form" class="preview-bar">
-          <strong><span lang="en">App preview</span><span lang="ko">앱 미리보기</span></strong>
-          <span id="preview-port" class="muted"></span>
-          <input id="preview-path" type="text" value="/" aria-label="Path / 주소" spellcheck="false" autocomplete="off">
-          <button type="submit"><span lang="en">Open</span><span lang="ko">열기</span></button>
-          <span id="preview-info" class="muted" role="status"></span>
-        </form>
-        <iframe id="preview-frame" title="App preview / 앱 미리보기" sandbox="allow-same-origin allow-forms"></iframe>
-      </section>
-      <p class="hint"><span lang="en">Starts as user <code>student</code> in <code>/home/student/week06/starter</code>. All course code is under <code>/home/student</code> (<code>week01</code> …, <code>sample</code>). Editors: <code>nano</code> (save <kbd>Ctrl</kbd>+<kbd>O</kbd>, quit <kbd>Ctrl</kbd>+<kbd>X</kbd>) and <code>vi</code>. Uploaded files appear in <code>/mnt/host</code>. To save a result (chart, CSV, HTML) to your computer, run <code>cp file /mnt/host/</code>, type its name in the box above and press <b>Download</b>. Reloading or rebooting returns the machine to its original state.</span><span lang="ko"><code>/home/student/week06/starter</code>에서 <code>student</code> 사용자로 시작합니다. 수업 코드가 모두 <code>/home/student</code>(<code>week01</code> …, <code>sample</code>)에 들어 있습니다. 편집기는 <code>nano</code>(저장 <kbd>Ctrl</kbd>+<kbd>O</kbd>, 종료 <kbd>Ctrl</kbd>+<kbd>X</kbd>)와 <code>vi</code>입니다. 올린 파일은 <code>/mnt/host</code>에 나타나고, 결과 파일(그림·CSV·HTML)은 <code>cp 파일 /mnt/host/</code> 후 이름을 입력하고 <b>받기</b>를 누르면 내 컴퓨터에 저장됩니다. 새로고침하거나 재부팅하면 처음 상태로 돌아갑니다.</span></p>
-    </section>
-    <aside class="guide">
-      <h2><span lang="en">Steps</span><span lang="ko">실행 순서</span></h2>
-      <ol class="steps">
-        <li>
-          <div class="cmd"><button type="button" data-cmd="python3 journal_chart.py; echo &quot;exit=$?&quot;" title="Run in the terminal / 터미널에서 실행" aria-label="Run: python3 journal_chart.py; echo &quot;exit=$?&quot;">▶</button><code>python3 journal_chart.py; echo &quot;exit=$?&quot;</code></div>
-          <p><span lang="en">The starter only reads the CSV into a DataFrame and prints nothing. read_csv does for every line the strip, split and int() you did by hand in Practice 1.</span><span lang="ko">스타터는 CSV를 DataFrame으로 읽기만 하고 출력이 없다. Practice 1에서 손으로 하던 strip, split, int()를 read_csv가 줄마다 대신한다.</span></p>
-        </li>
-        <li>
-          <div class="cmd"><button type="button" data-cmd="awk -F, 'NR &gt; 1 { total += $4 * $5 } END { print &quot;Traded:&quot;, total }' trades.csv" title="Run in the terminal / 터미널에서 실행" aria-label="Run: awk -F, 'NR &gt; 1 { total += $4 * $5 } END { print &quot;Traded:&quot;, total }' trades.csv">▶</button><code>awk -F, 'NR &gt; 1 { total += $4 * $5 } END { print &quot;Traded:&quot;, total }' trades.csv</code></div>
-          <p><span lang="en">Skipping the header in the shell and adding up shares × price gives Traded: 340000. The finished program should print buy 6, sell 4, Traded: 340000, Saved journal.png.</span><span lang="ko">셸에서 헤더를 건너뛰고 shares × price를 더하면 Traded: 340000이다. 완성한 프로그램은 buy 6, sell 4, Traded: 340000, Saved journal.png를 출력해야 한다.</span></p>
-        </li>
-      </ol>
-      <p class="callout"><span lang="en">pandas, matplotlib and Flask are downloaded the first time they are used, and loading them inside the emulator takes 10–30 seconds. Wait until the prompt comes back.</span><span lang="ko">pandas·matplotlib·Flask는 처음 쓸 때 필요한 파일을 내려받고, 에뮬레이터 안에서 불러오는 데 10~30초가 걸립니다. 프롬프트가 다시 나올 때까지 기다리세요.</span></p>
-    </aside>
-  </main>
-  <section class="sources">
-    <h2><span lang="en">Source</span><span lang="ko">소스</span></h2>
-    <details class="source" open>
-      <summary>journal_chart.py <span class="muted"><span lang="en">12 lines</span><span lang="ko">12줄</span></span></summary>
-      <pre class="code"><code><span class="ln">&quot;&quot;&quot;Lab 3 (take-home): chart the trade journal.</span>
-<span class="ln">Tests: buy 6 / sell 4 / Traded: 340000 /</span>
-<span class="ln">Saved journal.png. trades.csv sits beside this file.</span>
-<span class="ln">&quot;&quot;&quot;</span>
-<span class="ln">import pandas as pd</span>
-<span class="ln">import matplotlib.pyplot as plt</span>
-<span class="ln"> </span>
-<span class="ln">log = pd.read_csv(&quot;trades.csv&quot;)</span>
-<span class="ln"># TODO: count the actions with value_counts,</span>
-<span class="ln"># chart the counts as a titled bar chart saved as</span>
-<span class="ln"># journal.png, and print both counts, the total</span>
-<span class="ln"># traded (shares * price) and the saved name.</span></code></pre>
-    </details>
-    <details class="source">
-      <summary>trades.csv <span class="muted"><span lang="en">11 lines</span><span lang="ko">11줄</span></span></summary>
-      <pre class="code"><code><span class="ln">date,ticker,action,shares,price</span>
-<span class="ln">2026-03-02,TEA,buy,10,5000</span>
-<span class="ln">2026-03-02,MLBK,buy,10,2000</span>
-<span class="ln">2026-03-03,CODE,sell,3,10000</span>
-<span class="ln">2026-03-03,MLBK,buy,20,2000</span>
-<span class="ln">2026-03-04,CODE,sell,3,10000</span>
-<span class="ln">2026-03-04,CODE,buy,2,10000</span>
-<span class="ln">2026-03-05,TEA,buy,10,5000</span>
-<span class="ln">2026-03-05,CODE,sell,3,10000</span>
-<span class="ln">2026-03-06,CODE,sell,3,10000</span>
-<span class="ln">2026-03-06,MLBK,buy,20,2000</span></code></pre>
-    </details>
-  </section>
-  <nav class="pager">
-    <a href="year_report.html">← year_report</a>
-    <a href="make_prices_2026.html">make_prices_2026 →</a>
-  </nav>
-  <script src="../../js/lab.js"></script>
-</body>
+<body><p><a href="../week06/index.html#ex=journal_chart">../week06/index.html#ex=journal_chart</a></p></body>
 </html>
